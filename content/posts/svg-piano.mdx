@@ -202,8 +202,9 @@ export default function Keyboard({ options, onClick, onAttack, onRelease }) {
 Using [Tone.js](https://tonejs.github.io/), we now can make the keys playable:
 
 import { Synth, PolySynth } from "tone"
-const synth = new Synth({ volume: -12 }).toMaster()
-const poly = new PolySynth(6, Synth, { volume: -12 }).toMaster()
+const isBrowser = typeof window !== "undefined"
+const synth = isBrowser && new Synth({ volume: -12 }).toMaster()
+const poly = isBrowser && new PolySynth(6, Synth, { volume: -12 }).toMaster()
 
 ```jsx
 
@@ -212,15 +213,15 @@ const synth = new Synth({ volume: -6 }).toMaster()
 
 <Keyboard
   options={{range: ["C3", "C5"]}}
-  onAttack={key => synth.triggerAttack(key.notes[0])}
-  onRelease={key => synth.triggerRelease([key.notes[0]])}
+  onAttack={key => synth?.triggerAttack(key.notes[0])}
+  onRelease={key => synth?.triggerRelease([key.notes[0]])}
 />
 ```
 
 <Keyboard
   options={{ range: ["C3", "C5"] }}
-  onAttack={key => synth.triggerAttack(key.notes[0])}
-  onRelease={key => synth.triggerRelease([key.notes[0]])}
+  onAttack={key => synth?.triggerAttack(key.notes[0])}
+  onRelease={key => synth?.triggerRelease([key.notes[0]])}
 />
 
 ---
@@ -262,8 +263,8 @@ in action:
 
 ```jsx
 <Keyboard
-  onAttack={key => poly.triggerAttack(key.notes[0])}
-  onRelease={key => poly.triggerRelease([key.notes[0]])}
+  onAttack={key => poly?.triggerAttack(key.notes[0])}
+  onRelease={key => poly?.triggerRelease([key.notes[0]])}
   keyControl={{
     a: "C3",
     w: "C#3",
@@ -309,8 +310,8 @@ ffef a afuhf
 ```
 
 <Keyboard
-  onAttack={key => poly.triggerAttack(key.notes[0])}
-  onRelease={key => poly.triggerRelease([key.notes[0]])}
+  onAttack={key => poly?.triggerAttack(key.notes[0])}
+  onRelease={key => poly?.triggerRelease([key.notes[0]])}
   keyControl={{
     a: "C3",
     w: "C#3",
