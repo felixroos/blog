@@ -11,7 +11,7 @@ export default function NoteSelect({ onChange, value }) {
     ...Note.names().map(n => n + "#"),
   ].sort()
   return (
-    <select value={value} onBlur={handleChange}>
+    <select value={value} onChange={handleChange}>
       {notes.map((note, index) => (
         <option key={index}>{note}</option>
       ))}

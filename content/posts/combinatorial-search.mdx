@@ -1,0 +1,567 @@
+---
+title: Combinatorial Search
+date: 2020-03-31
+---
+
+import { Urn, Permutation } from "../components/combinatorial-search/Urn"
+
+import { Analyzer } from "../components/combinatorial-search/Analyzer"
+
+This article explains a recursive algorithm that performs a combinatorial search.
+The concept will be used in a future post to find all possible piano voicings for a given chord.
+We will walk through the concepts with this urn demo:
+
+<Analyzer
+  render={({ start, stop, analyze }) => (
+    <Urn
+      balls={3}
+      minItems={2}
+      maxItems={5}
+      samples={3}
+      uniqueItems={true}
+      hideCombinations={false}
+      canEditSamples={true}
+      canEditOrder={true}
+      canEditUnique={true}
+      picker={(items, number = items.length, strictOrder, unique) => {
+        start()
+        const results = Permutation.search(
+          (collected, solutions) =>
+            analyze(
+              collected,
+              collected.length >= number
+                ? []
+                : unique
+                ? items.filter(
+                    ball =>
+                      !collected.includes(ball) &&
+                      (strictOrder ||
+                        !solutions.find(solution =>
+                          Permutation.isEqual([...collected, ball], solution)
+                        ))
+                  )
+                : items
+            ),
+          (collected, solutions) =>
+            collected.length === number &&
+            (strictOrder ||
+              !solutions.find(solution =>
+                Permutation.isEqual(collected, solution)
+              ))
+        )
+        stop()
+        return results
+      }}
+    />
+  )}
+/>
+
+## The algorithm
+
+The following algorithm can be used to generate permutations of any kind:
+
+```ts
+class Permutation {
+  static search<T>(
+    finder: (path: T[], solutions: T[][]) => T[],
+    validator: (path: T[], solutions: T[][]) => boolean,
+    concatFn = (_path: T[], _candidate: T): T[] => [..._path, _candidate],
+    path: T[] = [],
+    solutions: T[][] = []
+  ): T[][] {
+    // get candidates for current path
+    const candidates = finder(path, solutions)
+    // runs current path through validator to either get a new solution or nothing
+    if (validator(path, solutions)) {
+      solutions.push(path)
+    }
+    // if no candidates found, we cannot go deeper => either solution or dead end
+    if (!candidates.length) {
+      return solutions
+    }
+    // go deeper
+    return candidates.reduce(
+      (_, candidate) =>
+        Permutation.search(
+          finder,
+          validator,
+          concatFn,
+          concatFn(path, candidate),
+          solutions
+        ),
+      []
+    )
+  }
+}
+```
+
+The basic three steps are:
+
+1. call the finder to get possible candidates based on the current path and solutions.
+2. validate current path, and if valid, add to solutions
+3. if no more candidates => done, if more candidates => repeat
+
+## Classic Combinatorics: Urn model
+
+Let's implement the classic combinatoric urn model with it.
+
+### Basic Urn Implementation
+
+```js
+function urn(items) {
+  return Permutation.search(
+    // all balls that are not yet collected, are available => unique
+    collected => items.filter(ball => !collected.includes(ball)),
+    // all collections that have the length of the items are valid => pull till empty
+    collected => collected.length === items.length
+  )
+}
+```
+
+Here, we pass two functions:
+
+- The first function returns a set of items we can pull at a given state. In this case, we return all items that have not been collected yet
+- The second function returns a validation function for a given collection to be accepted as "solution". In this case, we only accept collections of the items length
+
+The functions in this case lead to:
+
+- Order is important
+- Balls can be pulled once
+- We pull till its "empty"
+
+<Urn
+  minItems={2}
+  maxItems={5}
+  balls={3}
+  picker={items =>
+    Permutation.search(
+      collected => items.filter(ball => !collected.includes(ball)),
+      collected => collected.length === items.length
+    )
+  }
+/>
+
+### Extension 1: pull sample
+
+We can extend the implementation by passing a number of balls that should be pulled:
+
+```js
+function urn(items, number = items.length) {
+  return Permutation.search(
+    collected => items.filter(ball => !collected.includes(ball)),
+    collected => collected.length === number
+  )
+}
+```
+
+This is like pulling Lotto numbers:
+
+- Order is important
+- Each ball is unique (only one can be pulled)
+- pulling only a subset (e.g. 6 of 49)
+
+<Urn
+  minItems={2}
+  maxItems={5}
+  samples={2}
+  balls={3}
+  canEditSamples={true}
+  picker={(items, number = items.length) =>
+    Permutation.search(
+      collected =>
+        collected.length >= number
+          ? []
+          : items.filter(ball => !collected.includes(ball)),
+      collected => collected.length === number
+    )
+  }
+/>
+
+The above implementation works, but has a performance flaw: The first function does not include the sample so it will always run till the end, despite the fact that it won't find new valid combinations. Fix:
+
+```js
+function urn(items, number = items.length) {
+  return Permutation.search(
+    collected =>
+      collected.length >= number
+        ? []
+        : items.filter(ball => !collected.includes(ball)),
+    collected => collected.length === number
+  )
+}
+```
+
+Returning an empty array means, we have no candidates that could be added => recursion stops.
+
+### Extension 2: ignore order
+
+We could also ignore the order of items:
+
+```js
+function isEqual(collectionA, collectionB) {
+  return collectionA.sort().join("-") === collectionB.sort().join("-")
+}
+
+function urn(items, number = items.length, strictOrder = true) {
+  return Permutation.search(
+    collected =>
+      collected.length >= number
+        ? []
+        : items.filter(ball => !collected.includes(ball)),
+    (collected, solutions) =>
+      collected.length === number &&
+      (strictOrder ||
+        !solutions.find(solution => Permutation.isEqual(collected, solution)))
+  )
+}
+```
+
+Note: This implementation of isEqual only works with strings.
+
+A real world usage would be pulling a hand in a card game:
+
+- Order is not important
+- Each card is unique
+- Pulling only a subset of the deck
+
+<Urn
+  balls={3}
+  minItems={2}
+  maxItems={6}
+  samples={2}
+  canEditSamples={true}
+  canEditOrder={true}
+  ignoreOrder={true}
+  picker={(items, number = items.length, strictOrder) =>
+    Permutation.search(
+      collected =>
+        collected.length >= number
+          ? []
+          : items.filter(ball => !collected.includes(ball)),
+      (collected, solutions) =>
+        collected.length === number &&
+        (strictOrder ||
+          !solutions.find(solution => Permutation.isEqual(collected, solution)))
+    )
+  }
+/>
+
+### Extension 3: Balls can be pulled multiple times:
+
+Lets add a flag called _unique_. If we switch it to false, a ball can be picked multiple times.
+
+A good mental model for this is a combination lock:
+
+- Order is important
+- Each number can be used multiple times
+- The amount of picks is not related to the amount of available numbers
+
+Another mental model for this without ordering is throwing multiple dice:
+
+- Order is not important
+- Each number can be used multiple times
+- We throw how many dices we want
+
+<Urn
+  balls={2}
+  minItems={2}
+  maxItems={5}
+  samples={4}
+  uniqueItems={false}
+  canEditSamples={true}
+  canEditOrder={true}
+  canEditUnique={true}
+  picker={(items, number = items.length, strictOrder, unique) =>
+    Permutation.search(
+      collected =>
+        collected.length >= number
+          ? []
+          : unique
+          ? items.filter(ball => !collected.includes(ball))
+          : items,
+      (collected, solutions) =>
+        collected.length === number &&
+        (strictOrder ||
+          !solutions.find(solution => Permutation.isEqual(collected, solution)))
+    )
+  }
+/>
+
+```js
+function urn(
+  items,
+  number = items.length,
+  strictOrder = true,
+  unique = true
+) {
+  return Permutation.search(
+    collected =>
+      collected.length >= number
+        ? []
+        : unique
+        ? items.filter(ball => !collected.includes(ball)),
+        : items
+    (collected, solutions) =>
+      collected.length === number &&
+      (strictOrder ||
+        !solutions.find(solution => Permutation.isEqual(collected, solution)))
+  );
+}
+```
+
+## Abstraction Optimization
+
+The final urn method is pretty heavy to read. Lets encapsulate the logic in seperate methods:
+
+### unique
+
+```js
+function unique() {
+  return (collected, next) => !collected.includes(next)
+}
+```
+
+used in the original urn method:
+
+```js
+function urn(items) {
+  return Permutation.search(
+    collected => items.filter(ball => unique()(collected, ball)),
+    collected => collected.length === items.length
+  )
+}
+```
+
+the double call might seem irritating, but we'll get to that later.
+
+### sample
+
+```js
+function sample(n) {
+  return collected => collected.length === n
+}
+```
+
+usage:
+
+```js
+function urn(items, number = items.length) {
+  return Permutation.search(
+    collected =>
+      collected.length >= number
+        ? []
+        : items.filter(ball => unique()(collected, ball)),
+    sample(number)
+  )
+}
+```
+
+### strictOrder
+
+lets wrap the ordering rule to a seperate method:
+
+```js
+function strictOrder(active = true, equalityFn = Permutation.isEqual) {
+  return (path, solutions) =>
+    active || !solutions.find(solution => equalityFn(path, solution))
+}
+```
+
+```js
+function isEqual(collectionA, collectionB) {
+  return collectionA.sort().join("-") === collectionB.sort().join("-")
+}
+
+function urn(items, number = items.length, strictOrder = true) {
+  return Permutation.search(
+    collected =>
+      collected.length >= number
+        ? []
+        : items.filter(ball => unique()(collected, ball)),
+    (collected, solutions) =>
+      sample(number)(collected) &&
+      strictOrder(strictOrder, isEqual)(collected, solutions)
+  )
+}
+```
+
+### with unique flag
+
+For now, we will not abstract the unique flag. The final method looks like this:
+
+```js
+function urn(
+  items,
+  number = items.length,
+  strictOrder = true,
+  unique = true
+) {
+  return Permutation.search(
+    collected =>
+      collected.length >= number
+        ? []
+        : unique
+        ? items.filter(ball => unique()(collected, ball)),
+        : items
+    (collected, solutions) =>
+      sample(number)(collected) &&
+      strictOrder(strictOrder, isEqual)(collected, solutions)
+  );
+}
+```
+
+Compared to the version without encapsulation, this is pretty readable. But what's still not perfect is the double function calls, which we can unify:
+
+### validate Helper
+
+This method is useful to fuse existing boolean emitting methods together:
+
+```ts
+function validate(filters: ((...args) => boolean)[]) {
+  return (...args) =>
+    filters.reduce((result, filter) => result && filter(...args), true)
+}
+```
+
+Usage for combining filters:
+
+```js
+const names = ["Clementine", "Max", "Camilla", "Tom", "Cleo"]
+function min(characters) {
+  return name => name.length >= characters
+}
+function startsWith(character) {
+  return name => name[0] === character
+}
+const longNamesWithC = names.filter(validate([min(5), startsWith("C")]))
+expect(longNamesWithC).toEqual(["Clementine", "Camilla"])
+```
+
+#### usage in urn function
+
+```js
+function urn(
+  items,
+  number = items.length,
+  strictOrder = true,
+  unique = true
+) {
+  return Permutation.search(
+    collected =>
+      collected.length >= number
+        ? []
+        : unique
+        ? items.filter(ball => unique()(collected, ball)),
+        : items
+    validate([sample(number), strictOrder(strictOrder, isEqual)])
+  );
+}
+```
+
+the second function argument is now pretty slick, and could easily be extended.
+
+### collect Helper
+
+In our urn function, the first method is still pretty cluttered with logic. It would be easier to pass an a set of rules that should be applied. This is where the collect function comes in:
+
+```js
+function collect<T>(
+  items,
+  collectors: ((items: T[]) => (collected, solutions) => T[])[]
+) {
+  return (collected, solutions) => {
+    return collectors.reduce(
+      (filtered, collector) => collector(filtered)(collected, solutions),
+      items
+    )
+  }
+}
+```
+
+If you still don't understand what it does, no worries, first check out the example collectors:
+
+```js
+function maxItems(n) {
+  return items => (collected, solutions) => {
+    n = n || items.length
+    return collected.length >= n ? [] : items
+  }
+}
+
+function unique(active = true) {
+  items => (collected, solutions) => {
+    return active ? items.filter(item => !collected.includes(item)) : items
+  }
+}
+```
+
+- maxItems: Returns an empty array as soon as the collected length reaches the max
+- unique: Returns only the items that have not been picked yet (if active)
+
+... and the usage in our urn function
+
+```js
+function urn(items, number = items.length, strictOrder = true, unique = true) {
+  return Permutation.search(
+    collect(items, [maxItems(number), unique(unique)]),
+    validate([sample(number), strictOrder(strictOrder)])
+  )
+}
+```
+
+Now we have a pretty high level functional thing going on...
+
+## Final Thoughts
+
+Now we should have a clear understanding of how to perform combinatorial search with a functional approach. 
+In the next post(s), we will use that knowledge to generate voicings, melodies and rhythms!
+
+<!-- ## Using the urn model in the "real" world
+
+Let's play lotto:
+
+```js
+const lottoNumbers = Array(49)
+  .fill(0)
+  .map((_, i) => i + 1)
+urn(lottoNumbers, 6)
+// DONT run that
+```
+
+If we would run the above snippet, your pc could melt... Lets limit the solutions first:
+
+```ts
+function maxSolutions(number) {
+  return items => (collected, solutions) => {
+    return number !== undefined && solutions.length >= number ? [] : items
+  }
+}
+
+function urn(
+  items,
+  number = items.length,
+  strictOrder = true,
+  unique = true,
+  maxSolutions?
+) {
+  return Permutation.search(
+    collect(items, [
+      maxSolutions(maxSolutions),
+      maxItems(number),
+      unique(unique),
+    ]),
+    validate([sample(number), strictOrder(strictOrder)])
+  )
+}
+```
+
+Now:
+
+```js
+const lottoNumbers = Array(49)
+  .fill(0)
+  .map((_, i) => i + 1)
+urn(lottoNumbers, 6, true, true, 1)
+```
+
+will stop after finding the first solution which is 1, 2, 3, 4, 5, 6. We could now add random sorting -->
