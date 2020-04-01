@@ -1,42 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { CirclePicker } from "react-color"
-
-export class Permutation {
-  static isEqual(collectionA, collectionB) {
-    return collectionA.sort().join("-") === collectionB.sort().join("-")
-  }
-  static search( // <T>
-    finder, //: (path: T[], solutions: T[][]) => T[],
-    validator, //: (path: T[], solutions: T[][]) => boolean,
-    concatFn = (path, candidate) => [...path, candidate], // = (_path: T[], _candidate: T): T[] => [..._path, _candidate],
-    path /* : T[] */ = [],
-    solutions /* : T[][] */ = []
-  ) /* : T[][] */ {
-    // get candidates for current path
-    const candidates = finder(path, solutions)
-
-    // runs current path through validator to either get a new solution or nothing
-    if (validator(path, solutions)) {
-      solutions.push(path)
-    }
-    // if no candidates found, we cannot go deeper => either solution or dead end
-    if (!candidates.length) {
-      return solutions
-    }
-    // go deeper
-    return candidates.reduce(
-      (_, candidate) =>
-        Permutation.search(
-          finder,
-          validator,
-          concatFn,
-          concatFn(path, candidate),
-          solutions
-        ),
-      []
-    )
-  }
-}
+export { Permutation } from "./Permutation"
 
 export function Urn({
   maxItems,
@@ -59,7 +23,7 @@ export function Urn({
 
   const [size, setSize] = useState(samples)
   const [max, setMax] = useState(size)
-  const nonUniqueMax = 8; 
+  const nonUniqueMax = 8
 
   const scheme = [
     "#f44336",
@@ -83,7 +47,7 @@ export function Urn({
     "#9c27b0",
   ]
   const [colors, setColors] = useState(scheme.slice(0, balls))
-  const [activeIndex, setActiveIndex] = useState()
+  const [activeIndex, setActiveIndex] = useState(-1)
   const [strictOrder, setStrictOrder] = useState(!ignoreOrder)
   const [unique, setUnique] = useState(
     uniqueItems !== undefined ? uniqueItems : true
@@ -91,10 +55,10 @@ export function Urn({
 
   useEffect(() => {
     const isBrowser = typeof window !== "undefined"
-    const listener =
+    const listener: any =
       isBrowser &&
       window.addEventListener("click", () => {
-        setActiveIndex(undefined)
+        setActiveIndex(-1)
       })
     return () => isBrowser && window.removeEventListener("click", listener)
   }, [])
@@ -141,7 +105,7 @@ export function Urn({
           text="+"
         />
       )}
-      {activeIndex !== undefined && (
+      {activeIndex !== -1 && (
         <CirclePicker
           color={colors[activeIndex]}
           onChangeComplete={newColor => {
@@ -228,7 +192,7 @@ export function Urn({
   )
 }
 
-function Ball({ color, onClick, active, text }) {
+function Ball({ color, onClick, active, text }: any) {
   const padding = 2
   const size = 40
   const dimension = size + padding * 2
@@ -264,7 +228,7 @@ function Ball({ color, onClick, active, text }) {
     </>
   )
 }
-function Combination({ colors, onBallClick, activeIndex }) {
+function Combination({ colors, onBallClick, activeIndex }: any) {
   return colors.map((color, c) => (
     <Ball
       active={activeIndex === c}

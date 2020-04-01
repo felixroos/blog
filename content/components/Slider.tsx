@@ -7,7 +7,7 @@ export default function Slider({ value, min, max }) {
     <input
       type="range"
       value={((state - min) / diff) * 100}
-      onChange={e => setState((e.target.value / 100) * diff + min)}
+      onChange={e => setState((parseInt(e.target.value) / 100) * diff + min)}
     />
   )
 }

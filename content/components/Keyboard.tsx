@@ -9,7 +9,7 @@ export default function Keyboard({
   onAttack,
   onRelease,
   keyControl,
-}) {
+}: any) {
   const active = useRef([])
   const [colorized, setColorized] = useState([])
   useKeyEvents({

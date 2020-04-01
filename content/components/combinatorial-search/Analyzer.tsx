@@ -38,8 +38,8 @@ export function insertChildren(tree, path, children) {
 }
 
 export function Analyzer({ render }) {
-  const tree = { children: [], executions: 0 }
-  const [result, setResult] = useState()
+  const tree: any = { children: [], executions: 0 }
+  const [result, setResult] = useState<any>()
   const rendered = useMemo(
     () =>
       render({
@@ -55,7 +55,7 @@ export function Analyzer({ render }) {
           return available
         },
       }),
-    [/* tree,  */render]
+    [/* tree,  */ render]
   )
   return (
     <>
@@ -63,7 +63,7 @@ export function Analyzer({ render }) {
 
       {result && (
         <div>
-          <p>Permutation Graph ({result.executions} nodes)</p>
+          <p>Permutation Graph ({result?.executions} nodes)</p>
           <MyTree data={result} />
         </div>
       )}

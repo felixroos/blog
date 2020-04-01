@@ -1,8 +1,11 @@
 import React, { useState } from "react"
-import Keyboard from "../components/Keyboard"
-import Slider from "../components/Slider"
+import Keyboard from "./Keyboard"
+import Slider from "./Slider"
 
-import { Synth } from "tone"
+import * as Tone from "tone"
+
+const { Synth } = Tone
+
 const synth = new Synth({ volume: -6 }).toMaster()
 
 export default function Keyboards() {

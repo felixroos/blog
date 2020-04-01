@@ -4,7 +4,9 @@ import Keyboard from "./Keyboard"
 import { Note } from "@tonaljs/tonal"
 import { ChordType } from "@tonaljs/tonal"
 import { useMouseDrag } from "./useMouseDrag"
-import { PolySynth, Synth } from "tone"
+import * as Tone from "tone"
+
+const { PolySynth, Synth } = Tone
 
 const allNotes = [
   ...Note.names(),

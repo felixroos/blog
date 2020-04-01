@@ -15,21 +15,21 @@ export function useMouseDrag({ activate, deactivate }) {
 
   const [mouseDown, setMouseDown] = useState(false)
 
-  function handleMouseDown() {
+  function handleMouseDown(...args: any[]) {
     setMouseDown(true)
-    activate(...arguments)
+    activate(...args)
   }
-  function handleMouseEnter() {
+  function handleMouseEnter(...args: any[]) {
     if (mouseDown) {
-      activate(...arguments)
+      activate(...args)
     }
   }
-  function handleMouseUp() {
-    deactivate(...arguments)
+  function handleMouseUp(...args: any[]) {
+    deactivate(...args)
   }
-  function handleMouseLeave() {
+  function handleMouseLeave(...args: any[]) {
     if (mouseDown) {
-      deactivate(...arguments)
+      deactivate(...args)
     }
   }
   return {

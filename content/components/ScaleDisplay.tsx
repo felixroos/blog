@@ -1,15 +1,12 @@
 import React, { useState, useMemo } from "react"
-import {
-  Scale,
-  Interval,
-  RomanNumeral,
-  Range,
-} from "@tonaljs/tonal"
+import { Scale, Interval, RomanNumeral, Range } from "@tonaljs/tonal"
 
 import Keyboard from "./Keyboard"
 import { Note } from "@tonaljs/tonal"
-import { PolySynth, Synth } from "tone"
 
+import * as Tone from "tone"
+
+const { PolySynth, Synth } = Tone
 const allNotes = [
   ...Note.names(),
   ...Note.names().map(n => n + "b"),
