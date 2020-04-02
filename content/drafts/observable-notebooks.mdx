@@ -1,0 +1,58 @@
+---
+title: Importing Observable Notebooks in MDX
+date: 2020-04-01
+---
+
+Thanks to
+
+- https://observablehq.com/@observablehq/downloading-and-embedding-notebooks
+- https://observablehq.com/@observablehq/how-to-embed-a-notebook-in-a-react-app
+- https://www.serendipidata.com/posts/observablehq-in-markdown-with-gatsby
+
+I found a way to import Observable notebooks into mdx. Some things are still not perfect:
+
+- es6 imports dont work with gatsby
+  - cannot import notebook directly / dynamically
+  - even when installing notebooks statically, referenced es6 modules still wont work
+- no code editor
+
+1. add ObservableNotebook.js component
+
+```jsx
+import React, { useRef, useEffect } from "react"
+import { Runtime, Inspector } from "@observablehq/runtime"
+
+export default function ObservableNotebook({ notebook }) {
+  const container = useRef()
+  useEffect(() => {
+    if (!container.current || !notebook) {
+      return
+    }
+    container.current.innerHTML = ""
+    Runtime.load(notebook, Inspector.into(container.current))
+  }, [notebook])
+  return <div ref={container}></div>
+}
+```
+
+2. install notebook
+
+```sh
+yarn add https://api.observablehq.com/@hydrosquall/breathing-cube-in-p5-js.tgz
+```
+
+3. load it
+
+```md
+import notebook from "breathing-cube-in-p5-js"
+import ObservableNotebook from "../components/ObservableNotebook"
+
+<ObservableNotebook notebook={notebook} />
+```
+
+4. Voir la:
+
+import notebook from "breathing-cube-in-p5-js"
+import ObservableNotebook from "../components/ObservableNotebook"
+
+<ObservableNotebook notebook={notebook} />
