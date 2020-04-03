@@ -4,10 +4,11 @@ date: 2020-04-01
 ---
 
 import { TinyColor } from "@ctrl/tinycolor"
-import { ColorKeyboard } from "../components/coloring-pitches/ColorKeyboard"
-import { noteColor, noteLightness, rainbow, sinebow } from "../components/coloring-pitches/noteColor"
+import { ColorKeyboard } from "../components/coloring-pitches/ColorKeyboard.tsx"
+import { noteColor, noteLightness, rainbow, sinebow } from "../components/coloring-pitches/noteColor.ts"
 
-<ColorKeyboard options={{ scaleX: 0.5, scaleY: 0.5, range: ["C0", "C8"] }} colorizer={rainbow} />
+<ColorKeyboard options={{ scaleX: 0.5, scaleY: 0.5, range: ["C0", "C7"] }} 
+colorizer={note=>sinebow(note).desaturate(20).toHex()} />
 
 Let's play with colors. Vizualization loves color. To map musical notes to color, we can do various things.
 
