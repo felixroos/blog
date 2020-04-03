@@ -3,12 +3,11 @@
 - This file documents my process of finding the idea of the [extended rhythmical format](https://felixroos.github.io/rhythmical/).
 - Up to this point I had already implemented the [basis of rhythmical](https://github.com/felixroos/rhythmical), which is the nested array syntax (similar to tidalcycles), but I had not found a solution for polyphony, other than [writing multiple Tone.js schedulers](https://github.com/felixroos/rhythmical#polyrythms).
 - I found inspiration after reading through [this issue](https://github.com/soundio/music-json/issues/2) and by reading through "Lisp as a second language", which implements the idea of parallel and sequential musical structures in nested lists
-- I tried to search for a way of combining the nested array notation with the parallel and sequential using json format
+- I tried to search for a way of combining the nested array notation with the parallel and sequential approach, using json format
 - Though it might look like it, I did not intend to write a teardown of the [musicJSON proposal](https://github.com/soundio/music-json), it just acted as a starting point that got me puzzled, trying to find a better solution
 - The format proposed in musicJSON is perfectly fine for many use cases (as it is essentially midi with meta data in json), I just don't think it is a format that expresses music in a musical way, being only suitable to be processed by machines rather by humans
 - If you have questions, arguments, ideas or similar, you leave me a message [at github](https://github.com/felixroos/)
-- UPDATE: [I have implemented the format with many additions](https://felixroos.github.io/rhythmical/)
-
+- [I have implemented the format with many additions](https://felixroos.github.io/rhythmical/)
 
 ## [original musicJSON proposal](https://github.com/soundio/music-json#music-json-proposal)
 
@@ -34,7 +33,7 @@
 
 # ideas for optimization
 
-## 1. use object syntax for being independent of param ordering:
+## idea 1: use object syntax for being independent of param ordering:
 
 ```json
 [
@@ -414,7 +413,7 @@ Now lets think through how this would be converted to absolute, non nested event
 
 Lets imagine how the algorithm would resolve this nested structure. Note that the following process will not be the end algorithm but just an illustration of how it might work.
 
-The type now affects how the value children are given their default values. On the outer most event, relative times are calculated.
+The type now affects how children are given their default values. On the outer most event, relative times are calculated.
 
 ```js
 const peeled = [
@@ -453,7 +452,7 @@ const peeled = [
 ]
 ```
 
-Now having absolute times on the first and second layer, we can multiply the outer duration with all inner durations and times (nothing spectacular happens as all durations are 1). This way we can remove the outer layer as it is now represented in the second level:
+Now having absolute times on the first and second layer, we can multiply the outer duration with all inner durations and times (nothing spectacular happens as all durations are 1) and then add the times together. This way we can remove the outer layer as it is now represented in the second level:
 
 ```js
 const peeled = [ // layer 2
@@ -507,7 +506,7 @@ const peeled = [
 ]
 ```
 
-Now, again, we can combine the times and duration by multiplying:
+Now, again, we can combine the times and duration by multiplying durations and adding times together:
 
 ```js
 const peeled = [
@@ -524,9 +523,7 @@ const peeled = [
 ```
 
 Thats it! We have successfully turned the nested object into a single layer array with absolute events.
-This was just a non formal proof that this could be with an algorithm.
-
-Now that we have both relative and absolute object formats optimized, we could typescript interfaces for them
+This was just a non formal proof that this could be done with an algorithm.
 
 ### optimization 1: extra attributes to eliminate type
 
@@ -561,11 +558,11 @@ const after = [
 ]
 ```
 
-This is mucher slicker!
+This is much more compact and readable!
 
 #### Other possible wordings
 
-one good metaphor would be ic circuits, which work just like our timing system:
+one good metaphor would be electric circuits, which work just like our timing system:
 
 ```js
 const circuit = [
@@ -736,11 +733,11 @@ Note that we need to divide time and duration by the number of children in a gro
 We could arrange multiple tracks like that:
 
 ```js
-{
+const backbeat = {
   absolute: [
-    ["bd", "~", "bd", "~"],
-    ["hhhh", "hh", "hh", "hh", "hh", "hh", "hh"],
-    ["~", "snare", "~", "snare"],
+    ["bd", "~", "bd", "~"], //bassdrum
+    ["hh", "hh", "hh", "hh", "hh", "hh", "hh"], //hihat
+    ["~", "sd", "~", "sd"], //snaredrum
   ],
 }
 ```
