@@ -63,7 +63,7 @@ export function Analyzer({ render }) {
 
       {result && (
         <div>
-          <p>Permutation Graph ({result?.executions} nodes)</p>
+          <p>Permutation Graph ({!!result && result.executions} nodes)</p>
           <MyTree data={result} />
         </div>
       )}
