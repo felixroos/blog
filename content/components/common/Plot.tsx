@@ -1,6 +1,5 @@
 import React from "react"
 import { scaleLinear } from "d3-scale"
-import { extent } from "d3-array"
 
 export function PlotPath({ f }) {}
 
@@ -11,27 +10,26 @@ export function Plot({
   height,
   range,
   colors,
+  grid,
+  onHover,
+  onClick,
 }: any) {
   width = width || 600
   height = height || 600
   strokeWidth = strokeWidth || 1
   colors = colors || []
   functions = functions || []
-  const w = Math.min(600, width),
+  const w = width,
     h = height,
-    m = width > 599 ? 30 : 10
+    m = 10
+
   const x = scaleLinear()
       .domain(range.x)
-      .nice()
       .range([m, w - m]),
     y = scaleLinear()
       .domain(range.y)
-      .nice()
       .range([h - m, m])
-  /*   svg = d3.create("svg")
-      .attr("width", width + 20)
-      .attr("height", h + 20),
-    g = svg.append("g"), */
+      .nice()
 
   const lines = functions.map((f) => {
     const line = []
@@ -45,10 +43,51 @@ export function Plot({
   })
 
   return (
-    <svg width={width + 20} height={h + 20}>
+    <svg
+      width={w + m * 2}
+      height={h + m * 2}
+      onClick={(e) => onClick && onClick(e)}
+    >
+      {grid && grid.x && (
+        <g>
+          {Array.from(
+            { length: Math.floor((range.x[1] - range.x[0]) / grid.x) + 1 },
+            (_, i) => (
+              <line
+                key={`grid-x-${i}`}
+                x1={x(i * grid.x)}
+                x2={x(i * grid.x)}
+                y1={y(range.y[0])}
+                y2={y(range.y[1])}
+                stroke="gray"
+                strokeWidth={1}
+              />
+            )
+          )}
+        </g>
+      )}
+      {grid && grid.y && (
+        <g>
+          {Array.from(
+            { length: Math.floor((range.y[1] - range.y[0]) / grid.y) + 1 },
+            (_, i) => (
+              <line
+                key={`grid-y-${i}`}
+                x1={x(range.x[0])}
+                x2={x(range.x[1])}
+                y1={y(range.y[0] + i * grid.y)}
+                y2={y(range.y[0] + i * grid.y)}
+                stroke="gray"
+                strokeWidth={1}
+              />
+            )
+          )}
+        </g>
+      )}
       <g>
         {lines.map((line, i) => (
           <path
+            onMouseEnter={() => onHover && onHover(i)}
             key={i}
             d={"M" + line.join("L")}
             stroke={colors[i] || "black"}

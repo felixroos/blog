@@ -32,6 +32,7 @@ import { Lambdoma } from "../components/tuning/Lambdoma.tsx"
 import { LambdomaSettings } from "../components/tuning/LambdomaSettings.tsx"
 import { Demo } from "../components/tuning/Demo.tsx"
 import { LambdomaFloats } from "../components/tuning/LambdomaFloats.tsx"
+import { Harmonics } from "../components/tuning/Harmonics.tsx"
 
 import { FrequencyPlot } from "../components/tuning/FrequencyPlot.tsx"
 import { FrequencyPlotSettings } from "../components/tuning/FrequencyPlotSettings.tsx"
@@ -71,19 +72,12 @@ There are three basic units to talk about:
 Lets take this string:
 
 <FrequencyPlot
-  height={50}
-  frequencies={[[0.5, 0, 0]]}
-  addSum={false}
-  colors={["green"]}
-/>
-
-If we pluck it, the exact moment we let it go will look like this:
-
-<FrequencyPlot
   height={150}
-  frequencies={[[0.5, 2, 0]]}
+  frequencies={[[1, 1, 0]]}
   addSum={false}
   colors={["green"]}
+  autostartAnimation={true}
+  animationSpeed={1 / 500}
 />
 
 Physically spoken, this is the point of maximal **potential energy**, and no **kinetic energy**.
@@ -91,7 +85,7 @@ It will now start accelerating down, reaching full kinetic energy here:
 
 <FrequencyPlot
   height={50}
-  frequencies={[[0.5, 0, 0]]}
+  frequencies={[[1, 0, 0]]}
   addSum={false}
   colors={["green"]}
 />
@@ -100,7 +94,7 @@ After this point, the kinetic energy will decrease again, and the potential ener
 
 <FrequencyPlot
   height={150}
-  frequencies={[[0.5, -2, 0]]}
+  frequencies={[[1, -1, 0]]}
   addSum={false}
   colors={["green"]}
 />
@@ -123,10 +117,10 @@ Lets say this is the string elongation (y axis) over the time period of 100 seco
 <FrequencyPlot
   height={150}
   frequencies={[
-    [0.5, 2, 0],
-    [0.5, 1, 0],
-    [0.5, 0, 0],
-    [1, 2, 0],
+    [1, 1, 0],
+    [1, 0.5, 0],
+    [1, 0, 0],
+    [2, 1, 0],
   ]}
   colors={["green", "red", "blue", "yellow"]}
   addSum={false}
@@ -146,52 +140,19 @@ It depends on the material which frequencies are heard, but there is also a simp
 
 ## Overtones
 
-Above the **fundamental frequency**, additional higher frequencies will occur simultaneously.
+Above the **fundamental frequency**, additional higher frequencies can occur simultaneously.
 These higher frequencies are called **overtones**.
-Strings and other so called standing waves (like created in air tubes) create a specific set of overtones called **harmonics**:
+Strings and other so called standing waves (like created in air tubes) create a specific set of overtones called **the Harmonic Series**:
 
-### Harmonics
+### The Harmonic Series
 
-Harmonics are overtones that multiply the fundamental frequency by natural numbers:
+The Harmonic Series is a set of overtones that multiply the fundamental frequency by natural numbers:
 
-<State initial={{ partials: 5, damp: 100 }}>
-  {({ state, setState }) => {
-    const frequencies = Array.from({ length: state.partials }, (_, i) => [
-      (i + 1) * 0.5,
-      Math.min(1 / (((i + 1) * state.damp) / 100), 1),
-      1,
-    ])
-    return (
-      <>
-        <FrequencyPlot height={300} frequencies={frequencies} addSum={false} />
-        <Grid container>
-          <Grid item xs={3}>
-            <Typography>
-              {state.partials} partial{state.partials !== 1 ? "s" : ""}
-            </Typography>
-          </Grid>
-          <Grid item xs>
-            <Slider
-              min={1}
-              max={8}
-              value={state.partials}
-              onChange={(_, partials) => setState({ partials })}
-            />
-          </Grid>
-        </Grid>
-        <p>If we draw the above frequencies as lines, it looks like this:</p>
-        <Strings
-          frequencies={frequencies.map(([f]) => f * 2 * Note.freq("C2"))}
-          labels={frequencies.map((_, i) => i + 1)}
-          amplitudes={frequencies.map(([f, a], i) => a)}
-        />
-      </>
-    )
-  }}
+<State initial={{ partials: 5, damp: 75, speed: 50 }}>
+  {({ state, setState }) => <Harmonics state={state} setState={setState} />}
 </State>
 
-The x position shows the frequency while the length is the string length.
-The length also depicts the amplitude, which is dampened for higher frequencies.
+The x position shows the frequency while the length is the amplitude, which is dampened for higher frequencies.
 This is also mostly the case on real objects.
 
 ## Harmonic Ratios
@@ -226,13 +187,14 @@ In mathematical terms, we could say that all frequencies produced by `m*2^n` sha
     return (
       <>
         <PitchClasses
+          base={base}
           strokeWidth={4}
           frequencies={partials([1, state.partials], base)}
         />
         <label>
           <Slider
             min={2}
-            max={32}
+            max={12}
             value={state.partials}
             onChange={(e, partials) => setState({ partials })}
           />
@@ -291,8 +253,6 @@ This major triad feels a little too low for a person that is accustomed to the e
 - 5:7 = tritone
 
 ## Old chinese tuning system
-
-
 
 We can now construct tuning systems by stacking intervals. One of the oldest and simplest tuning systems is [the pythagorean tuning](https://en.wikipedia.org/wiki/Pythagorean_tuning).
 It works by stacking fifths, which means multiplying repeatedly by 3/2:
@@ -476,7 +436,7 @@ Lets clamp the overtone series to remain in one octave. We can do this by dividi
       <Strings
         frequencies={Array.from(
           { length: state.partials },
-          (_, i) => (i + 1) * Note.freq("C2")
+          (_, i) => (i + 1) * Note.freq("C3")
         )
           .map((f) => clamp(f, Note.freq("C3")))
           .concat(Note.freq("C4"))}
@@ -556,9 +516,9 @@ A frequency describes a single pitch, which would be a sine wave:
 <State
   initial={{
     frequencies: [
-      [0.5, 1, 0],
-      [1, 0.5, 0],
-      [1.5, 0.25, 0],
+      [1, 1, 0],
+      [2, 0.5, 0],
+      [3, 0.25, 0],
     ],
   }}
 >

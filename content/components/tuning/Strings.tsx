@@ -49,8 +49,13 @@ export default function Strings({
     .range([1, innerHeight])
     .interpolate(interpolateRound)
 
-  function handleTrigger(f) {
-    harp.triggerAttackRelease(f, "4n")
+  function handleTrigger(i) {
+    harp.triggerAttackRelease(
+      frequencies[i],
+      "4n",
+      "+0",
+      amplitudes ? Math.abs(amplitudes[i]) || 1 : 1
+    )
   }
   return (
     <>
@@ -78,7 +83,7 @@ export default function Strings({
           const label = labels ? labels[i] : nearestPitch(f)
           const color = frequencyColor(f)
           return (
-            <g key={i} onMouseEnter={() => handleTrigger(f)}>
+            <g key={i} onMouseEnter={() => handleTrigger(i)}>
               <rect
                 key={`string-${i}`}
                 fill={color}
