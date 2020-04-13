@@ -40,8 +40,8 @@ export function FrequencyPlot({
     functions.push(sum)
   }
 
-  const { toggle } = useFrame((t) => {
-    setTime(t * animationSpeed)
+  const { toggle } = useFrame(({ time }) => {
+    setTime(time * animationSpeed)
   }, autostartAnimation)
 
   return (

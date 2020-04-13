@@ -1,0 +1,114 @@
+import AnimationFrame from "./AnimationFrame.tsx"
+import Fab from "@material-ui/core/Fab"
+import PlayArrowIcon from "@material-ui/icons/PlayArrow"
+import StopIcon from "@material-ui/icons/Stop"
+import { Plot } from "./Plot.tsx"
+import CircularProgress from "@material-ui/core/CircularProgress"
+import LinearProgress from "@material-ui/core/LinearProgress"
+
+# Animation
+
+The AnimationFrame component can be used to use an animation callback without creating a component.
+This is useful for example animating stuff in MDX:
+
+## animation with progress
+
+```jsx
+<AnimationFrame>
+  {({ toggle, time, isRunning, start, stop, toggle }) => {
+    return (
+      <>
+        <Fab onClick={() => start(1000)}>
+          {!isRunning ? <PlayArrowIcon /> : <StopIcon />}
+        </Fab>
+        <h1 style={{ opacity: time ? time.progress : 0 }}>
+          {Math.round(((time && time.progress) || 0) * 100)}%
+        </h1>
+      </>
+    )
+  }}
+</AnimationFrame>
+```
+
+<AnimationFrame>
+  {({ time, isRunning, start, stop, toggle }) => {
+    return (
+      <>
+        <Fab onClick={() => start(1000)}>
+          {!isRunning ? <PlayArrowIcon /> : <StopIcon />}
+        </Fab>
+        <h1 style={{ opacity: time ? time.progress : 0 }}>
+          {Math.round(((time && time.progress) || 0) * 100)}%
+        </h1>
+      </>
+    )
+  }}
+</AnimationFrame>
+
+## without fixed end
+
+<AnimationFrame>
+  {({ toggle, time, isRunning, start }) => {
+    return (
+      <>
+        <Fab onClick={() => toggle()}>
+          {!isRunning ? <PlayArrowIcon /> : <StopIcon />}
+        </Fab>
+        {time && (
+          <>
+            <p>
+              fromStart:{" "}
+              <span style={{ color: "yellow" }}>
+                {Math.round(time.fromStart / 10) / 100}s
+              </span>
+            </p>
+            <p>
+              fromFirstStart:{" "}
+              <span style={{ color: "green" }}>
+                {Math.round(time.fromFirstStart / 10) / 100}s
+              </span>
+            </p>
+            <p>
+              deltaTime: {Math.round(time.deltaTime)}ms ={" "}
+              {Math.round(1000 / time.deltaTime)}fps
+            </p>
+            {time && (
+              <Plot
+                range={{ x: [0, Math.PI], y: [0, 1] }}
+                height={330}
+                functions={[
+                  (x) => Math.abs(Math.sin(x + time.fromFirstStart / 1000)),
+                  (x) => Math.abs(Math.sin(x + time.fromStart / 1000)),
+                ]}
+                colors={["green", "yellow"]}
+              />
+            )}
+            <svg width={100} height={300}>
+              <circle
+                cy={
+                  300 -
+                  Math.abs(Math.sin(time.fromStart / 1000)) * (300 - 20) -
+                  10
+                }
+                cx={40}
+                r={10}
+                fill={"yellow"}
+              />
+              <circle
+                cy={
+                  300 -
+                  Math.abs(Math.sin(time.fromFirstStart / 1000)) * (300 - 20) -
+                  10
+                }
+                cx={10}
+                r={10}
+                fill={"green"}
+              />
+            </svg>
+          </>
+        )}
+        <br />
+      </>
+    )
+  }}
+</AnimationFrame>

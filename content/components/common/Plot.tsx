@@ -20,6 +20,8 @@ export function Plot({
   onClick,
   margin,
   hideAxes,
+  hideXAxis,
+  hideYAxis,
 }: any) {
   margin = margin || { top: 20, right: 30, bottom: 30, left: 50 }
   width = width || 500
@@ -72,22 +74,26 @@ export function Plot({
     <svg width={width} height={height} onClick={(e) => onClick && onClick(e)}>
       {!hideAxes && (
         <>
-          <g
-            className="x-axis plot-axis"
-            ref={(g) =>
-              select(g)
-                .attr("transform", `translate(0,${y(0)})`)
-                .call(axisBottom(x).ticks(width / 50))
-            }
-          />
-          <g
-            className="y-axis plot-axis"
-            ref={(g) =>
-              select(g)
-                .attr("transform", `translate(${x(0)},0)`)
-                .call(axisLeft(y).ticks(height / 50))
-            }
-          />
+          {!hideXAxis && (
+            <g
+              className="x-axis plot-axis"
+              ref={(g) =>
+                select(g)
+                  .attr("transform", `translate(0,${y(0)})`)
+                  .call(axisBottom(x).ticks(width / 50))
+              }
+            />
+          )}
+          {!hideYAxis && (
+            <g
+              className="y-axis plot-axis"
+              ref={(g) =>
+                select(g)
+                  .attr("transform", `translate(${x(0)},0)`)
+                  .call(axisLeft(y).ticks(height / 50))
+              }
+            />
+          )}
         </>
       )}
       {grid && (

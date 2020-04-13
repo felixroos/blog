@@ -14,7 +14,7 @@ import { Plot } from "../common/Plot.tsx"
   colors={["darkseagreen", "darksalmon"]}
 />
 
-## Multiple functions
+## Multiple functions & colors
 
 <Plot
   functions={[
@@ -23,8 +23,6 @@ import { Plot } from "../common/Plot.tsx"
     (x) => 2 * x,
     (x) => Math.sin(x),
     (x) => Math.cos(x),
-    (x) => Math.pow(x, 2),
-    (x) => x,
     (x) => Math.pow(x, 2),
     (x) => Math.pow(2, x),
   ]}
@@ -38,26 +36,19 @@ import { Plot } from "../common/Plot.tsx"
     (x) => x !== 0 && 1 / x,
     (x) => (Math.floor(x) !== 2 ? x : 2),
   ]}
-  colors={[
-    "lightsalmon",
-    "lightseagreen",
-    "indianred",
-    "darkmagenta",
-    "cornflowerblue",
-    "aqua",
-  ]}
 />
 
-## With Grid
+## With Grid & custom style
 
 <Plot
   grid={{ x: 4, y: 4 }}
-  functions={[(x) => x]}
-  colors={["blue"]}
+  functions={[(x) => (1 / 8) * Math.pow(x, 3), (x) => Math.sin(x * 4)]}
+  strokeWidth={4}
   range={{
     x: [-5, 5],
     y: [-5, 5],
   }}
+  colors={["#f0a", "#0fa"]}
 />
 
 ## Custom functions
@@ -82,7 +73,6 @@ import { Plot } from "../common/Plot.tsx"
 <Plot
   hideAxes={true}
   functions={[(x) => Math.abs(x), (x) => -Math.sin(x) * 2]}
-  colors={["blue"]}
   range={{
     x: [-5, 5],
     y: [-5, 5],

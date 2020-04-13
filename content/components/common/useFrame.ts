@@ -1,24 +1,57 @@
-import React, { useRef } from "react"
+import React, { useRef, useState } from "react"
 
 export default function useFrame(callback, autostart = false) {
   const requestRef = useRef<number>();
   const previousTimeRef = useRef<number>();
+  const startTimeRef = useRef<number>();
+  const stopTimeRef = useRef<number>(0);
+  const maxTimeRef = useRef<number>();
+  const [isRunning, setIsRunning] = useState(autostart);
 
   const animate = time => {
+    if (!startTimeRef.current) {
+      startTimeRef.current = time;
+    }
     if (previousTimeRef.current != undefined) {
       const deltaTime = time - previousTimeRef.current
-      callback(time, deltaTime);
+      const fromStart = time - startTimeRef.current;
+      callback({
+        time,
+        deltaTime,
+        fromStart,
+        fromFirstStart: fromStart + stopTimeRef.current,
+        stopTime: stopTimeRef.current,
+        progress: maxTimeRef.current ? fromStart / maxTimeRef.current : 0
+      });
+      if (maxTimeRef.current && fromStart >= maxTimeRef.current) {
+        stop();
+        maxTimeRef.current = null;
+        return;
+      }
     }
     previousTimeRef.current = time;
     requestRef.current = requestAnimationFrame(animate);
   }
 
-  function start() {
+  function start(maxTime?) {
+    if (isRunning) {
+      stop();
+    }
+    if (maxTime) {
+      maxTimeRef.current = maxTime;
+    }
     requestRef.current = requestAnimationFrame(animate);
+    setIsRunning(true);
   }
+
   function stop() {
+    if (previousTimeRef.current && startTimeRef.current) {
+      stopTimeRef.current = previousTimeRef.current - startTimeRef.current + stopTimeRef.current;
+    }
     cancelAnimationFrame(requestRef.current);
+    startTimeRef.current = 0;
     requestRef.current = null;
+    setIsRunning(false)
   }
   function toggle() {
     if (!requestRef.current) {
@@ -32,5 +65,5 @@ export default function useFrame(callback, autostart = false) {
     autostart && start();
     return () => stop()
   }, []); // Make sure the effect runs only once
-  return { start, stop, toggle };
+  return { start, stop, toggle, isRunning };
 }
