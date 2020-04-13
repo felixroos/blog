@@ -13,11 +13,11 @@ export default function useFrame(callback, autostart = false) {
       startTimeRef.current = time;
     }
     if (previousTimeRef.current != undefined) {
-      const deltaTime = time - previousTimeRef.current
+      const delta = time - previousTimeRef.current
       const fromStart = time - startTimeRef.current;
       callback({
         time,
-        deltaTime,
+        delta,
         fromStart,
         fromFirstStart: fromStart + stopTimeRef.current,
         stopTime: stopTimeRef.current,

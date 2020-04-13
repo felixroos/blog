@@ -15,14 +15,14 @@ This is useful for example animating stuff in MDX:
 
 ```jsx
 <AnimationFrame>
-  {({ toggle, time, isRunning, start, stop, toggle }) => {
+  {({ time, isRunning, start, stop, toggle }) => {
     return (
       <>
         <Fab onClick={() => start(1000)}>
           {!isRunning ? <PlayArrowIcon /> : <StopIcon />}
         </Fab>
-        <h1 style={{ opacity: time ? time.progress : 0 }}>
-          {Math.round(((time && time.progress) || 0) * 100)}%
+        <h1 style={{ opacity: time.progress }}>
+          {Math.round(time.progress * 100)}%
         </h1>
       </>
     )
@@ -31,14 +31,14 @@ This is useful for example animating stuff in MDX:
 ```
 
 <AnimationFrame>
-  {({ time, isRunning, start, stop, toggle }) => {
+  {({ toggle, time, isRunning, start, stop }) => {
     return (
       <>
         <Fab onClick={() => start(1000)}>
           {!isRunning ? <PlayArrowIcon /> : <StopIcon />}
         </Fab>
-        <h1 style={{ opacity: time ? time.progress : 0 }}>
-          {Math.round(((time && time.progress) || 0) * 100)}%
+        <h1 style={{ opacity: time.progress }}>
+          {Math.round(time.progress * 100)}%
         </h1>
       </>
     )
@@ -57,20 +57,20 @@ This is useful for example animating stuff in MDX:
         {time && (
           <>
             <p>
-              fromStart:{" "}
+              time.fromStart:{" "}
               <span style={{ color: "yellow" }}>
                 {Math.round(time.fromStart / 10) / 100}s
               </span>
             </p>
             <p>
-              fromFirstStart:{" "}
+              time.fromFirstStart:{" "}
               <span style={{ color: "green" }}>
                 {Math.round(time.fromFirstStart / 10) / 100}s
               </span>
             </p>
             <p>
-              deltaTime: {Math.round(time.deltaTime)}ms ={" "}
-              {Math.round(1000 / time.deltaTime)}fps
+              time.delta: {Math.round(time.delta)}ms ={" "}
+              {Math.round(1000 / time.delta)}fps
             </p>
             {time && (
               <Plot

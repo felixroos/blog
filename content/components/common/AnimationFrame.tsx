@@ -2,7 +2,12 @@ import React, { useState } from "react"
 import useFrame from "./useFrame"
 
 export default function AnimationFrame(props) {
-  const [time, setTime] = useState()
+  const [time, setTime] = useState({
+    fromStart: 0,
+    fromFirstStart: 0,
+    progress: 0,
+    delta: null,
+  })
   const frame = useFrame(setTime)
   return props.children({ ...frame, time })
 }
