@@ -1,7 +1,12 @@
 import React from "react"
-import { scaleLinear } from "d3-scale"
+import { scalePoint, scaleLinear } from "d3-scale"
+import { axisBottom, axisLeft } from "d3-axis"
+import { select } from "d3-selection"
 
 export function PlotPath({ f }) {}
+
+declare type Vec2 = [number, number]
+declare type Path2 = Vec2[]
 
 export function Plot({
   strokeWidth,
@@ -13,91 +18,137 @@ export function Plot({
   grid,
   onHover,
   onClick,
+  margin,
+  hideAxes,
 }: any) {
-  width = width || 600
-  height = height || 600
+  margin = margin || { top: 20, right: 30, bottom: 30, left: 50 }
+  width = width || 500
+  height = height || 300
+  const innerHeight = height - margin.top - margin.bottom
+  const innerWidth = width - margin.left - margin.right
+
   strokeWidth = strokeWidth || 1
-  colors = colors || []
+  colors = colors || [
+    "lightsalmon",
+    "lightseagreen",
+    "indianred",
+    "darkmagenta",
+    "cornflowerblue",
+    "aqua",
+  ]
   functions = functions || []
-  const w = width,
-    h = height,
-    m = 10
+  range = range || { x: [-4, 4], y: [-4, 4] }
 
   const x = scaleLinear()
       .domain(range.x)
-      .range([m, w - m]),
+      .range([margin.left, width - margin.right]),
     y = scaleLinear()
       .domain(range.y)
-      .range([h - m, m])
+      .range([height - margin.top, margin.bottom])
       .nice()
 
-  const lines = functions.map((f) => {
-    const line = []
-    for (let i = m + 1e-6; i < w - m; i += 1) {
+  const plots = functions.map((f) => {
+    const lines: Path2[] = [[]]
+    for (let i: number = margin.left + 1e-6; i < width - margin.right; i += 1) {
       const X = x.invert(i),
-        Y = f(X),
-        j = y(Y)
-      line.push([i, j])
+        Y = f(X)
+      if (typeof Y === "number") {
+        const j: number = y(Y)
+        // TODO find out if differentiable => add new line if not
+        if (
+          X >= range.x[0] &&
+          X <= range.x[1] &&
+          Y >= range.y[0] &&
+          Y <= range.y[1]
+        ) {
+          lines[0].unshift([i, j])
+        }
+      }
     }
-    return line
+    return lines
   })
 
   return (
-    <svg
-      width={w + m * 2}
-      height={h + m * 2}
-      onClick={(e) => onClick && onClick(e)}
-    >
-      {grid && grid.x && (
-        <g>
-          {Array.from(
-            { length: Math.floor((range.x[1] - range.x[0]) / grid.x) + 1 },
-            (_, i) => (
-              <line
-                key={`grid-x-${i}`}
-                x1={x(i * grid.x)}
-                x2={x(i * grid.x)}
-                y1={y(range.y[0])}
-                y2={y(range.y[1])}
-                stroke="gray"
-                strokeWidth={1}
-              />
-            )
-          )}
-        </g>
+    <svg width={width} height={height} onClick={(e) => onClick && onClick(e)}>
+      {!hideAxes && (
+        <>
+          <g
+            className="x-axis plot-axis"
+            ref={(g) =>
+              select(g)
+                .attr("transform", `translate(0,${y(0)})`)
+                .call(axisBottom(x).ticks(width / 50))
+            }
+          />
+          <g
+            className="y-axis plot-axis"
+            ref={(g) =>
+              select(g)
+                .attr("transform", `translate(${x(0)},0)`)
+                .call(axisLeft(y).ticks(height / 50))
+            }
+          />
+        </>
       )}
-      {grid && grid.y && (
-        <g>
-          {Array.from(
-            { length: Math.floor((range.y[1] - range.y[0]) / grid.y) + 1 },
-            (_, i) => (
-              <line
-                key={`grid-y-${i}`}
-                x1={x(range.x[0])}
-                x2={x(range.x[1])}
-                y1={y(range.y[0] + i * grid.y)}
-                y2={y(range.y[0] + i * grid.y)}
-                stroke="gray"
-                strokeWidth={1}
-              />
-            )
+      {grid && (
+        <>
+          {grid.x && (
+            <g
+              className="grid"
+              ref={(g) =>
+                select(g)
+                  .attr("transform", `translate(0, ${y(range.y[1])})`)
+                  .call(
+                    axisBottom(x)
+                      .ticks(grid.x)
+                      .tickSize(innerHeight)
+                      .tickFormat("")
+                  )
+              }
+            />
           )}
-        </g>
+          {grid.y && (
+            <g
+              className="grid"
+              ref={(g) =>
+                select(g)
+                  .attr("transform", `translate(${x(range.x[0])}, 0)`)
+                  .call(
+                    axisLeft(y)
+                      .ticks(grid.y)
+                      .tickSize(-innerWidth)
+                      .tickFormat("")
+                  )
+              }
+            />
+          )}
+        </>
       )}
       <g>
-        {lines.map((line, i) => (
-          <path
-            onMouseEnter={() => onHover && onHover(i)}
-            key={i}
-            d={"M" + line.join("L")}
-            stroke={colors[i] || "black"}
-            strokeWidth={strokeWidth}
-            fill="none"
-          />
-        ))}
+        {plots.map((lines, i) =>
+          lines.map((line, j) => (
+            <path
+              onMouseEnter={() => onHover && onHover(i)}
+              key={i + "-" + j}
+              d={"M" + line.join("L")}
+              stroke={colors[i % colors.length] || "black"}
+              strokeWidth={strokeWidth}
+              fill="none"
+            />
+          ))
+        )}
         {/* <g transform={`translate(${m},0)`}></g> axisLeft(y) */}
         {/* <g transform={`translate(0,${y(0)})`}></g> axisBottom(x) */}
       </g>
     </svg>
   )
+}
+
+// https://stackoverflow.com/a/56029853/5470719
+const Axis = (props) => {
+  const axisRef = (axis) => {
+    axis && props.axisCreator(select(axis))
+  }
+
+  return <g className={props.className} ref={axisRef} />
 }

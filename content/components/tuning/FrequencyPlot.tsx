@@ -15,6 +15,7 @@ export function FrequencyPlot({
   autostartAnimation,
   animationSpeed,
   range,
+  hideAxes,
 }: any) {
   const [time, setTime] = useState(0)
   base = base || 440
@@ -48,11 +49,11 @@ export function FrequencyPlot({
       {/* <Button onClick={() => toggle()}>Toggle</Button> */}
       <Plot
         onClick={() => toggle()}
-        strokeWidth={5}
+        strokeWidth={2}
         width={width}
         height={height}
-        grid={{ x: Math.PI / 4, y: 0.5 }}
         functions={functions}
+        hideAxes={hideAxes !== undefined ? hideAxes : true}
         colors={
           colors ||
           frequencies.map(([f]) => frequencyColor(f * base)).concat(["green"])

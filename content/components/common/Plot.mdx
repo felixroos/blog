@@ -1,0 +1,90 @@
+import { Plot } from "../common/Plot.tsx"
+
+# Plot
+
+## Default
+
+<Plot functions={[(x) => 4 * Math.sin(x)]} />
+
+## Range
+
+<Plot
+  range={{ x: [0, Math.PI * 2], y: [0, 1] }}
+  functions={[(x) => -Math.cos(x) / 2 + 0.5]}
+  colors={["darkseagreen", "darksalmon"]}
+/>
+
+## Multiple functions
+
+<Plot
+  functions={[
+    (x) => x / 2,
+    (x) => x,
+    (x) => 2 * x,
+    (x) => Math.sin(x),
+    (x) => Math.cos(x),
+    (x) => Math.pow(x, 2),
+    (x) => x,
+    (x) => Math.pow(x, 2),
+    (x) => Math.pow(2, x),
+  ]}
+/>
+
+## Functions with undefined / non differentiable values
+
+<Plot
+  functions={[
+    (x) => x >= 0 && Math.sqrt(x),
+    (x) => x !== 0 && 1 / x,
+    (x) => (Math.floor(x) !== 2 ? x : 2),
+  ]}
+  colors={[
+    "lightsalmon",
+    "lightseagreen",
+    "indianred",
+    "darkmagenta",
+    "cornflowerblue",
+    "aqua",
+  ]}
+/>
+
+## With Grid
+
+<Plot
+  grid={{ x: 4, y: 4 }}
+  functions={[(x) => x]}
+  colors={["blue"]}
+  range={{
+    x: [-5, 5],
+    y: [-5, 5],
+  }}
+/>
+
+## Custom functions
+
+<Plot
+  grid={{ x: 4, y: 1 }}
+  range={{ x: [-10, 10], y: [-4, 4] }}
+  functions={[
+    // 4= b * 1/8
+    (x, a = 2, f = 1 / 2, b = 0) => {
+      const xf = Math.abs(((x + 1 / f) / 2) * f)
+      const fract = xf % 1
+      return (
+        2 * a * (Math.floor(xf) % 2 === 0 ? fract - 1 / 2 : 1 / 2 - fract) + b
+      )
+    },
+  ]}
+/>
+
+## Without Axes
+
+<Plot
+  hideAxes={true}
+  functions={[(x) => Math.abs(x), (x) => -Math.sin(x) * 2]}
+  colors={["blue"]}
+  range={{
+    x: [-5, 5],
+    y: [-5, 5],
+  }}
+/>

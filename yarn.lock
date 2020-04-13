@@ -4789,6 +4789,11 @@ cyclist@^1.0.1:
   resolved "https://registry.npmjs.org/d3-array/-/d3-array-2.4.0.tgz#87f8b9ad11088769c82b5ea846bcb1cc9393f242"
   integrity sha512-KQ41bAF2BMakf/HdKT865ALd4cgND6VcIztVQZUTt0+BH3RWy6ZYnHghVXf6NFjt2ritLr8H1T8LreAAlfiNcw==
 
+d3-axis@^1.0.12:
+  version "1.0.12"
+  resolved "https://registry.npmjs.org/d3-axis/-/d3-axis-1.0.12.tgz#cdf20ba210cfbb43795af33756886fb3638daac9"
+  integrity sha512-ejINPfPSNdGFKEOAtnBtdkpr24c4d4jsei6Lg98mxf424ivoDP2956/5HDpIAtmHo85lqT4pruy+zEgvRUBqaQ==
+
 d3-color@1, d3-color@^1.4.0:
   version "1.4.0"
   resolved "https://registry.npmjs.org/d3-color/-/d3-color-1.4.0.tgz#89c45a995ed773b13314f06460df26d60ba0ecaf"
@@ -4829,6 +4834,11 @@ d3-scale@^3.2.1:
     d3-interpolate "^1.2.0"
     d3-time "1"
     d3-time-format "2"
+
+d3-selection@^1.4.1:
+  version "1.4.1"
+  resolved "https://registry.npmjs.org/d3-selection/-/d3-selection-1.4.1.tgz#98eedbbe085fbda5bafa2f9e3f3a2f4d7d622a98"
+  integrity sha512-BTIbRjv/m5rcVTfBs4AMBLKs4x8XaaLkwm28KWu9S2vKNqXkXt2AH2Qf0sdPZHjFxcWg/YL53zcqAz+3g4/7PA==
 
 d3-time-format@2:
   version "2.2.3"
