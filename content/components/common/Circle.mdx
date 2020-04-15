@@ -1,0 +1,55 @@
+import { clamp, ratios } from "../tuning/tuning.ts"
+import NoteCircle from "../tuning/NoteCircle"
+import FractionCircle from "./FractionCircle.tsx"
+import Circle, { circlePosition } from "./Circle.tsx"
+import { State } from "react-powerplug"
+import { Note } from "@tonaljs/tonal"
+import { Switch } from "@material-ui/core"
+
+## FractionCircle
+
+As frequency ratio:
+
+<svg width={42} height={42}>
+  <FractionCircle top={2} bottom={3} radius={20} cx={20} cy={20} />
+</svg>
+
+As length ration (uses invert):
+
+<svg width={42} height={42}>
+  <FractionCircle
+    top={2}
+    bottom={3}
+    radius={20}
+    cx={20}
+    cy={20}
+    invert={true}
+  />
+</svg>
+
+## Note Circle
+
+<svg width={42} height={42}>
+  <NoteCircle radius={20} cx={20} cy={20} frequency={440} />
+</svg>
+
+## Custom Circle
+
+<svg width={240} height={240}>
+  <Circle fill="transparent" radius={100} stroke="white" cx={120} cy={120}>
+    {Array(12)
+      .fill(0)
+      .map((_, i, a) => {
+        const { x, y } = circlePosition(i / a.length, 100)
+        return (
+          <>
+            <circle r={20} cx={x + 20} cy={y + 20} fill="steelblue" />
+            <text x={x + 20} y={y + 25} fill="black" textAnchor="middle">
+              {Note.get(Note.fromMidi(i + 60)).pc}
+              {/* {Note.get(Note.fromMidiSharps(i + 60)).pc} */}
+            </text>
+          </>
+        )
+      })}
+  </Circle>
+</svg>

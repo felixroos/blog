@@ -86,25 +86,10 @@ This tuning can be obtained by going 6 fifth down and 6 fifths up from the root
       81 / 64,
       243 / 128,
       729 / 512,
-    ]
-      .map((r) => 1 / r)
-      {/* .sort((a, b) => (state.sort ? b - a : 0)) */}
-    return (
-      <>
-        {/* <label>
-          sort
-          <Switch
-            checked={state.sort}
-            color="primary"
-            onChange={(e) => setState({ sort: e.target.checked })}
-          />
-        </label> */}
-        <br />
-        {ratios.map((p) => (
-          <Monochord value={p} base={Note.freq("C4")} disableRight={true} />
-        ))}
-      </>
-    )
+    ].map((r) => 1 / r)
+    return ratios.map((p) => (
+      <Monochord value={p} base={Note.freq("C4")} disableRight={true} />
+    ))
   }}
 </State>
 
@@ -181,7 +166,15 @@ ratios(1 / 4, [3 / 2, 3 / 4], 12)
 </State>
  -->
 
-## Further reading
+## Further reading / watching
 
 - http://www.harmonik.de/harmonik/vtr_pdf/JustIntonation.pdf
 - https://en.wikipedia.org/wiki/Just_intonation
+- https://www.youtube.com/watch?v=8syA7S_5E3A
+- https://www.youtube.com/watch?v=TYhPAbsIqA8
+
+## TBD
+
+- show nearest note / cents
+- animate vibration of string with Plot
+- calculate ratios automatically everywhere (dont use hard coded wikipedia ratios)

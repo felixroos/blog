@@ -1,6 +1,7 @@
 import React, { useMemo, useRef, useEffect } from "react"
 import { frequencyColor } from "./tuning"
 import { gcd } from "../common/gcd"
+import FractionCircle from "../common/FractionCircle"
 import canUseDOM from "../canUseDOM"
 import * as Tone from "tone"
 const { PolySynth, Synth } = Tone
@@ -154,7 +155,7 @@ export function Lambdoma({
             const { x, y } = coordinates(top, bottom)
             return (
               <g key={`${top}-${bottom}`}>
-                <Fraction
+                <FractionCircle
                   border={1}
                   base={base}
                   top={top}
@@ -168,80 +169,6 @@ export function Lambdoma({
           })}
         </svg>
       </div>
-    </>
-  )
-}
-
-export function Fraction({
-  radius: _radius,
-  cx,
-  cy,
-  top,
-  bottom,
-  base,
-  border,
-  strokeWidth,
-  fill,
-  invertColor,
-}: any) {
-  base = base || 440
-  const circle = {
-    radius: _radius || 30,
-    padding: 0.4,
-    cx: cx || 100,
-    cy: cy || 100,
-    fontSize: 12,
-  }
-  border = typeof border === "number" ? border : 1
-  strokeWidth =
-    typeof strokeWidth === "number"
-      ? strokeWidth
-      : (circle.radius / 16) * border
-  const x = circle.cx + strokeWidth
-  const y = circle.cy + strokeWidth
-  const radius = circle.radius
-  const text = {
-    fontSize: radius * 0.6,
-    textAnchor: "middle",
-    pointerEvents: "none",
-    style: { userSelect: "none" },
-  }
-  const value = useMemo(() => top / bottom, [top, bottom])
-
-  function handleTrigger() {
-    harp.triggerAttackRelease(value * base, "4n")
-  }
-  fill =
-    fill ||
-    (!top || !bottom
-      ? "white"
-      : frequencyColor((invertColor ? 1 / value : value) * base))
-  return (
-    <>
-      <circle
-        onClick={handleTrigger}
-        cx={x}
-        cy={y}
-        r={radius}
-        fill={fill}
-        stroke="black"
-        strokeWidth={strokeWidth}
-      />
-      <text x={x} y={y - radius / 4} {...(text as any)}>
-        {top}
-      </text>
-      <text x={x} y={y + radius / 2 + text.fontSize / 4} {...(text as any)}>
-        {bottom}
-      </text>
-      <line
-        x1={x - radius + circle.padding * radius}
-        x2={x + radius - circle.padding * radius}
-        y1={y}
-        y2={y}
-        stroke="black"
-        strokeWidth={strokeWidth}
-        style={{ pointerEvents: "none" }}
-      />
     </>
   )
 }

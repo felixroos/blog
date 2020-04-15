@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { useDrag, useHover, useGesture } from "react-use-gesture"
 import { scaleLinear } from "d3-scale"
 import Fraction from "fraction.js"
-import { Fraction as Fract } from "./Lambdoma"
+import FractionCircle from "../common/FractionCircle"
 import { frequencyColor } from "./tuning"
 import * as Tone from "tone"
 import canUseDOM from "../canUseDOM"
@@ -50,25 +50,25 @@ export default function Monochord({ value, base, disableRight }) {
 
   return (
     <svg width={width} height={height}>
-      <Fract
+      <FractionCircle
         cx={radius}
         cy={radius - 1}
         radius={radius}
         strokeWidth={1}
         top={lt}
         bottom={lb || 1}
-        invertColor={true}
+        invert={true}
         base={base}
       />
       {!disableRight && (
-        <Fract
+        <FractionCircle
           cx={width - radius - 2}
           cy={radius - 1}
           radius={radius}
           strokeWidth={1}
           top={rt}
           bottom={rb || 1}
-          invertColor={true}
+          invert={true}
           base={base}
         />
       )}
