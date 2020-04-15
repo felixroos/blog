@@ -1,0 +1,35 @@
+import { State } from "react-powerplug"
+import { FrequencyPlot } from "./FrequencyPlot.tsx"
+import { FrequencyPlotSettings } from "./FrequencyPlotSettings.tsx"
+
+# FrequencyPlot
+
+This is a wrapper around Plot that simplifies working with harmonics.
+
+<FrequencyPlot
+  height={150}
+  frequencies={[[1, 1, 0]]}
+  addSum={false}
+  colors={["green"]}
+  autostartAnimation={true}
+  animationSpeed={1 / 500}
+/>
+
+<State
+  initial={{
+    frequencies: [[1, 1, 0]],
+  }}
+>
+  {({ state, setState }) => (
+    <>
+      {state.frequencies && (
+        <FrequencyPlot
+          height={150}
+          addSum={false}
+          frequencies={state.frequencies}
+        />
+      )}
+      <FrequencyPlotSettings state={state} setState={setState} />
+    </>
+  )}
+</State>

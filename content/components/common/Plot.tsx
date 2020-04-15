@@ -1,3 +1,5 @@
+// TODO:
+// add zoom https://observablehq.com/@d3/zoomable-scatterplot
 import React from "react"
 import { scalePoint, scaleLinear } from "d3-scale"
 import { axisBottom, axisLeft } from "d3-axis"
@@ -79,7 +81,8 @@ export function Plot({
               className="x-axis plot-axis"
               ref={(g) =>
                 select(g)
-                  .attr("transform", `translate(0,${y(0)})`)
+                  /* .attr("transform", `translate(0,${y(0)})`) */
+                  .attr("transform", `translate(0,${height - margin.top})`)
                   .call(axisBottom(x).ticks(width / 50))
               }
             />
@@ -89,7 +92,8 @@ export function Plot({
               className="y-axis plot-axis"
               ref={(g) =>
                 select(g)
-                  .attr("transform", `translate(${x(0)},0)`)
+                  /* .attr("transform", `translate(${x(0)},0)`) */
+                  .attr("transform", `translate(${margin.left},0)`)
                   .call(axisLeft(y).ticks(height / 50))
               }
             />
@@ -108,7 +112,7 @@ export function Plot({
                     axisBottom(x)
                       .ticks(grid.x)
                       .tickSize(innerHeight)
-                      .tickFormat("")
+                      .tickFormat(() => "")
                   )
               }
             />
@@ -123,7 +127,7 @@ export function Plot({
                     axisLeft(y)
                       .ticks(grid.y)
                       .tickSize(-innerWidth)
-                      .tickFormat("")
+                      .tickFormat(() => "")
                   )
               }
             />
@@ -151,10 +155,3 @@ export function Plot({
 }
 
 // https://stackoverflow.com/a/56029853/5470719
-const Axis = (props) => {
-  const axisRef = (axis) => {
-    axis && props.axisCreator(select(axis))
-  }
-
-  return <g className={props.className} ref={axisRef} />
-}

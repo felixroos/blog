@@ -58,10 +58,10 @@ export function Lambdoma({
               : [col && row ? col / row : null, col, row]
           )
           .filter(([value, top, bottom]) => {
-            if (hideZeroes && (top === rows || bottom === cols)) {
+            /* if (hideZeroes && (top === rows || bottom === cols)) {
               // filter out last extra row
               return false
-            }
+            } */
             if (!value) {
               return clamp ? top === bottom : true
             }
@@ -113,14 +113,6 @@ export function Lambdoma({
       strokeWidth: 2,
     }
   }
-  /* {!hideLines &&
-    Array.from({ length: cols - 1 }).map((_, col) => (
-      <line {...lineTo(col + 1, rows - 1)} />
-    ))}
-  {!hideLines &&
-    Array.from({ length: rows - 1 }).map((_, row) => (
-      <line {...lineTo(cols - 1, row)} />
-    ))} */
 
   const maxWidth = 600
   const maxHeight = 600
@@ -188,6 +180,9 @@ export function Fraction({
   bottom,
   base,
   border,
+  strokeWidth,
+  fill,
+  invertColor,
 }: any) {
   base = base || 440
   const circle = {
@@ -198,7 +193,10 @@ export function Fraction({
     fontSize: 12,
   }
   border = typeof border === "number" ? border : 1
-  const strokeWidth = (circle.radius / 16) * border
+  strokeWidth =
+    typeof strokeWidth === "number"
+      ? strokeWidth
+      : (circle.radius / 16) * border
   const x = circle.cx + strokeWidth
   const y = circle.cy + strokeWidth
   const radius = circle.radius
@@ -206,13 +204,18 @@ export function Fraction({
     fontSize: radius * 0.6,
     textAnchor: "middle",
     pointerEvents: "none",
+    style: { userSelect: "none" },
   }
   const value = useMemo(() => top / bottom, [top, bottom])
 
   function handleTrigger() {
     harp.triggerAttackRelease(value * base, "4n")
   }
-  const fill = !top || !bottom ? "white" : frequencyColor(value * base)
+  fill =
+    fill ||
+    (!top || !bottom
+      ? "white"
+      : frequencyColor((invertColor ? 1 / value : value) * base))
   return (
     <>
       <circle
@@ -224,10 +227,10 @@ export function Fraction({
         stroke="black"
         strokeWidth={strokeWidth}
       />
-      <text x={x} y={y - radius / 4} {...text}>
+      <text x={x} y={y - radius / 4} {...(text as any)}>
         {top}
       </text>
-      <text x={x} y={y + radius / 2 + text.fontSize / 4} {...text}>
+      <text x={x} y={y + radius / 2 + text.fontSize / 4} {...(text as any)}>
         {bottom}
       </text>
       <line

@@ -8,10 +8,12 @@ import LinearProgress from "@material-ui/core/LinearProgress"
 
 # Animation
 
+## AnimationFrame
+
 The AnimationFrame component can be used to use an animation callback without creating a component.
 This is useful for example animating stuff in MDX:
 
-## animation with progress
+### with progress
 
 ```jsx
 <AnimationFrame>
@@ -45,7 +47,7 @@ This is useful for example animating stuff in MDX:
   }}
 </AnimationFrame>
 
-## without fixed end
+### without fixed end
 
 <AnimationFrame>
   {({ toggle, time, isRunning, start }) => {
@@ -112,3 +114,15 @@ This is useful for example animating stuff in MDX:
     )
   }}
 </AnimationFrame>
+
+## useFrame hook
+
+The AnimationFrame component is based on the useFrame hook.
+
+## Next steps
+
+- https://observablehq.com/@d3/learn-d3-animation
+- https://github.com/nearform/react-animation
+- https://reactcommunity.org/react-transition-group/
+- https://www.react-spring.io/
+- https://github.com/react-restart/hooks/blob/master/src/useAnimationFrame.ts

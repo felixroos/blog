@@ -1,0 +1,67 @@
+import SimplePopover from "../common/Popover.tsx"
+import { Lambdoma } from "./Lambdoma.tsx"
+import { LambdomaFloats } from "./LambdomaFloats.tsx"
+import { LambdomaSettings } from "./LambdomaSettings.tsx"
+import { State } from "react-powerplug"
+import { Note } from "@tonaljs/tonal"
+
+import { clamp } from "./tuning"
+
+## Lambdoma
+
+A good way to look at the distribution of ratios is the Lambdoma
+
+<State
+  initial={{
+    angle: 45,
+    radius: 20,
+    size: 10,
+    hideExtensions: true,
+    hideLines: false,
+    hideZeroes: false,
+    clamp: true,
+  }}
+>
+  {({ state, setState }) => (
+    <>
+      <SimplePopover placement="left-start">
+        <LambdomaSettings state={state} setState={setState} />
+      </SimplePopover>
+      <Lambdoma
+        margin={0}
+        cols={state.size}
+        rows={state.size}
+        angle={state.angle}
+        radius={state.radius}
+        base={Note.freq("C4")}
+        clamp={state.clamp}
+        hideExtensions={state.hideExtensions}
+        hideLines={state.hideLines}
+        hideZeroes={state.hideZeroes}
+      />
+    </>
+  )}
+</State>
+
+This will give all frequencies of the same pitch class the same color.
+
+## LambdomaFLoats
+
+Displays the the given floats as fractions in the Lambdoma
+
+<LambdomaFloats
+  floats={[1, 2, 3, 4 / 3].map((p) => clamp(p, 1))}
+  base={Note.freq("C4")}
+  radius={25}
+/>
+
+## TBD
+
+- active / colorless states
+- display irrational numbers e.g. equal tempered notes
+- play synth continuus and change pitch via mouseover
+- alternative diamond shapes to close gaps
+
+## Related
+
+- https://github.com/infusion/Fraction.js/

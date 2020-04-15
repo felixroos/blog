@@ -14,7 +14,7 @@ export function PitchClasses({ frequencies, strokeWidth, range, base }: any) {
         functions={frequencies.map((f) => (x) => f * Math.pow(2, x))}
         colors={frequencies.map((f) => frequencyColor(f))}
         range={range}
-        grid={{ x: 1, y: base }}
+        grid={{ x: 10, y: frequencies.length }}
       />
     </>
   )

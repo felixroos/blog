@@ -12,7 +12,6 @@ import StopIcon from "@material-ui/icons/Stop"
 import { Fab } from "@material-ui/core"
 import Waveform from "../synthesis/Waveform"
 
-
 export function Harmonics({ state, setState }) {
   const base = Note.freq("C4")
   const hearingRange = [20, 16000]
@@ -22,7 +21,7 @@ export function Harmonics({ state, setState }) {
   ]
 
   function partials(n: number, damp = 100) {
-    return Waveform[state.waveform || "square"](n)
+    return Waveform[state.waveform || "saw"](n)
   }
 
   const frequencies = partials(state.partials, state.damp)
@@ -33,11 +32,12 @@ export function Harmonics({ state, setState }) {
         height={500}
         frequencies={frequencies}
         addSum={true}
+        hideAxes={false}
         base={base}
         animationSpeed={state.speed / 100 / base}
         range={{
           x: [0, Math.PI],
-          y: [-1, 1],
+          y: [-0.6, 0.6],
         }}
         onTrigger={(f, velocity) => {
           if (!notes.includes(f)) {
@@ -129,7 +129,7 @@ export function Harmonics({ state, setState }) {
         frequencies={frequencies.map(([f]) => f * base)}
         labels={frequencies.map((_, i) => i + 1)}
         amplitudes={frequencies.map(
-          ([f, a], i) => a / max(frequencies.map(([f, a]) => a)) // stretches max a to full height
+          ([f, a], i) => a / max<number>(frequencies.map(([f, a]) => a)) // stretches max a to full height
         )}
       />
     </>

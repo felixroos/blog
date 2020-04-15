@@ -6,7 +6,7 @@ import Fraction from "fraction.js"
 export function partials([min, max], base = 440) {
   const f = [];
   for (let i = min; i <= max; ++i) {
-    if (![0, -1].includes(i)) {
+    if ([0, -1].indexOf(i) === -1) {
       f.push(base * (i < 0 ? -(1 / i) : i));
     }
   }
@@ -27,6 +27,14 @@ export function stack(n, factor = 3 / 2, base = 440) {
     f.push(f[f.length - 1] * factor)
   }
   return f;
+}
+
+export function ratios(start = 1, factors = [2 / 3, 4 / 3], n = factors.length) {
+  const ratios = [start]
+  for (let i = 0; i < n; ++i) {
+    ratios.push(ratios[ratios.length - 1] * factors[i % factors.length])
+  }
+  return ratios;
 }
 
 // divides a frequency by 2 until it is inside one octave above the base

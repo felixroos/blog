@@ -1,0 +1,96 @@
+import { clamp, ratios } from "./tuning.ts"
+import { State } from "react-powerplug"
+import { Note } from "@tonaljs/tonal"
+
+# Monochord
+
+import Monochord from "./Monochord.tsx"
+
+# Pythagorean Tuning
+
+The tuning known as ratios Tuning can be obtained by starting with a certain string length and alternately applying intervals of fifths and fourths.
+It turns out that the chinese invented a similar system much earlier.
+
+Lets define a function that calculates ratios:
+
+```js
+export function ratios(
+  start = 1,
+  factors = [2 / 3, 4 / 3],
+  n = factors.length
+) {
+  const ratios = [start]
+  for (let i = 0; i < n; ++i) {
+    ratios.push(ratios[ratios.length - 1] * factors[i % factors.length])
+  }
+  return ratios
+}
+```
+
+This enables us to stack any combination of ratios on top of each other:
+
+## 5th up / 4th down
+
+```js
+ratios(1, [2 / 3, 4 / 3], 12)
+```
+
+<State initial={{}}>
+  {() =>
+    ratios(1, [2 / 3, 4 / 3], 12)
+      .concat([1 / 2])
+      .map((p) => (
+        <Monochord value={p} base={Note.freq("C4")} disableRight={true} />
+      ))
+  }
+</State>
+
+You can hear the [pythagorean comma](https://en.wikipedia.org/wiki/Pythagorean_comma) by comparing the last two ratios.
+
+## 4th up / 5th down
+
+```js
+ratios(1 / 2, [3 / 4, 3 / 2], 12)
+```
+
+<State initial={{}}>
+  {() =>
+    ratios(1 / 2, [3 / 4, 3 / 2], 12)
+      .concat([1])
+      .map((p) => (
+        <Monochord value={p} base={Note.freq("C4")} disableRight={true} />
+      ))
+  }
+</State>
+
+## 4th down / 5th up
+
+```js
+ratios(1 / 2, [4 / 3, 2 / 3], 12)
+```
+
+<State initial={{}}>
+  {() =>
+    ratios(1 / 2, [4 / 3, 2 / 3], 12)
+      .concat([1 / 4])
+      .map((p) => (
+        <Monochord value={p} base={Note.freq("C4")} disableRight={true} />
+      ))
+  }
+</State>
+
+## 5th down / 4th up
+
+```js
+ratios(1 / 4, [3 / 2, 3 / 4], 12)
+```
+
+<State initial={{}}>
+  {() =>
+    ratios(1 / 4, [3 / 2, 3 / 4], 12)
+      .concat([1 / 2])
+      .map((p) => (
+        <Monochord value={p} base={Note.freq("C4")} disableRight={true} />
+      ))
+  }
+</State>

@@ -12,6 +12,7 @@ import Button from "@material-ui/core/Button"
 import IconButton from "@material-ui/core/IconButton"
 
 import { Note } from "@tonaljs/tonal"
+import { interpolateRainbow } from "d3-scale-chromatic"
 import Strings from "../components/tuning/Strings.tsx"
 import { PitchClasses } from "../components/tuning/PitchClasses.tsx"
 import {
@@ -47,6 +48,9 @@ import ListItem from "@material-ui/core/ListItem"
 import ListItemIcon from "@material-ui/core/ListItemIcon"
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction"
 import ListItemText from "@material-ui/core/ListItemText"
+import Monochord from "../components/tuning/Monochord.tsx"
+
+<Monochord />
 
 This post is about the fundamental questions of musical tuning:
 
@@ -123,7 +127,9 @@ Lets say this is the string elongation (y axis) over the time period of 100 seco
     [1, 0, 0],
     [2, 1, 0],
   ]}
-  colors={["green", "red", "blue", "yellow"]}
+  colors={Array(10)
+    .fill()
+    .map((_, i) => interpolateRainbow(i / 10))}
   addSum={false}
 />
 
@@ -510,27 +516,6 @@ Lets clamp the overtone series to remain in one octave. We can do this by dividi
 
 </State>
 
-### The Overtone Series
-
-A frequency describes a single pitch, which would be a sine wave:
-
-<State
-  initial={{
-    frequencies: [
-      [1, 1, 0],
-      [2, 0.5, 0],
-      [3, 0.25, 0],
-    ],
-  }}
->
-  {(state) => (
-    <>
-      <FrequencyPlot frequencies={state.frequencies || []} />
-      <FrequencyPlotSettings {...state} />
-    </>
-  )}
-</State>
-
 ## Overtones vs Undertones
 
 Lets generate the frequencies of pitches in the overtone and undertone series.
@@ -556,4 +541,7 @@ const first5undertones = partials([-5, 0], Note.freq("A4"))
 // = [440, 220, 146.66666666666666, 110, 88]
 ```
 
-Let's visualize those frequencies with lines:
+More Links:
+
+Fourier: https://www.youtube.com/watch?v=spUNpyF58BY
+Fourier Viz + more: https://jackschaedler.github.io/circles-sines-signals/dft_introduction.html
