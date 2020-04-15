@@ -56,7 +56,7 @@ export default function Monochord({ value, base, disableRight }) {
         radius={radius}
         strokeWidth={1}
         top={lt}
-        bottom={lb || 0}
+        bottom={lb || 1}
         invertColor={true}
         base={base}
       />
