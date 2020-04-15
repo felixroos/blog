@@ -1,17 +1,55 @@
 import { clamp, ratios } from "./tuning.ts"
 import { State } from "react-powerplug"
 import { Note } from "@tonaljs/tonal"
+import { Switch } from "@material-ui/core"
 
 # Monochord
 
 import Monochord from "./Monochord.tsx"
 
-# Pythagorean Tuning
+The monochord component mimics a real monochord. You can move the handle by dragging to change the ratio.
+The numbers describe the fraction of the length on either side.
 
-The tuning known as ratios Tuning can be obtained by starting with a certain string length and alternately applying intervals of fifths and fourths.
-It turns out that the chinese invented a similar system much earlier.
+For example, this is the natural major triad, as it appears in the harmonic series:
 
-Lets define a function that calculates ratios:
+<Monochord value={1} base={Note.freq("C4")} disableRight={true} />
+<Monochord value={4 / 5} base={Note.freq("C4")} disableRight={true} />
+<Monochord value={2 / 3} base={Note.freq("C4")} disableRight={true} />
+
+Or, the natural minor triad:
+
+<Monochord value={1} base={Note.freq("C4")} disableRight={true} />
+<Monochord value={5 / 6} base={Note.freq("C4")} disableRight={true} />
+<Monochord value={2 / 3} base={Note.freq("C4")} disableRight={true} />
+
+# Just Intonation
+
+Lets look at [just intonation](https://de.wikipedia.org/wiki/Reine_Stimmung).
+I just took the frequency ratios from wikipedia and inverted them, as we are using string ratios here:
+
+```jsx
+function JustStrings() {
+  return [1, 9 / 8, 5 / 4, 4 / 3, 3 / 2, 5 / 3, 15 / 8, 2]
+    .map((r) => 1 / r)
+    .map((p) => (
+      <Monochord value={p} base={Note.freq("C4")} disableRight={true} />
+    ))
+}
+```
+
+<State initial={{}}>
+  {() =>
+    [1, 9 / 8, 5 / 4, 4 / 3, 3 / 2, 5 / 3, 15 / 8, 2]
+      .map((r) => 1 / r)
+      .map((p) => (
+        <Monochord value={p} base={Note.freq("C4")} disableRight={true} />
+      ))
+  }
+</State>
+
+# Calculating Ratios
+
+Lets first define a function that calculates ratios
 
 ```js
 export function ratios(
@@ -27,9 +65,56 @@ export function ratios(
 }
 ```
 
-This enables us to stack any combination of ratios on top of each other:
+# 12 note Pythagorean Tuning
 
-## 5th up / 4th down
+This tuning can be obtained by going 6 fifth down and 6 fifths up from the root
+
+<State initial={{ sort: false }}>
+  {({ state, setState }) => {
+    let ratios = [
+      1,
+      1024 / 729,
+      256 / 243,
+      128 / 81,
+      32 / 27,
+      16 / 9,
+      4 / 3,
+      2 / 1,
+      3 / 2,
+      9 / 8,
+      27 / 16,
+      81 / 64,
+      243 / 128,
+      729 / 512,
+    ]
+      .map((r) => 1 / r)
+      {/* .sort((a, b) => (state.sort ? b - a : 0)) */}
+    return (
+      <>
+        {/* <label>
+          sort
+          <Switch
+            checked={state.sort}
+            color="primary"
+            onChange={(e) => setState({ sort: e.target.checked })}
+          />
+        </label> */}
+        <br />
+        {ratios.map((p) => (
+          <Monochord value={p} base={Note.freq("C4")} disableRight={true} />
+        ))}
+      </>
+    )
+  }}
+</State>
+
+This way, we have the comma in the middle, between F# and G#.
+
+# Chinese Tuning
+
+The chinese tuning is similar to the pythagorean tuning:
+
+<!-- ## 5th up / 4th down -->
 
 ```js
 ratios(1, [2 / 3, 4 / 3], 12)
@@ -47,7 +132,7 @@ ratios(1, [2 / 3, 4 / 3], 12)
 
 You can hear the [pythagorean comma](https://en.wikipedia.org/wiki/Pythagorean_comma) by comparing the last two ratios.
 
-## 4th up / 5th down
+<!-- ## 4th up / 5th down
 
 ```js
 ratios(1 / 2, [3 / 4, 3 / 2], 12)
@@ -94,3 +179,9 @@ ratios(1 / 4, [3 / 2, 3 / 4], 12)
       ))
   }
 </State>
+ -->
+
+## Further reading
+
+- http://www.harmonik.de/harmonik/vtr_pdf/JustIntonation.pdf
+- https://en.wikipedia.org/wiki/Just_intonation
