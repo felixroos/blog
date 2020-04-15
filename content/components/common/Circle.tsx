@@ -23,8 +23,8 @@ export default function Circle(props: any) {
 }
 
 export function circlePosition(fraction, radius) {
-  return {
-    x: radius + Math.sin(fraction * Math.PI * 2) * radius,
-    y: radius - Math.cos(fraction * Math.PI * 2) * radius,
-  }
+  return [
+    Math.round(radius + Math.sin(fraction * Math.PI * 2) * radius),
+    Math.round(radius - Math.cos(fraction * Math.PI * 2) * radius),
+  ]
 }

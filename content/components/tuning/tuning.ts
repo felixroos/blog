@@ -15,7 +15,7 @@ export function partials([min, max], base = 440) {
 
 export function frequencyColor(frequency) {
   const fraction = Math.log(frequency / 440) / Math.log(2)
-  return new TinyColor(interpolateRainbow(fraction % 1))
+  return new TinyColor(interpolateRainbow((fraction) % 1))
     .lighten(20)
     .toHexString()
 }
