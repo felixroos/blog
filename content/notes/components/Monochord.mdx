@@ -1,11 +1,10 @@
-import { clamp, ratios } from "./tuning.ts"
 import { State } from "react-powerplug"
 import { Note } from "@tonaljs/tonal"
 import { Switch } from "@material-ui/core"
+import { clamp, ratios } from "../../components/tuning/tuning.ts"
+import Monochord from "../../components/tuning/Monochord.tsx"
 
 # Monochord
-
-import Monochord from "./Monochord.tsx"
 
 The monochord component mimics a real monochord. You can move the handle by dragging to change the ratio.
 The numbers describe the fraction of the length on either side.
@@ -170,6 +169,7 @@ ratios(1 / 4, [3 / 2, 3 / 4], 12)
 
 - http://www.harmonik.de/harmonik/vtr_pdf/JustIntonation.pdf
 - https://en.wikipedia.org/wiki/Just_intonation
+- https://en.wikipedia.org/wiki/Pythagorean_comma
 - https://www.youtube.com/watch?v=8syA7S_5E3A
 - https://www.youtube.com/watch?v=TYhPAbsIqA8
 

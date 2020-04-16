@@ -10,13 +10,15 @@ interface SynthAction {
   velocity?: number | number[],
 };
 
-var reverb = new Tone.Reverb({
+var reverb = canUseDOM() && new Tone.Reverb({
   decay: 0.5,
   preDelay: 0.02,
   wet: 0.5,
 }
 ).toMaster();
-reverb.generate()/* .then((r) => console.log('reverb ready', r)); */
+if (reverb) {
+  reverb.generate()/* .then((r) => console.log('reverb ready', r)); */
+}
 
 const defaultSynth =
   canUseDOM() &&

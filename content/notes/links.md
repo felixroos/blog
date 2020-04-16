@@ -1,3 +1,5 @@
+## People
+
 - alex mclean - tidalcycles creator https://slab.org/
   - https://toplap.org/
   - https://github.com/toplap/awesome-livecoding
@@ -16,3 +18,17 @@
   - yt channel https://www.youtube.com/channel/UCc6BBUE5zmmLMT-NQ_8sTzQ
 
 https://github.com/pshrmn/notes
+
+## d3
+
+- https://observablehq.com/collection/@d3/learn-d3
+- https://medium.com/@enjalot/how-do-you-learn-d3-js-ccffc151419b
+- https://github.com/d3/d3-hierarchy#d3-hierarchy
+- https://medium.com/@enjalot/the-hitchhikers-guide-to-d3-js-a8552174733a
+  - http://www.r2d3.us/visual-intro-to-machine-learning-part-1/ !
+
+## ideas:
+
+- use scales with d3 :x = d3.scaleLinear().domain([0, scale.length])
+- use https://de.wikipedia.org/wiki/Euklidischer_Algorithmus
+- connect symbols (chords & scales) in a graph network, use shortest paths as progressions

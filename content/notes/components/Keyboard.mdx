@@ -1,0 +1,128 @@
+import Keyboard from "../../components/Keyboard.tsx"
+import { ColorKeyboard } from "../../components/coloring-pitches/ColorKeyboard.tsx"
+import ChordDisplay from "../../components/ChordDisplay.tsx"
+import ScaleDisplay from "../../components/ScaleDisplay.tsx"
+import {
+  noteColor,
+  noteLightness,
+  rainbow,
+  sinebow,
+} from "../../components/coloring-pitches/noteColor.ts"
+
+# Keyboards
+
+With Mouse Events + Synth
+
+import { Synth, PolySynth } from "tone"
+const isBrowser = typeof window !== "undefined"
+const synth = isBrowser && new Synth({ volume: -12 }).toMaster()
+const poly = isBrowser && new PolySynth(6, Synth, { volume: -12 }).toMaster()
+
+<Keyboard
+  options={{ range: ["C3", "C5"] }}
+  onAttack={(key) => synth && synth.triggerAttack(key.notes[0])}
+  onRelease={(key) => synth && synth.triggerRelease([key.notes[0]])}
+/>
+
+## With Color
+
+import { State, Toggle } from "react-powerplug"
+
+<State initial={{ offset: 60, width: 1.4, rotation: 180, saturation: 80 }}>
+  {({ state, setState }) => (
+    <>
+      <label>
+        <input
+          min="0"
+          max="360"
+          type="range"
+          value={state.rotation}
+          step="1"
+          onChange={(e) => setState({ rotation: parseInt(e.target.value) })}
+        />
+        rotation {state.rotation}
+      </label>
+      <br />
+      <label>
+        <input
+          min="0"
+          max="100"
+          type="range"
+          value={state.offset}
+          step="1"
+          onChange={(e) =>
+            setState({ ...state, offset: parseInt(e.target.value) })
+          }
+        />
+        center {state.offset}
+      </label>
+      <br />
+      <label>
+        <input
+          min="0.1"
+          max="3.0"
+          type="range"
+          value={state.width}
+          step="0.1"
+          onChange={(e) =>
+            setState({ ...state, width: parseFloat(e.target.value) })
+          }
+        />
+        width {state.width}
+      </label>
+      <br />
+      <label>
+        <input
+          min="0"
+          max="100"
+          type="range"
+          value={state.saturation}
+          step="1"
+          onChange={(e) =>
+            setState({ ...state, saturation: parseInt(e.target.value) })
+          }
+        />
+        saturation {state.saturation}
+      </label>
+      <br />
+      <p>angry rainbow</p>
+      <ColorKeyboard
+        options={{ scaleX: 1, scaleY: 1, range: ["C2", "C6"] }}
+        colorizer={(note) =>
+          noteColor(note, state.rotation)
+            .desaturate(100 - state.saturation)
+            .lighten(noteLightness(note, state.offset, 1 / state.width))
+            .toHex()
+        }
+      />
+      <p>sinebow</p>
+      <ColorKeyboard
+        options={{ scaleX: 1, scaleY: 1, range: ["C2", "C6"] }}
+        colorizer={(note) =>
+          rainbow(note, state.rotation)
+            .desaturate(100 - state.saturation)
+            .lighten(noteLightness(note, state.offset, 1 / state.width))
+            .toHex()
+        }
+      />
+      <p>less angry rainbow</p>
+      <ColorKeyboard
+        options={{ scaleX: 1, scaleY: 1, range: ["C2", "C6"] }}
+        colorizer={(note) =>
+          sinebow(note, state.rotation)
+            .desaturate(100 - state.saturation)
+            .lighten(noteLightness(note, state.offset, 1 / state.width))
+            .toHex()
+        }
+      />
+    </>
+  )}
+</State>
+
+## Chords
+
+<ChordDisplay />
+
+## Scales
+
+<ScaleDisplay />

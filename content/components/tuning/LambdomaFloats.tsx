@@ -1,6 +1,5 @@
 import React from "react"
 import { maxFractionSize } from "./tuning"
-import { gcd } from "../common/gcd"
 import { Lambdoma } from "./Lambdoma"
 import Fraction from "fraction.js"
 

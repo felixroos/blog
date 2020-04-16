@@ -1,0 +1,67 @@
+import { Urn } from "../../components/combinatorial-search/Urn.tsx"
+import { Permutation } from "../../components/combinatorial-search/Permutation.ts"
+import { Analyzer } from "../../components/combinatorial-search/Analyzer.tsx"
+
+# Urn
+
+<!-- 
+<Analyzer
+  render={({ start, stop, analyze }) => (
+    <Urn
+      balls={3}
+      minItems={2}
+      maxItems={5}
+      samples={3}
+      uniqueItems={true}
+      hideCombinations={false}
+      canEditSamples={true}
+      canEditOrder={true}
+      canEditUnique={true}
+      picker={(items, number = items.length, strictOrder, unique) => {
+        start()
+        const results = Permutation.search(
+          (collected, solutions) =>
+            analyze(
+              collected,
+              collected.length >= number
+                ? []
+                : unique
+                ? items.filter(
+                    ball =>
+                      !collected.includes(ball) &&
+                      (strictOrder ||
+                        !solutions.find(solution =>
+                          Permutation.isEqual([...collected, ball], solution)
+                        ))
+                  )
+                : items
+            ),
+          (collected, solutions) =>
+            collected.length === number &&
+            (strictOrder ||
+              !solutions.find(solution =>
+                Permutation.isEqual(collected, solution)
+              ))
+        )
+        stop()
+        return results
+      }}
+    />
+  )}
+/> -->
+
+<Urn
+  minItems={2}
+  maxItems={5}
+  balls={3}
+  picker={items =>
+    Permutation.search(
+      collected => items.filter(ball => !collected.includes(ball)),
+      collected => collected.length === items.length
+    )
+  }
+/>
+
+## TBD
+
+- add full Urn

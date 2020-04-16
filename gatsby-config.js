@@ -2,8 +2,17 @@ module.exports = {
   pathPrefix: "/blog",
   plugins: [
     {
+      resolve: `gatsby-theme-notes`,
+      options: {
+        // basePath defaults to `/`
+        basePath: `/notes`,
+      },
+    },
+    {
       resolve: `gatsby-theme-blog`,
-      options: {},
+      options: {
+        mdxOtherwiseConfigured: false,
+      },
     },
     {
       resolve: `gatsby-plugin-typescript`,

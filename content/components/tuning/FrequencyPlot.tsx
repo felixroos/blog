@@ -2,7 +2,6 @@ import React, { useState } from "react"
 import { Plot } from "../common/Plot"
 import { frequencyColor } from "./tuning"
 import useFrame from "../common/useFrame"
-import { Button } from "@material-ui/core"
 
 export function FrequencyPlot({
   base,

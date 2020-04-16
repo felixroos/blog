@@ -9,10 +9,13 @@ export function ColorKeyboard({ options, colorizer = noteColor }) {
     <Keyboard
       options={{
         ...options,
-        colorize: Range.chromatic(options.range).map(note => ({
+        colorize: Range.chromatic(options.range).map((note) => ({
           keys: [note],
           color: colorizer(note),
         })),
+      }}
+      onClick={(p) => {
+        console.log("click", p)
       }}
     />
   )

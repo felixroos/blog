@@ -1,1 +1,0 @@
-idea: connect symbols (chords & scales) in a graph network, use shortest paths as progressions

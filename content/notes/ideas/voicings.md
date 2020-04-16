@@ -1,4 +1,3 @@
-
 <!-- ## Goal
 
 The goal is to generate permutations of any items by following certain rules. For example we could want all possible voicings of a c major chord, with a minimum of two notes and a maximum of four notes:
@@ -32,7 +31,6 @@ All possible voicings, by following the above rules, would be:
 
 So voicings are basically permutations of chord notes within given constraints.
 But before we get into the voicing implementation, we need to understand the algorithm behind it. -->
-
 
 ## Modeling Musical Voicings
 
@@ -69,57 +67,3 @@ For example, a C7 chord:
 - required pitches: E and Bb
 - optional pitches: C and G
 - one could argue that is C is also required. That depends on what we want to achieve
-
-<!-- 
-
-## Using it for Voicings
-
-```ts
-static search(pitches: string[], options: VoicingValidation = {}) {
-  return Permutation.search(
-    (path: string[]) => pitches.filter(
-      (pitch) => Permutation.validate(Voicing.constraints(options))(path,pitch)
-    ),
-    Permutation.validate(Voicing.validators(options))
-  );
-}
-static constraints(options?: VoicingValidation): ConstraintFilter<string>[] {
-  options = {
-    maxDistance: 6, // max semitones between any two sequential notes
-    minDistance: 1, // min semitones between two notes
-    minBottomDistance: 3, // min semitones between the two bottom notes
-    unique: true,
-    maxNotes: 4,
-    ...options,
-  }
-  return [
-    Voicing.intervalConstraint(interval => Interval.semitones(interval) <=options.maxDistance),
-    Voicing.intervalConstraint(interval => Interval.semitones(interval) >=options.minDistance),
-    Voicing.intervalConstraint((interval, path) => path.length !== 1 || Interval.semitone(interval) >= options.minBottomDistance),
-    ...(options.unique ? [Permutation.constraints.unique()] : []),
-    Permutation.constraints.max(options.maxNotes),
-  ]
-}
-static validators(options?: VoicingValidation): PathValidator<string>[] {
-  options = {
-    minTopDistance: 3, // min semitones between the two top notes
-    minNotes: 3,
-    ...options,
-  }
-  return [
-    Permutation.validators.min(options.minNotes),
-    path => {
-      return path.length > 1 && Interval.semitones(Distance.interval(path[path.length - 2],path[path.length - 1])) >= options.minTopDistance
-    }
-  ]
-}
-/** Validates the interval to the next note. You can write your own logic inside the validate fn. */
-static intervalConstraint(validate: (interval: string, path, next) => boolean) {
-  return (path, next) => {
-    if (!path.length) { return true; }
-    const interval = Distance.interval(path[path.length - 1], next) + '';
-    return validate(interval, path, next);
-  }
-}
-```
- -->

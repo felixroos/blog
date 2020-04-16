@@ -4,9 +4,9 @@
   "private": true,
   "version": "0.0.1",
   "scripts": {
-    "develop": "npx --node-arg '-r esm' gatsby develop",
-    "start": "npx --node-arg '-r esm' gatsby develop",
-    "build": "npx --node-arg '-r esm' gatsby build --prefix-paths",
+    "develop": "gatsby develop",
+    "start": "gatsby develop",
+    "build": "gatsby build --prefix-paths",
     "clean": "gatsby clean",
     "deploy": "gatsby clean && npm run build && gh-pages -d public -b gh-pages"
   },
@@ -39,6 +39,7 @@
     "gatsby-cli": "^2.11.3",
     "gatsby-plugin-typescript": "^2.3.1",
     "gatsby-theme-blog": "^1.3.30",
+    "gatsby-theme-notes": "^1.2.22",
     "gh-pages": "^2.2.0",
     "jest": "^25.2.7",
     "react": "^16.12.0",
