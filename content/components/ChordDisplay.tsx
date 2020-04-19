@@ -3,19 +3,19 @@ import React, { useState, useMemo } from "react"
 import Keyboard from "./Keyboard"
 import { Note } from "@tonaljs/tonal"
 import { ChordType } from "@tonaljs/tonal"
-import { useMouseDrag } from "./useMouseDrag"
 import * as Tone from "tone"
+import { useDrag } from "react-use-gesture"
 
 const { PolySynth, Synth } = Tone
 
 const allNotes = [
   ...Note.names(),
-  ...Note.names().map(n => n + "b"),
-  ...Note.names().map(n => n + "#"),
+  ...Note.names().map((n) => n + "b"),
+  ...Note.names().map((n) => n + "#"),
 ]
 
 function getChordNotes(tonic, symbol) {
-  return ChordType.get(symbol).intervals.map(interval =>
+  return ChordType.get(symbol).intervals.map((interval) =>
     Note.transpose(tonic, interval)
   )
 }
@@ -37,16 +37,20 @@ export default function ChordDisplay() {
     poly.triggerAttack(notes)
   }
 
-  const mouseEvents = useMouseDrag({
-    activate: () => poly.triggerAttack(active),
-    deactivate: () => poly.triggerRelease(active),
+  const onDrag = useDrag(({ down, first, active: _active }) => {
+    if (first) {
+      poly.triggerAttack(active)
+    }
+    if (!_active) {
+      poly.triggerRelease(active)
+    }
   })
 
   return (
     <>
       <select
         value={note.replace(/[0-9]/, "")}
-        onChange={e => {
+        onChange={(e) => {
           setNote(e.target.value + "3")
           setActive(getChordNotes(e.target.value + "3", chord))
         }}
@@ -57,7 +61,7 @@ export default function ChordDisplay() {
       </select>
       <select
         value={chord}
-        onChange={e => {
+        onChange={(e) => {
           setChord(e.target.value)
           setActive(getChordNotes(note, e.target.value))
         }}
@@ -66,10 +70,10 @@ export default function ChordDisplay() {
           <option key={index}>{_chord}</option>
         ))}
       </select>
-      <button {...mouseEvents.bind()}>play</button>
+      <button {...onDrag()}>play</button>
       <br />
       <Keyboard
-        onAttack={key => {
+        onAttack={(key) => {
           setNote(key.notes[0])
           attack(key.notes[0])
         }}
@@ -83,7 +87,7 @@ export default function ChordDisplay() {
           colorize: [
             {
               color: "yellow",
-              keys: active.map(n => Note.simplify(n)),
+              keys: active.map((n) => Note.simplify(n)),
             },
           ],
           labels: active.reduce(

@@ -73,7 +73,7 @@ Usage:
 />
 ```
 
-import Keyboard from "../components/Keyboard"
+import Keyboard from "../components/Keyboard.tsx"
 
 <Keyboard
   options={{
@@ -87,115 +87,62 @@ import Keyboard from "../components/Keyboard"
 
 ## Adding Mouse Events
 
-Let's add mouseDown / mouseUp logic, that will fire attack and release events.
-
-This custom hook handles all the mouse stuff:
+Let's add some mouse events to trigger attack / release. We can use 'react-use-gesture' to handle the mouse events:
 
 ```js
-import React, { useState, useEffect } from "react"
-
-export function useMouseDrag({ activate, deactivate }) {
-  // listen for document mouse up
-  useEffect(() => {
-    const handleMouseUp = () => setMouseDown(false)
-    const handleMouseDown = () => setMouseDown(true)
-    window.addEventListener("mouseup", handleMouseUp)
-    window.addEventListener("mousedown", handleMouseDown)
-    return () => {
-      window.removeEventListener("mouseup", handleMouseUp)
-      window.removeEventListener("mousedown", handleMouseDown)
+const active = useRef([])
+const [colorized, setColorized] = useState([])
+const onDrag = useGesture({
+  onDragStart: ({ down, args: [key] }) => down && activate(key),
+  onHover: ({ down, active, args: [key] }) => {
+    if (active && down) {
+      activate(key)
     }
-  }, [])
-
-  const [mouseDown, setMouseDown] = useState(false)
-
-  function handleMouseDown() {
-    setMouseDown(true)
-    activate(...arguments)
-  }
-  function handleMouseEnter() {
-    if (mouseDown) {
-      activate(...arguments)
+    if (!active) {
+      deactivate(key)
     }
+  },
+})
+const activate = (key) => {
+  if (!colorized.includes(key.notes[0])) {
+    active.current = [...active.current, key.notes[0]]
+    onAttack && onAttack(key)
   }
-  function handleMouseUp() {
-    deactivate(...arguments)
-  }
-  function handleMouseLeave() {
-    if (mouseDown) {
-      deactivate(...arguments)
-    }
-  }
-  return {
-    handleMouseDown,
-    handleMouseEnter,
-    handleMouseUp,
-    handleMouseLeave,
-  }
+  setColorized(active.current)
 }
-```
-
-We can import and use the hook in our Keyboard component, by passing activate and deactivate callbacks:
-
-```jsx
-export default function Keyboard({ options, onClick, onAttack, onRelease }) {
-  const active = useRef([])
-  const [colorized, setColorized] = useState([])
-
-  const activate = key => {
-    if (!colorized.includes(key.notes[0])) {
-      active.current = [...active.current, key.notes[0]]
-      onAttack && onAttack(key)
-    }
-    setColorized(active.current)
+const deactivate = (key) => {
+  if (colorized.includes(key.notes[0])) {
+    active.current = active.current.filter((n) => n !== key.notes[0])
+    onRelease && onRelease(key)
   }
-
-  const deactivate = key => {
-    if (colorized.includes(key.notes[0])) {
-      active.current = active.current.filter(n => n !== key.notes[0])
-      onRelease && onRelease(key)
-    }
-    setColorized(active.current)
-  }
-
-  const {
-    handleMouseDown,
-    handleMouseUp,
-    handleMouseEnter,
-    handleMouseLeave,
-  } = useMouseDrag({ activate, deactivate })
-
-  const { svg, children } = renderSVG({
-    ...options,
-    colorize: [{ keys: colorized, color: "red" }],
-  })
-  return (
-    <svg {...svg}>
-      {children.map(({ polygon, circle, text, key }, index) => [
-        polygon && (
-          <polygon
-            {...polygon}
-            key={"p" + index}
-            onMouseDown={() => handleMouseDown(key)}
-            onMouseUp={() => handleMouseUp(key)}
-            onMouseEnter={() => handleMouseEnter(key)}
-            onMouseLeave={() => handleMouseLeave(key)}
-            onClick={() => onClick && onClick(key)}
-          />
-        ),
-        circle && <circle {...circle} key={"c" + index} />,
-        text && (
-          <text {...text} key={"t" + index}>
-            {text.value}
-          </text>
-        ),
-      ])}
-    </svg>
-  )
+  setColorized(active.current)
 }
 ```
 
 > I had to useRef as an extra layer to always have the latest active keys. Using state directly did not work for me, but maybe this can be done better.
+
+Then we need to pass the colorization:
+
+```js
+const { svg, children } = renderSVG({
+  ...options,
+  colorize: [...(options.colorize || []), { keys: colorized, color: "red" }],
+})
+```
+
+...and pass the mouse events to the key polygon:
+
+```js
+<polygon
+  {...polygon}
+  key={"p" + index}
+  {...onDrag(key)}
+  onMouseUp={() => deactivate(key)}
+  onClick={() => onClick && onClick(key)}
+/>
+```
+
+We also need the mouse up event, as we need use the key and passing args to useGesture's onMouseUp is not possible.
 
 ## Adding a Synth
 
@@ -213,15 +160,15 @@ const synth = new Synth({ volume: -6 }).toMaster()
 
 <Keyboard
   options={{range: ["C3", "C5"]}}
-  onAttack={key => synth?.triggerAttack(key.notes[0])}
-  onRelease={key => synth?.triggerRelease([key.notes[0]])}
+  onAttack={key => synth && synth.triggerAttack(key.notes[0])}
+  onRelease={key => synth && synth.triggerRelease([key.notes[0]])}
 />
 ```
 
 <Keyboard
   options={{ range: ["C3", "C5"] }}
-  onAttack={key => synth?.triggerAttack(key.notes[0])}
-  onRelease={key => synth?.triggerRelease([key.notes[0]])}
+  onAttack={(key) => synth && synth.triggerAttack(key.notes[0])}
+  onRelease={(key) => synth && synth.triggerRelease([key.notes[0]])}
 />
 
 ---
@@ -250,9 +197,9 @@ export function useKeyEvents({ downHandler, upHandler }) {
 ```js
 // + add keyControl to props
 useKeyEvents({
-  downHandler: e =>
+  downHandler: (e) =>
     keyControl && keyControl[e.key] && activate({ notes: [keyControl[e.key]] }),
-  upHandler: e =>
+  upHandler: (e) =>
     keyControl &&
     keyControl[e.key] &&
     deactivate({ notes: [keyControl[e.key]] }),
@@ -263,8 +210,8 @@ in action:
 
 ```jsx
 <Keyboard
-  onAttack={key => poly?.triggerAttack(key.notes[0])}
-  onRelease={key => poly?.triggerRelease([key.notes[0]])}
+  onAttack={(key) => poly && poly.triggerAttack(key.notes[0])}
+  onRelease={(key) => poly && poly.triggerRelease([key.notes[0]])}
   keyControl={{
     a: "C3",
     w: "C#3",
@@ -310,8 +257,8 @@ ffef a afuhf
 ```
 
 <Keyboard
-  onAttack={key => poly?.triggerAttack(key.notes[0])}
-  onRelease={key => poly?.triggerRelease([key.notes[0]])}
+  onAttack={(key) => poly && poly.triggerAttack(key.notes[0])}
+  onRelease={(key) => poly && poly.triggerRelease([key.notes[0]])}
   keyControl={{
     a: "C3",
     w: "C#3",
@@ -355,6 +302,6 @@ Thats it for today..
 
 - Redo mouse events with https://use-gesture.netlify.com/docs/state, see Monochord for usage
 - Use https://www.react-spring.io/ for animated colorization fade
-- use midi input 
+- use midi input
   - https://www.newline.co/@waterplea/jam-on-your-midi-keyboard-in-angular--6c16e1e0?utm_campaign=NG-Newsletter&utm_medium=email&utm_source=NG-Newsletter_327
   - https://github.com/stephband/midi

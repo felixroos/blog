@@ -1,0 +1,112 @@
+## Keyboard custom mouse events
+
+
+## Adding Mouse Events
+
+Let's add mouseDown / mouseUp logic, that will fire attack and release events.
+
+This custom hook handles all the mouse stuff:
+
+```js
+import React, { useState, useEffect } from "react"
+
+export function useMouseDrag({ activate, deactivate }) {
+  // listen for document mouse up
+  useEffect(() => {
+    const handleMouseUp = () => setMouseDown(false)
+    const handleMouseDown = () => setMouseDown(true)
+    window.addEventListener("mouseup", handleMouseUp)
+    window.addEventListener("mousedown", handleMouseDown)
+    return () => {
+      window.removeEventListener("mouseup", handleMouseUp)
+      window.removeEventListener("mousedown", handleMouseDown)
+    }
+  }, [])
+
+  const [mouseDown, setMouseDown] = useState(false)
+
+  function handleMouseDown() {
+    setMouseDown(true)
+    activate(...arguments)
+  }
+  function handleMouseEnter() {
+    if (mouseDown) {
+      activate(...arguments)
+    }
+  }
+  function handleMouseUp() {
+    deactivate(...arguments)
+  }
+  function handleMouseLeave() {
+    if (mouseDown) {
+      deactivate(...arguments)
+    }
+  }
+  return {
+    handleMouseDown,
+    handleMouseEnter,
+    handleMouseUp,
+    handleMouseLeave,
+  }
+}
+```
+
+We can import and use the hook in our Keyboard component, by passing activate and deactivate callbacks:
+
+```jsx
+export default function Keyboard({ options, onClick, onAttack, onRelease }) {
+  const active = useRef([])
+  const [colorized, setColorized] = useState([])
+
+  const activate = (key) => {
+    if (!colorized.includes(key.notes[0])) {
+      active.current = [...active.current, key.notes[0]]
+      onAttack && onAttack(key)
+    }
+    setColorized(active.current)
+  }
+
+  const deactivate = (key) => {
+    if (colorized.includes(key.notes[0])) {
+      active.current = active.current.filter((n) => n !== key.notes[0])
+      onRelease && onRelease(key)
+    }
+    setColorized(active.current)
+  }
+
+  const {
+    handleMouseDown,
+    handleMouseUp,
+    handleMouseEnter,
+    handleMouseLeave,
+  } = useMouseDrag({ activate, deactivate })
+
+  const { svg, children } = renderSVG({
+    ...options,
+    colorize: [{ keys: colorized, color: "red" }],
+  })
+  return (
+    <svg {...svg}>
+      {children.map(({ polygon, circle, text, key }, index) => [
+        polygon && (
+          <polygon
+            {...polygon}
+            key={"p" + index}
+            onMouseDown={() => handleMouseDown(key)}
+            onMouseUp={() => handleMouseUp(key)}
+            onMouseEnter={() => handleMouseEnter(key)}
+            onMouseLeave={() => handleMouseLeave(key)}
+            onClick={() => onClick && onClick(key)}
+          />
+        ),
+        circle && <circle {...circle} key={"c" + index} />,
+        text && (
+          <text {...text} key={"t" + index}>
+            {text.value}
+          </text>
+        ),
+      ])}
+    </svg>
+  )
+}
+```
