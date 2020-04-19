@@ -49,7 +49,6 @@ export function Plot({
     y = scaleLinear()
       .domain(range.y)
       .range([height - margin.top, margin.bottom])
-      .nice()
 
   const plots = functions.map((f) => {
     const lines: Path2[] = [[]]

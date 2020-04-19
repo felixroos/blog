@@ -17,34 +17,30 @@ This is useful for example animating stuff in MDX:
 
 ```jsx
 <AnimationFrame>
-  {({ time, isRunning, start, stop, toggle }) => {
-    return (
-      <>
-        <Fab onClick={() => start(1000)}>
-          {!isRunning ? <PlayArrowIcon /> : <StopIcon />}
-        </Fab>
-        <h1 style={{ opacity: time.progress }}>
-          {Math.round(time.progress * 100)}%
-        </h1>
-      </>
-    )
-  }}
+  {({ time, isRunning, start, stop, toggle }) => (
+    <>
+      <Fab onClick={() => start(1000)}>
+        {!isRunning ? <PlayArrowIcon /> : <StopIcon />}
+      </Fab>
+      <h1 style={{ opacity: time.progress }}>
+        {Math.round(time.progress * 100)}%
+      </h1>
+    </>
+  )}
 </AnimationFrame>
 ```
 
 <AnimationFrame>
-  {({ toggle, time, isRunning, start, stop }) => {
-    return (
-      <>
-        <Fab onClick={() => start(1000)}>
-          {!isRunning ? <PlayArrowIcon /> : <StopIcon />}
-        </Fab>
-        <h1 style={{ opacity: time.progress }}>
-          {Math.round(time.progress * 100)}%
-        </h1>
-      </>
-    )
-  }}
+  {({ toggle, time, isRunning, start, stop }) => (
+    <>
+      <Fab onClick={() => start(1000)}>
+        {!isRunning ? <PlayArrowIcon /> : <StopIcon />}
+      </Fab>
+      <h1 style={{ opacity: time.progress }}>
+        {Math.round(time.progress * 100)}%
+      </h1>
+    </>
+  )}
 </AnimationFrame>
 
 ### without fixed end

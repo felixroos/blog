@@ -8,6 +8,6 @@ export default function AnimationFrame(props) {
     progress: 0,
     delta: null,
   })
-  const frame = useFrame(setTime)
+  const frame = useFrame(setTime, props.autostart)
   return props.children({ ...frame, time })
 }

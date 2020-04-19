@@ -34,6 +34,7 @@ import { LambdomaSettings } from "../components/tuning/LambdomaSettings.tsx"
 import { Demo } from "../components/tuning/Demo.tsx"
 import { LambdomaFloats } from "../components/tuning/LambdomaFloats.tsx"
 import { Harmonics } from "../components/tuning/Harmonics.tsx"
+import Keyboard from "../components/Keyboard.tsx"
 
 import { FrequencyPlot } from "../components/tuning/FrequencyPlot.tsx"
 import { FrequencyPlotSettings } from "../components/tuning/FrequencyPlotSettings.tsx"
@@ -50,14 +51,272 @@ import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction"
 import ListItemText from "@material-ui/core/ListItemText"
 import Monochord from "../components/tuning/Monochord.tsx"
 
-<Monochord />
-
 This post is about the fundamental questions of musical tuning:
 
 - How to decide which pitches to use as material?
-- Why are there 12 notes in (most) music? Is this arbitrary?
+- Why are there 12 notes in (most) music of today? Is this arbitrary?
 
 To teach myself d3, and play around with tunings, I did a few vizualisations.
+
+## Harmonic Ratios on the Monochord
+
+Let's understand what harmonic ratios are, by looking at a monochord.
+One of the first tuning systems, the pythagorean tuning, was also developed using this instrument, which consists of a single stretched string:
+
+<Monochord />
+
+_You can play it by clicking at the circle at the left, or by hovering over the string._
+
+### Physical Assumptions
+
+> In general, the pitch of a string is determined by its length, material and the amount of applied tension.
+
+For example, imagine a guitar:
+
+- to adjust the pitch of the open strings, we need to add or remove tension by rotating the peghead.
+- If a finger is placed on a fret, the length of the vibrating part is changed, which will increase the pitch
+
+For this article, if not explicitly stated, we will assume that all strings have the same tension and material, so the only changing variable will be the length of the vibrating part.
+
+Further Reading: If you know a bit about physics and math, you should read [The Physics of Musical Instruments](https://www.amazon.de/Physics-Musical-Instruments-Neville-Fletcher/dp/0387983740).
+
+### Octaves and the number 2
+
+Lets look at the Monochord:
+
+<Monochord />
+
+The pitch produced by this string will from now on be called fundamental pitch.
+It is the pitch that all the others will relate to.
+
+If we fixate the string in the exact middle, we get this:
+
+<Monochord value={1 / 2} ticks={4} width={400} />
+
+The left circle tells us the length ratio, which is 1/2. This means that this is one half of the full length.
+
+> If we compare the pitches above, we notice that there is not a real difference in quality, just in "brightness".
+> In musical terms, this ratio is called **Octave**.
+
+> We can say: Dividing the string by 2 raises the pitch by one octave.
+
+We could go one octave further up by dividing by 2 again:
+
+<Monochord value={1 / 4} ticks={4} width={400} />
+
+Instead of dividing, we could also double the length of our original string:
+
+<Monochord />
+<Monochord factor={2} value={1} ticks={4} base={220} width={800} />
+
+Here we have a ratio of 2/1, which means that this length is double the length of our 1/1 string. Now we are one octave below our fundamental pitch.
+
+We could achieve the same pitch lowering the tension of the string instead:
+
+<Monochord
+  strokeWidth={8}
+  factor={2}
+  value={1}
+  ticks={4}
+  base={220}
+  width={400}
+/>
+
+The lower tension is indicated by the increased thickness of the string.
+
+We can now produce our original pitch by dividing that string by 2:
+
+<Monochord
+  strokeWidth={8}
+  factor={2}
+  value={1 / 2}
+  ticks={4}
+  base={220}
+  width={400}
+/>
+
+Generally speaking, we can multiply or divide any string length by 2 any number of times to get octaves (in fact any octave) of the original pitch.
+
+<!-- #### On the Keyboard
+
+As our full string length produces an A4,
+the ratios above will place like that:
+
+<Keyboard
+  options={{
+    range: ["C3", "C7"],
+    scaleX: 1,
+    scaleY: 1,
+    colorize: [
+      {
+        keys: ["A3", "A4", "A5", "A6"],
+        color: frequencyColor(440),
+      },
+    ],
+    labels: {
+      A3: "2/1",
+      A4: "1/1",
+      A5: "1/2",
+      A6: "1/4",
+    },
+  }}
+/> -->
+
+#### Historical Context: Cave Music
+
+The octave is so fundamental, that probably already the first human beings were using them.
+Imagine a caveman and a cavewoman, singing a tribal song. The cavewoman's voice will generally be higher than the caveman's voice.
+If they now sing a melody together, they will probably sing it an octave apart, which results in the feeling of being "in tune".
+
+### Fifths and the number 3
+
+While the octave used divisions/multiples of the number 2, we can do the same with the number 3.
+
+Let's take the string:
+
+<Monochord value={1} ticks={4} width={400} />
+
+... and divide it by 3:
+
+<Monochord value={1 / 3} ticks={4} width={400} />
+
+Now we get a new color, but the difference is really high.
+But knowing that dividing/multplying by 2 does not affect color, we can just lower it by an octave by multiplying it by 2:
+
+<Monochord value={2 / 3} ticks={4} width={400} />
+
+> This length ratio of 2/3 is called a (just) **perfect fifth**.
+> It is the simplest ratio that results in a new pitch quality, which is indicated here by the change in color.
+
+We can now combine a row of strings that just use multiples of 2 and 3, sorted by length:
+
+<Monochord value={1} ticks={4} width={400} />
+<Monochord value={2 / 3} ticks={4} width={400} />
+<Monochord value={1 / 2} ticks={4} width={400} />
+<Monochord value={1 / 3} ticks={4} width={400} />
+<Monochord value={1 / 4} ticks={4} width={400} />
+
+### Inversion of intervals
+
+
+
+#### Historical Context: Monk Music
+
+TBD
+
+### Fourths and the number 3
+
+We can do more with the number 3.
+
+Like with the octaves, we can lower the string tension until the pitch is one octave below:
+
+<Monochord
+  factor={1}
+  strokeWidth={4}
+  value={1}
+  ticks={4}
+  width={400}
+  base={440}
+/>
+<Monochord
+  factor={2}
+  strokeWidth={8}
+  value={1}
+  ticks={4}
+  width={400}
+  base={220}
+/>
+
+Now let's divide by 4:
+
+<Monochord
+  factor={2}
+  strokeWidth={8}
+  value={1 / 4}
+  ticks={4}
+  width={400}
+  base={220}
+/>
+
+And then multiply by three:
+
+<Monochord
+  factor={2}
+  strokeWidth={8}
+  value={3 / 4}
+  ticks={4}
+  width={400}
+  base={220}
+/>
+
+compare that to the fundamental pitch:
+
+<Monochord
+  factor={2}
+  strokeWidth={8}
+  value={1}
+  ticks={4}
+  width={400}
+  base={220}
+/>
+
+
+>With the length ratio 3/2, we get a new quality which is called __perfect fourth__.
+>To be precise, this particular one is the just perfect fourth.
+
+### Thirds and the number 5
+
+The next interesting number is the 5.
+Like we did with the number 3, we can generate octaves of divisions by 5, along with the octaves of the full length:
+
+<Monochord value={1 / 1} ticks={4} width={400} />
+<Monochord value={4 / 5} ticks={4} width={400} />
+<Monochord value={1 / 2} ticks={4} width={400} />
+<Monochord value={2 / 5} ticks={4} width={400} />
+<Monochord value={1 / 4} ticks={4} width={400} />
+<Monochord value={1 / 5} ticks={4} width={400} />
+
+> The length ratio of 4/5 is called the (just) major third. It is the next new quality after the fifth.
+
+We can also combine the three qualities (octave, fifth, third):
+
+<Monochord value={1 / 1} ticks={4} width={400} />
+<Monochord value={4 / 5} ticks={4} width={400} />
+<Monochord value={2 / 3} ticks={4} width={400} />
+<Monochord value={1 / 2} ticks={4} width={400} />
+<Monochord value={2 / 5} ticks={4} width={400} />
+<Monochord value={1 / 3} ticks={4} width={400} />
+<Monochord value={1 / 4} ticks={4} width={400} />
+
+> Musicians would call a combination of major third and perfect fifth a **major third**.
+> To be precise, one would call it a just major third.
+
+#### Historical Context: Renaissance
+
+### Prime numbers
+
+You may have noticed that the number 4 was omitted. The reason is because 4 is just 2\*2 which is two octaves.
+So the number 4 will not give us a new quality. The same applies to 6 as it is 2\*3.
+
+So if we want to find new qualities, we need numbers that have no multiples of smaller numbers.
+This is exactly what a prime number is!
+
+> New pitch ratio qualities can be found by using multiples of prime numbers
+
+#### Math
+
+Mathematically speaking, we can say that if we take a string length L, the lengths L\*2^/n will produce octaves of the pitch of L.
+Where n is a real number. Negative numbers will produce octaves above, while positive numbers produce octaves below the fundamental.
+
+- 2^-1 = 1/2 = 1 octave above
+- 2^0 = 1/1 = fundamental
+- 2^1 = 2/1 = 1 octave below
+
+### The Cause of consonance
+
+Ear as a calculating organ
+Buffer length = full wavelength of a ratio
+Look at "beats", and compare to minimal perceivable tempo.
 
 ## Physical Reasons
 

@@ -1,0 +1,4 @@
+- bret victor
+- waitbutwhy
+- first principles
+- feynman technique

@@ -13,8 +13,12 @@ export function partials([min, max], base = 440) {
   return f.filter((f, i, a) => a.indexOf(f) === i)
 }
 
-export function frequencyColor(frequency) {
-  const fraction = Math.log(frequency / 440) / Math.log(2)
+export function cents(ratio: number) {
+  return Math.log(ratio) / Math.log(2) * 1200
+}
+
+export function frequencyColor(frequency: number) {
+  const fraction = cents(frequency / 440) / 1200;
   return new TinyColor(interpolateRainbow((fraction) % 1))
     .lighten(20)
     .toHexString()

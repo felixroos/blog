@@ -6,6 +6,17 @@ import { Plot } from "../../components/common/Plot.tsx"
 
 <Plot functions={[(x) => 4 * Math.sin(x)]} />
 
+## Bare
+
+<Plot
+  margin={{ top: 1, bottom: 1, left: 0, right: 0 }}
+  functions={[(x) => Math.sin(x)]}
+  range={{ x: [0, Math.PI], y: [-1, 1] }}
+  hideAxes={true}
+  height={20}
+  width={100}
+/>
+
 ## Range
 
 <Plot

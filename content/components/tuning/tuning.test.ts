@@ -1,5 +1,25 @@
 import { stack, clamp, nearestPitch, maxFractionSize } from './tuning';
 
+
+function limit(numbers, min, max) {
+  const solutions = [];
+  numbers.forEach(n => {
+    const powers = []
+    for (let i = min; i <= max; ++i) {
+      powers.push(Math.pow(n, i));
+    }
+    solutions.push(powers);
+  });
+  return solutions
+}
+test('limit', () => {
+  expect(limit([2, 3, 5], -1, 1)).toEqual([
+    [1 / 2, 1, 2],
+    [1 / 3, 1, 3],
+    [1 / 5, 1, 5],
+  ])
+})
+
 test('fraction', () => {
   expect(stack(1)).toEqual([440])
   expect(stack(2)).toEqual([440, 660])

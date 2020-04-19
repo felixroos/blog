@@ -1,56 +1,293 @@
-import { clamp, ratios, frequencyColor } from "../../components/tuning/tuning.ts"
+import {
+  clamp,
+  ratios,
+  frequencyColor,
+  cents,
+} from "../../components/tuning/tuning.ts"
+import IntervalSet, {
+  getLinks,
+  getNodes,
+} from "../../components/tuning/IntervalSet.tsx"
 import NoteCircle from "../../components/tuning/NoteCircle"
 import FractionCircle from "../../components/common/FractionCircle.tsx"
 import Circle, { circlePosition } from "../../components/common/Circle.tsx"
 import { State } from "react-powerplug"
-import { Note } from "@tonaljs/tonal"
+import { Note, Scale, Range } from "@tonaljs/tonal"
 import { Switch } from "@material-ui/core"
 import { line } from "d3-shape"
+import ConnectedCircle from "../../components/common/ConnectedCircle"
+import AnimationFrame from "../../components/common/AnimationFrame.tsx"
+import Fraction from "fraction.js"
+import Slider from "@material-ui/core/Slider"
 
-# Circles
+## ConnectedCircle
 
-## using circlePosition
+### TBD
 
-<svg width={240} height={240}>
-  <circle
-    cx={120}
-    cy={120}
-    r={100}
-    stroke="gray"
-    strokeWidth={4}
-    fill="none"
-  />
-  <path
-    stroke="gray"
-    strokeWidth={4}
-    fill="none"
-    d={line()(
-      ["C", "Eb", "G", "Bb"].map((n) =>
-        circlePosition(Note.chroma(n) / 12, 100).map((p) => p + 20)
-      )
-    )}
-  />
-  {Array(12)
-    .fill(0)
-    .map((_, i, a) => {
-      const [x, y] = circlePosition(i / a.length, 100)
-      const note = Note.fromMidi(i + 60)
-      return (
-        <>
-          <circle
-            r={20}
-            cx={x + 20}
-            cy={y + 20}
-            fill={frequencyColor(Note.freq(note))}
+- [x] show ticks
+- [x] inside + outside ticks with two labels for one value
+- [ ] draggable nodes to change value on circle
+- [ ] use d3 scaleLog to make use of invert
+
+## Just Tuning
+
+<State initial={{ toggle: false, interval: 1, focus: undefined }}>
+  {({ state, setState }) => {
+    const base = 440
+    const nodes = getNodes(
+      [1, 9 / 8, 5 / 4, 4 / 3, 3 / 2, 5 / 3, 15 / 8],
+      base,
+      state.toggle ? "cents" : "ratios",
+      state.focus
+    )
+    const links = getLinks(nodes, state.interval, base, state.focus)
+    const intervals = ["2nds", "3rds", "4ths", "5ths", "6ths", "7ths"]
+    function onlyUnique(value, index, self) {
+      return self.indexOf(value) === index
+    }
+    const unique = links
+      .map((l) => Math.round(l.value.frequency))
+      .filter(onlyUnique)
+    return (
+      <>
+        <label>
+          ratios
+          <Switch
+            checked={state.toggle}
+            color="default"
+            onChange={(e) => setState({ toggle: e.target.checked })}
           />
-          <text x={x + 20} y={y + 25} fill="black" textAnchor="middle">
-            {Note.get(note).pc}
-            {/* {Note.get(Note.fromMidiSharps(i + 60)).pc} */}
-          </text>
-        </>
-      )
-    })}
-</svg>
+          cents
+        </label>
+        <br />
+        <ConnectedCircle
+          onClick={({ link }) => setState({ focus: link })}
+          onHover={({ link }) => setState({ focus: link })}
+          nodeRadius={30}
+          r={140}
+          links={links}
+          nodes={nodes}
+        />
+        <br />
+        <label>
+          compare {intervals[state.interval - 1]} (
+          {intervals[intervals.length - state.interval]})
+          <br />
+          <Slider
+            min={1}
+            max={6}
+            step={1}
+            style={{ width: 350 }}
+            value={state.interval}
+            onChange={(e, v) =>
+              setState({
+                interval: v,
+              })
+            }
+          />
+        </label>
+        <br />
+        <IntervalSet
+          onClick={(link) => setState({ focus: link })}
+          onHover={(link) => setState({ focus: link })}
+          links={links}
+          view={state.toggle ? "cents" : "ratios"}
+          base={base}
+          focus={state.focus}
+        />
+        <br />
+        there are {unique.length} different {intervals[state.interval - 1]}
+      </>
+    )
+  }}
+</State>
+
+### with both combined:
+
+<ConnectedCircle
+  nodeRadius={20}
+  r={120}
+  nodes={[1, 9 / 8, 5 / 4, 4 / 3, 3 / 2, 5 / 3, 15 / 8]
+    .map((ratio, i, notes) => ({
+      ratio,
+      cents: cents(ratio),
+      value: cents(ratio) / 1200,
+      frequency: ratio * Note.freq("A4"),
+    }))
+    .reduce(
+      (nodes, { value, ratio, frequency, cents }, i, notes) =>
+        nodes.concat([
+          {
+            id: `cents-${i}`,
+            // label: new Fraction(frequency).toFraction(true),
+            label: Math.round(cents),
+            value,
+            fill: frequencyColor(frequency),
+            //fill: "white",
+            radius: 20,
+            distance: 90,
+          },
+          {
+            id: `ratio-${i}`,
+            label: new Fraction(ratio).toFraction(),
+            value,
+            fill: frequencyColor(frequency),
+            //fill: "white",
+            radius: 20,
+            distance: 150,
+          },
+        ]),
+      []
+    )}
+/>
+
+### TBD
+
+- [ ] add colored lines from tonic to ratios
+- [x] show all possible intervals of same type
+- [x] calculate ratios dynamically with limit n
+
+## Equal Temperament
+
+To get the frequencies for equal temperament we can use:
+
+```js
+const equal = Array.from({ length: 12 }, (_, i) => Math.pow(2, i / 12))
+```
+
+This will result in equidistant frequencies:
+
+<ConnectedCircle
+  nodeRadius={25}
+  r={120}
+  nodes={Array.from({ length: 12 }, (_, i) => Math.pow(2, i / 12))
+    .map((ratio, i, notes) => ({
+      ratio,
+      value: cents(ratio) / 1200,
+      frequency: ratio * Note.freq("A4"),
+    }))
+    .map(({ value, ratio, frequency }, i, notes) => ({
+      id: i,
+      label: Math.round(frequency * 2) / 2,
+      value,
+      fill: frequencyColor(frequency),
+    }))}
+/>
+
+- Note that the frequencies are rounded.
+- Using ratios would be useless as we are in the irrational number space
+
+### TBD
+
+- Allow setting different octave divisons (other than 12)
+- show deviation from just ratios
+
+## Pythagorean
+
+labeled number of fifths applied:
+
+<ConnectedCircle
+  nodes={[
+    1,
+    1024 / 729,
+    256 / 243,
+    128 / 81,
+    32 / 27,
+    16 / 9,
+    4 / 3,
+    3 / 2,
+    9 / 8,
+    27 / 16,
+    81 / 64,
+    243 / 128,
+    729 / 512,
+  ].map((ratio, i, notes) => ({
+    id: i,
+    label: i,
+    value: cents(ratio) / 1200,
+    fill: frequencyColor(ratio * Note.freq("A3")),
+  }))}
+/>
+
+### TBD
+
+- show diff to just intervals
+- show comma
+- show wolf fifth
+- calculate ratios dynamically, being able to rotate
+- spiral representation?
+  - can change distance from nodes to big circle center
+  - diff from circle is diff to equal temperament
+
+## Scale Circle
+
+<!-- + time.fromStart / 20000 -->
+
+<State initial={{ tonic: "C", scale: "major", allNotes: false }}>
+  {({ state, setState }) => {
+    const scale = Scale.get(`${state.tonic} ${state.scale}`)
+    const notes = state.allNotes
+      ? Range.chromatic(["C3", "B3"])
+      : scale.intervals.map((interval) =>
+          Note.transpose(state.tonic + "3", interval)
+        )
+    return (
+      <>
+        <ConnectedCircle
+          nodes={notes.map((note, i, notes) => ({
+            id: Note.chroma(note),
+            label: Note.get(note).pc,
+            value: i / notes.length,
+            fill: frequencyColor(Note.freq(note)),
+          }))}
+          links={[]}
+          sets={[
+            {
+              set: scale.notes.concat([state.tonic]).map((n) => Note.chroma(n)),
+              stroke: "steelblue",
+            },
+          ]}
+          r={120}
+        />
+        <br />
+        <select
+          value={state.tonic}
+          onChange={(e) => setState({ tonic: e.target.value })}
+        >
+          {Range.chromatic(["C3", "B3"]).map((note, index) => (
+            <option key={index}>{Note.get(note).pc}</option>
+          ))}
+        </select>
+        <select
+          value={state.scale}
+          onChange={(e) => setState({ scale: e.target.value })}
+        >
+          {Scale.names()
+            .sort()
+            .map((_scale, index) => (
+              <option key={index}>{_scale}</option>
+            ))}
+        </select>
+        <label>
+          allNotes
+          <Switch
+            checked={state.allNotes}
+            color="primary"
+            onChange={(e) => setState({ allNotes: e.target.checked })}
+          />
+        </label>
+      </>
+    )
+  }}
+</State>
+
+### TBD
+
+- show correct accidentals when allNotes true
+- show subsets (chords & scales that fit inside)
+- group scales by number of notes + darkness
+
+# Other Circles
 
 ## FractionCircle
 
