@@ -15,15 +15,17 @@ export default function useFrame(callback, autostart = false) {
     if (previousTimeRef.current != undefined) {
       const delta = time - previousTimeRef.current
       const fromStart = time - startTimeRef.current;
+      const last = maxTimeRef.current && fromStart >= maxTimeRef.current;
       callback({
         time,
         delta,
         fromStart,
+        last,
         fromFirstStart: fromStart + stopTimeRef.current,
         stopTime: stopTimeRef.current,
         progress: maxTimeRef.current ? fromStart / maxTimeRef.current : 0
       });
-      if (maxTimeRef.current && fromStart >= maxTimeRef.current) {
+      if (last) {
         stop();
         maxTimeRef.current = null;
         return;

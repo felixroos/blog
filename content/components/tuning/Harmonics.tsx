@@ -1,18 +1,10 @@
-import React, { useEffect } from "react"
-import { max } from "d3-array"
-import Grid from "@material-ui/core/Grid"
-import Slider from "@material-ui/core/Slider"
-import Typography from "@material-ui/core/Typography"
 import { Note } from "@tonaljs/tonal"
+import React from "react"
 import useSynth from "../common/useSynth"
-import { FrequencyPlot } from "./FrequencyPlot"
-import Strings from "./Strings"
-import PlayArrowIcon from "@material-ui/icons/PlayArrow"
-import StopIcon from "@material-ui/icons/Stop"
-import { Fab } from "@material-ui/core"
 import Waveform from "../synthesis/Waveform"
+import { FrequencyPlot } from "./FrequencyPlot"
 
-export function Harmonics({ state, setState }) {
+export function Harmonics({ state, setState, polysynth }) {
   const base = Note.freq("C4")
   const hearingRange = [20, 16000]
   const partialRange = [
@@ -21,11 +13,11 @@ export function Harmonics({ state, setState }) {
   ]
 
   function partials(n: number, damp = 100) {
-    return Waveform[state.waveform || "saw"](n)
+    return Waveform[state.waveform || "triangle"](n)
   }
 
   const frequencies = partials(state.partials, state.damp)
-  const { attack, releaseAll, notes, setNotes, synth } = useSynth()
+  const { attack, releaseAll, notes, setNotes, synth } = polysynth || useSynth()
   return (
     <>
       <FrequencyPlot
@@ -37,15 +29,31 @@ export function Harmonics({ state, setState }) {
         animationSpeed={state.speed / 100 / base}
         range={{
           x: [0, Math.PI],
-          y: [-0.6, 0.6],
+          y: [-1, 1],
         }}
-        onTrigger={(f, velocity) => {
+        onMouseEnter={(f, velocity) => {
           if (!notes.includes(f)) {
-            synth.triggerAttackRelease(f, "4n", "+0", velocity)
+            synth && synth.triggerAttackRelease(f, "4n", "+0", velocity)
           }
         }}
       />
-      <Grid container>
+    </>
+  )
+}
+
+/*
+
+
+
+      <p>If we draw the above frequencies as lines, it looks like this:</p>
+      <Strings
+        frequencies={frequencies.map(([f]) => f * base)}
+        labels={frequencies.map((_, i) => i + 1)}
+        amplitudes={frequencies.map(
+          ([f, a], i) => a / max<number>(frequencies.map(([f, a]) => a)) // stretches max a to full height
+        )}
+      />
+<Grid container>
         <Grid item xs={2} style={{ textAlign: "center" }}>
           <Fab
             color="primary"
@@ -89,27 +97,6 @@ export function Harmonics({ state, setState }) {
               }}
             />
           </Grid>
-          {/* <Grid item xs={3}>
-            <Typography>{state.damp}% dampening</Typography>
-          </Grid>
-          <Grid item xs={9}>
-            <Slider
-              min={0}
-              max={100}
-              step={5}
-              value={state.damp}
-              onChange={(_, damp: number) => {
-                if (damp !== state.damp && notes.length) {
-                  const freqs = partials(state.partials, damp)
-                  setNotes({
-                    notes: freqs.map(([f]) => f * base),
-                    velocity: freqs.map(([_, v]) => v),
-                  })
-                }
-                setState({ damp })
-              }}
-            />
-          </Grid> */}
           <Grid item xs={3}>
             <Typography>{state.speed}% speed</Typography>
           </Grid>
@@ -124,14 +111,4 @@ export function Harmonics({ state, setState }) {
           </Grid>
         </Grid>
       </Grid>
-      <p>If we draw the above frequencies as lines, it looks like this:</p>
-      <Strings
-        frequencies={frequencies.map(([f]) => f * base)}
-        labels={frequencies.map((_, i) => i + 1)}
-        amplitudes={frequencies.map(
-          ([f, a], i) => a / max<number>(frequencies.map(([f, a]) => a)) // stretches max a to full height
-        )}
-      />
-    </>
-  )
-}
+*/

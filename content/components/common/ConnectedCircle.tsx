@@ -3,7 +3,8 @@ import React from "react"
 import { max } from "d3-array"
 import { useHover } from "react-use-gesture"
 
-export declare type NodeIdentifier = "string" | number
+//export declare type NodeIdentifier = "string" | number
+export declare type NodeIdentifier = any
 export declare type Node = {
   id: NodeIdentifier
   value: number
@@ -11,6 +12,7 @@ export declare type Node = {
   label: string
   distance?: number
   radius?: number
+  [key: string]: any
 }
 export declare type Link<T> = {
   source: NodeIdentifier
@@ -39,7 +41,7 @@ export default function ConnectedCircle({
   sets?: Set[]
   r: number
   nodeRadius: number
-  size: number
+  size?: number
   onClick?: (item: { link?: Link<any>; set?: Set; node?: Node }) => void
   onHover?: (item: { link?: Link<any>; set?: Set; node?: Node }) => void
 }) {
@@ -120,8 +122,6 @@ export default function ConnectedCircle({
         return (
           <React.Fragment key={i}>
             <path
-              onClick={() => onClick && onClick({ node })}
-              {...hover({ node })}
               strokeWidth={2}
               stroke={"gray"}
               d={line()([
@@ -129,7 +129,14 @@ export default function ConnectedCircle({
                 [x, y],
               ])}
             />
-            <circle r={_radius || nodeRadius} cx={x} cy={y} fill={fill} />
+            <circle
+              r={_radius || nodeRadius}
+              cx={x}
+              cy={y}
+              fill={fill}
+              onClick={() => onClick && onClick({ node })}
+              {...hover({ node })}
+            />
             <text
               style={{ userSelect: "none", pointerEvents: "none" }}
               x={x}

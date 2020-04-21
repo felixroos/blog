@@ -65,6 +65,10 @@ export function nearestPitch(frequency) {
       { note: "no_match", freq: 0, delta: Infinity }).note
 }
 
+export function nearestInterval(ratio) {
+  // TBD return nearest ET12 interval
+}
+
 export function maxFractionSize(floats) {
   return floats.reduce(
     ([maxCols, maxRows], float) => {

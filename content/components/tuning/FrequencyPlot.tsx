@@ -11,6 +11,9 @@ export function FrequencyPlot({
   width,
   colors,
   onTrigger,
+  onMouseEnter,
+  onMouseLeave,
+  strokeWidth,
   autostartAnimation,
   animationSpeed,
   range,
@@ -39,8 +42,8 @@ export function FrequencyPlot({
     functions.push(sum)
   }
 
-  const { toggle } = useFrame(({ time }) => {
-    setTime(time * animationSpeed)
+  const { toggle } = useFrame(({ fromStart }) => {
+    setTime(fromStart * animationSpeed)
   }, autostartAnimation)
 
   return (
@@ -48,11 +51,12 @@ export function FrequencyPlot({
       {/* <Button onClick={() => toggle()}>Toggle</Button> */}
       <Plot
         onClick={() => toggle()}
-        strokeWidth={2}
+        strokeWidth={strokeWidth || 2}
         width={width}
         height={height}
         functions={functions}
         hideAxes={hideAxes !== undefined ? hideAxes : true}
+        hideXAxis={true}
         colors={
           colors ||
           frequencies.map(([f]) => frequencyColor(f * base)).concat(["green"])
@@ -63,15 +67,8 @@ export function FrequencyPlot({
             y: [-1, 1],
           }
         }
-        onHover={(i) => {
-          if (i === frequencies.length) {
-            return // is sum
-          }
-          // console.log("hover!", i, frequencies[i][0]*base)
-          const [f, a] = frequencies[i]
-          onTrigger && onTrigger(f * base, Math.abs(a))
-          // synth.triggerAttackRelease(f * base, "4n", "+0", Math.abs(a))
-        }}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
       />
     </>
   )

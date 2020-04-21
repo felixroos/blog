@@ -21,10 +21,10 @@ export default function IntervalSet({
   links: IntervalLink[]
   view: ViewType
   base: number
-  width: number
-  height: number
-  onClick?: (link: IntervalLink, complement?: boolean) => void
-  onHover?: (link: IntervalLink, complement?: boolean) => void
+  width?: number
+  height?: number
+  onClick?: (link: IntervalLink) => void
+  onHover?: (link: IntervalLink) => void
   focus?: IntervalLink
 }) {
   width = width || 350
@@ -54,7 +54,7 @@ export default function IntervalSet({
                   Math.round(cents(ratio) - (complement ? 1200 : 0))
                 )
               default:
-                return new Fraction(complement ? 1 / r : r).toFraction()
+                return new Fraction(complement ? 2 / r : r).toFraction()
             }
           }
 
@@ -90,7 +90,10 @@ export default function IntervalSet({
                     ? frequencyColor((1 / ratio) * base)
                     : "lightgray"
                 }
-                onClick={() => onClick && onClick(link, true)}
+                onClick={() =>
+                  onClick &&
+                  onClick({ source: link.target, target: link.source })
+                }
                 {...hover({ source: link.target, target: link.source })}
               />
               <text
@@ -177,7 +180,7 @@ export function getNodes(
   base: number,
   view?: ViewType,
   focus?: IntervalLink
-) {
+): Node[] {
   return ratios
     .map((ratio) => ({
       ratio,
@@ -188,7 +191,7 @@ export function getNodes(
       id: i,
       label:
         view === "cents"
-          ? Math.round(cents(ratio))
+          ? Math.round(cents(ratio)) + ""
           : new Fraction(ratio).toFraction(false),
       value,
       ratio,

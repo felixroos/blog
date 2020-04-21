@@ -6,7 +6,7 @@
   "configurations": [
     {
       "type": "chrome",
-      "request": "attach",
+      "request": "launch",
       "name": "Attach to Chrome",
       "url": "http://localhost:8000",
       "webRoot": "${workspaceFolder}"

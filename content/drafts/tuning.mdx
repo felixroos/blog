@@ -3,8 +3,10 @@ title: Tuning Pitches
 date: 2020-04-10
 ---
 
+import PlayArrowIcon from "@material-ui/icons/PlayArrow"
+import StopIcon from "@material-ui/icons/Stop"
+import { Fab } from "@material-ui/core"
 import { Plot } from "../components/common/Plot.tsx"
-import Fab from "@material-ui/core/Fab"
 import AddIcon from "@material-ui/icons/Add"
 import CloseIcon from "@material-ui/icons/Close"
 import Grid from "@material-ui/core/Grid"
@@ -25,6 +27,7 @@ import {
 } from "../components/tuning/tuning"
 import { gcd } from "../components/common/gcd"
 import Switch from "@material-ui/core/Switch"
+import Partials from "../components/synthesis/Partials.tsx"
 
 import { State } from "react-powerplug"
 import { Slider as Sl } from "../components/common/Slider.tsx"
@@ -50,6 +53,8 @@ import ListItemIcon from "@material-ui/core/ListItemIcon"
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction"
 import ListItemText from "@material-ui/core/ListItemText"
 import Monochord from "../components/tuning/Monochord.tsx"
+import { InlineMath, BlockMath } from "react-katex"
+import "katex/dist/katex.min.css"
 
 This post is about the fundamental questions of musical tuning:
 
@@ -84,7 +89,7 @@ Further Reading: If you know a bit about physics and math, you should read [The 
 
 Lets look at the Monochord:
 
-<Monochord />
+<Monochord min={1 / 4} />
 
 The pitch produced by this string will from now on be called fundamental pitch.
 It is the pitch that all the others will relate to.
@@ -107,33 +112,19 @@ We could go one octave further up by dividing by 2 again:
 Instead of dividing, we could also double the length of our original string:
 
 <Monochord />
-<Monochord factor={2} value={1} ticks={4} base={220} width={800} />
+<Monochord factor={2} value={1} ticks={4} width={800} />
 
 Here we have a ratio of 2/1, which means that this length is double the length of our 1/1 string. Now we are one octave below our fundamental pitch.
 
 We could achieve the same pitch lowering the tension of the string instead:
 
-<Monochord
-  strokeWidth={8}
-  factor={2}
-  value={1}
-  ticks={4}
-  base={220}
-  width={400}
-/>
+<Monochord strokeWidth={8} factor={2} value={1} ticks={4} width={400} />
 
 The lower tension is indicated by the increased thickness of the string.
 
 We can now produce our original pitch by dividing that string by 2:
 
-<Monochord
-  strokeWidth={8}
-  factor={2}
-  value={1 / 2}
-  ticks={4}
-  base={220}
-  width={400}
-/>
+<Monochord strokeWidth={8} factor={2} value={1 / 2} ticks={4} width={400} />
 
 Generally speaking, we can multiply or divide any string length by 2 any number of times to get octaves (in fact any octave) of the original pitch.
 
@@ -198,8 +189,6 @@ We can now combine a row of strings that just use multiples of 2 and 3, sorted b
 
 ### Inversion of intervals
 
-
-
 #### Historical Context: Monk Music
 
 TBD
@@ -218,51 +207,22 @@ Like with the octaves, we can lower the string tension until the pitch is one oc
   width={400}
   base={440}
 />
-<Monochord
-  factor={2}
-  strokeWidth={8}
-  value={1}
-  ticks={4}
-  width={400}
-  base={220}
-/>
+<Monochord factor={2} strokeWidth={8} value={1} ticks={4} width={400} />
 
 Now let's divide by 4:
 
-<Monochord
-  factor={2}
-  strokeWidth={8}
-  value={1 / 4}
-  ticks={4}
-  width={400}
-  base={220}
-/>
+<Monochord factor={2} strokeWidth={8} value={1 / 4} ticks={4} width={400} />
 
 And then multiply by three:
 
-<Monochord
-  factor={2}
-  strokeWidth={8}
-  value={3 / 4}
-  ticks={4}
-  width={400}
-  base={220}
-/>
+<Monochord factor={2} strokeWidth={8} value={3 / 4} ticks={4} width={400} />
 
 compare that to the fundamental pitch:
 
-<Monochord
-  factor={2}
-  strokeWidth={8}
-  value={1}
-  ticks={4}
-  width={400}
-  base={220}
-/>
+<Monochord factor={2} strokeWidth={8} value={1} ticks={4} width={400} />
 
-
->With the length ratio 3/2, we get a new quality which is called __perfect fourth__.
->To be precise, this particular one is the just perfect fourth.
+> With the length ratio 3/2, we get a new quality which is called **perfect fourth**.
+> To be precise, this particular one is the just perfect fourth.
 
 ### Thirds and the number 5
 
@@ -329,80 +289,6 @@ There are three basic units to talk about:
 - **amplitude**: How loud is the oscillation? (dB)
 
 [Read this](https://waitbutwhy.com/2016/03/sound.html) if you want to know more about the basics of sound.
-
-### Theory of Strings
-
-Lets take this string:
-
-<FrequencyPlot
-  height={150}
-  frequencies={[[1, 1, 0]]}
-  addSum={false}
-  colors={["green"]}
-  autostartAnimation={true}
-  animationSpeed={1 / 500}
-/>
-
-Physically spoken, this is the point of maximal **potential energy**, and no **kinetic energy**.
-It will now start accelerating down, reaching full kinetic energy here:
-
-<FrequencyPlot
-  height={50}
-  frequencies={[[1, 0, 0]]}
-  addSum={false}
-  colors={["green"]}
-/>
-
-After this point, the kinetic energy will decrease again, and the potential energy will rise until the other end:
-
-<FrequencyPlot
-  height={150}
-  frequencies={[[1, -1, 0]]}
-  addSum={false}
-  colors={["green"]}
-/>
-
-From there, the whole process will happen again in the other direction.
-
-- One full cycle of string vibration is completed when the initial position (directly after plucking) is reached again.
-- The sound is produced as the string pushes the air molecules around it
-
-For the string, the basic units are:
-
-- frequency = number of vibrations per second
-- wavelength = 2\*length of string
-- amplitude = distance from the initial pluck position to the rest position
-
-#### Example
-
-Lets say this is the string elongation (y axis) over the time period of 100 seconds (x axis):
-
-<FrequencyPlot
-  height={150}
-  hideAxes={false}
-  frequencies={[
-    [1, 1, 0],
-    [1, 0.5, 0],
-    [1, 0, 0],
-    [2, 1, 0],
-  ]}
-  colors={Array(10)
-    .fill()
-    .map((_, i) => interpolateRainbow(i / 10))}
-  addSum={false}
-/>
-
-- green: 50Hz with amplitude of 100%
-- red: 50Hz with amplitude of 50%
-- blue: amplitude of 0% => frequency could be anything
-- yellow: 100Hz with amplitude of 100%
-
-### Reality of Strings
-
-In reality, this pushing of air + dampening of the string leads to energy "loss", which will decrease the amplitude over time, eventually bringing it to rest.
-
-Also, the string will not vibrate with a single frequency, but with multiple ones that are superimposed.
-It depends on the material which frequencies are heard, but there is also a simple principle that is shared by not only strings, but all physical objects that vibrate:
 
 ## Overtones
 
@@ -804,3 +690,7 @@ More Links:
 
 Fourier: https://www.youtube.com/watch?v=spUNpyF58BY
 Fourier Viz + more: https://jackschaedler.github.io/circles-sines-signals/dft_introduction.html
+
+https://www.youtube.com/watch?v=XhY_7LT8eTw&t=606s
+https://www.youtube.com/watch?v=dBxmCia_bvM
+https://www.youtube.com/watch?v=9KKpNe5t2t4

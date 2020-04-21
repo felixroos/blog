@@ -19,6 +19,8 @@ export function Plot({
   colors,
   grid,
   onHover,
+  onMouseEnter,
+  onMouseLeave,
   onClick,
   margin,
   hideAxes,
@@ -137,7 +139,8 @@ export function Plot({
         {plots.map((lines, i) =>
           lines.map((line, j) => (
             <path
-              onMouseEnter={() => onHover && onHover(i)}
+              onMouseEnter={() => onMouseEnter && onMouseEnter(i)}
+              onMouseLeave={() => onMouseLeave && onMouseLeave(i)}
               key={i + "-" + j}
               d={"M" + line.join("L")}
               stroke={colors[i % colors.length] || "black"}

@@ -16,6 +16,9 @@
 - Bret Victor: http://worrydream.com/
 - Ian Ring: music theory geekery https://ianring.com/musictheory/
   - yt channel https://www.youtube.com/channel/UCc6BBUE5zmmLMT-NQ_8sTzQ
+- https://macwright.org/
+  - https://macwright.org/2020/02/14/math-keeps-changing.html
+
 
 https://github.com/pshrmn/notes
 
@@ -26,9 +29,16 @@ https://github.com/pshrmn/notes
 - https://github.com/d3/d3-hierarchy#d3-hierarchy
 - https://medium.com/@enjalot/the-hitchhikers-guide-to-d3-js-a8552174733a
   - http://www.r2d3.us/visual-intro-to-machine-learning-part-1/ !
+- https://github.com/vicapow/explained-visually
+  - https://setosa.io/#/
 
 ## ideas:
 
 - use scales with d3 :x = d3.scaleLinear().domain([0, scale.length])
 - use https://de.wikipedia.org/wiki/Euklidischer_Algorithmus
 - connect symbols (chords & scales) in a graph network, use shortest paths as progressions
+
+## view libs
+- https://github.com/snabbdom/snabbdom
+  - https://github.com/Swizz/snabbdom-pragma
+  - 

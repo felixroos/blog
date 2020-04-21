@@ -1,50 +1,48 @@
 import React, { useState } from "react"
-import { useDrag, useHover, useGesture } from "react-use-gesture"
+import { useDrag } from "react-use-gesture"
 import { scaleLinear } from "d3-scale"
 import Fraction from "fraction.js"
 import FractionCircle from "../common/FractionCircle"
 import { frequencyColor } from "./tuning"
-import * as Tone from "tone"
-import canUseDOM from "../canUseDOM"
 import { Plot } from "../common/Plot"
 import useFrame from "../common/useFrame"
-const { PolySynth, Synth } = Tone
-const harp =
-  canUseDOM() &&
-  new PolySynth(6, Synth, {
-    volume: -10,
-    envelope: {
-      attack: 0.01,
-      decay: 0.9,
-      sustain: 0,
-      release: 0,
-      decayCurve: "linear",
-    },
-    oscillator: {
-      type: "triangle",
-    },
-  }).toMaster()
+import useSynth from "../common/useSynth"
 
 export default function Monochord({
   value,
   base,
   disableRight,
+  min,
+  max,
   ticks,
   width,
   factor,
+  harmonic,
+  amplitude: initialAmplitude,
   strokeWidth,
+  draggable,
+  label,
+  polysynth,
 }) {
+  const { synth } = polysynth || useSynth()
+  min = min || 1 / 4
+  max = max || 1
   base = base || 440
-  const [amplitude, setAmplitude] = useState(0)
-  factor = factor || 1
+  initialAmplitude = initialAmplitude || 0
+  const [amplitude, setAmplitude] = useState(initialAmplitude || 0)
+  value = value || 1
+  harmonic = harmonic || 1
+  factor = factor || 1 / harmonic || 1
   disableRight = typeof disableRight === "undefined" ? true : disableRight
   const [{ x }, set] = useState({ x: Math.min(value || 1, 1) })
   const [firstX, setFirstX] = useState(x)
+  const frequencyLeft = (1 / x) * base * (1 / factor)
+  const frequencyRight = (1 / (1 - x)) * base * (1 / factor)
   const radius = 15
   width = width || 400
   const margin = { left: radius * 2, right: radius * 2 }
   const colors = {
-    line: "white",
+    line: "gray",
     circle: "rgba(100,100,100,0.5)",
   }
   ticks = ticks || 12
@@ -58,28 +56,29 @@ export default function Monochord({
     }
     set({
       x: Math.min(
-        1,
-        Math.max(0, Math.round((mx / innerWidth) * ticks) / ticks + firstX)
+        max,
+        Math.max(min, Math.round((mx / innerWidth) * ticks) / ticks + firstX)
       ),
     })
   })
 
   const duration = 1000
-  const speed = ((1 / x) * base * factor) / 50
-  const { start, stop } = useFrame(({ fromStart, progress }) => {
+  const speed = frequencyLeft / 100
+  const { start, stop } = useFrame(({ fromStart, last, progress }) => {
     setAmplitude(
-      (1 - progress) * Math.sin((speed * Math.PI * 2 * fromStart) / 1000)
+      (initialAmplitude ? 1 : 1 - progress) *
+        Math.sin((speed * Math.PI * 2 * fromStart) / 1000)
     )
+    if (last) {
+      setAmplitude(initialAmplitude)
+    }
   }, false)
 
   function play() {
     start(duration)
-    harp.triggerAttackRelease((1 / (x || 1)) * base, duration / 1000)
+    synth.triggerAttackRelease(frequencyLeft, duration / 1000)
   }
 
-  const hover = useGesture({
-    onMoveStart: ({ args: r }) => play(),
-  })
   const px = scaleLinear()
     .domain([0, 1])
     .range([margin.left, width - margin.right])
@@ -89,17 +88,36 @@ export default function Monochord({
 
   return (
     <svg width={width} height={height}>
-      <g {...hover()} onClick={() => play()}>
-        <FractionCircle
-          cx={radius}
-          cy={radius - 1}
-          radius={radius}
-          strokeWidth={1}
-          top={lt || 1}
-          bottom={lb || 1}
-          invert={true}
-          base={base}
-        />
+      <g onMouseEnter={() => play()} onClick={() => play()}>
+        {!label ? (
+          <FractionCircle
+            cx={radius}
+            cy={radius - 1}
+            radius={radius}
+            strokeWidth={1}
+            top={lt || 1}
+            bottom={lb || 1}
+            invert={true}
+            base={base}
+          />
+        ) : (
+          <g>
+            <circle
+              cx={radius}
+              cy={radius}
+              r={radius}
+              fill={frequencyColor(frequencyLeft)}
+            />
+            <text
+              style={{ pointerEvents: "none", userSelect: "none" }}
+              x={radius}
+              y={radius + radius / 3}
+              textAnchor="middle"
+            >
+              {label}
+            </text>
+          </g>
+        )}
       </g>
       {!disableRight ? (
         <FractionCircle
@@ -123,14 +141,17 @@ export default function Monochord({
         />
       )}
 
-      <g transform={`translate(${px(0)},0)`} {...hover()}>
+      <g transform={`translate(${px(0)},0)`} onMouseEnter={() => play()}>
         <Plot
           margin={{ top: strokeWidth, bottom: strokeWidth, left: 0, right: 0 }}
-          functions={[(_x) => amplitude * Math.sin(_x)]}
+          functions={[
+            (_x) => amplitude * Math.sin(harmonic * _x),
+            (_x) => -amplitude * Math.sin(harmonic * _x),
+          ]}
           range={{ x: [0, Math.PI], y: [-1, 1] }}
           hideAxes={true}
           height={radius * 2}
-          colors={[frequencyColor((1 / (x || 1)) * base)]}
+          colors={[frequencyColor(frequencyLeft)]}
           width={px(x) - px(0)}
           strokeWidth={strokeWidth}
         />
@@ -142,7 +163,7 @@ export default function Monochord({
         y1={radius}
         y2={radius}
         {...hover(x)}
-        stroke={frequencyColor((1 / (x || 1)) * base)}
+        stroke={frequencyColor(frequency)}
         strokeWidth={strokeWidth}
       /> */}
       <line
@@ -151,7 +172,7 @@ export default function Monochord({
         x2={px(1)}
         y1={radius}
         y2={radius}
-        {...(disableRight ? {} : hover(1 - x))}
+        {...(disableRight ? {} : { onMouseEnter: () => play() })}
         stroke={
           disableRight ? "gray" : frequencyColor((1 / (x ? 1 - x : 1)) * base)
         }
@@ -170,7 +191,7 @@ export default function Monochord({
           />
         )}
       </g>
-      {![1, 0].includes(x) && (
+      {draggable && (
         <>
           <circle
             className="handle"

@@ -1,0 +1,77 @@
+import { FrequencyPlot } from "../components/tuning/FrequencyPlot.tsx"
+import { interpolateRainbow } from "d3-scale-chromatic"
+
+
+## Theory of Strings
+
+Lets take this string:
+
+<FrequencyPlot
+  height={150}
+  frequencies={[[1, 1, 0]]}
+  addSum={false}
+  colors={["green"]}
+  autostartAnimation={true}
+  animationSpeed={1 / 500}
+/>
+
+Physically spoken, this is the point of maximal **potential energy**, and no **kinetic energy**.
+It will now start accelerating down, reaching full kinetic energy here:
+
+<FrequencyPlot
+  height={50}
+  frequencies={[[1, 0, 0]]}
+  addSum={false}
+  colors={["green"]}
+/>
+
+After this point, the kinetic energy will decrease again, and the potential energy will rise until the other end:
+
+<FrequencyPlot
+  height={150}
+  frequencies={[[1, -1, 0]]}
+  addSum={false}
+  colors={["green"]}
+/>
+
+From there, the whole process will happen again in the other direction.
+
+- One full cycle of string vibration is completed when the initial position (directly after plucking) is reached again.
+- The sound is produced as the string pushes the air molecules around it
+
+For the string, the basic units are:
+
+- frequency = number of vibrations per second
+- wavelength = 2\*length of string
+- amplitude = distance from the initial pluck position to the rest position
+
+### Example
+
+Lets say this is the string elongation (y axis) over the time period of 100 seconds (x axis):
+
+<FrequencyPlot
+  height={150}
+  hideAxes={false}
+  frequencies={[
+    [1, 1, 0],
+    [1, 0.5, 0],
+    [1, 0, 0],
+    [2, 1, 0],
+  ]}
+  colors={Array(10)
+    .fill()
+    .map((_, i) => interpolateRainbow(i / 10))}
+  addSum={false}
+/>
+
+- green: 50Hz with amplitude of 100%
+- red: 50Hz with amplitude of 50%
+- blue: amplitude of 0% => frequency could be anything
+- yellow: 100Hz with amplitude of 100%
+
+## Reality of Strings
+
+In reality, this pushing of air + dampening of the string leads to energy "loss", which will decrease the amplitude over time, eventually bringing it to rest.
+
+Also, the string will not vibrate with a single frequency, but with multiple ones that are superimposed.
+It depends on the material which frequencies are heard, but there is also a simple principle that is shared by not only strings, but all physical objects that vibrate:

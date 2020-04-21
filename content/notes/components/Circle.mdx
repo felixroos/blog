@@ -8,6 +8,7 @@ import IntervalSet, {
   getLinks,
   getNodes,
 } from "../../components/tuning/IntervalSet.tsx"
+import TuningCircle from "../../components/tuning/TuningCircle.tsx"
 import NoteCircle from "../../components/tuning/NoteCircle"
 import FractionCircle from "../../components/common/FractionCircle.tsx"
 import Circle, { circlePosition } from "../../components/common/Circle.tsx"
@@ -20,86 +21,53 @@ import AnimationFrame from "../../components/common/AnimationFrame.tsx"
 import Fraction from "fraction.js"
 import Slider from "@material-ui/core/Slider"
 
-## ConnectedCircle
+## Just Tuning (Limit 5)
 
-### TBD
+### Diatonic
 
-- [x] show ticks
-- [x] inside + outside ticks with two labels for one value
-- [ ] draggable nodes to change value on circle
-- [ ] use d3 scaleLog to make use of invert
-
-## Just Tuning
-
-<State initial={{ toggle: false, interval: 1, focus: undefined }}>
-  {({ state, setState }) => {
-    const base = 440
-    const nodes = getNodes(
-      [1, 9 / 8, 5 / 4, 4 / 3, 3 / 2, 5 / 3, 15 / 8],
-      base,
-      state.toggle ? "cents" : "ratios",
-      state.focus
-    )
-    const links = getLinks(nodes, state.interval, base, state.focus)
-    const intervals = ["2nds", "3rds", "4ths", "5ths", "6ths", "7ths"]
-    function onlyUnique(value, index, self) {
-      return self.indexOf(value) === index
-    }
-    const unique = links
-      .map((l) => Math.round(l.value.frequency))
-      .filter(onlyUnique)
-    return (
-      <>
-        <label>
-          ratios
-          <Switch
-            checked={state.toggle}
-            color="default"
-            onChange={(e) => setState({ toggle: e.target.checked })}
-          />
-          cents
-        </label>
-        <br />
-        <ConnectedCircle
-          onClick={({ link }) => setState({ focus: link })}
-          onHover={({ link }) => setState({ focus: link })}
-          nodeRadius={30}
-          r={140}
-          links={links}
-          nodes={nodes}
-        />
-        <br />
-        <label>
-          compare {intervals[state.interval - 1]} (
-          {intervals[intervals.length - state.interval]})
-          <br />
-          <Slider
-            min={1}
-            max={6}
-            step={1}
-            style={{ width: 350 }}
-            value={state.interval}
-            onChange={(e, v) =>
-              setState({
-                interval: v,
-              })
-            }
-          />
-        </label>
-        <br />
-        <IntervalSet
-          onClick={(link) => setState({ focus: link })}
-          onHover={(link) => setState({ focus: link })}
-          links={links}
-          view={state.toggle ? "cents" : "ratios"}
-          base={base}
-          focus={state.focus}
-        />
-        <br />
-        there are {unique.length} different {intervals[state.interval - 1]}
-      </>
-    )
+<State
+  initial={{
+    toggle: false,
+    interval: 1,
+    focus: undefined,
+    ratios: [1, 9 / 8, 5 / 4, 4 / 3, 3 / 2, 5 / 3, 15 / 8],
   }}
+>
+  {({ state, setState }) => (
+    <>
+      <TuningCircle state={state} setState={setState} />
+    </>
+  )}
+</State>
+
+### Chromatic
+
+<State
+  initial={{
+    toggle: false,
+    interval: 1,
+    focus: undefined,
+    ratios: [
+      1,
+      16 / 15,
+      9 / 8,
+      6 / 5,
+      5 / 4,
+      4 / 3,
+      45 / 32,
+      3 / 2,
+      8 / 5,
+      5 / 3,
+      16 / 9,
+      15 / 8,
+    ],
+  }}
+>
+  {({ state, setState }) => (
+    <>
+      <TuningCircle state={state} setState={setState} />
+    </>
+  )}
 </State>
 
 ### with both combined:
@@ -141,12 +109,6 @@ import Slider from "@material-ui/core/Slider"
     )}
 />
 
-### TBD
-
-- [ ] add colored lines from tonic to ratios
-- [x] show all possible intervals of same type
-- [x] calculate ratios dynamically with limit n
-
 ## Equal Temperament
 
 To get the frequencies for equal temperament we can use:
@@ -177,6 +139,21 @@ This will result in equidistant frequencies:
 - Note that the frequencies are rounded.
 - Using ratios would be useless as we are in the irrational number space
 
+<State
+  initial={{
+    toggle: true,
+    interval: 1,
+    focus: undefined,
+    ratios: Array.from({ length: 12 }, (_, i) => Math.pow(2, i / 12)),
+  }}
+>
+  {({ state, setState }) => (
+    <>
+      <TuningCircle state={state} setState={setState} />
+    </>
+  )}
+</State>
+
 ### TBD
 
 - Allow setting different octave divisons (other than 12)
@@ -184,30 +161,33 @@ This will result in equidistant frequencies:
 
 ## Pythagorean
 
-labeled number of fifths applied:
-
-<ConnectedCircle
-  nodes={[
-    1,
-    1024 / 729,
-    256 / 243,
-    128 / 81,
-    32 / 27,
-    16 / 9,
-    4 / 3,
-    3 / 2,
-    9 / 8,
-    27 / 16,
-    81 / 64,
-    243 / 128,
-    729 / 512,
-  ].map((ratio, i, notes) => ({
-    id: i,
-    label: i,
-    value: cents(ratio) / 1200,
-    fill: frequencyColor(ratio * Note.freq("A3")),
-  }))}
-/>
+<State
+  initial={{
+    toggle: false,
+    interval: 1,
+    focus: undefined,
+    ratios: [
+      1,
+      256 / 243,
+      128 / 81,
+      32 / 27,
+      16 / 9,
+      4 / 3,
+      3 / 2,
+      9 / 8,
+      27 / 16,
+      81 / 64,
+      243 / 128,
+      729 / 512,
+    ].sort(),
+  }}
+>
+  {({ state, setState }) => (
+    <>
+      <TuningCircle state={state} setState={setState} />
+    </>
+  )}
+</State>
 
 ### TBD
 
@@ -220,8 +200,6 @@ labeled number of fifths applied:
   - diff from circle is diff to equal temperament
 
 ## Scale Circle
-
-<!-- + time.fromStart / 20000 -->
 
 <State initial={{ tonic: "C", scale: "major", allNotes: false }}>
   {({ state, setState }) => {
