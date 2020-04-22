@@ -33,17 +33,18 @@ const defaultSynth =
     }
   }).toMaster(reverb)
 
-export default function useSynth(synth?: Tone.Monophonic/*  = defaultSynth */) {
+export default function useSynth(props: { synth?: Tone.Monophonic, options?: any } = {}) {
+  let { synth, options } = props;
   synth = synth || useMemo(() =>
     canUseDOM() &&
-    new PolySynth(12, Synth, {
+    new PolySynth(12, Synth, options || {
       volume: -12,
       oscillator: { type: "sine" },
       envelope: {
         attack: 0.01,
         decay: 0.01,
         sustain: 1,
-        release: 0.01 
+        release: 0.01
       }
     }).toMaster(), []);
   const [state, dispatch] = useReducer(

@@ -23,8 +23,22 @@ export default function Monochord({
   draggable,
   label,
   polysynth,
+  invert,
 }) {
-  const { synth } = polysynth || useSynth()
+  const { synth, notes } =
+    polysynth ||
+    useSynth({
+      options: {
+        volume: -12,
+        oscillator: { type: "sine" },
+        envelope: {
+          attack: 0.01,
+          decay: 2,
+          sustain: 0,
+          release: 0.01,
+        },
+      },
+    })
   min = min || 1 / 4
   max = max || 1
   base = base || 440
@@ -64,17 +78,23 @@ export default function Monochord({
 
   const duration = 1000
   const speed = frequencyLeft / 100
-  const { start, stop } = useFrame(({ fromStart, last, progress }) => {
-    setAmplitude(
-      (initialAmplitude ? 1 : 1 - progress) *
-        Math.sin((speed * Math.PI * 2 * fromStart) / 1000)
-    )
-    if (last) {
-      setAmplitude(initialAmplitude)
-    }
-  }, false)
+  const { start, stop, isRunning } = useFrame(
+    ({ fromStart, last, progress }) => {
+      setAmplitude(
+        (initialAmplitude ? 1 : 1 - progress) *
+          Math.sin((speed * Math.PI * 2 * fromStart) / 1000)
+      )
+      if (last) {
+        setAmplitude(initialAmplitude)
+      }
+    },
+    false
+  )
 
   function play() {
+    if (isRunning) {
+      return
+    }
     start(duration)
     synth.triggerAttackRelease(frequencyLeft, duration / 1000)
   }
@@ -95,9 +115,10 @@ export default function Monochord({
             cy={radius - 1}
             radius={radius}
             strokeWidth={1}
-            top={lt || 1}
-            bottom={lb || 1}
-            invert={true}
+            onClick={() => play()}
+            top={(invert ? lb : lt) || 1}
+            bottom={(invert ? lt : lb) || 1}
+            invert={!invert}
             base={base}
           />
         ) : (
@@ -125,9 +146,9 @@ export default function Monochord({
           cy={radius - 1}
           radius={radius}
           strokeWidth={1}
-          top={rt || 1}
-          bottom={rb || 1}
-          invert={true}
+          top={(invert ? rb : rt) || 1}
+          bottom={(invert ? rt : rb) || 1}
+          invert={!invert}
           base={base}
         />
       ) : (

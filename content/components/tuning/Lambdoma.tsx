@@ -5,7 +5,6 @@ import FractionCircle from "../common/FractionCircle"
 import canUseDOM from "../canUseDOM"
 import * as Tone from "tone"
 const { PolySynth, Synth } = Tone
-const harp = canUseDOM() && new PolySynth(6, Synth, { volume: -6 }).toMaster()
 
 export function Lambdoma({
   radius,

@@ -36,7 +36,7 @@ export default function FractionCircle({
       : (circle.radius / 16) * border
   const x = circle.cx + strokeWidth
   const y = circle.cy + strokeWidth
-  const radius = circle.radius
+  const radius = circle.radius - strokeWidth / 2
   const text = {
     fontSize: radius * 0.6,
     textAnchor: "middle",
@@ -53,7 +53,9 @@ export default function FractionCircle({
   return (
     <>
       <circle
-        onClick={() => onClick(invert ? (1 / value) * base : value * base)}
+        onClick={() =>
+          top && bottom && onClick(invert ? (1 / value) * base : value * base)
+        }
         cx={x}
         cy={y}
         r={radius}
