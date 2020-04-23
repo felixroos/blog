@@ -1,0 +1,136 @@
+import {
+  FormikWithHook,
+  FormikWithChildrenFunction,
+  FormikWithContext,
+} from "../../components/common/FormikTest.tsx"
+
+# Formik Experiments
+
+After having worked with formik a few times, I want to break down different ways of using it.
+For all the below components, I will be using this FormikConfig:
+
+```js
+const formikConfig = {
+  initialValues: {
+    firstName: "",
+    lastName: "",
+    email: "",
+  },
+  onSubmit: (values, actions) => {
+    alert(JSON.stringify(values))
+    actions.resetForm({
+      values: {
+        firstName: "form",
+        lastName: "reset",
+        email: "hihi@test.de",
+      },
+    })
+  },
+}
+```
+
+and this helper, which just passes some props to a TextField:
+
+```js
+function controlField(name, { handleChange, values }) {
+  return {
+    onChange: handleChange,
+    value: values[name],
+    name,
+  }
+}
+```
+
+This helper could be further extended to e.g. handle different field types etc..
+
+## via useFormik hook
+
+```js
+export function FormikWithHook() {
+  const formikHook = useFormik(formikConfig)
+  return (
+    <form onSubmit={formikHook.handleSubmit}>
+      {JSON.stringify(formikHook.values)}
+      <TextField label="Vorname" {...controlField("firstName", formikHook)} />
+      <TextField label="Nachname" {...controlField("lastName", formikHook)} />
+      <TextField
+        type="email"
+        label="Mail"
+        {...controlField("email", formikHook)}
+      />
+      <button type="submit">Submit</button>
+    </form>
+  )
+}
+```
+
+<FormikWithHook />
+
+- pro: flat hierarchy => no HOC
+- pro: non obfuscated
+- contra: cannot use formik helper components => no context
+
+## via useFormikContext
+
+```js
+export function FormikWithContext() {
+  return (
+    <Formik {...formikConfig}>
+      <Form>
+        <FormikState />
+        <FormikField label="Vorname" name="firstName" />
+        <FormikField label="Nachname" name="lastName" />
+        <FormikField label="Mail" name="email" />
+        <button type="submit">Submit</button>
+      </Form>
+    </Formik>
+  )
+}
+```
+
+the child components of Formik can access the context like this:
+
+```js
+function FormikField(props) {
+  const { name, type } = props
+  const { values, handleChange } = useFormikContext()
+  // TBD switch on type, adapt change handler
+  return (
+    <TextField {...controlField(name, { values, handleChange })} {...props} />
+  )
+}
+function FormikState() {
+  const { values, handleChange } = useFormikContext()
+  return <>{JSON.stringify(values)}</>
+}
+```
+
+<FormikWithContext />
+
+- pro: less verbose, everything is encapsulated
+- contra: more obfuscation => no direct access to formikBag
+
+## via child function
+
+```js
+export function FormikWithChildrenFunction() {
+  return (
+    <Formik {...formikConfig}>
+      {(formik) => (
+        <form onSubmit={formik.handleSubmit}>
+          {JSON.stringify(formik.values)}
+          <TextField label="Vorname" {...controlField("firstName", formik)} />
+          <TextField label="Nachname" {...controlField("lastName", formik)} />
+          <FormikField label="Mail" name="email" placeholder="Mail" />
+          <button type="submit">Submit</button>
+        </form>
+      )}
+    </Formik>
+  )
+}
+```
+
+<FormikWithChildrenFunction />
+
+- pro: can mix non obfuscated elements & encapsulated components
+- contra: everything is wrapped in a function

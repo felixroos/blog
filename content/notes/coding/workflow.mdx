@@ -26,3 +26,19 @@ gatsby imports fail when placing .mdx file with same name in folder where is als
 ## Ideas
 
 - Could use https://mdxjs.com/getting-started/parcel to build mdx and pupeteer to screenshot current state on commit!
+
+### MDX Live Code editor
+
+with "show code" link that shows snippet (similar to storybook)
+=> doesnt need the same code twice, once for showing and once for running
+
+#### Anatomy
+
+[post.js](https://github.com/gatsbyjs/gatsby/blob/master/packages/gatsby-theme-blog/src/components/post.js) uses
+[MDXRenderer](https://github.com/gatsbyjs/gatsby/blob/master/packages/gatsby-plugin-mdx/mdx-renderer.js), [@mdx-js/react](https://github.com/mdx-js/mdx/blob/master/packages/react/src/index.js), which contains
+[create-element](https://github.com/mdx-js/mdx/blob/master/packages/react/src/create-element.js) and
+[useMDXComponents](https://github.com/mdx-js/mdx/blob/master/packages/react/src/context.js).
+
+TODO: find way to use [Live Code Editor](https://mdxjs.com/guides/live-code)
+
+- see [this tutorial](https://egghead.io/lessons/react-create-a-live-code-component-with-gatsby-mdx-and-react-live)
