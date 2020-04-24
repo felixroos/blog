@@ -6,6 +6,7 @@ date: 2020-04-22
 import Monochord from "../components/tuning/Monochord.tsx"
 import { Lambdoma } from "../components/tuning/Lambdoma.tsx"
 import { InlineMath, BlockMath } from "react-katex"
+import "katex/dist/katex.min.css"
 import { State } from "react-powerplug"
 import { Fab, Slider } from "@material-ui/core"
 import { Switch } from "@material-ui/core"
@@ -60,7 +61,7 @@ With those ratios, we can calculate the frequencies like that:
 <InlineMath>{`f_3 = \\frac{3}{2}*440hz = 660hz`}</InlineMath>
 <br />
 <InlineMath>{`f_4 = \\frac{2}{1}*440hz = 880hz`}</InlineMath>
-<Divider />
+<br />
 <br />
 
 ## Ordering Ratios
@@ -140,7 +141,7 @@ The Lambdoma arranges ratios in a two dimensional grid, using one dimension for 
         rows={state.size}
         angle={state.rotate ? 45 : 0}
         radius={20}
-        base={Note.freq("A4")}
+        base={440}
         clamp={state.clamp}
         hideExtensions={state.hideExtensions}
         hideLines={false}
