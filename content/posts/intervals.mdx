@@ -161,36 +161,32 @@ The Lambdoma arranges ratios in a two dimensional grid, using one dimension for 
       <br />
       <h4>Options</h4>
       <label>
-        <Switch
+        <input type="checkbox"
           checked={state.playOnHover}
-          color="primary"
           onChange={(e) => setState({ playOnHover: e.target.checked })}
         />
         Autplay on hover
       </label>
       <br />
       <label>
-        <Switch
+        <input type="checkbox"
           checked={state.playWithTonic}
-          color="primary"
           onChange={(e) => setState({ playWithTonic: e.target.checked })}
         />
         Play together with fundamental pitch
       </label>
       <br />
       <label>
-        <Switch
+        <input type="checkbox"
           checked={state.clamp}
-          color="primary"
           onChange={(e) => setState({ clamp: e.target.checked })}
         />
         Only show fractions from -1 to +1 octave, which are all ratios inside <InlineMath>{`[\\frac{1}{2}, \\frac{2}{2}]`}</InlineMath>
       </label>
       <br />
       <label>
-        <Switch
+        <input type="checkbox"
           checked={state.hideExtensions}
-          color="primary"
           onChange={(e) => setState({ hideExtensions: e.target.checked })}
         />
         Only show reduced fractions
