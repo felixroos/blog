@@ -30,7 +30,7 @@ export default function Monochord({
     useSynth({
       options: {
         volume: -12,
-        oscillator: { type: "sine" },
+        oscillator: { type: "triangle" },
         envelope: {
           attack: 0.01,
           decay: 2,

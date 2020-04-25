@@ -9,8 +9,8 @@ const { PolySynth, Synth } = Tone
 const harp =
   canUseDOM() &&
   new PolySynth(6, Synth, {
-    volume: -16,
-    oscillator: { type: "sine" },
+    volume: -12,
+    oscillator: { type: "triangle" },
     envelope: {
       attack: 0.04,
       decay: 2,
