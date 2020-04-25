@@ -64,7 +64,9 @@ import Waveform from "../components/synthesis/Waveform.ts"
 Sawtooth waves have a really sharp timbre. For example, all bowed instruments produce sawtooth waves.
 The friction between the bow and the string will move the string in the direction of the bow.
 At some point, the force of the string will be larger than the friction, which will all of a sudden pull the string back again.
-This back and fourth ends up looking like a sawtooth motion.
+This back and fourth ends up looking like a sawtooth motion:
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/6JeyiM0YNo4" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 We can recreate this waveform by adding harmonic partials with amplitudes of:
 
@@ -76,7 +78,11 @@ where n is the partial number
 
 ### Triangle
 
-Triangle waves can be produced by plucking a string exactly at the center. It contains only odd partials, with an amplitude of
+Triangle waves can be produced by plucking a string exactly at the center:
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/Qr_rxqwc1jE" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+It contains only odd partials, with an amplitude of
 
 <InlineMath>{`A = \\frac{4}{(n*\\pi)^2}`}</InlineMath>
 
@@ -86,8 +92,11 @@ where n is the partial number
 
 ### Square
 
-As square waves cannot be produced in an analog way, they have a digital and unnatural hard feel.
-With less harmonics, they are similar to reed instruments, as they only have odd partials. You can imagine a reed bouncing back and forth, closing and opening the air canal.
+A perfect square wave cannot be produced in an analog way, thus they have a digital and unnatural hard feel.
+With less harmonics, they are similar to reed instruments, as they only have odd partials. You can imagine a reed bouncing back and forth, closing and opening the air canal:
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/UMvuThaOqjw" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 So every even number of bounces, the canal is closed, which leads to no overtone being generated.
 The square wave amplitudes are defined by
 
