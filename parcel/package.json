@@ -1,0 +1,25 @@
+{
+  "name": "parcel-mdx-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/polyfill": "^7.8.7",
+    "@babel/preset-env": "^7.9.5",
+    "@babel/preset-react": "^7.9.4",
+    "@mdx-js/parcel-plugin-mdx": "^1.5.9",
+    "@mdx-js/react": "^1.0.0-rc.5",
+    "parcel-bundler": "^1.12.4",
+    "parcel-plugin-svelte": "^4.0.6",
+    "svelte": "^3.21.0"
+  },
+  "browserslist": [
+    "last 1 chrome versions"
+  ]
+}

@@ -33,11 +33,7 @@ import Slider from "@material-ui/core/Slider"
     ratios: [1, 9 / 8, 5 / 4, 4 / 3, 3 / 2, 5 / 3, 15 / 8],
   }}
 >
-  {({ state, setState }) => (
-    <>
-      <TuningCircle state={state} setState={setState} />
-    </>
-  )}
+  {({ state, setState }) => <TuningCircle state={state} setState={setState} />}
 </State>
 
 ### Chromatic
@@ -63,11 +59,7 @@ import Slider from "@material-ui/core/Slider"
     ],
   }}
 >
-  {({ state, setState }) => (
-    <>
-      <TuningCircle state={state} setState={setState} />
-    </>
-  )}
+  {({ state, setState }) => <TuningCircle state={state} setState={setState} />}
 </State>
 
 ### with both combined:
@@ -147,11 +139,7 @@ This will result in equidistant frequencies:
     ratios: Array.from({ length: 12 }, (_, i) => Math.pow(2, i / 12)),
   }}
 >
-  {({ state, setState }) => (
-    <>
-      <TuningCircle state={state} setState={setState} />
-    </>
-  )}
+  {({ state, setState }) => <TuningCircle state={state} setState={setState} />}
 </State>
 
 ### TBD
@@ -182,11 +170,7 @@ This will result in equidistant frequencies:
     ].sort(),
   }}
 >
-  {({ state, setState }) => (
-    <>
-      <TuningCircle state={state} setState={setState} />
-    </>
-  )}
+  {({ state, setState }) => <TuningCircle state={state} setState={setState} />}
 </State>
 
 ### TBD
@@ -210,7 +194,7 @@ This will result in equidistant frequencies:
           Note.transpose(state.tonic + "3", interval)
         )
     return (
-      <>
+      <div>
         <ConnectedCircle
           nodes={notes.map((note, i, notes) => ({
             id: Note.chroma(note),
@@ -254,7 +238,7 @@ This will result in equidistant frequencies:
             onChange={(e) => setState({ allNotes: e.target.checked })}
           />
         </label>
-      </>
+      </div>
     )
   }}
 </State>

@@ -1,5 +1,7 @@
 taken from notes
 
+https://github.com/rollup/rollup/wiki/pkg.module#wait-it-just-means-import-and-export--not-other-future-javascript-features
+
 # jazzband Module
 
 This document tries to find the best module format

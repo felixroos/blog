@@ -18,7 +18,7 @@
   - yt channel https://www.youtube.com/channel/UCc6BBUE5zmmLMT-NQ_8sTzQ
 - https://macwright.org/
   - https://macwright.org/2020/02/14/math-keeps-changing.html
-
+- https://thelocalhost.blog/
 
 https://github.com/pshrmn/notes
 

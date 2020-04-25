@@ -25,7 +25,33 @@ gatsby imports fail when placing .mdx file with same name in folder where is als
 
 ## Ideas
 
-- Could use https://mdxjs.com/getting-started/parcel to build mdx and pupeteer to screenshot current state on commit!
+- https://thelocalhost.blog/2019/10/31/build-an-mdx-blog/
+- https://www.npmjs.com/package/typescript-json-schema
+
+### Minimal MDX Rendering / Screenshot Commits
+
+it would be cool to find a good minimal mdx setup. Tools that could be good:
+
+- parcel
+- gatsby
+
+this minimal mdx setup could be used with pupeteer to take screenshots / generate pdfs etc...
+
+see parcel/README.md for setup with parcel
+
+### Storybook
+
+See storybook branch...
+
+### typescript to doc / form
+
+Generate JSON schema from ts entry using https://github.com/YousefED/typescript-json-schema
+
+`npx typescript-json-schema tsconfig.json Person --include Person.ts`
+
+- json schema could be used to display props in a doc
+- can also add comments + TJS types
+- could also generate forms for json schemas using: https://www.npmjs.com/package/json-schema-to-yup
 
 ### MDX Live Code editor
 

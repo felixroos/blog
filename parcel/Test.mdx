@@ -1,0 +1,12 @@
+import { State } from "react-powerplug"
+
+<State initial={{ count: 0 }}>
+  {({ state, setState }) => (
+    <div>
+      {state.count}{" "}
+      <button onClick={() => setState({ count: state.count + 1 })}>
+        increment
+      </button>
+    </div>
+  )}
+</State>

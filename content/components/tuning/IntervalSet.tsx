@@ -18,9 +18,9 @@ export default function IntervalSet({
   onHover,
   focus,
 }: {
-  links: IntervalLink[]
-  view: ViewType
-  base: number
+  links?: IntervalLink[]
+  view?: ViewType
+  base?: number
   width?: number
   height?: number
   onClick?: (link: IntervalLink) => void
@@ -30,6 +30,8 @@ export default function IntervalSet({
   width = width || 350
   height = height || 250
   base = base || 440
+  links = links || []
+  view = view || "ratios"
   const size = width
 
   const hover = useHover(
