@@ -33,7 +33,7 @@ export function Harmonics({ state, setState, polysynth }) {
         }}
         onMouseEnter={(f, velocity) => {
           if (!notes.includes(f)) {
-            synth && synth.triggerAttackRelease(f, "4n", "+0", velocity)
+            synth && synth.triggerAttackRelease(f, "4n", "+0.01", velocity)
           }
         }}
       />

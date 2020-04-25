@@ -1,10 +1,8 @@
-import React, { useMemo, useRef, useEffect } from "react"
+import React, { useRef } from "react"
 import { frequencyColor } from "./tuning"
 import { gcd } from "../common/gcd"
 import FractionCircle from "../common/FractionCircle"
-import canUseDOM from "../canUseDOM"
-import * as Tone from "tone"
-const { PolySynth, Synth } = Tone
+import useSynth from "../common/useSynth"
 
 export function Lambdoma({
   radius,
@@ -30,6 +28,18 @@ export function Lambdoma({
   playOnHover = playOnHover === "undefined" ? false : playOnHover
   playWithTonic = playWithTonic === "undefined" ? true : playWithTonic
   angle = ((typeof angle !== "number" ? 45 : angle) / 180) * Math.PI
+  const { synth } = useSynth({
+    options: {
+      volume: -20,
+      oscillator: { type: "sine" },
+      envelope: {
+        attack: 0.04,
+        decay: 2,
+        sustain: 0,
+        release: 0.04,
+      },
+    },
+  })
 
   cols += 1
   rows += 1
@@ -165,6 +175,9 @@ export function Lambdoma({
                   radius={radius}
                   cx={x}
                   cy={y}
+                  onTrigger={(pitches) => {
+                    synth.triggerAttackRelease(pitches, 1)
+                  }}
                   playOnHover={playOnHover}
                   playWithTonic={playWithTonic}
                 />

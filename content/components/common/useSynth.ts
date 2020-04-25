@@ -1,7 +1,8 @@
 import canUseDOM from "../canUseDOM"
-import { useReducer, useEffect, useMemo } from 'react'
+import { useReducer, useMemo } from 'react'
 import * as Tone from "tone"
 const { PolySynth, Synth } = Tone
+/* Tone.context.latencyHint = 'balanced' */
 
 interface SynthAction {
   type?: string,
@@ -9,47 +10,50 @@ interface SynthAction {
   time?: Tone.Time,
   velocity?: number | number[],
 };
-
+/* 
 var reverb = canUseDOM() && new Tone.Reverb({
-  decay: 0.5,
+  decay: 0.8,
   preDelay: 0.02,
-  wet: 0.5,
+  wet: 0.6,
 }
 ).toMaster();
 if (reverb) {
-  reverb.generate()/* .then((r) => console.log('reverb ready', r)); */
+  reverb.generate()//
 }
 
 const defaultSynth =
   canUseDOM() &&
-  new PolySynth(12, Synth, {
-    volume: -12,
-    oscillator: { type: "sine" },
+  new PolySynth(6, Synth, {
+    volume: -6,
+    oscillator: { type: "triangle" },
     envelope: {
-      attack: 0.1,
-      decay: 0.1,
-      sustain: 1,
-      release: 0.1
-    }
-  }).toMaster(reverb)
+      attack: 0.04,
+      decay: 2,
+      sustain: 0,
+      release: 0.04
+    },
+  }).connect(reverb)
+
+console.log('synth..'); */
 
 export default function useSynth(props: { synth?: Tone.Monophonic, options?: any } = {}) {
   let { synth, options } = props;
-  synth = synth || useMemo(() =>
-    canUseDOM() &&
-    new PolySynth(12, Synth, options || {
-      volume: -12,
-      oscillator: { type: "sine" },
-      envelope: {
-        attack: 0.01,
-        decay: 0.01,
-        sustain: 1,
-        release: 0.01
-      }
-    }).toMaster(), []);
+  synth = synth /* || defaultSynth */ || useMemo(() => {
+    return canUseDOM() &&
+      new PolySynth(6, Synth, options || {
+        volume: -12,
+        oscillator: { type: "sine" },
+        envelope: {
+          attack: 0.01,
+          decay: 0.01,
+          sustain: 1,
+          release: 0.01
+        }
+      }).toMaster()
+  }, []);
   const [state, dispatch] = useReducer(
     (state, action: SynthAction) => {
-      const { type, notes, time, velocity } = { time: "+0", velocity: 1, ...action };
+      const { type, notes, time, velocity } = { time: "+0.01", velocity: 1, ...action };
 
       function attackWithVelocity(notes: Tone.Frequency[], time: Tone.Time, velocity: number | number[] = 1) {
         if (typeof velocity === 'number') {

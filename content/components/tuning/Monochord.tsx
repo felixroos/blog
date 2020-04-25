@@ -29,13 +29,13 @@ export default function Monochord({
     polysynth ||
     useSynth({
       options: {
-        volume: -12,
-        oscillator: { type: "triangle" },
+        volume: -20,
+        oscillator: { type: "sine" },
         envelope: {
-          attack: 0.01,
+          attack: 0.04,
           decay: 2,
           sustain: 0,
-          release: 0.01,
+          release: 0.04
         },
       },
     })

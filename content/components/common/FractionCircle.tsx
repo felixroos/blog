@@ -2,7 +2,7 @@ import React from "react"
 import { useMemo } from "react"
 import { frequencyColor } from "../tuning/tuning"
 
-import * as Tone from "tone"
+/* import * as Tone from "tone"
 import canUseDOM from "../canUseDOM"
 const { PolySynth, Synth } = Tone
 
@@ -17,7 +17,7 @@ const harp =
       sustain: 0,
       release: 0.01,
     },
-  }).toMaster()
+  }).toMaster() */
 
 export default function FractionCircle({
   radius: _radius,
@@ -47,7 +47,8 @@ export default function FractionCircle({
     if (onTrigger) {
       onTrigger(frequencies)
     } else {
-      harp.triggerAttackRelease(frequencies, "4n")
+      console.warn('onTrigger not set..')
+      // harp.triggerAttackRelease(frequencies, "4n")
     }
   }
   onClick = onClick || play

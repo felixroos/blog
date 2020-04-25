@@ -35,10 +35,10 @@ export default function TuningCircle({ state, setState }) {
         ratio = ratio * 2
       }
       const frequencies = [from.ratio * base, from.ratio * base * ratio]
-      harp.triggerAttackRelease(frequencies, "4n", "+0")
+      harp.triggerAttackRelease(frequencies, "4n", "+0.01")
     }
     if (node && node.ratio) {
-      harp.triggerAttackRelease([node.ratio * base], "4n", "+0")
+      harp.triggerAttackRelease([node.ratio * base], "4n", "+0.01")
     }
   }
   const unique = links
