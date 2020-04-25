@@ -2,8 +2,8 @@ import canUseDOM from "../canUseDOM"
 import { useReducer, useMemo } from 'react'
 import * as Tone from "tone"
 const { PolySynth, Synth } = Tone
-/* Tone.context.latencyHint = 'balanced' */
-Tone.context.lookAhead = 0.1
+// Tone.context.latencyHint = 'balanced'
+// Tone.context.lookAhead = 0.1
 
 interface SynthAction {
   type?: string,
