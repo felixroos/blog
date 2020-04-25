@@ -12,117 +12,6 @@ import "katex/dist/katex.min.css"
 
 A good way to look at the distribution of ratios is the Lambdoma
 
-### 5 limit tuning
-
-Ratios of [5 limit tuning](https://en.wikipedia.org/wiki/Five-limit_tuning) can be obtained by products of integer powers of all prime numbers up to 5, which is true for any ratio R:
-
-<InlineMath>R = 2^a * 3^b * 5^c</InlineMath>
-
-for example the ratio 9/8 can be expressed as
-
-<InlineMath>{`R = 2^{-3} * 3^2`}</InlineMath>
-
-Generally, there is an unlimited number of ratios that can be produced with this formula, but we could limit the powers to remain inside some margin.
-
-For example, setting the margin to [-2,2], we get:
-
-<InlineMath>{`\\frac{1}{36} = 2^{-2} * 3^{-2} = `}</InlineMath>
-<br />
-<InlineMath>{`\\frac{1}{12} = 2^{-2} * 3^{-1}`}</InlineMath>
-<br />
-<InlineMath>{`\\frac{1}{4} = 2^{-2} * 3^{0}`}</InlineMath>
-<br />
-<InlineMath>{`\\frac{3}{4} = 2^{-2} * 3^{1}`}</InlineMath>
-<br />
-<InlineMath>{`\\frac{9}{4} = 2^{-2} * 3^{2}`}</InlineMath>
-<br />
-<InlineMath>{`\\frac{1}{18} = 2^{-1} * 3^{-2}`}</InlineMath>
-<br />
-<InlineMath>{`\\frac{1}{9} = 2^{-1} * 3^{-1}`}</InlineMath>
-<br />
-<InlineMath>{`\\frac{1}{2} = 2^{-1} * 3^{0}`}</InlineMath>
-<br />
-<InlineMath>{`\\frac{3}{2} = 2^{-1} * 3^{1}`}</InlineMath>
-<br />
-<InlineMath>{`\\frac{9}{2} = 2^{-1} * 3^{2}`}</InlineMath>
-<br />
-<InlineMath>{`\\frac{1}{9} = 2^{0} * 3^{-2}`}</InlineMath>
-<br />
-<InlineMath>{`\\frac{1}{3} = 2^{0} * 3^{-1}`}</InlineMath>
-<br />
-<InlineMath>{`1 = 2^{0} * 3^{0}`}</InlineMath>
-<br />
-<InlineMath>{`3 = 2^{0} * 3^{1}`}</InlineMath>
-<br />
-<InlineMath>{`9 = 2^{0} * 3^{2}`}</InlineMath>
-<br />
-<InlineMath>{`\\frac{2}{9} = 2^{1} * 3^{-2}`}</InlineMath>
-<br />
-<InlineMath>{`\\frac{2}{3} = 2^{1} * 3^{-1}`}</InlineMath>
-<br />
-<InlineMath>{`2 = 2^{1} * 3^{0}`}</InlineMath>
-<br />
-<InlineMath>{`6 = 2^{1} * 3^{1}`}</InlineMath>
-<br />
-<InlineMath>{`18 = 2^{1} * 3^{2}`}</InlineMath>
-<br />
-<InlineMath>{`\\frac{4}{9} = 2^{2} * 3^{-2}`}</InlineMath>
-<br />
-<InlineMath>{`\\frac{4}{3} = 2^{2} * 3^{-1}`}</InlineMath>
-<br />
-<InlineMath>{`4 = 2^{2} * 3^{0}`}</InlineMath>
-<br />
-<InlineMath>{`12 = 2^{2} * 3^{1}`}</InlineMath>
-<br />
-<InlineMath>{`27 = 2^{2} * 3^{2}`}</InlineMath>
-
-As we're only interested in one octave, we can limit the results to be >1 and <2:
-
-<InlineMath>{`\\frac{9}{4} = 2^{-2} * 3^{2}`}</InlineMath>
-<br />
-<InlineMath>{`\\frac{3}{2} = 2^{-1} * 3^{1}`}</InlineMath>
-<br />
-<InlineMath>{`\\frac{4}{3} = 2^{2} * 3^{-1}`}</InlineMath>
-
-After stripping extensions:
-
-<InlineMath>{`\\frac{3}{2} = 2^{-1} * 3^{1}`}</InlineMath>
-<br />
-<InlineMath>{`\\frac{4}{3} = 2^{2} * 3^{-1}`}</InlineMath>
-
-Maybe there is an easier solution...
-
-<InlineMath>{`2^{a} * 3^{b} > 1`}</InlineMath>
-<br/>
-<InlineMath>{`2^{a} > {3^{-b}}`}</InlineMath>
-
-and 
-
-<InlineMath>{`2^{a} * 3^{b} < 2`}</InlineMath>
-<br/>
-<InlineMath>{`2^{a-1} < 3^{-b}`}</InlineMath>
-
-
-<Lambdoma
-  margin={0}
-  cols={15}
-  rows={15}
-  angle={45}
-  radius={20}
-  base={Note.freq("C4")}
-  clamp={true}
-  hideExtensions={true}
-  hideLines={false}
-  hideZeroes={false}
-  filter={([value, top, bottom]) => {
-    return (
-      ([top % 2, top % 3].includes(0) &&
-        [bottom % 2, bottom % 3].includes(0)) ||
-      value === 1
-    )
-  }}
-/>
-
 <State
   initial={{
     angle: 45,
@@ -131,6 +20,8 @@ and
     hideExtensions: true,
     hideLines: false,
     hideZeroes: false,
+    playOnHover: true,
+    playWithTonic: true,
     clamp: true,
   }}
 >
@@ -150,30 +41,10 @@ and
         hideExtensions={state.hideExtensions}
         hideLines={state.hideLines}
         hideZeroes={state.hideZeroes}
+        playOnHover={state.playOnHover}
+        playWithTonic={state.playWithTonic}
       />
     </>
   )}
 </State>
 
-This will give all frequencies of the same pitch class the same color.
-
-## LambdomaFLoats
-
-Displays the the given floats as fractions in the Lambdoma
-
-<LambdomaFloats
-  floats={[1, 2, 3, 4 / 3].map((p) => clamp(p, 1))}
-  base={Note.freq("C4")}
-  radius={25}
-/>
-
-## TBD
-
-- active / colorless states
-- display irrational numbers e.g. equal tempered notes
-- play synth continuus and change pitch via mouseover
-- alternative diamond shapes to close gaps
-
-## Related
-
-- https://github.com/infusion/Fraction.js/

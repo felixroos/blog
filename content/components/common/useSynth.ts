@@ -3,6 +3,7 @@ import { useReducer, useMemo } from 'react'
 import * as Tone from "tone"
 const { PolySynth, Synth } = Tone
 /* Tone.context.latencyHint = 'balanced' */
+Tone.context.lookAhead = 0.1
 
 interface SynthAction {
   type?: string,
@@ -10,45 +11,21 @@ interface SynthAction {
   time?: Tone.Time,
   velocity?: number | number[],
 };
-/* 
-var reverb = canUseDOM() && new Tone.Reverb({
-  decay: 0.8,
-  preDelay: 0.02,
-  wet: 0.6,
-}
-).toMaster();
-if (reverb) {
-  reverb.generate()//
-}
 
-const defaultSynth =
-  canUseDOM() &&
-  new PolySynth(6, Synth, {
-    volume: -6,
-    oscillator: { type: "triangle" },
-    envelope: {
-      attack: 0.04,
-      decay: 2,
-      sustain: 0,
-      release: 0.04
-    },
-  }).connect(reverb)
-
-console.log('synth..'); */
-
-export default function useSynth(props: { synth?: Tone.Monophonic, options?: any } = {}) {
-  let { synth, options } = props;
-  synth = synth /* || defaultSynth */ || useMemo(() => {
+export default function useSynth(props: { synth?: Tone.Monophonic, options?: any, voices?: number } = {}) {
+  let { synth, options, voices } = props;
+  synth = synth || useMemo(() => {
     return canUseDOM() &&
-      new PolySynth(6, Synth, options || {
+      new PolySynth(voices || 3, Synth, {
         volume: -12,
         oscillator: { type: "sine" },
         envelope: {
-          attack: 0.01,
-          decay: 0.01,
-          sustain: 1,
-          release: 0.01
-        }
+          attack: 0.001,
+          decay: 0.1,
+          sustain: 0.6,
+          release: 0.1
+        },
+        ...options
       }).toMaster()
   }, []);
   const [state, dispatch] = useReducer(
@@ -96,6 +73,7 @@ export default function useSynth(props: { synth?: Tone.Monophonic, options?: any
     { notes: [] },
   )
   return {
+    triggerAttackRelease: (notes, duration, time = "+0.01", velocity = 0.8) => synth.triggerAttackRelease(notes, duration, time, velocity),
     attack: (action: SynthAction) => dispatch({ type: "ATTACK", ...action }),
     release: (action: SynthAction) => dispatch({ type: "RELEASE", ...action }),
     releaseAll: () => dispatch({ type: "RELEASE_ALL" }),

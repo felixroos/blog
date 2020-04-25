@@ -67,6 +67,22 @@ export function LambdomaSettings({ state, setState }) {
           color="primary"
           onChange={(e) => setState({ hideZeroes: e.target.checked })}
         />
+      </label><br/>
+      <label>
+        play on hover
+        <Switch
+          checked={state.playOnHover}
+          color="primary"
+          onChange={(e) => setState({ playOnHover: e.target.checked })}
+        />
+      </label>
+      <label>
+        play with tonic
+        <Switch
+          checked={state.playWithTonic}
+          color="primary"
+          onChange={(e) => setState({ playWithTonic: e.target.checked })}
+        />
       </label>
     </>
   )

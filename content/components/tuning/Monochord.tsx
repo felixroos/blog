@@ -25,17 +25,18 @@ export default function Monochord({
   polysynth,
   invert,
 }) {
-  const { synth, notes } =
+  const { triggerAttackRelease } =
     polysynth ||
     useSynth({
+      voices: 1,
       options: {
-        volume: -20,
-        oscillator: { type: "sine" },
+        volume: -16,
+        oscillator: { type: "fmtriangle" },
         envelope: {
-          attack: 0.04,
+          attack: 0.001,
           decay: 2,
           sustain: 0,
-          release: 0.04
+          release: 0.1,
         },
       },
     })
@@ -96,7 +97,7 @@ export default function Monochord({
       return
     }
     start(duration)
-    synth.triggerAttackRelease(frequencyLeft, duration / 1000)
+    triggerAttackRelease(frequencyLeft, duration / 1000)
   }
 
   const px = scaleLinear()
@@ -177,17 +178,16 @@ export default function Monochord({
           width={px(x) - px(0)}
           strokeWidth={strokeWidth}
         />
+        {/* <line
+          className="string-left"
+          x1={0}
+          x2={px(x) - px(0)}
+          y1={radius}
+          y2={radius}
+          stroke={frequencyColor(frequencyLeft)}
+          strokeWidth={strokeWidth}
+        /> */}
       </g>
-      {/*  <line
-        className="string-left"
-        x1={px(0)}
-        x2={px(x)}
-        y1={radius}
-        y2={radius}
-        {...hover(x)}
-        stroke={frequencyColor(frequency)}
-        strokeWidth={strokeWidth}
-      /> */}
       <line
         className="string-right"
         x1={px(x)}

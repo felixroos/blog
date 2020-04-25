@@ -28,15 +28,16 @@ export function Lambdoma({
   playOnHover = playOnHover === "undefined" ? false : playOnHover
   playWithTonic = playWithTonic === "undefined" ? true : playWithTonic
   angle = ((typeof angle !== "number" ? 45 : angle) / 180) * Math.PI
-  const { synth } = useSynth({
+  const { triggerAttackRelease } = useSynth({
+    voices: 6,
     options: {
-      volume: -20,
-      oscillator: { type: "sine" },
+      volume: -16,
+      oscillator: { type: "fmtriangle" },
       envelope: {
-        attack: 0.04,
+        attack: 0.05,
         decay: 2,
         sustain: 0,
-        release: 0.04,
+        release: 0.1,
       },
     },
   })
@@ -175,9 +176,7 @@ export function Lambdoma({
                   radius={radius}
                   cx={x}
                   cy={y}
-                  onTrigger={(pitches) => {
-                    synth.triggerAttackRelease(pitches, 1)
-                  }}
+                  onTrigger={(pitches) => triggerAttackRelease(pitches, 1)}
                   playOnHover={playOnHover}
                   playWithTonic={playWithTonic}
                 />
