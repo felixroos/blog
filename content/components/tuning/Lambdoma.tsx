@@ -20,12 +20,15 @@ export function Lambdoma({
   max,
   clamp,
   angle,
+  playOnHover,
+  playWithTonic,
 }: any) {
   const containerRef = useRef<any>()
   margin = margin !== undefined ? margin : radius * 0.2
   base = base || 440
   hideZeroes = hideZeroes === "undefined" ? false : hideZeroes
-
+  playOnHover = playOnHover === "undefined" ? false : playOnHover
+  playWithTonic = playWithTonic === "undefined" ? true : playWithTonic
   angle = ((typeof angle !== "number" ? 45 : angle) / 180) * Math.PI
 
   cols += 1
@@ -162,6 +165,8 @@ export function Lambdoma({
                   radius={radius}
                   cx={x}
                   cy={y}
+                  playOnHover={playOnHover}
+                  playWithTonic={playWithTonic}
                 />
               </g>
             )

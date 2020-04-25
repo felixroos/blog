@@ -121,7 +121,16 @@ This gives us a lot of options, which are difficult to visualize in this one dim
 
 The Lambdoma arranges ratios in a two dimensional grid, using one dimension for the numerator and another for the denominator:
 
-<State initial={{ size: 8, clamp: false, rotate: true, hideExtensions: false }}>
+<State
+  initial={{
+    size: 8,
+    clamp: true,
+    rotate: true,
+    hideExtensions: false,
+    playWithTonic: true,
+    playOnHover: true,
+  }}
+>
   {({ state, setState }) => (
     <>
       <p>
@@ -146,9 +155,29 @@ The Lambdoma arranges ratios in a two dimensional grid, using one dimension for 
         hideExtensions={state.hideExtensions}
         hideLines={false}
         hideZeroes={false}
+        playWithTonic={state.playWithTonic}
+        playOnHover={state.playOnHover}
       />
       <br />
       <h4>Options</h4>
+      <label>
+        <Switch
+          checked={state.playOnHover}
+          color="primary"
+          onChange={(e) => setState({ playOnHover: e.target.checked })}
+        />
+        Autplay on hover
+      </label>
+      <br />
+      <label>
+        <Switch
+          checked={state.playWithTonic}
+          color="primary"
+          onChange={(e) => setState({ playWithTonic: e.target.checked })}
+        />
+        Play together with fundamental pitch
+      </label>
+      <br />
       <label>
         <Switch
           checked={state.clamp}
@@ -232,10 +261,10 @@ On a monochord, stacking 4 fifths would look like that:
 <State>
   {() =>
     Array.from({ length: 5 }, (_, i) => (
-      <>
+      <React.Fragment key={i}>
         <Monochord value={Math.pow(2 / 3, i)} invert={false} base={220} />
         <InlineMath>{`\\frac{2}{3}^{${i}}`}</InlineMath>
-      </>
+      </React.Fragment>
     ))
   }
 </State>
@@ -287,4 +316,4 @@ Here we can hear that 4 octave reduced stacked fifths result in a major pentaton
 
 This is just the beginning, as there are more possibilities to organize ratios.
 
-In the next post, we will look at n-Limit tuning and different historic systems of just intonation (JI).
+In the next post, we will look at n-Limit tuning and compare just intonation systems to equal tempered ones.

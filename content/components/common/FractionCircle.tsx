@@ -5,7 +5,19 @@ import { frequencyColor } from "../tuning/tuning"
 import * as Tone from "tone"
 import canUseDOM from "../canUseDOM"
 const { PolySynth, Synth } = Tone
-const harp = canUseDOM() && new PolySynth(6, Synth, { volume: -6 }).toMaster()
+
+const harp =
+  canUseDOM() &&
+  new PolySynth(6, Synth, {
+    volume: -16,
+    oscillator: { type: "sine" },
+    envelope: {
+      attack: 0.04,
+      decay: 2,
+      sustain: 0,
+      release: 0.01,
+    },
+  }).toMaster()
 
 export default function FractionCircle({
   radius: _radius,
@@ -19,8 +31,27 @@ export default function FractionCircle({
   fill,
   invert,
   onClick,
+  onHover,
+  playOnHover,
+  playWithTonic,
+  onTrigger,
 }: any) {
-  onClick = onClick || ((f) => harp.triggerAttackRelease(f, "4n"))
+  function play(f) {
+    if (!top || !bottom) {
+      return
+    }
+    let frequencies = [f]
+    if (f !== base && playWithTonic) {
+      frequencies.push(base)
+    }
+    if (onTrigger) {
+      onTrigger(frequencies)
+    } else {
+      harp.triggerAttackRelease(frequencies, "4n")
+    }
+  }
+  onClick = onClick || play
+  onHover = onHover || (playOnHover ? play : () => {})
   base = base || 440
   const circle = {
     radius: _radius || 30,
@@ -53,9 +84,8 @@ export default function FractionCircle({
   return (
     <>
       <circle
-        onClick={() =>
-          top && bottom && onClick(invert ? (1 / value) * base : value * base)
-        }
+        onClick={() => onClick(invert ? (1 / value) * base : value * base)}
+        onMouseEnter={() => onHover(invert ? (1 / value) * base : value * base)}
         cx={x}
         cy={y}
         r={radius}

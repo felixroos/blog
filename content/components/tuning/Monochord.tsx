@@ -116,6 +116,7 @@ export default function Monochord({
             radius={radius}
             strokeWidth={1}
             onClick={() => play()}
+            onHover={() => play()}
             top={(invert ? lb : lt) || 1}
             bottom={(invert ? lt : lb) || 1}
             invert={!invert}
