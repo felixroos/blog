@@ -13,7 +13,9 @@ export default function Partials({ width, height, base, generator }) {
   height = height || 400
   const [n, setN] = useState(8)
   const margin = 20
-  const { attack, release, notes, releaseAll, synth, setNotes } = useSynth()
+  const { attack, release, notes, releaseAll, setNotes } = useSynth({
+    voices: 32,
+  })
   const partials = generator(n)
   const bar = width / partials.length
   const amplitudes = partials.map(([f, a]) => a)
