@@ -43,6 +43,7 @@
     "gatsby-theme-notes": "^1.2.22",
     "gh-pages": "^2.2.0",
     "jest": "^25.2.7",
+    "js-combinatorics": "^0.5.5",
     "react": "^16.12.0",
     "react-color": "^2.18.0",
     "react-d3-tree": "^1.16.1",

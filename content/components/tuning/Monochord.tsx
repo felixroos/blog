@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { useDrag } from "react-use-gesture"
 import { scaleLinear } from "d3-scale"
 import Fraction from "fraction.js"
@@ -46,6 +46,9 @@ export default function Monochord({
   initialAmplitude = initialAmplitude || 0
   const [amplitude, setAmplitude] = useState(initialAmplitude || 0)
   value = value || 1
+  useEffect(() => {
+    set({ x: Math.min(value || 1, 1) })
+  }, [value])
   harmonic = harmonic || 1
   factor = factor || 1 / harmonic || 1
   disableRight = typeof disableRight === "undefined" ? true : disableRight

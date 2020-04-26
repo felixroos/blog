@@ -1,22 +1,30 @@
-import { stack, clamp, nearestPitch, maxFractionSize } from './tuning';
+import { stack, clamp, nearestPitch, maxFractionSize, powers, limitN, equivalence } from './tuning';
+import * as Combinatorics from 'js-combinatorics';
 
-
-function limit(numbers, min, max) {
-  const solutions = [];
-  numbers.forEach(n => {
-    const powers = []
-    for (let i = min; i <= max; ++i) {
-      powers.push(Math.pow(n, i));
-    }
-    solutions.push(powers);
-  });
-  return solutions
-}
 test('limit', () => {
-  expect(limit([2, 3, 5], -1, 1)).toEqual([
-    [1 / 2, 1, 2],
-    [1 / 3, 1, 3],
-    [1 / 5, 1, 5],
+  expect(powers([[3, -1, 3]])).toEqual([
+    [1 / 3, 1, 3, 9, 27]
+  ])
+  expect(powers([[3, 0, 2], [5, 0, 1]])).toEqual([
+    [1, 3, 9],
+    [1, 5]
+  ])
+  expect(Combinatorics.cartesianProduct(
+    [1, 3, 9],
+    [1, 5]
+  ).toArray()).toEqual([
+    [1, 1], [3, 1], [9, 1], [1, 5], [3, 5], [9, 5]
+  ])
+  expect(limitN([[3, 0, 2], [5, 0, 1]])).toEqual([
+    1, 3, 9, 5, 15, 45
+  ])
+  expect(equivalence(3, 2)).toEqual(3 / 2)
+  expect(equivalence(1 / 3, 2)).toEqual(4 / 3)
+  expect(limitN([[3, 0, 2], [5, 0, 1]])).toEqual([
+    1, 3, 9, 5, 15, 45
+  ])
+  expect(limitN([[3, 0, 2], [5, 0, 1]], 2)).toEqual([
+    1, 3 / 2, 9 / 8, 5 / 4, 15 / 8, 45 / 32
   ])
 })
 

@@ -189,14 +189,22 @@ export function getNodes(
       value: cents(ratio) / 1200,
       frequency: ratio * base,
     }))
-    .map(({ value, ratio, frequency }, i) => ({
-      id: i,
-      label:
-        view === "cents"
-          ? Math.round(cents(ratio)) + ""
-          : new Fraction(ratio).toFraction(false),
-      value,
-      ratio,
-      fill: isNodeActive(i, focus) ? frequencyColor(frequency) : "lightgray",
-    }))
+    .reduce(
+      (nodes, { value, ratio, frequency }, i) =>
+        nodes.concat([
+          {
+            id: i,
+            label:
+              view === "cents"
+                ? Math.round(cents(ratio)) + ""
+                : new Fraction(ratio).toFraction(false),
+            value,
+            ratio,
+            fill: isNodeActive(i, focus)
+              ? frequencyColor(frequency)
+              : "lightgray",
+          },
+        ]),
+      []
+    )
 }

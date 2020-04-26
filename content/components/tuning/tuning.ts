@@ -2,6 +2,7 @@ import { Range, Note } from '@tonaljs/tonal'
 import { TinyColor } from '@ctrl/tinycolor';
 import { interpolateRainbow } from "d3-scale-chromatic"
 import Fraction from "fraction.js"
+import * as Combinatorics from 'js-combinatorics';
 
 export function partials([min, max], base = 440) {
   const f = [];
@@ -11,6 +12,55 @@ export function partials([min, max], base = 440) {
     }
   }
   return f.filter((f, i, a) => a.indexOf(f) === i)
+}
+
+export function powerN(n, power) {
+  const factor = Math.pow(n, power)
+  const exp = Math.ceil(Math.log(1 / factor) / Math.log(2))
+  const value = Math.pow(2, exp) * factor
+  const [top, bottom] = new Fraction(value).toFraction().split("/")
+  return { factor, exp, value, top, bottom }
+}
+
+export function pythagoreanComma(power) {
+  return (1 - 524288 / 531441) * (power / 12)
+}
+
+// generates all possible powers for array of [base, min, max]
+// example: [[3,0,2], [5,0,1]] yields [[1, 3, 9], [1, 5]]
+export function powers(numbers: [number, number, number][], mapFn?: (power: [number, number]) => number) {
+  const powers = numbers.reduce((_powers, n) => {
+    const values = []
+    for (let p = n[1]; p <= n[2]; ++p) {
+      if (typeof mapFn === 'function') {
+        values.push(mapFn([n[0], p]));
+      } else {
+        values.push(Math.pow(n[0], p));
+      }
+    }
+    _powers.push(values);
+    return _powers;
+  }, []);
+  return powers;
+}
+
+// generates all possible ratios for given bases
+// example: limitN([[3, 0, 2], [5, 0, 1]]) yields [1, 3, 9, 5, 15, 45]
+// if equivalence factor is passed, then it reduces by that factor:
+// example: limitN([[3, 0, 2], [5, 0, 1]],2) yields [1, 3/2, 9/8, 5/4, 15/8, 45/32]
+export function limitN(numbers: [number, number, number][], equivalenceFactor?: number, mapFn?: (power: [number, number]) => number) {
+  const primePowers = powers(numbers, mapFn);
+  return Combinatorics.cartesianProduct(...primePowers).toArray()
+    .map(powers => powers.reduce((value, power) => value * power, 1))
+    .map(v => equivalenceFactor ? equivalence(v, equivalenceFactor) : v)
+}
+
+// reduces ratio to given equivalence factor
+// example: equivalence(1/3, 2) yields 4/3
+// TBD: think about if its possible to have multiple values for the same ratio, if yes => fails for those
+export function equivalence(r, equivalenceFactor = 2) {
+  const exp = Math.ceil(Math.log(1 / r) / Math.log(equivalenceFactor))
+  return Math.pow(2, exp) * r;
 }
 
 export function cents(ratio: number) {
