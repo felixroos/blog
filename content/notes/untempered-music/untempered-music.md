@@ -545,4 +545,629 @@ https://www.youtube.com/watch?v=Z_neo1zIAK0&feature=emb_title
 
 Is it my imagination, or do I hear a little melodrama here? Is the minor overly sad, the major a little over-the-top happy?
 
-![melodrama](./800px)
+![melodrama](./800px-TragicComicMasksHadriansVillamosaic.jpg)
+
+## The Minor Seventh
+
+The farther we get from the center, the less consonant the notes are, when played against the tonic. Consonance is a whole subject. It’s generally spoken of as though it could be plotted on a scale, from consonance to dissonance. I think this is a big mistake. Consonance has more than one dimension. Trying to force these independent dimensions of consonance onto a one-dimensional scale leads to unnecessary confusion.
+
+Anywayy … The minor seventh is a pretty dissonant note in all dimensions. It’s three moves away from the tonic, down a third and up two fifths:
+
+https://www.youtube.com/watch?v=dhDDhddfsD0&feature=emb_title
+
+The ratio is 9/5.
+
+This is some beautiful, exotic harmony.
+
+Here’s a progression that shows off the flavor of the b7, in just intonation:
+
+https://www.youtube.com/watch?v=sqTnOLV7y0g&feature=emb_title
+
+Hey, that’s beautiful! I worked it out as an illustration, with the idea of showcasing the minor seventh, and it turned out to be really nice music.
+
+See why I’m in love with the lattice? It’s a beauty engine.
+
+## Untempered Vs. Tempered
+
+I’ve been listening to yesterday’s chord progression showing off the b7.
+
+I think it offers an excellent opportunity to hear the difference between equal temperament and just intonation.
+
+Equal temperament works by implying or evoking a note rather than playing it exactly. There are dozens of singable notes per octave; ET represents them all with just twelve tones.
+
+Some ET notes are close to their just counterparts; the 4 and 5 are close enough to be essentially right on. The major third is not so great. It’s 0.8% sharp, enough to change the feeling it produces.
+
+The ET b7 is even further off, a full 1% flat of the untempered note. For me, this is enough to change its flavor entirely, and dilute its resonance to the point where it’s just not the same note. I would contend that the real experience of the b7 is not actually available in equal temperament.
+
+Here it is again:
+
+https://www.youtube.com/watch?v=sqTnOLV7y0g&feature=emb_title
+
+And in ET:
+
+https://www.youtube.com/watch?v=qy_BPaqRuL0&feature=emb_title
+
+To me, the real b7 sounds triumphant, like its arms are outstretched to the sky after a great victory.
+
+The ET one sounds very different. It’s not unpleasant, but it sure is different. It it a little sad? The leaping dance is gone. The b3 is flat too. Poor minor, no wonder she’s sad! A mortal has [seized the hem of her garment](http://www.sacred-texts.com/neu/ftmg/ftmg03.htm) and made her earthbound, in order to put her in his power and make her a little better behaved.
+
+Now go back and listen to the JI version. My experience is that I hear it a little sharp for a second, and then it settles in and wow. This is all subjective; you may hear entirely different things. But this example makes it pretty clear, I think, that JI and ET do not sound the same.
+
+So here we have a note, with a distinct (and unique) personality, that produces a physiological sensation that just isn’t quite available in equal temperament. There are a lot more of these to come, with strange and beautiful colors. Really getting into JI and the lattice is like getting the [64-color Crayola box](http://en.wikipedia.org/wiki/List_of_Crayola_crayon_colors) for Christmas. Orange-yellow and yellow-orange, what riches!
+
+One of my favorite phrases in any song comes from the great [Greg Brown](http://www.gregbrown.org/). In [Eugene](http://www.lyricstime.com/greg-brown-eugene-lyrics.html), from [The Evening Call](http://www.redhouserecords.com/198.html), he says,
+
+_The Northwest is good, once you get off I-5 and wander up and down the Willamette dammit, on the back back roads. I know a few people who’d let me park in their drive, plug in for a night or two, stay up late, and talk about these crazy times — the blandification of our whole situation. And then back to the woods. A dog is bound to find me sooner or later. Sometimes you gotta not look too hard — just let the dog find you._
+
+The blandification of our whole situation. Nice one, Mr. Brown. I recommend going back and forth between the last two vids a few times. Deblandification!
+
+By the way, [The Evening Call](http://www.gregbrown.org/gblyricsevening.html) is packed with great lyrics and music. Top notch.
+
+## The Minor Second
+
+The last three notes (b6, b3 and b7) are related to each other. They all contain a reciprocal third. There is a family resemblance of sound and function. (They also all happen to be a little flat in equal temperament. On a guitar it’s a nice trick to bend them a little to sweeten them.)
+
+Here is another note in the family, farther out harmonically, the minor second:
+
+https://www.youtube.com/watch?v=c8GPcR6p6DQ&feature=emb_title
+
+That’s a dissonant interval. The b6 is already tense with reciprocal third energy. Now this b2- (The minus is an accidental to show its exact pitch; more later) is another reciprocal fifth beyond (below?) that note. Its ratio is 1/15, which expands to 16/15 — just above 1. See how the ratios show where the pitch of the note is? 1/1 is the tonic, 2/1 is the octave. 16/15 is just a little bit greater than 1, so it’s just a little sharper than the tonic.
+
+It’s not pitch so much that makes consonance and dissonance. It’s harmonic relationship.
+
+Music is all about tension and resolution. Here’s a very tense note. How to resolve it?
+
+One answer is just a half step away, a drop to the tonic.
+
+https://www.youtube.com/watch?v=ya9S3gR-OKg&feature=emb_title
+
+That’s a move in melodic space. The tonic is right next door and it’s an easy drop.
+
+On the lattice, the 1 is not a next door neighbor. How about going home through harmonic space instead?
+
+https://www.youtube.com/watch?v=yQFkEPQEeqs&feature=emb_title
+
+Going to the 4 is an interesting experience for me. There’s still reciprocal tension, but I’m much closer to home — I can smell the stables. It’s as though I felt a bit lost at the b2-, the harmonic distance was too great to really get my bearings. But moving to the 4 allows me to figure out where I am, and where the tonic is, so that the final move home sounds really right. The 4 says to me, “There is home, now go.”
+
+Then the melody moves to the 5, and there is resolution. The 5 sends just as strong a signal as the 4, but of opposite polarity. The 5 says, “Here is home. Now stay.”
+
+It’s a little story, a journey on a microcosmic landscape of attraction, repulsion and beauty.
+
+## The Augmented Fourth
+
+I’ve described eleven notes now, and each one has a piano key to go with it, an equal tempered equivalent.
+
+The one remaining black key has a lot of names. It’s the note between the 4 and 5, right in the middle of the octave — the tritone, devil’s interval, flatted fifth, augmented fourth.
+
+In ET there’s only one tritone, and it precisely splits the octave in half. In JI, there are several tritones, with different tunings, that sound and function differently from each other.
+
+One tritone, that nicely fills out the set of 12 notes, is the [augmented fourth](http://www.guardian.co.uk/notesandqueries/query/0,,-1767,00.html):
+
+https://www.youtube.com/watch?v=czSq2LpOYzw&feature=emb_title
+
+This note is not like the other black keys. It’s completely overtonal, that is, it is generated entirely by multiplication — x3, x3, x5, or 45/1. It does appear in the Chord of Nature, but so far up that it wouldn’t be audible in the harmonics of a vibrating string. I think the fact that we can hear any harmony at all with this note shows that we can hear compounds of simple ratios, even when the numbers are getting pretty big. If pure ratios were all that mattered, 13/1 would be far more harmonious than 45/1 — the numbers are smaller. But 13/1 is almost nonexistent in the musics of the world, and even 11/1 is very rare.
+
+So the harmonic connection with the tonic is tenuous, but it’s there. I hear a different kind of dissonance than the b6 or b2-, more harmonically distant, but without as much of that urgency-to-move that the reciprocal notes have.
+
+It’s natural to resolve it melodically to the 5:
+
+https://www.youtube.com/watch?v=kbQ_IFVdge4&feature=emb_title
+
+Or once again we can travel through harmonic space to get back home.
+
+https://www.youtube.com/watch?v=yScfxlxz3QU&feature=emb_title
+
+Can you hear yourself getting closer to home with each step?
+
+We now have a set of 12 notes, one for each key of the keyboard. Next, the prime number 7, and then some notes between the keys. [Oh, the places we’ll go!](http://www.youtube.com/watch?v=ahv_1IS7SiE)
+
+## Prime Numbers and the Big Bang
+
+Every prime number generates a new musical universe.
+
+Prime numbers are numbers, greater than one, that can only be evenly divided by themselves and 1. All other numbers are composite — that is, they can be made by multiplying two or more primes.
+
+1. Multiplying by 1 does nothing. 1 is a singularity, the [universe](http://www.youtube.com/watch?v=08LBltePDZw) before the big bang, the anvil upon which the music is forged.
+
+2. Two starts off the explosion. Multiplying by two creates a universe of octaves, an endless, sterile line of equally spaced mile markers on the road to harmony.
+
+Reminds me of the [first chapter of Genesis](http://www.biblegateway.com/passage/?search=Genesis+1&version=NIV), where everything is formless until the Creator starts differentiating stuff, day from night, water from sky, land from water, animals from plants, and people from animals. Start multiplying by two and before you know it you have a universe!
+
+I’m also reminded of the current theory as to how our own universe came to be. Here’s a nice summary I found on a [physics message board](http://www.physlink.com/education/askexperts/ae649.cfm). It’s by Joel Novicio, an undergraduate physics student at the time.
+
+_The Big Bang singularity is a point of zero volume, but very high mass, which makes the density infinite. This singularity contained all of the matter and energy in the Universe. The initial moment of the [cyclopean explosion](http://www.thefreedictionary.com/cyclopean) very well remains a mystery — however, astronomers and physicists believe that after the tiniest fraction of a second, the strong nuclear force and the electromagnetic force separated, which probably caused the Universe to begin inflating. The Big Bang itself created space, time, and all of the matter and energy we know today._
+
+OK, maybe I’m getting a little bit [woo-woo](http://www.urbandictionary.com/define.php?term=woo%20woo) here, but really I don’t think this is a trivial or accidental connection. The musical universe arises from the numbers. So does the physical one, at its deepest levels. I think that’s why we perceive music as beautiful.
+
+I _am_ stretching it now, but guess what is thought to have [happened next](http://en.wikipedia.org/wiki/Chronology_of_the_universe) after the splitting of the forces? Quarks! [Quarks](http://www.particleadventure.org/quarks.html) are the building blocks of protons and neutrons, almost all the matter we’re familiar with. And they come in threes.
+
+![quarks](./Quark-proton.jpg)
+
+3. Three makes it interesting. Keep multiplying and dividing by 3 and you can get an equivalent for every key on the keyboard, and many more. The notes never repeat, as you multiply and divide, so this universe is infinite as well.
+
+This is the central spine of the lattice. The crucial notes 4 (perfect fourth, 4/3) and 5 (perfect fifth, 3/2) are multiples of 3. They are the backbone of music, and in my opinion, the fact that these are almost exactly in tune in equal temperament is a big reason why ET has been able to be so successful. If the 4 and the 5 were as far out of tune as the major third is, I don’t think ET could ever have been adopted.
+
+Pythagoras based his musical scale entirely on 3 and 2. His followers expanded this, compounding it many times into what is now called Pythagorean tuning.
+
+The first few notes generated by this tuning are beautiful. The 5 (x3) and 4 (÷3) are perfect consonances. The 2 (3×3) is really sweet. I personally like the Pythagorean sixth (3x3x3, 6+ on my map). But apparently the ear can’t follow compounds of 3 forever. By the time you get to the Pythagorean major third (3x3x3x3) you have a dissonant note. It’s on the central spine of the lattice, just off the border of my map, to the east of the 6+.
+
+Here’s a 5/4 major third, with the tonic, and then in the context of a major chord.
+
+[just 3](./just-3.mp3)
+
+Now here it is in Pythagorean tuning. It’s even sharper than the equal tempered version. Ouch!
+
+[pythagorean 3](./pythagorean-3.mp3)
+
+The universe of threes is infinite, but still somewhat limited musically.
+
+4. Four doesn’t add anything new, it’s just two octaves, every second mile marker.
+
+5. Five, on the other hand, combines with three to create a vast and wondrous universe, the world of the lattice, and adds many more flavors of consonance, dissonance and beauty. The twelve tones I’ve just described, and virtually all of European classical music, can be found in this universe.
+
+6. Six, like four, adds nothing fundamental. It’s 3×2, and generates only Pythagorean intervals.
+
+7. Aha.
+
+America doesn’t export much any more. Except culture. American music, and the movies, have spread worldwide.
+
+Strange turn of events considering that 100 years ago, America was pretty raw. It imported much of its culture from Europe. But when it imported the music of Africa, and combined it with the music of Europe, blues and jazz and rock and roll were born, and the world’s music is still ringing like a bell. Go Johnny go!
+
+http://www.youtube.com/watch?v=6ofD9t_sULM
+
+In my opinion, the great advance in this music (harmonically, at least), is the incorporation of the prime number seven.
+
+## Seven
+
+My favorite contemporary band is the [Black Keys](http://www.theblackkeys.com/). I think [Dan Auerbach](http://www.nonesuch.com/artists/dan-auerbach) is a harmonic genius. The video is funny.
+
+https://www.youtube.com/watch?v=x_PrT25o8Vs&feature=emb_title
+
+Dinosaur? What dinosaur?
+
+This song _lives_ in the universe of 7. I just spent a half day taking apart the main riff and seeing how it works out on the lattice. It strictly uses a 5-note scale: 1, 7b3, 74+, 5, and 7b7. The notes are all in the universe of 3 and 7; there is no 5 energy at all, in this part of the song at least.
+
+https://www.youtube.com/watch?v=I8T3ViHSXqQ&feature=emb_title
+
+There are three new lattice notes in this video, the [septimal minor third](http://en.wikipedia.org/wiki/Septimal_minor_third), or 7b3, the [harmonic seventh](http://en.wikipedia.org/wiki/Harmonic_seventh), or septimal flatted seventh, labeled 7b7, and a crazy new note I’ll get to in a minute. The 7b3 is found (on the scale) between the 2 and the b3. It’s a lot flatter than the minor third. The 7b7 is pitched between the 6 and the b7, a lot flatter than the minor seventh. Neither of these can be played directly on the piano. Blues pianists can evoke them by trilling between the key above and the key below. Variable pitch instruments, notably voice and electric guitar, are capable of actually nailing these notes and delivering their full effect.
+
+This song added a new note to my lattice! [Mathieu](http://en.wikipedia.org/wiki/W._A._Mathieu) writes that it is used in the blues, and I knew about it theoretically, but I hadn’t used it or observed it in the wild before. One source calls it the septimal narrow fourth. It is slightly flat of the 4. My name for it turns out to be 74+. (The + is a slight pitch adjustment to show exactly how it’s tuned in just intonation.) In Next Girl, it makes a harmony note with the 7b3 root — a nice interval of a ninth.
+
+Cool, haven’t confirmed the existence of a new note in a while. The bestiary grows. Kind of like particle physics.
+
+Septimal notes are essentially unknown in European classical music, but thanks to the blues, they thoroughly infuse the music of America and many other countries. Without them, some music just doesn’t sound the same. They are one reason the Beatles don’t translate well to elevator music. Check this out:
+
+https://www.youtube.com/watch?v=cOTGJwJhn_8&feature=emb_title
+
+Listen to the signature riff, how it changes and morphs. Throughout the song, George is playing with the region between the septimal flatted third and the major third. As the chords change, the song moves around on the lattice. In response, he bends the note a little more, a little less, to evoke the septimal third, then the major, and maybe even the minor third, located between the other two notes.
+
+By the way, this is a great little zone on guitar. It’s the second fret up from the tonic. You can play four distinct notes just by bending — the 2, 7b3, b3 and 3. George Harrison spends this whole song exploring the tension and resolution in that little melodic space.
+
+John’s vocals are great blues, right in tune.
+
+As I hear them, the [Black Keys](http://www.youtube.com/watch?v=6k8es2BNloE) go even further by putting septimal notes in the roots. Great lyrics and a sense of musical history too, an excellent band.
+
+The usable septimal notes are all close to the center. They just get too far out for me to hear, rather quickly. I personally have found three of them useful so far, and today I’ve been introduced to another.
+
+Here are the septimal notes I have on my current lattice. I imagine I’ll add more as I explore.
+
+7/4, the harmonic seventh, 7b7
+
+7/6, the septimal minor third, 7b3
+
+7/5, the [septimal tritone](http://en.wikipedia.org/wiki/Septimal_tritone), a staple of rock guitar and one of my personal favorite notes.
+
+21/16, the septimal narrow fourth, or blu ma according to Mathieu. He has some great note names in his book, based on the Indian singing notes, [sa – re – ga – ma](http://en.wikipedia.org/wiki/Swara) and so on.
+
+## Summary (So Far)
+
+I messed around with electronics quite a bit as a kid. I’d put things together according to diagrams, and if they didn’t work, I’d change something and see what happened, and get a feeling for what was happening inside the black box.
+
+When I started doing audio electronics in earnest, I found the [oscilloscope](http://www.derivedlogic.com/TestEquipment/Oscilloscopes/Oscilloscopes.html). Here’s a cool handmade one by [Andrew Smith](http://www.electronicsweekly.com/blogs/gadget-master/2007/10/meet-andrews-blast-from-the-pa-1.html).
+
+![toycro](./toycro.jpg)
+
+An oscilloscope is a powerful tool, a visualizer, that lets you look right into the black box. It feels almost like cheating. All the energy that went into detective work can now be put to creative purposes. Electronics is much easier when you can directly see what’s happening in there.
+
+I feel that hearing the notes in their untempered form, and learning their relationships on the lattice, has connected me with music in a similar way. Was blind, but now I see.
+
+I’ve finished my first goal for this blog — to create and post the Flying Dream video, and post enough information for an interested person to understand it. I could go on for a long time about the uses of the lattice, and I imagine I will. It’s a fabulous tool.
+
+There will be a slight pause in this blog as I write and rehearse for some [upcoming shows](http://theharmonypeople.com/). I intend to be back with some new subjects, especially an exploration of consonance and dissonance. If this work interests you, and you’d like to discuss it, you can reach me through the contact page.
+
+Oh, and the matrix in which all of this is happening is love.
+
+## Mozart on the Lattice
+
+In one of my favorite passages in Harmonic Experience (p. 104-105), W.A. Mathieu points out that by the time Mozart came around, equal temperament was well enough established that a D# and an Eb could be thought of as the same note. So when Mozart wanted his melody to go back and forth between an Eb and an E, he wrote (spelled) the notes as D# and E, probably to make the music easier to read. In just intonation, D# is an entirely different note, and makes less harmonic sense than Eb.
+
+I got curious as to how the two spellings would sound and look on the lattice. I also made one in equal temperament. They are quite different, and I think it’s fun to compare them. These are on YouTube with the following descriptions:
+
+https://www.youtube.com/watch?v=llD8dET9QIg&feature=emb_title
+
+A passage from Sonata in F, K. 332. This is the spelling suggested by W.A. Mathieu, Harmonic Experience, p. 105. The melody moves between the major and minor third. Listen to the major/minor interplay in just intonation.
+
+https://www.youtube.com/watch?v=CMcD8DxfLA8&feature=emb_title
+
+A passage from Sonata in F, K. 332. This is how Mozart spelled it, with a #2 instead of a b3. He likely did this to make it easier to read. This video shows how that spelling would look, and sound, in just intonation, if taken literally. The melody moves by a diatonic semitone (112 cents) rather than by a chromatic semitone (70 cents), and the effect is quite different.
+
+https://www.youtube.com/watch?v=_JW2ADS-iCI&feature=emb_title
+
+A passage from Sonata in F, K. 332, in equal temperament. In ET, the b3 and #2 are both tuned to a compromise pitch, in between the two. I think the ear turns it into a b3 here, but the effect is off, the note is quite flat. The whole passage feels different than it does in either of the JI versions.
+
+How beautiful Mozart’s music is! I have watched the first video, in JI with the major/minor pair, many times. Try following just the orange one a couple of times, then just the yellow one.
+
+## Melodic Space, Harmonic Space
+
+Throughout my musical education, I’ve been taught that music happens in a linear space. This is the space so beautifully laid out on the piano keyboard.
+
+![piano](./Piano-keyboard.jpg)
+
+Music teaching is organized around scales. In most Western music, the full scale consists of twelve notes, equally spaced. Other scales, such as the seven-note minor and major scales, are subsets of this full, “chromatic” scale. Due to octave magic, a mysterious and crucial aspect of our inner perception, when we get to the thirteenth note, we have multiplied the original note by two, and the sequence starts over again.
+
+So, fortunately for musical analysis, melodic space can be described in one octave. It takes about ten of these octaves to cover the range of human hearing.
+
+On the piano keyboard, melodies look the way they sound. When the pitch goes up, you move up the scale, and when the pitch goes down, you move down the scale. Short distances (the shortest is from one key to the next, a half step), feel short. Long distances (more than about three half steps) feel long. This is a good and useful space for visualizing melody.
+
+Harmony, not so much.
+
+Musical nomenclature, as I’ve pointed out before, has grown like an old city over the years. As music theory changes, bits and pieces of the old terminology are appropriated and redefined by new thinkers. The result is a cobbled-together mass that has a lot of weird contradictions and misleading names.
+
+I think one of the most regrettable bits of confusion comes from the word interval.
+
+The distance between two notes on the keyboard is called an interval. When my melody moves by an interval of a minor third, it has covered a distance of three half steps. When I move by a major third, I’ve covered four half steps. The major interval is bigger than the minor one — that’s why it’s called “major.” No problem! The move feels bigger when you sing it.
+
+The problem comes when you start to think about harmony — two or more notes sounding simultaneously. The word “interval,” with the same connotation of pitch difference, is also used to describe the distance between harmony notes. Yet in the world of harmony, the interval, or pitch distances don’t make any intuitive sense at all.
+
+For example, two notes a fifth apart (seven half steps) sound wonderful when played together. C and G are two such notes. They are closely related to each other, harmonically. So are C and F, which are a fourth apart (five half steps). These are the best consonances there are, except for unisons and octaves.
+
+So what about the note in between them, an interval of six half steps?
+
+Yep, none other than the dreaded tritone, the devil’s interval, definitely a dissonant note.
+
+If the linear scale were the best way to think about harmony, wouldn’t the tritone be between the fourth and fifth in consonance? Why would three notes in a row, next-door neighbors on the scale, be so drastically different from each other harmonically? The scale gives no clue. You just have to remember.
+
+Perhaps there is a more intuitive way to visualize harmony, one that puts harmonically related notes closer to each other, and puts the notes that are harmonically farther apart … farther apart?
+
+I think there is indeed a harmonic space as distinct from a melodic space. This space can be illustrated on the lattice. It’s not a good model for melody — scales do a much better job. But it’s a great model for visualizing harmony — what you see corresponds intuitively to what you hear.
+
+The interplay between these two spaces creates the beautiful dance that is harmonized music.
+
+## Cents
+
+Musical notes can be mapped onto many different spaces. The two I find useful so far are:
+
+— Harmonic space, the space of the lattice, organized by harmonic connections (ratios of whole numbers).
+
+— Melodic space, the space of the scale, organized by pitch, or frequency.
+
+Both maps show the location of a note relative to a reference tone, the Tonic, the “do” of do-re-mi.
+
+![tinkertoy](./51DRCT06DJL._SL500_AA300_.jpg)
+
+
+Distance on the lattice could be measured by the number and length of the connections to the tonic, sort of “how many Tinkertoy sticks away are we?”
+
+How to measure distance in melodic space?
+
+One of my favorite music theorists is [Alexander Ellis](http://en.wikipedia.org/wiki/Alexander_John_Ellis). Ellis was an interesting character, a researcher in phonetics, and the prototype for Professor Henry Higgins of George Bernard Shaw’s Pygmalion (My Fair Lady). He wrote a huge appendix for Helmholz’s foundational book about psychoacoustics, On the Sensations of Tone, in which he laid out a version of the harmonic lattice that is very much like the one I’m using. The appendix was published in 1885.
+
+Ellis proposed dividing each equal-tempered semitone into 100 equal parts, called cents. This gives 1200 cents to the octave. Cents have caught on almost universally as a way to describe and compare pitches of tones.
+
+Cents are a logarithmic unit. Logarithms form a bridge between addition and multiplication. When you add logarithms, you are multiplying in the real world. Adding 1200 cents is the same as multiplying by 2. When you add one cent, you are multiplying by a small number, the same number each time. It’s the 1200th root of two, in fact, a very small number, about 1.0006. Multiply by 1.0006, 1200 times, and you get 2.
+
+The ratios themselves show what the pitch of a note will be, and there’s a formula for translating from harmonic space (ratios, the lattice) to melodic space (cents, pitch). It is great fun, if you’re a geek like me, to plug this formula into a spreadsheet and start exploring the musical spectrum.
+
+For any ratio, b/a, the pitch in cents is:
+
+1200 x log2(b/a)
+
+That’s log to the base 2. A good straightforward explanation of logarithms can be found [here.](http://www.mathsisfun.com/algebra/logarithms.html) They are a handy concept in the study of perception, since many human senses, including visual brightness, loudness and pitch, work in a logarithmic way. A 100-watt amplifier sounds louder than a 10-watt amp, but it’s nowhere near 10 times as loud. Maybe three times as loud, subjectively? A 10-watt amp is louder than a 1-watt by about the same amount. I have a 1-watt Vox tube amp that the neighbors have yelled at me about. For something to sound “twice as loud,” it has to be moving something like 4 or 5 times as much air.
+
+So let’s run that formula. The untempered major third is a ratio of 5/4.
+
+log2(5/4) = 0.32
+
+x 1200 = 386.3 cents
+
+The ET major third is at exactly 400 cents, 14 cents sharper. This is a clearly audible difference — the ear can distinguish a difference of about [5-10 cents](http://en.wikipedia.org/wiki/Pitch_(music)#Just-noticeable_difference).
+
+Cents give us a language for comparing pitches, and quantifying the differences between them.
+
+## “Untempered” vs. “Just Intonation”
+
+Even though I love just intonation, I have a couple of problems with the term itself.
+
+One is grammatical. It’s a noun, and sometimes I want an adjective, as in “the just intonation version compared with the equal tempered version.” Kind of awkward. How else would you say this? “Justly intonated”? “The version in just intonation”? I haven’t found a construction that satisfies me.
+
+The other reason is cultural. If you search “just intonation,” and start reading, you will get the distinct impression that just intonation is something avant-garde, esoteric, on the fringes. It’s as though equal temperament is the basic system of music, and just intonation is a modification of it. The word “[microtonal](http://en.wikipedia.org/wiki/Microtonal_music)” has similar connotations.
+
+In fact, equal temperament is the newcomer, a development of a few hundred years ago that facilitated the flowering of a particular kind of music in Europe, and has spread, I think, because it makes so many things so much easier.
+
+Equal temperament is built upon just intonation, not the other way around. If I put my music in the “just intonation” or “microtonal” category, I’m in great company — [Harry Partch](http://musicmavericks.publicradio.org/features/feature_partch.html), [Ben Johnston](http://www.youtube.com/watch?v=RT4ChF1cWrc), [Kyle Gann](http://www.kylegann.com/). These composers are exploring the edges of just intonation, picking up the trails that were abandoned when such music as [Ars Nova](http://en.wikipedia.org/wiki/Ars_nova) was superseded by the slow growth to dominance of tempered scales. Ars Nova is amazing music, terribly neglected now. I like it better than either earlier or later European music — some of it sounds like jazz or bluegrass. Check out this [exquisite piece](http://www.youtube.com/watch?v=avh_BsumERY) by the group Ensemble PAN, performing some of the last of such music, from early 15th century Cyprus.
+
+I’m not a classical composer, I’m a folk-pop singer-songwriter. I’m interested in such things as modulation, and exploring the edges (especially the world of the prime number 7). But my interest in JI comes from wanting to play music that is more accessible by virtue of being in tune, and thus having a more direct route to the heart and soul. My interest is in communication, and in musical joy. Untempered music simply speaks more directly to my heart.
+
+Think of [Ladysmith Black Mambazo](http://www.youtube.com/watch?v=O6Hnfu76QIs) on Paul Simon’s Graceland album. I get goosebumps even listening on these tiny computer speakers. Untempered music is not avant-garde at all. It’s the ancient miracle of resonance and joy that happens when we hear in-tune harmony.
+
+Of course I still need a noun, and I’ll continue to use “just intonation” when it’s the word that works. But I have my adjective. I’m calling my music “untempered music.”
+
+## The Untempered Major Scale
+
+In harmonic space, the clearest name for each note is its ratio — 5/3, 3/2, 4/3, etc. Precise and unambiguous. But the ratios don’t give a very good idea of how to go about playing or singing those notes.
+
+There are a few instruments, such as the left hand keyboard on the accordion, that are organized for harmonic thinking.
+
+![major](./800px-120-button_Stradella_chart.svg_.png)
+
+The rows are arranged in fifths, and the first two rows are a major third apart, just like the lattice.
+
+For most music making, though, we need to know the pitch of the note. Instruments and voices tend to live in the world of melodic space — scales and pitches.
+
+Here’s what the simplest, most harmonically consonant major scale looks like on the lattice:
+
+https://www.youtube.com/watch?v=uDYiNd7NXuM&feature=emb_title
+
+One can convert the ratios to pitches using the formula for cents. The ET values are in parentheses.
+
+1 = 1/1 = 0 cents (0)
+
+2 = 9/8 = 204 (200)
+
+3 = 5/4 = 386 (400)
+
+4 = 4/3 = 498 (500)
+
+5 = 3/2 = 702 (700)
+
+6 = 5/3 = 884 (900)
+
+7 = 15/8 = 1088 (1100)
+
+Note that the 1, 2, 4 and 5 are very close to their ET equivalents. Most ears would be unable to tell the difference.
+
+The third, sixth and seventh, however, are all noticeably flat. Or perhaps I should say their ET namesakes are noticeably sharp.
+
+I think this explains a lot about rock music, which depends heavily on power chords (roots and fifths with no thirds) and 1-4-5 chord progressions. The notes of a 1-4-5 power chord progression are 1, 4, 5 and 2!
+
+As Eddie Van Halen said in his terrific [Guitar Magazine interview](http://guitarinternational.com/2010/08/20/edward-van-halen-at-play/), “Really, the best songs are still based on I-IV-V, which is so pleasing to the ear. Billy Gibbons [of ZZ Top] calls me now and then, and he always asks, ‘Eddie, have you found that fourth chord yet?’ [Laughs].”
+
+Of course the I-IV-V is inherently satisfying, it’s that great rocking chair between reciprocal and overtonal territory, in the most consonant part of the lattice, as close to the tonic as you can get (harmonically).
+
+But I think the special appeal for rock music is that, in ET (and guitar is essentially an equal-tempered instrument), the 1, 4 and 5, and also the fifth of the 5 (the 2) are all in tune. Whatever one might think of ZZ Top’s simplicity (and some do scoff), it’s undeniable that they are fiercely in tune, and harmonically their music strikes a deep chord in the psyche, pun intended.
+
+If the bass and rhythm guitar stick to those roots and fifths, the voices and lead guitar can play all the other notes, because they can be bent and wiggled until they sound right.
+
+This works just as well in traditional country music. Let the bass player nail down those roots and fifths, and the voices (and the fiddle) can sing in-tune harmonies as sweet as you please.
+
+## The Major Scale in Cents
+
+The simplest untempered tuning of the major scale is:
+
+1 — 0 cents
+
+2 — 204
+
+3 — 386
+
+4 — 498
+
+5 — 702
+
+6 — 884
+
+7 — 1088
+
+Here’s how that tuning compares with the equal tempered scale:
+
+![scale](./Cents-1024x138.jpg)
+
+The black numbers show the pitches of 12-tone equal temperament. They are equally spaced, like inches on a ruler.
+
+The red numbers show the tuning of the untempered major scale. They are spaced in the way they naturally turn out when you generate them with small whole number ratios. As is so often the case with the natural world, they don’t line up too well with the nice human grid lines we love.
+
+The way I see it, when you play in equal temperament, you’re playing the grid lines on the map.
+
+When you sing or play the untempered notes, you are visiting the actual territory.
+
+I’ve read that it’s not possible to combine the two, but I disagree. It’s a matter of showing the ET instrument who’s the boss. My favorite example is Ray Charles. Here’s a [video from 1976](http://www.youtube.com/watch?v=glggureA_Kk). He’s playing the piano, laying down those grid lines, and the rest of the band is too, but when he sings, his voice owns the sound, and the sound becomes him. A great, dominant singer will infuse the whole combo with that soul.
+
+Another great example is Ella Fitzgerald. Want some goosebumps? Check [this](http://www.youtube.com/watch?v=LFrz11K_i6k) video out.
+
+## The Untempered Chromatic Scale (Part 1)
+
+The familiar 12-note scale is also called the chromatic scale. There are many ways to generate an untempered version of such a scale.
+
+The oldest way seems to be Pythagorean tuning. When you multiply a frequency by 3, you get a new note, an octave plus a fifth above. Multiply by 3 again, and you get another new note, and so on. Dividing by 3 gives you another new note, the perfect fourth, dividing by 3 again delivers another new note, and so on. Do this enough times and you can generate a 12-tone scale.
+
+This scale forms the central, horizontal spine of the lattice.
+
+![pythagoreanlattice](./pythagorean-lattice.jpg)
+
+The central six notes of the Pythagorean scale are highlighted. If you keep extending to the left and right you get all 12 notes, and then even more.
+
+Trouble is, once you’re more than two or three steps away from the center, the notes are definitely dissonant. The ratios just get so big that the ear can no longer hear them as harmony. The Pythagorean major third, for example, is the next note to the right of the 6+, just off the central lattice. Its ratio is 3x3x3x3, or 81/1. The octave reduction trick allows you to divide by 2 until it’s in the same octave as the tonic, so the ratio becomes 81/64.
+
+Harmony is built from small, whole number ratios, and these are not small numbers. Here is what a Pythagorean major third sounds like:
+
+[clarinet 81:64](./clarinet-8164.mp3)
+
+Wow. Back when Pythagorean tuning was the norm, the third was considered a dissonant interval. I concur!
+
+In late Medieval times, the 5/4 tuning became more popular, and major thirds began to be regarded as a consonant interval. Here’s the 5/4, for comparison:
+
+[clarinet 5:4](./clarinet-54.mp3)
+
+Ah. Using the prime number 5 allows a more consonant chromatic scale, with much smaller ratios. Here it is on the lattice:
+
+![lattice](./12-tone-lattice.jpg)
+
+All of these notes have been covered in previous posts. Each one has a unique personality. Some are more consonant, some more dissonant, but all twelve have small enough numbers in their ratios to be perceived as harmony by the ear.
+
+Here are their ratios, and pitches in cents:
+
+1 — 1/1 — 0
+
+b2 — 16/15 — 112
+
+2 — 9/8 — 204
+
+b3 — 6/5 — 316
+
+3 — 5/4 — 386
+
+4 — 4/3 — 498
+
+#4+ — 45/32 — 590
+
+5 — 3/2 — 702
+
+b6 — 8/5 — 814
+
+6 — 5/3 — 884
+
+b7 — 9/5 — 1018
+
+7 — 15/8 — 1088
+
+Here is the scale, compared with the 12 notes of equal temperament.
+
+![scale](./untempered-chromatic.jpg)
+
+When I first drew this scale, on graph paper, I was startled by how narrow the major-minor half steps are, compared with the equal-tempered versions. Take a look at the b3 (minor third) and the 3 (major third). They are only 70 cents apart, not the 100 cents of the piano scale. Same with the b6-6 and b7-7. It’s such a small move in pitch, such a large move harmonically!
+
+The Mozart movies I made a month ago or so illustrate the major-minor pair quite well. The blandification of equal temperament has obscured a beautiful detail of harmonic music. So much is gained with ET, and so much is lost or obfuscated.
+
+## The Untempered Chromatic Scale (Part 2)
+
+A closer look at the untempered 12-note scale reveals some interesting patterns.
+
+Here’s the scale on the lattice again. This time, I’ve colored the notes as follows:
+
+Red = notes from the central, Pythagorean row, or spine, of the lattice. They are generated by multiplying and dividing by 3.
+
+Green = notes from the next row up. These notes are a major third up from the ones on the central spine — you generate them by multiplying by 5.
+
+Blue = notes from the row below the central one. You make these by dividing by 5, which means they are a major third below.
+
+![rgb](./rgb-lattice.jpg)
+
+Now here’s the scale again, colored the same way.
+
+![coloredchromatic](./colored-chromatic.jpg)
+
+Notes in red are tuned about the same as their equal tempered counterparts.
+
+Notes in green (the majors) are all flatter than ET.
+
+Notes in blue (the minors) are all sharper than ET.
+
+OK, so what? I can think of several immediate ways to use this information.
+
+If you are a singer/guitar player, remember that you can only bend notes up. You can make your guitar playing sweeter if you:
+
+Avoid bending roots and fifths, play them right on the money
+Bend minor thirds slightly, and
+For sure don’t bend major notes. It actually helps to mute or avoid major thirds in your guitar playing, and leave those to the vocal. There are several ways to play a G chord, for example. Try singing a simple song in G (maybe Silent Night or Ring of Fire), using the classic G chord:
+
+![gchord](./G_major_chord_for_guitar_open.png)
+
+There are two equal-tempered major thirds in this chord.
+
+Now try it fingering this way:
+
+![gchord](./G_major_chord_for_guitar_open_position_no_doubled_third.png)
+
+For even more clarity, mute the 5th string with your left hand, and there will be no major thirds in the chord at all. It is all G and D notes, roots and fifths. Can you feel the difference in your singing? There is a division of labor: the guitar plays the notes that are in tune in ET, and the voice sings the rest, including that major third. I think you will find it much easier to sing, like your voice falls into a pocket instead of fighting the intonation of the guitar.
+
+Gotta go, I have a show tonight, but I’ll have a lot more to say about this sort of thing. I do welcome comments and questions, there’s a contact page and you are invited to email me if you’d like to discuss this stuff.
+
+## An Easy Experiment To Try
+
+It would be natural to read these posts and wonder why I’m so passionate about intonation, and why I’m going to so much trouble to explore it in this blog and in real life. After all, we’re talking about tiny differences in tuning here, why be so picky when it’s the heart that counts?
+
+It’s true, the tuning differences are small, and hard to hear. Thing is, it’s not actually about the pitch. It’s about the way it feels, and in that realm, the difference is not subtle at all. It is profound, and once you hear (no, feel) it, I think you may be hooked, or at least understand more of why I’m so interested in this subject. I think it opens the door to music that truly moves both the performer and the listener, a recipe for audio joy. You bet it’s about the heart. This is not just an intellectual pursuit.
+
+Here is an experiment you can do, to feel that difference in yourself. It uses a chord, and a melody, that you probably already know.
+
+The open G chord is one of the most common chords in guitar music. It looks like this:
+
+![openg](./Open-G.jpg)
+
+The notes, from left to right, are: G–B–D–G–B–G. If G is the tonic, these notes are the 1, 3, 5, 1, 3 and 1.
+
+One of the best-known melodies in the world is Frère Jacques, or in English, _Are You Sleeping (Brother John)_, a round that is hundreds of years old. It could be harmonized in several ways, but the melody is such that it sounds fine sung over just the tonic chord, over and over again.
+
+Here’s the experiment. First, tune your guitar carefully. A tuner is best. When the open strings are in tune, double check the notes of the open G chord. I think [Jody](http://jodymulgrew.com/home/) showed me this — it often sounds better if you tune to the tonic chord of the song instead of to the open strings.
+
+Now play a full, open G chord as above. Make sure all the strings sound clearly. You are playing a chord with an unusual property: It has two equal-tempered major thirds in it. This chord is highly equal-tempered in character.
+
+Strum away, and sing Frère Jacques over it, several times through. You may wish to capo and tune again, if this is not a comfortable key for you.
+
+When you have a good sense of what this feels like, try fingering the G chord as follows:
+
+![openg](./Open-G5.jpg)
+
+I’m a thumb-wrapper, so I finger the low G with my thumb, and mute the A string with more of my thumb. (This is heretical to some, but it’s a wonderfully useful technique when used at the right time. Here’s a beautiful explanation by guitar teacher [Jim Bowley](http://www.jimbowley.com/2011/12/the-definitive-lesson-thumb-placement/).) Then I finger the two high notes with my index. Any fingering will work as long as it mutes the A string.
+
+Now you have a chord with no major thirds at all. It goes G—D–G–D–G, or 1—5–1–5–1.
+
+Sing Frère Jacques over this chord, several times through and check out what happens.
+
+I won’t tell you what to feel. Don’t worry about trying to hear or sing subtle tuning differences. Just pay attention to your singing, and to your body’s reaction.
+
+Seriously, go do this now, or the next time you’re near a guitar. It works great with piano too, and in any key. First play a major chord, with a couple of thirds in it to really make the point. Then play only roots and fifths. Sing the song over each version of the chord, back and forth. The difference may surprise you.
+
+I’ll check in tomorrow with my own conclusions.
+
+## More Experimenting
+
+Yesterday, I described a simple way to hear, and more importantly, feel, the difference between equal temperament and just intonation, by singing Frère Jacques over an open G chord with ET major thirds, and then over a G chord that has only roots and fifths in it.
+
+The second half of the experiment is called [singing over a drone](http://www.matthewdallman.com/essay_object/to_sing_world_object.html), and it’s a great way to get acquainted with the resonance of the pure notes. The 1–5 drone is a bedrock foundation of [North Indian (Hindustani) classical music](http://en.wikipedia.org/wiki/Hindustani_classical_music). Check out this [gorgeous song](http://www.youtube.com/watch?v=316xH6tgobQ) with Ravi Shankar’s two daughters, Norah Jones and Anoushka Shankar. It’s not drone music, but it’s a beautiful blend of East and West, and I feel the purity of the notes down to my bones. This is untempered music.
+
+At this point I must pause again to acknowledge my enormous debt to W.A. Mathieu. I had been studying just intonation for several months when my friend Kay Ashley, a fine singer, guitarist and student of [Hindustani music](http://www.youtube.com/watch?v=pzAN5zmwpZI), loaned me her copy of Mathieu’s book Harmonic Experience. She did not get it back until I had my own copy.
+
+The first part of the book introduces the pure notes by showing the reader how to sing them over a drone. I have found no better way to understand the notes of just intonation than to sing them. It isn’t just about hearing them, even though that can be beautiful and illuminating. It is about feeling the resonance in your body.
+
+![equilibrium](./200px-Stable_equilibrium.svg-copy.jpg)
+
+My own experience in singing over a drone of a root and perfect fifth is that it is much easier to sing in tune. It’s as though the drone sets up a sort of sonic field that has grooves or troughs in it, points of stable equilibrium into which my voice falls, and wants to stay.
+
+The equal-tempered chord is not so friendly. The tempered major third is not in tune, that is, its natural resonance does not point exactly to the tonic. It’s as though it points to a different tonic, a little sharper than the one the root and fifth are pointing to. The groove is obscured, and there is a fight between the two worlds that makes it harder to know exactly what to sing. The reference is shaky.
+
+I confess, yesterday’s experiment was a little unfair to equal temperament. I changed two things at once, which is not a good way to investigate nature. It’s much better to change only [one thing at a time](http://www.geniusintelligence.com/changeonething.htm), so you know what causes what. When you sing over the straight G–D drone, you’re hearing two changes — the simpler chord (1–5 instead of 1–3–5), and the effect of removing the equal tempered third.
+
+In the interest of scientific honesty, here’s one more exercise that shows only the effect of ET.
+
+I’ve recorded some synthesized strings to sing along with. These are the same notes as the open G chord: G-B-D-G-B-G. Once again, sing Frère Jacques. Row, Row, Row Your Boat and Three Blind Mice are also excellent, I recommend trying them too.
+
+Here is a G major chord in just intonation:
+
+[G chord JI](./G-chord-JI.mp3)
+
+And in equal temperament.
+
+[G chord ET](./G-chord-ET.mp3)
+
+If this is not in your most comfortable vocal range, here are some six-note chords in the key of C. I find these better for my own voice. These are note-for-note the same as the first position C chord on guitar, another common chord with two equal tempered thirds in it.
+
+C major in just intonation:
+
+[C chord JI](./C-chord-JI.mp3)
+
+And in ET.
+
+[C chord ET](./C-chord-ET.mp3)
+
+I invite you to go back and forth between the JI and ET versions of the chord that is most comfortable for you, singing over each.
+
+While you’re singing, pay attention to how the notes feel, in your body.
+
+Also notice how easy, or how difficult, it is to hold your notes, to jump straight to the next note, to not waver when you hold a long one.
+
+And perhaps most importantly, pay close attention to the emotion you feel while singing.
+
+I have long experienced flashes of musical ecstasy — it’s why I make music, to experience and share that transcendence. But such experiences have been sporadic, and somewhat mysterious. Encountering, studying and internalizing the pure notes, and their relationships to each other (the lattice), has thrown open the double doors, and I am now in the long process of walking through them.
+
+next: http://www.garygarrett.me/?p=865

@@ -1,0 +1,54 @@
+---
+title: Just Intonation III - 5 Limit Tuning
+date: 2020-04-27
+---
+
+import ConnectedCircle from "../components/common/ConnectedCircle.tsx"
+import TuningCircle from "../components/tuning/TuningCircle.tsx"
+import Monochord from "../components/tuning/Monochord.tsx"
+import { InlineMath, BlockMath } from "react-katex"
+import "katex/dist/katex.min.css"
+import { State } from "react-powerplug"
+import Slider from "@material-ui/core/Slider"
+import Select from "@material-ui/core/Select"
+import Fraction from "fraction.js"
+import canUseDOM from "../components/canUseDOM.ts"
+import {
+  cents,
+  limitN,
+  frequencyColor,
+  pythagoreanComma,
+} from "../components/tuning/tuning.ts"
+import * as Tone from "tone"
+const { PolySynth, Synth } = Tone
+const harp =
+  canUseDOM() &&
+  new PolySynth(6, Synth, {
+    volume: -16,
+    envelope: { attack: 0.01, decay: 2, sustain: 0, release: 0.1 },
+    oscillator: { type: "fmtriangle" },
+  }).toMaster()
+
+As this is the third part of the Just Intonation series, let's talk about thirds.
+
+## 5 Limit Tuning
+
+With 5 limit tuning, we can use powers of 5 as an addition to the powers of 3 to generate ratios.
+This means that for each number of fifths, we can add any number of thirds. As a formula, this means:
+
+<InlineMath>{"R_{5} = 2^{a} * 3^{b} * 5^{c}"}</InlineMath>
+
+Like in the last post, we will use octave reduction to automatically set the exponent of 2 to keep the end result between 1 and 2.
+Having that out of the way we now have two exponents left that can have arbitrary values.
+
+So 5 limit tuning brings a whole new dimension to our system: The first dimension is the 3 (fifths) and the second, new dimension is the 5 (thirds).
+
+### Name collisions
+
+It may sound wrong that the 3 stands for a fifth, while the 5 stands for a third, but this just stems from the naming convention of musical intervals,
+based on 7 notes per octave. Funny enough, the next prime numbers are 7, which adds the minor seventh, and 9, which adds the major second (or 9th).
+But let's stay with 3 and 5 for now.
+
+### Lattice
+
+Having the 2 dimensions of 3 and 5, we can visualize their powers in a lattice, which is a common way of display:
