@@ -172,6 +172,7 @@ Now we can generate a whole tuning system, by picking a range of ratios. We can 
     pitches: 5,
     rotate: 0,
     preset: -1,
+    // sort: false
   }}
 >
   {({ state, setState }) => {
@@ -179,6 +180,7 @@ Now we can generate a whole tuning system, by picking a range of ratios. We can 
     const ratios = limitN([[3, from, to]], 2).map((ratio, i) => {
       return ratio // - pythagoreanComma(i)
     })
+    // const sorted = [...ratios].sort();
     // const ratios = [1,9/8];
     const range = [-28, 28]
     const base = 440
@@ -194,7 +196,7 @@ Now we can generate a whole tuning system, by picking a range of ratios. We can 
       [-5, 7, "Phrygian"],
       [-6, 7, "Locrian"],
       [-5, 12, "12 Notes centered"],
-      [0, 53, "53 Notes centered"],
+      [-26, 53, "53 Notes centered"],
     ]
     return (
       <div>
@@ -238,6 +240,7 @@ Now we can generate a whole tuning system, by picking a range of ratios. We can 
         <br />
         <Slider
           marks
+          track={false}
           min={2}
           max={60}
           value={state.pitches}
@@ -248,24 +251,42 @@ Now we can generate a whole tuning system, by picking a range of ratios. We can 
         <br />
         <Slider
           marks
-          min={-8}
-          max={+8}
+          track={false}
+          min={-state.pitches+1}
+          max={0}
           value={state.rotate}
           onChange={(e, v) => v !== state.rotate && setState({ rotate: v })}
         />
-        <br />
-        Fractions:
-        {ratios.map((ratio, i) => {
+        <h3>Tuning Table</h3>
+        <p>Let's look at the underlying data of the graphic above in a so called Tuning Table:</p>
+        {/* <label style={{float:'right'}}>
+          <input type="checkbox"
+            checked={state.sort}
+            onChange={(e) => setState({ sort: e.target.checked })}
+          />
+          Sort
+        </label> */}
+        <table>
+        <tr><th>powers</th><th>ratio</th><th>cents</th><th></th></tr>
+        {(state.sort?sorted:ratios).map((ratio, i) => {
+          const power = i + state.rotate;
+          const factor = Math.pow(3, power)
           const [top, bottom] = new Fraction(ratio).toFraction().split("/")
+          const exp = Math.ceil(Math.log(1 / factor) / Math.log(2));
           return (
-            <InlineMath key={i}>{`\\frac{${top}}{${bottom || 1}}`}</InlineMath>
+            <tr>
+            <td><InlineMath key={i}>{`3^{${power}} * 2^{${exp}}`}</InlineMath></td>
+            <td><InlineMath key={i}>{`\\frac{${top}}{${bottom || 1}}`}</InlineMath></td>
+            <td>{Math.round(cents(ratio))}</td>
+            <td><button onClick={()=>harp.triggerAttackRelease(ratio * base, 1)}>Play</button></td>
+            </tr>
           )
         })}
+        </table>
       </div>
     )
   }}
 </State>
-<br />
 
 The tuning above is mostly known in the west from pythagoras, also called the pythagorean tuning.
 Although pythagoras was not the first who invented that type of tuning, as we know now, see Shí-èr-lǜ for an earlier variant.
