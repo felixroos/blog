@@ -4,6 +4,29 @@ import { interpolateRainbow } from "d3-scale-chromatic"
 import Fraction from "fraction.js"
 import * as Combinatorics from 'js-combinatorics';
 
+// takes a generator and position + number of pitches inside an equivalence
+// example pythagorean tuning: generate(3, 7, 12, 2)
+// 3 is the number that is powered (generator)
+// 7 is the end position of the generator sorted scale (pos)
+// 12 is the number of pitches (n)
+// 2 is the equivalence factor (all ratios will be "powered into it")
+export function generate(generator, pos, n, equivalence = 2) {
+  const ratios = [];
+  for (let i = pos - n; i < pos; ++i) {
+    const unreduced = Math.pow(generator, i);
+    // exponent to reduce below equivalence (e.g. 2^x for octave reduction)
+    const reducer = Math.ceil(Math.log(1 / unreduced) / Math.log(equivalence));
+    const reduced = unreduced * Math.pow(equivalence, reducer);
+    ratios.push({
+      ratio: reduced,
+      power: i
+    })
+  }
+  return ratios
+    .sort((a, b) => a.ratio - b.ratio)
+    .map((r, i) => ({ ...r, position: i }))
+}
+
 export function partials([min, max], base = 440) {
   const f = [];
   for (let i = min; i <= max; ++i) {

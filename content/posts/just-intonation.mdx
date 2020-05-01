@@ -15,7 +15,7 @@ import Fraction from "fraction.js"
 import canUseDOM from "../components/canUseDOM.ts"
 import {
   cents,
-  limitN,
+  generate,
   frequencyColor,
   pythagoreanComma,
 } from "../components/tuning/tuning.ts"
@@ -177,11 +177,7 @@ Now we can generate a whole tuning system, by picking a range of ratios. We can 
 >
   {({ state, setState }) => {
     const [from, to] = [state.rotate, state.rotate + state.pitches - 1]
-    const ratios = limitN([[3, from, to]], 2).map((ratio, i) => {
-      return ratio // - pythagoreanComma(i)
-    })
-    // const sorted = [...ratios].sort();
-    // const ratios = [1,9/8];
+    const ratios = generate(3, state.pitches + state.rotate, state.pitches, 2)
     const range = [-28, 28]
     const base = 440
     const selectedPreset = state.preset >= 0 ? state.preset : undefined
@@ -205,9 +201,9 @@ Now we can generate a whole tuning system, by picking a range of ratios. We can 
         <ConnectedCircle
           r={100}
           nodeRadius={20}
-          nodes={ratios.map((ratio, id) => ({
-            id,
-            label: id + state.rotate,
+          nodes={ratios.map(({ ratio, power }, id) => ({
+            id: power,
+            label: power,
             value: cents(ratio) / 1200,
             ratio,
             distance: 140,
@@ -236,7 +232,7 @@ Now we can generate a whole tuning system, by picking a range of ratios. We can 
           ))}
         </select>
         <br />
-        {to - from + 1} pitch{state.piches !== 1 ? "es" : ""}
+        {state.pitches} pitch{state.pitches !== 1 ? "es" : ""}
         <br />
         <Slider
           marks
@@ -252,13 +248,16 @@ Now we can generate a whole tuning system, by picking a range of ratios. We can 
         <Slider
           marks
           track={false}
-          min={-state.pitches+1}
+          min={-state.pitches + 1}
           max={0}
           value={state.rotate}
           onChange={(e, v) => v !== state.rotate && setState({ rotate: v })}
         />
         <h3>Tuning Table</h3>
-        <p>Let's look at the underlying data of the graphic above in a so called Tuning Table:</p>
+        <p>
+          Let's look at the underlying data of the graphic above in a so called
+          Tuning Table:
+        </p>
         {/* <label style={{float:'right'}}>
           <input type="checkbox"
             checked={state.sort}
@@ -267,21 +266,37 @@ Now we can generate a whole tuning system, by picking a range of ratios. We can 
           Sort
         </label> */}
         <table>
-        <tr><th>powers</th><th>ratio</th><th>cents</th><th></th></tr>
-        {(state.sort?sorted:ratios).map((ratio, i) => {
-          const power = i + state.rotate;
-          const factor = Math.pow(3, power)
-          const [top, bottom] = new Fraction(ratio).toFraction().split("/")
-          const exp = Math.ceil(Math.log(1 / factor) / Math.log(2));
-          return (
-            <tr>
-            <td><InlineMath key={i}>{`3^{${power}} * 2^{${exp}}`}</InlineMath></td>
-            <td><InlineMath key={i}>{`\\frac{${top}}{${bottom || 1}}`}</InlineMath></td>
-            <td>{Math.round(cents(ratio))}</td>
-            <td><button onClick={()=>harp.triggerAttackRelease(ratio * base, 1)}>Play</button></td>
-            </tr>
-          )
-        })}
+          <tr>
+            <th>powers</th>
+            <th>ratio</th>
+            <th>cents</th>
+            <th></th>
+          </tr>
+          {ratios.map(({ ratio, power }, i) => {
+            const factor = Math.pow(3, power)
+            const [top, bottom] = new Fraction(ratio).toFraction().split("/")
+            const exp = Math.ceil(Math.log(1 / factor) / Math.log(2))
+            return (
+              <tr>
+                <td>
+                  <InlineMath key={i}>{`3^{${power}} * 2^{${exp}}`}</InlineMath>
+                </td>
+                <td>
+                  <InlineMath key={i}>{`\\frac{${top}}{${
+                    bottom || 1
+                  }}`}</InlineMath>
+                </td>
+                <td>{Math.round(cents(ratio))}</td>
+                <td>
+                  <button
+                    onClick={() => harp.triggerAttackRelease(ratio * base, 1)}
+                  >
+                    Play
+                  </button>
+                </td>
+              </tr>
+            )
+          })}
         </table>
       </div>
     )

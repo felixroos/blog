@@ -1,5 +1,22 @@
-import { stack, clamp, nearestPitch, maxFractionSize, powers, limitN, equivalence } from './tuning';
+import { stack, clamp, nearestPitch, maxFractionSize, powers, limitN, equivalence, generate } from './tuning';
 import * as Combinatorics from 'js-combinatorics';
+
+test('generate', () => {
+  expect(generate(3, 7, 12, 2)).toEqual([
+    { position: 0, ratio: 1, power: 0 },
+    { position: 1, ratio: 256 / 243, power: -5 },
+    { position: 2, ratio: 9 / 8, power: 2 },
+    { position: 3, ratio: 32 / 27, power: -3 },
+    { position: 4, ratio: 81 / 64, power: 4 },
+    { position: 5, ratio: 4 / 3, power: -1 },
+    { position: 6, ratio: 729 / 512, power: 6 },
+    { position: 7, ratio: 3 / 2, power: 1 },
+    { position: 8, ratio: 128 / 81, power: -4 },
+    { position: 9, ratio: 27 / 16, power: 3 },
+    { position: 10, ratio: 16 / 9, power: -2 },
+    { position: 11, ratio: 243 / 128, power: 5 },
+  ])
+})
 
 test('limit', () => {
   expect(powers([[3, -1, 3]])).toEqual([
