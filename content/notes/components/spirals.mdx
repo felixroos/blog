@@ -1,8 +1,8 @@
-import Spiral from "../components/common/Spiral.tsx"
-import SpiralSettings from "../components/common/SpiralSettings.tsx"
+import Spiral from "../../components/common/Spiral.tsx"
+import SpiralSettings from "../../components/common/SpiralSettings.tsx"
 import { State } from "react-powerplug"
 import Slider from "@material-ui/core/Slider"
-import AnimationFrame from "../components/common/AnimationFrame.tsx"
+import AnimationFrame from "../../components/common/AnimationFrame.tsx"
 
 # Spirals
 
@@ -72,8 +72,8 @@ a custom getRadius function:
 
 ```js
 function getRadius(angle) {
-  return -(
-    Math.pow(Math.abs(state.zoom) * 2, Math.abs(angle)) * state.zoom || 1
+  return (
+    Math.pow(Math.abs(state.zoom) * 2, Math.abs(angle)) * Math.abs(state.zoom)
   )
 }
 ```
@@ -121,6 +121,8 @@ _tap image to load random close to zero values_
     </AnimationFrame>
   )}
 </State>
+<br />
+<br />
 
 ### Logarithmic
 
@@ -157,6 +159,8 @@ _tap image to load random close to zero values_
     </AnimationFrame>
   )}
 </State>
+<br />
+<br />
 
 ### Hypnotic
 
@@ -184,6 +188,8 @@ _Click image to start_
     )
   }}
 </AnimationFrame>
+<br />
+<br />
 
 ### Psychedelic
 
@@ -211,6 +217,7 @@ The image takes a few moments to slow down.
               <Spiral
                 zoom={0.1}
                 height={height}
+                width={900}
                 precision={Math.sin(m) * Math.pow(2, i - spirals)}
                 stroke={hslaFloat(
                   sinFloat(m + colDiff * i),

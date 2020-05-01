@@ -1,5 +1,5 @@
 ---
-title: Just Intonation I - Pure Intervals
+title: Pure Intervals
 date: 2020-04-22
 ---
 
@@ -164,7 +164,8 @@ The Lambdoma arranges ratios in a two dimensional grid, using one dimension for 
       <br />
       <h4>Options</h4>
       <label>
-        <input type="checkbox"
+        <input
+          type="checkbox"
           checked={state.playOnHover}
           onChange={(e) => setState({ playOnHover: e.target.checked })}
         />
@@ -172,7 +173,8 @@ The Lambdoma arranges ratios in a two dimensional grid, using one dimension for 
       </label>
       <br />
       <label>
-        <input type="checkbox"
+        <input
+          type="checkbox"
           checked={state.playWithTonic}
           onChange={(e) => setState({ playWithTonic: e.target.checked })}
         />
@@ -180,7 +182,8 @@ The Lambdoma arranges ratios in a two dimensional grid, using one dimension for 
       </label>
       <br />
       <label>
-        <input type="checkbox"
+        <input
+          type="checkbox"
           checked={state.clamp}
           onChange={(e) => setState({ clamp: e.target.checked })}
         />
@@ -188,7 +191,8 @@ The Lambdoma arranges ratios in a two dimensional grid, using one dimension for 
       </label>
       <br />
       <label>
-        <input type="checkbox"
+        <input
+          type="checkbox"
           checked={state.hideExtensions}
           onChange={(e) => setState({ hideExtensions: e.target.checked })}
         />

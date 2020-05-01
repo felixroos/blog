@@ -44,7 +44,7 @@ export default function Spiral({
       <svg width={width} height={height}>
         <path
           d={`M${dots.join("L")}`}
-          stroke={stroke || "white"}
+          stroke={stroke || "gray"}
           strokeWidth={strokeWidth}
           fill="none"
           strokeLinecap={strokeLinecap || "round"}
