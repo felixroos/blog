@@ -1,5 +1,5 @@
 ---
-title: Just Intonation II - 3 Limit Tuning
+title: Just Intonation
 date: 2020-04-26
 ---
 
@@ -267,10 +267,11 @@ Now we can generate a whole tuning system, by picking a range of ratios. We can 
         </label> */}
         <table>
           <tr>
+            <th>position</th>
             <th>powers</th>
             <th>ratio</th>
             <th>cents</th>
-            <th></th>
+            <th>listen</th>
           </tr>
           {ratios.map(({ ratio, power }, i) => {
             const factor = Math.pow(3, power)
@@ -278,6 +279,7 @@ Now we can generate a whole tuning system, by picking a range of ratios. We can 
             const exp = Math.ceil(Math.log(1 / factor) / Math.log(2))
             return (
               <tr>
+                <td>{i}</td>
                 <td>
                   <InlineMath key={i}>{`3^{${power}} * 2^{${exp}}`}</InlineMath>
                 </td>
@@ -312,6 +314,7 @@ Although pythagoras was not the first who invented that type of tuning, as we kn
 - The 13th pitch is really close to the first
 - The next "point of saturation" is not reached until 53 pitches are generated
 - By rotation, we can generate all the greek modes + pentatonics
+- Rotating left will darken the scale (more subharmonic partials), while rotating right will brighten the scale (more harmonic partials)
 
 Here we see the main reason for why western music uses a 12 note tuning system!
 
