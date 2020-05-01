@@ -1,0 +1,229 @@
+import Spiral from "../components/common/Spiral.tsx"
+import SpiralSettings from "../components/common/SpiralSettings.tsx"
+import { State } from "react-powerplug"
+import Slider from "@material-ui/core/Slider"
+import AnimationFrame from "../components/common/AnimationFrame.tsx"
+
+# Spirals
+
+## Linear Spiral
+
+In this spiral, the line distance is constant.
+
+<State initial={{ zoom: 0.1, spin: 0, precision: 1 }}>
+  {({ state, setState }) => (
+    <>
+      <SpiralSettings state={state} setState={setState} />
+      <Spiral
+        width={620}
+        zoom={state.zoom}
+        spin={state.spin}
+        precision={state.precision}
+        strokeWidth={state.strokeWidth}
+      />
+    </>
+  )}
+</State>
+
+If the values for zoom and precision are close to zero, there are some interesting glitches / meta spiral patterns.
+
+Each point on the spiral is calculated like this:
+
+```js
+export function spiralPosition(
+  angle,
+  radius,
+  spin = 0,
+  cx = radius,
+  cy = radius
+): [number, number] {
+  return [
+    Math.sin((spin + angle) * Math.PI * 2) * radius + cx,
+    Math.cos((spin + angle) * Math.PI * 2) * radius + cy,
+  ]
+}
+```
+
+## Logarithmic Spiral
+
+<State initial={{ zoom: 1, spin: 0, precision: 0.2 }}>
+  {({ state, setState }) => (
+    <>
+      <SpiralSettings state={state} setState={setState} disableZoom={true} />
+      <Spiral
+        width={600}
+        height={600}
+        min={2 / state.zoom}
+        zoom={state.zoom}
+        spin={state.spin}
+        precision={state.precision}
+        strokeWidth={state.strokeWidth}
+        getRadius={(angle) =>
+          Math.pow(Math.abs(state.zoom) * 2, Math.abs(angle)) *
+          Math.abs(state.zoom)
+        }
+      />
+    </>
+  )}
+</State>
+
+In this spiral type, the radius is growing exponentially. This can be done by passing
+a custom getRadius function:
+
+```js
+function getRadius(angle) {
+  return -(
+    Math.pow(Math.abs(state.zoom) * 2, Math.abs(angle)) * state.zoom || 1
+  )
+}
+```
+
+Some special things about logarithmic spirals:
+
+- it is self similar across scale
+- the zoom controls the base size
+- if the base size gets close to 0, the spiral implodes
+- it is like the spiral is approximating concentric circles
+
+## Animated
+
+The following animations are made by layering multiple spirals.
+
+### Linear
+
+_tap image to load random close to zero values_
+
+<State initial={{ zoom: 0.007, spin: 0, precision: 0.24 }}>
+  {({ state, setState }) => (
+    <AnimationFrame autostart>
+      {({ time }) => (
+        <div
+          onClick={() =>
+            setState({
+              zoom: Math.random() * 0.002,
+              precision: Math.random() * 0.2,
+            })
+          }
+        >
+          <p>
+            {state.zoom}x zoom, {state.precision} precision
+          </p>
+          <Spiral
+            width={600}
+            height={600}
+            zoom={state.zoom}
+            spin={-time.fromFirstStart / 10000}
+            precision={state.precision}
+            strokeWidth={0.5}
+          />
+        </div>
+      )}
+    </AnimationFrame>
+  )}
+</State>
+
+### Logarithmic
+
+<State initial={{ zoom: 0.57, spin: 0, precision: 0.02 }}>
+  {({ state, setState }) => (
+    <AnimationFrame autostart>
+      {({ time }) => (
+        <div
+          onClick={() =>
+            setState({
+              zoom: Math.random() * 0.1 + 0.5,
+              precision: Math.random() * 0.2,
+            })
+          }
+        >
+          <p>
+            {state.zoom}x zoom, {state.precision} precision
+          </p>
+          <Spiral
+            width={600}
+            height={600}
+            min={10}
+            zoom={state.zoom}
+            spin={-time.fromFirstStart / 10000}
+            precision={state.precision}
+            strokeWidth={0.5}
+            getRadius={(angle) =>
+              Math.pow(Math.abs(state.zoom) * 2, Math.abs(angle)) *
+              Math.abs(state.zoom)
+            }
+          />
+        </div>
+      )}
+    </AnimationFrame>
+  )}
+</State>
+
+### Hypnotic
+
+_Click image to start_
+
+<AnimationFrame>
+  {({ time, toggle }) => {
+    const spirals = 4
+    const height = 600
+    return (
+      <div style={{ position: "relative", height }}>
+        {Array.from({ length: spirals }, (_, i) => (
+          <div onClick={toggle} style={{ position: "absolute" }}>
+            <Spiral
+              height={height}
+              zoom={0.5}
+              spin={(-time.fromFirstStart / 5000 + i / spirals) % 1}
+              stroke={i % 2 ? "black" : "white"}
+              strokeWidth={200 / spirals}
+              strokeLinecap="round"
+            />
+          </div>
+        ))}
+      </div>
+    )
+  }}
+</AnimationFrame>
+
+### Psychedelic
+
+_Click image to start_
+
+The image takes a few moments to slow down.
+
+<AnimationFrame>
+  {({ time, toggle }) => {
+    const spirals = 4
+    const s = time.fromFirstStart / 1000
+    const m = s / 60
+    const h = m / 60
+    const d = h / 24
+    const height = 600
+    const sinFloat = (t) => 0.5 * (Math.sin(t * Math.PI * 2) + 1)
+    const hslaFloat = (h = 0.5, s = 0.5, l = 0.5, a = 0.5) =>
+      `hsla(${Math.round((h % 1) * 360)},${s * 100}%,${l * 100}%,${a})`
+    const colDiff = 1 / spirals
+    return (
+      <div style={{ position: "relative", height }}>
+        {Array.from({ length: spirals }, (_, i) => {
+          return (
+            <div style={{ position: "absolute" }} onClick={toggle}>
+              <Spiral
+                zoom={0.1}
+                height={height}
+                precision={Math.sin(m) * Math.pow(2, i - spirals)}
+                stroke={hslaFloat(
+                  sinFloat(m + colDiff * i),
+                  0.5,
+                  0.5,
+                  sinFloat(m + colDiff * i)
+                )}
+                strokeWidth={(spirals / (i + 1)) * 20}
+              />
+            </div>
+          )
+        })}
+      </div>
+    )
+  }}
+</AnimationFrame>
