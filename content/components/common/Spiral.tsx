@@ -13,6 +13,7 @@ export default function Spiral({
   strokeLinecap,
   getRadius,
   lines,
+  labels,
 }) {
   zoom = zoom || 1
   spin = spin || 0
@@ -58,15 +59,17 @@ export default function Spiral({
           fill="none"
           strokeLinecap={strokeLinecap || "round"}
         />
-        {lines.map(([from, to]) => (
-          <line
-            x1={from[0]}
-            y1={from[1]}
-            x2={to[0]}
-            y2={to[1]}
-            stroke="white"
-          />
+        {(lines || []).map(([from, to]) => (
+          <line x1={from[0]} y1={from[1]} x2={to[0]} y2={to[1]} stroke="gray" strokeWidth={strokeWidth} />
         ))}
+        {(labels || []).map(({ angle, label }) => {
+          const [x, y] = spiralPosition(angle, rad(angle) - 10, spin, ...center)
+          return (
+            <text x={x} y={y + 5} textAnchor="middle" fill="gray">
+              {label}
+            </text>
+          )
+        })}
       </svg>
     </>
   )
@@ -80,7 +83,7 @@ export function spiralPosition(
   cy = radius
 ): [number, number] {
   return [
-    Math.sin((spin + angle + 0.5) * Math.PI * 2) * radius + cx,
-    Math.cos((spin + angle + 0.5) * Math.PI * 2) * radius + cy,
+    Math.sin((spin - angle + 0.5) * Math.PI * 2) * radius + cx,
+    Math.cos((spin - angle + 0.5) * Math.PI * 2) * radius + cy,
   ]
 }

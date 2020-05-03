@@ -21,10 +21,10 @@ In this spiral, the line distance is constant.
         width={620}
         zoom={state.zoom}
         spin={state.spin}
+        max={4}
         precision={state.precision}
         strokeWidth={state.strokeWidth}
         lines={[
-          [1, 1],
           [angle(2), 1],
           [angle(3), 1],
           [angle(4), 1],
@@ -32,10 +32,12 @@ In this spiral, the line distance is constant.
           [angle(6), 1],
           [angle(7), 1],
           [angle(8), 1],
-          [angle(9), 1],
-          [angle(10), 1],
-          [angle(11), 1],
-          [angle(12), 1],
+        ]}
+        labels={[
+          { label: "2", angle: angle(32) },
+          { label: "3", angle: angle(24) },
+          { label: "5", angle: angle(20) },
+          { label: "7", angle: angle(28) },
         ]}
       />
     </>
@@ -71,6 +73,7 @@ export function spiralPosition(
         width={620}
         height={730}
         min={4 / state.zoom}
+        max={8}
         zoom={state.zoom}
         spin={state.spin}
         precision={state.precision}
@@ -80,7 +83,6 @@ export function spiralPosition(
           Math.abs(state.zoom)
         }
         lines={[
-          [4 + 1, 1],
           [4 + angle(2), 1],
           [4 + angle(3), 1],
           [4 + angle(4), 1],
@@ -88,10 +90,12 @@ export function spiralPosition(
           [4 + angle(6), 1],
           [4 + angle(7), 1],
           [4 + angle(8), 1],
-          [4 + angle(9), 1],
-          [4 + angle(10), 1],
-          [4 + angle(11), 1],
-          [4 + angle(12), 1],
+        ]}
+        labels={[
+          { label: "2", angle: 4 + angle(16) },
+          { label: "3", angle: 4 + angle(12) },
+          { label: "5", angle: 4 + angle(10) },
+          { label: "7", angle: 4 + angle(14) },
         ]}
       />
     </>
