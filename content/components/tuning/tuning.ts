@@ -103,6 +103,10 @@ export function equivalence(r, equivalenceFactor = 2) {
   return Math.pow(2, exp) * r;
 }
 
+export function angle(ratio: number, equivalence = 2) {
+  return Math.log(ratio) / Math.log(equivalence)
+}
+
 export function cents(ratio: number) {
   return Math.log(ratio) / Math.log(2) * 1200
 }

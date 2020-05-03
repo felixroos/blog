@@ -12,6 +12,7 @@ export default function Spiral({
   strokeWidth,
   strokeLinecap,
   getRadius,
+  lines,
 }) {
   zoom = zoom || 1
   spin = spin || 0
@@ -23,21 +24,29 @@ export default function Spiral({
   const maxPositions = 20000
   const center = [width / 2, height / 2]
   let maxRadius = Math.sqrt(width * width + height * height) / 2
-  let i = min * zoom * maxRadius
+  let currentRadius = min * zoom * maxRadius
   let dots = []
+  const rad = (angle) =>
+    getRadius ? getRadius(angle) : angle * zoom * maxRadius
+
   while (
-    i < maxPositions &&
+    currentRadius < maxPositions &&
     (!dots.length ||
       (Math.abs(dots[0][1]) <= maxRadius &&
         (!max || Math.abs(dots[0][0]) <= max)))
   ) {
-    const angle = i / zoom / maxRadius
-    let radius = getRadius ? getRadius(angle) : i
-    dots.unshift([angle, radius])
-    i += 1 / precision
+    const angle = currentRadius / zoom / maxRadius
+    dots.unshift([angle, rad(angle)])
+    currentRadius += 1 / precision
   }
   dots = dots.map(([angle, radius]) => {
     return spiralPosition(angle, radius, spin, ...center)
+  })
+  lines = (lines || []).map(([a, b]) => {
+    return [
+      spiralPosition(a, rad(a), spin, ...center),
+      spiralPosition(a, rad(a + b), spin, ...center),
+    ]
   })
   return (
     <>
@@ -49,6 +58,15 @@ export default function Spiral({
           fill="none"
           strokeLinecap={strokeLinecap || "round"}
         />
+        {lines.map(([from, to]) => (
+          <line
+            x1={from[0]}
+            y1={from[1]}
+            x2={to[0]}
+            y2={to[1]}
+            stroke="white"
+          />
+        ))}
       </svg>
     </>
   )
@@ -62,7 +80,7 @@ export function spiralPosition(
   cy = radius
 ): [number, number] {
   return [
-    Math.sin((spin + angle) * Math.PI * 2) * radius + cx,
-    Math.cos((spin + angle) * Math.PI * 2) * radius + cy,
+    Math.sin((spin + angle + 0.5) * Math.PI * 2) * radius + cx,
+    Math.cos((spin + angle + 0.5) * Math.PI * 2) * radius + cy,
   ]
 }

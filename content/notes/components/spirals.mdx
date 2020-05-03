@@ -3,6 +3,7 @@ import SpiralSettings from "../../components/common/SpiralSettings.tsx"
 import { State } from "react-powerplug"
 import Slider from "@material-ui/core/Slider"
 import AnimationFrame from "../../components/common/AnimationFrame.tsx"
+import { angle } from "../../components/tuning/tuning.ts"
 
 # Spirals
 
@@ -22,6 +23,20 @@ In this spiral, the line distance is constant.
         spin={state.spin}
         precision={state.precision}
         strokeWidth={state.strokeWidth}
+        lines={[
+          [1, 1],
+          [angle(2), 1],
+          [angle(3), 1],
+          [angle(4), 1],
+          [angle(5), 1],
+          [angle(6), 1],
+          [angle(7), 1],
+          [angle(8), 1],
+          [angle(9), 1],
+          [angle(10), 1],
+          [angle(11), 1],
+          [angle(12), 1],
+        ]}
       />
     </>
   )}
@@ -53,9 +68,9 @@ export function spiralPosition(
     <>
       <SpiralSettings state={state} setState={setState} disableZoom={true} />
       <Spiral
-        width={600}
-        height={600}
-        min={2 / state.zoom}
+        width={620}
+        height={730}
+        min={4 / state.zoom}
         zoom={state.zoom}
         spin={state.spin}
         precision={state.precision}
@@ -64,6 +79,20 @@ export function spiralPosition(
           Math.pow(Math.abs(state.zoom) * 2, Math.abs(angle)) *
           Math.abs(state.zoom)
         }
+        lines={[
+          [4 + 1, 1],
+          [4 + angle(2), 1],
+          [4 + angle(3), 1],
+          [4 + angle(4), 1],
+          [4 + angle(5), 1],
+          [4 + angle(6), 1],
+          [4 + angle(7), 1],
+          [4 + angle(8), 1],
+          [4 + angle(9), 1],
+          [4 + angle(10), 1],
+          [4 + angle(11), 1],
+          [4 + angle(12), 1],
+        ]}
       />
     </>
   )}
