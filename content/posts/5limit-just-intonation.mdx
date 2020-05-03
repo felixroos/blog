@@ -16,6 +16,7 @@ import Button from "@material-ui/core/Button"
 import ButtonGroup from "@material-ui/core/ButtonGroup"
 import Fraction from "fraction.js"
 import canUseDOM from "../components/canUseDOM.ts"
+import flatten from "../components/common/flatten.ts"
 import {
   cents,
   limitN,
@@ -117,14 +118,12 @@ But let's stay with 3 and 5 for now.
       [-2, 1],
       [-2, -1],
     ],
-    // sort: false
   }}
 >
   {({ state, setState }) => {
     const units = {
       powers: "Powers",
       ratio: "Ratio",
-      // pitch:'Pitch',
       frequency: "Frequency",
       cent: "Cent",
     }
@@ -136,16 +135,13 @@ But let's stay with 3 and 5 for now.
       [state.fifths, state.rotateFifths],
       [state.thirds, state.rotateThirds]
     )
-    const flat = l5
-      .flat()
-      .filter(
-        ({ fifth, third }) =>
-          !state.disabled.find(([x, y]) => x === fifth && y === third)
-      )
+    const flat = flatten(l5).filter(
+      ({ fifth, third }) =>
+        !state.disabled.find(([x, y]) => x === fifth && y === third)
+    )
     const maxThirds = 3
     const maxFifths = 11
     const base = 440
-    //const selectedPreset = state.preset >= 0 ? state.preset : undefined
     const presets = [
       {
         preset: "Ionian",
@@ -219,7 +215,6 @@ But let's stay with 3 and 5 for now.
     ]
     return (
       <div>
-        {/*<InlineMath>{`3^{${from}} - 3^{${to}}`}</InlineMath>*/}
         <br />
         <ConnectedCircle
           r={100}
