@@ -67,6 +67,23 @@ export function powers(numbers: [number, number, number][], mapFn?: (power: [num
   return powers;
 }
 
+export function limit5([fifths, rotateFifths], [thirds, rotateThirds]) {
+  return Array.from({ length: fifths + 1 }, (_, f) =>
+    Array.from({ length: thirds + 1 }, (_, t) => {
+      const fifth = f + rotateFifths
+      const third = t + rotateThirds
+      const factor = Math.pow(3, fifth) * Math.pow(5, third)
+      const exp = Math.ceil(Math.log(1 / factor) / Math.log(2))
+      const ratio = Math.pow(2, exp) * factor
+      const [top, bottom] = new Fraction(ratio)
+        .toFraction()
+        .split("/")
+      return {
+        fifth, third, factor, exp, ratio, top, bottom: bottom || 1
+      }
+    }))
+}
+
 // generates all possible ratios for given bases
 // example: limitN([[3, 0, 2], [5, 0, 1]]) yields [1, 3, 9, 5, 15, 45]
 // if equivalence factor is passed, then it reduces by that factor:
