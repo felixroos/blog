@@ -8,8 +8,8 @@ export default function SpiralSettings({ state, setState, hideZoom }) {
         <label>
           Zoom {state.zoom}
           <Slider
-            min={-5}
-            max={5}
+            min={0.01}
+            max={2}
             step={0.0001}
             value={state.zoom}
             onChange={(e, v) => setState({ zoom: v })}
@@ -29,7 +29,7 @@ export default function SpiralSettings({ state, setState, hideZoom }) {
       <label>
         Precision {state.precision}
         <Slider
-          min={-10}
+          min={0.001}
           max={10}
           step={0.001}
           value={state.precision}
@@ -47,13 +47,13 @@ export default function SpiralSettings({ state, setState, hideZoom }) {
         />
       </label>
       <label>
-        max {state.max}
+        {state.min} - {state.max} rotations
         <Slider
-          min={1}
-          max={10}
+          min={0}
+          max={12}
           step={1}
-          value={state.max}
-          onChange={(e, v) => setState({ max: v })}
+          value={[state.min, state.max]}
+          onChange={(e, v) => setState({ min: v[0], max: v[1] })}
         />
       </label>
     </>

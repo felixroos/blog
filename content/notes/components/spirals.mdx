@@ -2,8 +2,11 @@ import Spiral from "../../components/common/Spiral.tsx"
 import SpiralSettings from "../../components/common/SpiralSettings.tsx"
 import { State } from "react-powerplug"
 import Slider from "@material-ui/core/Slider"
+import Grid from "@material-ui/core/Grid"
 import AnimationFrame from "../../components/common/AnimationFrame.tsx"
-import { angle } from "../../components/tuning/tuning.ts"
+import { angle, frequencyColor } from "../../components/tuning/tuning.ts"
+import { isPrime } from "../../components/common/isPrime.ts"
+import SimplePopover from "../../components/common/Popover"
 
 # Spirals
 
@@ -11,30 +14,47 @@ check https://jhhl.net/TS/tonespiral.html
 
 ## Linear Spiral
 
-In this spiral, the line distance is constant.
+In this spiral, the radius grows linearly:
 
-<State initial={{ zoom: 0.05, spin: 0, precision: 3, max: 6 }}>
+<State
+  initial={{
+    zoom: 0.11,
+    spin: 0,
+    precision: 4,
+    min: 0,
+    max: 6,
+    strokeWidth: 3,
+  }}
+>
   {({ state, setState }) => (
     <>
-      <SpiralSettings state={state} setState={setState} />
-      <Spiral
-        width={620}
-        zoom={state.zoom}
-        spin={state.spin}
-        max={state.max}
-        precision={state.precision}
-        strokeWidth={state.strokeWidth}
-        lines={Array.from(
-          { length: Math.pow(2, state.max - 1) - 1 },
-          (_, i) => [angle(i + 2), 1]
-        )}
-        labels={[
-          { label: "2", angle: angle(2) * (state.max + 1) },
-          { label: "3", angle: angle(3 * Math.pow(2, state.max - 1)) },
-          { label: "5", angle: angle(5 * Math.pow(2, state.max - 1)) },
-          { label: "7", angle: angle(7 * Math.pow(2, state.max - 1)) },
-        ]}
-      />
+      <div
+        style={{
+          overflow: "auto",
+          maxWidth: 900,
+          maxHeight: 700,
+          position: "relative",
+        }}
+      >
+        <Spiral
+          width={600}
+          height={600}
+          stroke="gray"
+          zoom={state.zoom}
+          spin={state.spin}
+          min={state.min}
+          max={state.max}
+          precision={state.precision}
+          strokeWidth={state.strokeWidth}
+        />
+        <div style={{ position: "absolute", left: 10, bottom: 30 }}>
+          <SimplePopover placement="left-start">
+            <div style={{ width: 300 }}>
+              <SpiralSettings state={state} setState={setState} />
+            </div>
+          </SimplePopover>
+        </div>
+      </div>
     </>
   )}
 </State>
@@ -60,45 +80,60 @@ export function spiralPosition(
 
 ## Logarithmic Spiral
 
-<State initial={{ zoom: 1, spin: 0, precision: 0.2 }}>
+The radius of the following spiral is growing exponentially:
+
+<State
+  initial={{
+    zoom: 0.85,
+    spin: 0,
+    precision: 0.2,
+    min: 5,
+    max: 11,
+    strokeWidth: 3,
+  }}
+>
   {({ state, setState }) => (
     <>
-      <SpiralSettings state={state} setState={setState} disableZoom={true} />
-      <Spiral
-        width={620}
-        height={730}
-        min={4 / state.zoom}
-        max={8}
-        zoom={state.zoom}
-        spin={state.spin}
-        precision={state.precision}
-        strokeWidth={state.strokeWidth}
-        getRadius={(angle) =>
-          Math.pow(Math.abs(state.zoom) * 2, Math.abs(angle)) *
-          Math.abs(state.zoom)
-        }
-        lines={[
-          [4 + angle(2), 1],
-          [4 + angle(3), 1],
-          [4 + angle(4), 1],
-          [4 + angle(5), 1],
-          [4 + angle(6), 1],
-          [4 + angle(7), 1],
-          [4 + angle(8), 1],
-        ]}
-        labels={[
-          { label: "2", angle: 4 + angle(16) },
-          { label: "3", angle: 4 + angle(12) },
-          { label: "5", angle: 4 + angle(10) },
-          { label: "7", angle: 4 + angle(14) },
-        ]}
-      />
+      <div
+        style={{
+          overflow: "auto",
+          maxWidth: 900,
+          maxHeight: 700,
+          position: "relative",
+        }}
+      >
+        <Spiral
+          width={600}
+          height={600}
+          stroke="gray"
+          min={state.min}
+          max={state.max}
+          zoom={state.zoom}
+          spin={state.spin}
+          precision={state.precision}
+          strokeWidth={state.strokeWidth}
+          getRadius={(angle) =>
+            Math.pow(Math.abs(state.zoom) * 2, Math.abs(angle)) *
+            Math.abs(state.zoom)
+          }
+        />
+        <div style={{ position: "absolute", left: 10, bottom: 30 }}>
+          <SimplePopover placement="left-start">
+            <div style={{ width: 300 }}>
+              <SpiralSettings
+                state={state}
+                setState={setState}
+                disableZoom={true}
+              />
+            </div>
+          </SimplePopover>
+        </div>
+      </div>
     </>
   )}
 </State>
 
-In this spiral type, the radius is growing exponentially. This can be done by passing
-a custom getRadius function:
+The radius can be calculated from the angle like this:
 
 ```js
 function getRadius(angle) {
@@ -108,12 +143,160 @@ function getRadius(angle) {
 }
 ```
 
+_Note that the angle is a float between 0 and 1 (easier to calculate with)._
+
 Some special things about logarithmic spirals:
 
 - it is self similar across scale
-- the zoom controls the base size
-- if the base size gets close to 0, the spiral implodes
-- it is like the spiral is approximating concentric circles
+- it creates the illusion of zooming when spinning
+
+## Harmonic Spirals
+
+Let's play [Erv Wilson](http://www.anaphoria.com/harm-subharm.pdf) and create some harmonic spirals.
+
+<State
+  initial={{
+    zoom: 0.11,
+    spin: 0,
+    precision: 4,
+    min: 0,
+    max: 6,
+    strokeWidth: 3,
+  }}
+>
+  {({ state, setState }) => (
+    <>
+      <div
+        style={{
+          overflow: "auto",
+          maxWidth: 900,
+          maxHeight: 700,
+          position: "relative",
+        }}
+      >
+        <Spiral
+          width={600}
+          height={600}
+          stroke="gray"
+          zoom={state.zoom}
+          spin={state.spin}
+          min={state.min}
+          max={state.max}
+          precision={state.precision}
+          strokeWidth={state.strokeWidth}
+          lines={Array.from(
+            { length: Math.pow(2, state.max - 1 - state.min) },
+            (_, i) => [
+              angle(i + 1) + state.min,
+              1,
+              frequencyColor((i + 1) * 440),
+            ]
+          )}
+          labels={Array.from(
+            { length: Math.pow(2, state.max - state.min) },
+            (_, i) => i + 1
+          )
+            /*.filter((n) => n === 2 || n % 2)*/
+            .map((n) => ({
+              label: n,
+              angle: angle(n) + state.min,
+              fill: frequencyColor(n * 440),
+              color: "black",
+            }))}
+        />
+        <div style={{ position: "absolute", left: 10, bottom: 30 }}>
+          <SimplePopover placement="left-start">
+            <div style={{ width: 300 }}>
+              <SpiralSettings state={state} setState={setState} />
+            </div>
+          </SimplePopover>
+        </div>
+      </div>
+    </>
+  )}
+</State>
+
+- you can think of this as a number line with a twist
+- starting at 1 (root pitch) in the center, we map one full rotation (=360 degrees) to the multiplication of 2 (octaves)
+- each line starts at a prime number representing the beginning of a new pitch color
+- the line extends to infinity, crossing the spiral at octaves of the root prime
+- all natural numbers will be part of a line
+- the whole image is a dense visualization of the harmonic series from the perspective of octaves
+
+It gets even more accurate (but not as compact) if we use a logarithmic spiral:
+
+<State
+  initial={{
+    zoom: 0.85,
+    spin: 0,
+    precision: 0.2,
+    min: 5,
+    max: 11,
+    strokeWidth: 3,
+  }}
+>
+  {({ state, setState }) => (
+    <>
+      <div
+        style={{
+          overflow: "auto",
+          maxWidth: 900,
+          maxHeight: 700,
+          position: "relative",
+        }}
+      >
+        <Spiral
+          width={600}
+          height={600}
+          stroke="gray"
+          min={state.min}
+          max={state.max}
+          zoom={state.zoom}
+          spin={state.spin}
+          precision={state.precision}
+          strokeWidth={state.strokeWidth}
+          getRadius={(angle) =>
+            Math.pow(Math.abs(state.zoom) * 2, Math.abs(angle)) *
+            Math.abs(state.zoom)
+          }
+          lines={Array.from(
+            { length: Math.pow(2, state.max - 1 - state.min) },
+            (_, i) => [
+              angle(i + 1) + state.min,
+              1,
+              frequencyColor((i + 1) * 440),
+            ]
+          )}
+          labels={Array.from(
+            { length: Math.pow(2, state.max - state.min) },
+            (_, i) => i + 1
+          )
+            /*.filter((n) => n === 2 || n % 2)*/
+            .map((n) => ({
+              label: n,
+              angle: angle(n) + state.min,
+              fill: frequencyColor(n * 440),
+              color: "black",
+            }))}
+        />
+        <div style={{ position: "absolute", left: 10, bottom: 30 }}>
+          <SimplePopover placement="left-start">
+            <div style={{ width: 300 }}>
+              <SpiralSettings
+                state={state}
+                setState={setState}
+                disableZoom={true}
+              />
+            </div>
+          </SimplePopover>
+        </div>
+      </div>
+    </>
+  )}
+</State>
+
+- Here, the radius gets two times bigger on every rotation.
+- This growth represents the behaviour of frequencies, as we go up the harmonic series.
 
 ## Animated
 
@@ -125,15 +308,16 @@ _tap image to load random close to zero values_
 
 <State initial={{ zoom: 0.007, spin: 0, precision: 0.24 }}>
   {({ state, setState }) => (
-    <AnimationFrame autostart>
-      {({ time }) => (
+    <AnimationFrame>
+      {({ time, start }) => (
         <div
-          onClick={() =>
+          onClick={() => {
             setState({
               zoom: Math.random() * 0.002,
               precision: Math.random() * 0.2,
             })
-          }
+            start()
+          }}
         >
           <p>
             {state.zoom}x zoom, {state.precision} precision
@@ -158,15 +342,16 @@ _tap image to load random close to zero values_
 
 <State initial={{ zoom: 0.57, spin: 0, precision: 0.02 }}>
   {({ state, setState }) => (
-    <AnimationFrame autostart>
-      {({ time }) => (
+    <AnimationFrame>
+      {({ time, start }) => (
         <div
-          onClick={() =>
+          onClick={() => {
+            start()
             setState({
               zoom: Math.random() * 0.1 + 0.5,
               precision: Math.random() * 0.2,
             })
-          }
+          }}
         >
           <p>
             {state.zoom}x zoom, {state.precision} precision
@@ -203,7 +388,7 @@ _Click image to start_
     return (
       <div style={{ position: "relative", height }}>
         {Array.from({ length: spirals }, (_, i) => (
-          <div onClick={toggle} style={{ position: "absolute" }}>
+          <div key={i} onClick={toggle} style={{ position: "absolute" }}>
             <Spiral
               height={height}
               zoom={0.5}
@@ -243,7 +428,7 @@ The image takes a few moments to slow down.
       <div style={{ position: "relative", height }}>
         {Array.from({ length: spirals }, (_, i) => {
           return (
-            <div style={{ position: "absolute" }} onClick={toggle}>
+            <div style={{ position: "absolute" }} onClick={toggle} key={i}>
               <Spiral
                 zoom={0.1}
                 height={height}

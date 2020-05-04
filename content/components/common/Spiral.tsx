@@ -14,9 +14,11 @@ export default function Spiral({
   getRadius,
   lines,
   labels,
+  fontSize,
 }) {
   zoom = zoom || 1
   spin = spin || 0
+  fontSize = fontSize || 10
   min = min || 0
   precision = Math.abs(precision || 1)
   strokeWidth = strokeWidth || 1
@@ -48,10 +50,11 @@ export default function Spiral({
   dots = dots.map(([angle, radius]) => {
     return spiralPosition(angle, radius, spin, ...center)
   })
-  lines = (lines || []).map(([a, b]) => {
+  lines = (lines || []).map(([a, b, color]) => {
     return [
       spiralPosition(a, rad(a), spin, ...center),
       spiralPosition(a, rad(a + b), spin, ...center),
+      color,
     ]
   })
   return (
@@ -64,22 +67,38 @@ export default function Spiral({
           fill="none"
           strokeLinecap={strokeLinecap || "round"}
         />
-        {(lines || []).map(([from, to]) => (
+        {(lines || []).map(([from, to, color], i) => (
           <line
+            key={i}
             x1={from[0]}
             y1={from[1]}
             x2={to[0]}
             y2={to[1]}
-            stroke="gray"
+            stroke={color || stroke || "gray"}
             strokeWidth={strokeWidth}
+            strokeLinecap={strokeLinecap || "round"}
           />
         ))}
-        {(labels || []).map(({ angle, label }) => {
-          const [x, y] = spiralPosition(angle, rad(angle) - 10, spin, ...center)
+        {(labels || []).map(({ angle, label, color, fill }, i) => {
+          const [x, y] = spiralPosition(angle, rad(angle), spin, ...center)
           return (
-            <text x={x} y={y + 5} textAnchor="middle" fill="gray">
-              {label}
-            </text>
+            <g key={i}>
+              <circle
+                cx={x}
+                cy={y}
+                r={fontSize}
+                fill={fill || stroke || "gray"}
+              />
+              <text
+                x={x}
+                y={y + fontSize / 3}
+                textAnchor="middle"
+                fill={color || "white"}
+                style={{ fontSize }}
+              >
+                {label}
+              </text>
+            </g>
           )
         })}
       </svg>
