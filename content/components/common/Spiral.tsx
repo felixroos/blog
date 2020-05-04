@@ -40,6 +40,11 @@ export default function Spiral({
     dots.unshift([angle, rad(angle)])
     currentRadius += 1 / precision
   }
+  if (max) {
+    const lastAngle = Math.min(dots[0][0], max)
+    dots[0][0] = lastAngle
+    dots[0][1] = rad(lastAngle)
+  }
   dots = dots.map(([angle, radius]) => {
     return spiralPosition(angle, radius, spin, ...center)
   })
@@ -60,7 +65,14 @@ export default function Spiral({
           strokeLinecap={strokeLinecap || "round"}
         />
         {(lines || []).map(([from, to]) => (
-          <line x1={from[0]} y1={from[1]} x2={to[0]} y2={to[1]} stroke="gray" strokeWidth={strokeWidth} />
+          <line
+            x1={from[0]}
+            y1={from[1]}
+            x2={to[0]}
+            y2={to[1]}
+            stroke="gray"
+            strokeWidth={strokeWidth}
+          />
         ))}
         {(labels || []).map(({ angle, label }) => {
           const [x, y] = spiralPosition(angle, rad(angle) - 10, spin, ...center)

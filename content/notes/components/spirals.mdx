@@ -13,7 +13,7 @@ check https://jhhl.net/TS/tonespiral.html
 
 In this spiral, the line distance is constant.
 
-<State initial={{ zoom: 0.1, spin: 0, precision: 1 }}>
+<State initial={{ zoom: 0.05, spin: 0, precision: 3, max: 6 }}>
   {({ state, setState }) => (
     <>
       <SpiralSettings state={state} setState={setState} />
@@ -21,23 +21,18 @@ In this spiral, the line distance is constant.
         width={620}
         zoom={state.zoom}
         spin={state.spin}
-        max={4}
+        max={state.max}
         precision={state.precision}
         strokeWidth={state.strokeWidth}
-        lines={[
-          [angle(2), 1],
-          [angle(3), 1],
-          [angle(4), 1],
-          [angle(5), 1],
-          [angle(6), 1],
-          [angle(7), 1],
-          [angle(8), 1],
-        ]}
+        lines={Array.from(
+          { length: Math.pow(2, state.max - 1) - 1 },
+          (_, i) => [angle(i + 2), 1]
+        )}
         labels={[
-          { label: "2", angle: angle(32) },
-          { label: "3", angle: angle(24) },
-          { label: "5", angle: angle(20) },
-          { label: "7", angle: angle(28) },
+          { label: "2", angle: angle(2) * (state.max + 1) },
+          { label: "3", angle: angle(3 * Math.pow(2, state.max - 1)) },
+          { label: "5", angle: angle(5 * Math.pow(2, state.max - 1)) },
+          { label: "7", angle: angle(7 * Math.pow(2, state.max - 1)) },
         ]}
       />
     </>

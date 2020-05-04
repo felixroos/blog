@@ -46,6 +46,16 @@ export default function SpiralSettings({ state, setState, hideZoom }) {
           onChange={(e, v) => setState({ strokeWidth: v })}
         />
       </label>
+      <label>
+        max {state.max}
+        <Slider
+          min={1}
+          max={10}
+          step={1}
+          value={state.max}
+          onChange={(e, v) => setState({ max: v })}
+        />
+      </label>
     </>
   )
 }
