@@ -1,4 +1,31 @@
 import React from "react"
+import { useHover, useGesture, useDrag } from "react-use-gesture"
+
+export type Line = [number, number, string]
+export type Label = {
+  label: string
+  angle: number
+  fill: string
+  color: string
+}
+
+export interface SpiralProps {
+  zoom?: number
+  width?: number
+  height?: number
+  spin?: number
+  min?: number
+  max?: number
+  stroke?: string
+  precision?: number
+  strokeWidth?: number
+  strokeLinecap?: "round" | "butt" | "square" | "inherit"
+  getRadius?: (angle: number) => number
+  lines?: Line[]
+  labels?: Label[]
+  fontSize?: number
+  onTrigger?: (index: number) => void
+}
 
 export default function Spiral({
   zoom,
@@ -15,7 +42,8 @@ export default function Spiral({
   lines,
   labels,
   fontSize,
-}) {
+  onTrigger,
+}: SpiralProps) {
   zoom = zoom || 1
   spin = spin || 0
   fontSize = fontSize || 10
@@ -50,7 +78,9 @@ export default function Spiral({
   dots = dots.map(([angle, radius]) => {
     return spiralPosition(angle, radius, spin, ...center)
   })
-  lines = (lines || []).map(([a, b, color]) => {
+  const lineProps: [[number, number], [number, number], string][] = (
+    lines || []
+  ).map(([a, b, color]) => {
     return [
       spiralPosition(a, rad(a), spin, ...center),
       spiralPosition(a, rad(a + b), spin, ...center),
@@ -59,7 +89,12 @@ export default function Spiral({
   })
   return (
     <>
-      <svg width={width} height={height}>
+      <svg
+        width={width}
+        height={height}
+        onTouchStart={(e) => e.preventDefault()}
+        onTouchMove={(e) => e.preventDefault()}
+      >
         <path
           d={`M${dots.join("L")}`}
           stroke={stroke || "gray"}
@@ -67,7 +102,7 @@ export default function Spiral({
           fill="none"
           strokeLinecap={strokeLinecap || "round"}
         />
-        {(lines || []).map(([from, to, color], i) => (
+        {lineProps.map(([from, to, color], i) => (
           <line
             key={i}
             x1={from[0]}
@@ -82,7 +117,15 @@ export default function Spiral({
         {(labels || []).map(({ angle, label, color, fill }, i) => {
           const [x, y] = spiralPosition(angle, rad(angle), spin, ...center)
           return (
-            <g key={i}>
+            <g
+              key={i}
+              style={{ cursor: "pointer" }}
+              {...useGesture({
+                onMoveStart: ({ down }) => {
+                  /* down &&  */onTrigger && onTrigger(i)
+                },
+              })()}
+            >
               <circle
                 cx={x}
                 cy={y}
@@ -94,7 +137,11 @@ export default function Spiral({
                 y={y + fontSize / 3}
                 textAnchor="middle"
                 fill={color || "white"}
-                style={{ fontSize }}
+                style={{
+                  fontSize,
+                  pointerEvents: "none",
+                  userSelect: "none",
+                }}
               >
                 {label}
               </text>
