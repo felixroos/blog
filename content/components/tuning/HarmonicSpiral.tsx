@@ -7,7 +7,7 @@ export default function HarmonicSpiral(props: SpiralProps) {
   function getLines(): Line[] {
     return Array.from({ length: Math.pow(2, max - 1 - min) }, (_, i) => [
       angle(i + 1) + min,
-      1,
+      angle(i + 1) + min + 1,
       frequencyColor((i + 1) * 440),
     ])
   }
@@ -23,11 +23,5 @@ export default function HarmonicSpiral(props: SpiralProps) {
         }))
     )
   }
-  return (
-    <Spiral
-      {...props}
-      lines={getLines()}
-      labels={getLabels()}
-    />
-  )
+  return <Spiral {...props} lines={getLines()} labels={getLabels()} />
 }

@@ -20,7 +20,7 @@ export interface SpiralProps {
   precision?: number
   strokeWidth?: number
   strokeLinecap?: "round" | "butt" | "square" | "inherit"
-  getRadius?: (angle: number) => number
+  getRadius?: (angle?: number, maxRadius?: number, zoom?: number) => number
   lines?: Line[]
   labels?: Label[]
   fontSize?: number
@@ -58,7 +58,7 @@ export default function Spiral({
   let currentRadius = min * zoom * maxRadius
   let dots = []
   const rad = (angle) =>
-    getRadius ? getRadius(angle) : angle * zoom * maxRadius
+    getRadius ? getRadius(angle, maxRadius, zoom) : angle * zoom * maxRadius
 
   while (
     currentRadius < maxPositions &&
@@ -83,18 +83,30 @@ export default function Spiral({
   ).map(([a, b, color]) => {
     return [
       spiralPosition(a, rad(a), spin, ...center),
-      spiralPosition(a, rad(a + b), spin, ...center),
+      //spiralPosition(a, rad(a + b), spin, ...center),
+      spiralPosition(a, rad(b), spin, ...center),
       color,
     ]
   })
+  /*
+  onTouchStart={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+        }}
+        onTouchMove={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+        }}
+
+              {...useGesture({
+                onMoveStart: ({ down }) => {
+                  onTrigger && onTrigger(i)
+                },
+                })()}
+        */
   return (
     <>
-      <svg
-        width={width}
-        height={height}
-        onTouchStart={(e) => e.preventDefault()}
-        onTouchMove={(e) => e.preventDefault()}
-      >
+      <svg width={width} height={height}>
         <path
           d={`M${dots.join("L")}`}
           stroke={stroke || "gray"}
@@ -120,11 +132,7 @@ export default function Spiral({
             <g
               key={i}
               style={{ cursor: "pointer" }}
-              {...useGesture({
-                onMoveStart: ({ down }) => {
-                  /* down &&  */onTrigger && onTrigger(i)
-                },
-              })()}
+              onClick={() => onTrigger && onTrigger(i)}
             >
               <circle
                 cx={x}

@@ -4,7 +4,8 @@
   "private": true,
   "version": "0.0.1",
   "scripts": {
-    "develop": "gatsby develop",
+    "develop": "gatsby develop -p 8080",
+    "develop-80": "sudo npx gatsby develop -p 80",
     "start": "gatsby develop",
     "build": "gatsby build --prefix-paths",
     "clean": "gatsby clean",
@@ -45,6 +46,7 @@
     "jest": "^25.2.7",
     "js-combinatorics": "^0.5.5",
     "react": "^16.12.0",
+    "react-audio-player": "^0.13.0",
     "react-color": "^2.18.0",
     "react-d3-tree": "^1.16.1",
     "react-dom": "^16.12.0",
