@@ -3,25 +3,30 @@ title: Harmonic Spirals
 date: 2020-05-05
 ---
 
-import Spiral from "../components/common/Spiral.tsx"
-import HarmonicSpiral from "../components/tuning/HarmonicSpiral.tsx"
-import SpiralSettings from "../components/common/SpiralSettings.tsx"
-import { State } from "react-powerplug"
-import Slider from "@material-ui/core/Slider"
-import Grid from "@material-ui/core/Grid"
-import AnimationFrame from "../components/common/AnimationFrame.tsx"
-import { angle, frequencyColor } from "../components/tuning/tuning.ts"
-import SimplePopover from "../components/common/Popover"
-import * as Tone from "tone"
-import canUseDOM from "../components/canUseDOM.ts"
-const { PolySynth, Synth } = Tone
+import Spiral from '../components/common/Spiral.tsx';
+import HarmonicSpiral from '../components/tuning/HarmonicSpiral.tsx';
+import SpiralSettings from '../components/common/SpiralSettings.tsx';
+import { State } from 'react-powerplug';
+import Slider from '@material-ui/core/Slider';
+import Grid from '@material-ui/core/Grid';
+import AnimationFrame from '../components/common/AnimationFrame.tsx';
+import {
+  angle,
+  frequencyColor,
+  equivalence,
+  clamp
+} from '../components/tuning/tuning.ts';
+import SimplePopover from '../components/common/Popover';
+import * as Tone from 'tone';
+import canUseDOM from '../components/canUseDOM.ts';
+const { PolySynth, Synth } = Tone;
 const harp =
   canUseDOM() &&
   new PolySynth(6, Synth, {
     volume: -16,
     envelope: { attack: 0.01, decay: 2, sustain: 0, release: 0.1 },
-    oscillator: { type: "fmtriangle" },
-  }).toMaster()
+    oscillator: { type: 'fmtriangle' }
+  }).toMaster();
 
 Let's play [Erv Wilson](http://www.anaphoria.com/harm-subharm.pdf) and create some harmonic spirals.
 
@@ -36,17 +41,17 @@ Let's play [Erv Wilson](http://www.anaphoria.com/harm-subharm.pdf) and create so
     max: 6,
     strokeWidth: 3,
     base: 55,
-    fontSize: 14,
+    fontSize: 14
   }}
 >
   {({ state, setState }) => (
     <>
       <div
         style={{
-          overflow: "auto",
+          overflow: 'auto',
           maxWidth: 900,
           maxHeight: 700,
-          position: "relative",
+          position: 'relative'
         }}
       >
         <HarmonicSpiral
@@ -59,7 +64,7 @@ Let's play [Erv Wilson](http://www.anaphoria.com/harm-subharm.pdf) and create so
           }
           onTrigger={(i) => harp.triggerAttackRelease((i + 1) * state.base, 1)}
         />
-        <div style={{ position: "absolute", left: 10, bottom: 30 }}>
+        <div style={{ position: 'absolute', left: 10, bottom: 30 }}>
           <SimplePopover placement="left-start">
             <div style={{ width: 300 }}>
               <SpiralSettings state={state} setState={setState} />
@@ -90,32 +95,32 @@ It gets even more accurate (but not as compact) if we use a logarithmic spiral:
     min: 5,
     max: 11,
     strokeWidth: 3,
-    stroke: "gray",
+    stroke: 'gray',
     width: 600,
     height: 600,
-    base: 55,
+    base: 55
   }}
 >
   {({ state, setState }) => (
     <>
       <div
         style={{
-          overflow: "auto",
+          overflow: 'auto',
           maxWidth: 900,
           maxHeight: 700,
-          position: "relative",
+          position: 'relative'
         }}
       >
         <HarmonicSpiral
           {...state}
-          onTrigger={(i) => console.log("trigger", i)}
+          onTrigger={(i) => console.log('trigger', i)}
           getRadius={(angle) =>
             Math.pow(Math.abs(state.zoom) * 2, Math.abs(angle)) *
             Math.abs(state.zoom)
           }
           onTrigger={(i) => harp.triggerAttackRelease((i + 1) * state.base, 1)}
         />
-        <div style={{ position: "absolute", left: 10, bottom: 30 }}>
+        <div style={{ position: 'absolute', left: 10, bottom: 30 }}>
           <SimplePopover placement="left-start">
             <div style={{ width: 300 }}>
               <SpiralSettings
@@ -136,54 +141,182 @@ It gets even more accurate (but not as compact) if we use a logarithmic spiral:
 
 ## Scale Spiral
 
+Pythagorean vs 12EDO
+
 <State
   initial={{
-    zoom: 0.14,
+    zoom: 0.8,
+    spin: 0,
+    precision: 1,
+    min: 1,
+    max: 6,
+    strokeWidth: 3,
+    base: 55,
+    fontSize: 14
+  }}
+>
+  {({ state, setState }) => {
+    const generator = 4 / 3;
+    const notes = 53;
+    let ratios = Array.from({ length: notes }, (_, i) =>
+      Math.pow(generator, i)
+    );
+    const show12EDO = true;
+    const temper = false;
+    const reduce = true;
+    const eq = temper ? 2 : equivalence(Math.pow(generator, 12), 2);
+    const comma = 1 - equivalence(Math.pow(generator, 12), 2) / 2;
+    // const comma = 1 - equivalence(Math.pow(generator, 12), 2);
+    if (temper) {
+      ratios = ratios.map((ratio, i) => ratio * (1 + (comma * i) / 12));
+    }
+    if (reduce) {
+      ratios = ratios.map((ratio, i) => {
+        return clamp(ratio, Math.pow(eq, Math.floor((i - 1) / 12))); // ;
+        //return equivalence(ratio, Math.pow(eq, Math.floor((i - 1) / 12)));
+        //return equivalence(ratio, 2) * Math.pow(2, Math.floor(i / 12));
+      });
+    }
+    return (
+      <>
+        <div
+          style={{
+            overflow: 'auto',
+            maxWidth: 900,
+            maxHeight: 700,
+            position: 'relative'
+          }}
+        >
+          <Spiral
+            width={600}
+            height={600}
+            stroke="gray"
+            {...state}
+            getRadius={(angle, maxRadius, zoom) => zoom * angle * 50}
+            lines={[]
+              .concat(
+                show12EDO
+                  ? Array.from({ length: 12 }, (_, i) => [
+                      0,
+                      angle(Math.pow(2, i / 12) * Math.pow(2, state.max)),
+                      'gray'
+                    ])
+                  : []
+              )
+              .concat(
+                ratios.map((ratio, i) => [
+                  angle(ratio * 2),
+                  angle(ratio * Math.pow(2, state.max)),
+                  frequencyColor(ratio * state.base)
+                ])
+              )}
+            labels={ratios.map((ratio, i) => ({
+              label: i + '',
+              angle: angle(ratio * 2),
+              fill: frequencyColor(ratio * 440),
+              color: 'black'
+            }))}
+            onTrigger={(i) =>
+              harp.triggerAttackRelease(ratios[i] * state.base, 1)
+            }
+          />
+          <div style={{ position: 'absolute', left: 10, bottom: 30 }}>
+            <SimplePopover placement="left-start">
+              <div style={{ width: 300 }}>
+                <SpiralSettings state={state} setState={setState} />
+              </div>
+            </SimplePopover>
+          </div>
+        </div>
+      </>
+    );
+  }}
+</State>
+
+## Tempered Pythagorean Tuning
+
+<State
+  initial={{
+    zoom: 0.4,
     spin: 0,
     precision: 1,
     min: 0,
-    max: 5,
-    strokeWidth: 3,
+    max: 2,
+    strokeWidth: 2,
     base: 55,
-    fontSize: 14,
+    fontSize: 14
   }}
 >
-  {({ state, setState }) => (
-    <>
-      <div
-        style={{
-          overflow: "auto",
-          maxWidth: 900,
-          maxHeight: 700,
-          position: "relative",
-        }}
-      >
-        <Spiral
-          width={600}
-          height={600}
-          stroke="gray"
-          {...state}
-          lines={Array.from({ length: 12 }, (_, i) => [
-            angle(Math.pow(2, i / 12)),
-            state.max,
-            "gray",
-          ]).concat(
-            Array.from({ length: 12 }, (_, i) => [
-              angle(Math.pow(4 / 3, i)),
-              state.max,
-              frequencyColor(Math.pow(4 / 3, i) * 440),
-            ])
-          )}
-          onTrigger={(i) => harp.triggerAttackRelease((i + 1) * state.base, 1)}
-        />
-        <div style={{ position: "absolute", left: 10, bottom: 30 }}>
-          <SimplePopover placement="left-start">
-            <div style={{ width: 300 }}>
-              <SpiralSettings state={state} setState={setState} />
-            </div>
-          </SimplePopover>
+  {({ state, setState }) => {
+    const generator = 3 / 2;
+    const notes = 13;
+    const comma = equivalence(Math.pow(generator, 12), 2) - 1;
+    const temper = (i) => (i / 12) * comma;
+    const ratios = Array.from(
+      { length: notes },
+      (_, i) =>
+        (equivalence(Math.pow(generator, i), 2) / (1 + (comma * i) / 12)) *
+        Math.pow(2, Math.floor(i / 12))
+    );
+    const angles = ratios.map((ratio) => angle(ratio)).sort();
+    return (
+      <>
+        <div
+          style={{
+            overflow: 'auto',
+            maxWidth: 900,
+            maxHeight: 700,
+            position: 'relative'
+          }}
+        >
+          <Spiral
+            width={600}
+            height={600}
+            stroke="gray"
+            {...state}
+            max={angles[angles.length - 1] + 1}
+            getRadius={(angle, maxRadius, zoom) => 100 + angle * 100 * zoom}
+            lines={[]
+              .concat(
+                Array.from({ length: 12 }, (_, i) => [
+                  angle(Math.pow(2, i / 12)),
+                  angle(Math.pow(2, i / 12) * Math.pow(2, state.max)),
+                  'gray'
+                ])
+              )
+              .concat(
+                ratios.map((ratio) => [
+                  angle(ratio),
+                  angle(ratio * Math.pow(2, 1)),
+                  frequencyColor(ratio * 440)
+                ])
+              )
+              .concat(
+                angles.map((angle, i) => {
+                  const next = i + 5;
+                  return [
+                    angle,
+                    angles[next % angles.length] +
+                      Math.floor(next / angles.length),
+                    'transparent'
+                  ];
+                })
+              )}
+            onTrigger={(i) =>
+              harp.triggerAttackRelease((i + 1) * state.base, 1)
+            }
+          />
+          <div style={{ position: 'absolute', left: 10, bottom: 30 }}>
+            <SimplePopover placement="left-start">
+              <div style={{ width: 300 }}>
+                <SpiralSettings state={state} setState={setState} />
+              </div>
+            </SimplePopover>
+          </div>
         </div>
-      </div>
-    </>
-  )}
+      </>
+    );
+  }}
 </State>
+
+- Tempered Pythagorean Tuning equals 12edo!!

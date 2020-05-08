@@ -84,7 +84,7 @@ export default function Spiral({
     return [
       spiralPosition(a, rad(a), spin, ...center),
       //spiralPosition(a, rad(a + b), spin, ...center),
-      spiralPosition(a, rad(b), spin, ...center),
+      spiralPosition(b, rad(b), spin, ...center),
       color,
     ]
   })
