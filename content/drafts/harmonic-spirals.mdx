@@ -141,7 +141,7 @@ It gets even more accurate (but not as compact) if we use a logarithmic spiral:
 
 ## Scale Spiral
 
-Pythagorean vs 12EDO
+stacked fourths vs 12EDO
 
 <State
   initial={{
@@ -150,14 +150,15 @@ Pythagorean vs 12EDO
     precision: 1,
     min: 1,
     max: 6,
-    strokeWidth: 3,
+    strokeWidth: 2,
     base: 55,
-    fontSize: 14
+    fontSize: 12
   }}
 >
   {({ state, setState }) => {
     const generator = 4 / 3;
     const notes = 53;
+    const octaveRadius = 60;
     let ratios = Array.from({ length: notes }, (_, i) =>
       Math.pow(generator, i)
     );
@@ -192,7 +193,7 @@ Pythagorean vs 12EDO
             height={600}
             stroke="gray"
             {...state}
-            getRadius={(angle, maxRadius, zoom) => zoom * angle * 50}
+            getRadius={(angle, maxRadius, zoom) => zoom * angle * octaveRadius}
             lines={[]
               .concat(
                 show12EDO
@@ -235,6 +236,8 @@ Pythagorean vs 12EDO
 
 ## Tempered Pythagorean Tuning
 
+stacked fifths vs 12edo
+
 <State
   initial={{
     zoom: 0.4,
@@ -249,13 +252,15 @@ Pythagorean vs 12EDO
 >
   {({ state, setState }) => {
     const generator = 3 / 2;
-    const notes = 13;
+    const notes = 25;
     const comma = equivalence(Math.pow(generator, 12), 2) - 1;
-    const temper = (i) => (i / 12) * comma;
+    const temper = true;
+    const tempered = (i) => (temper ? 1 / (1 + (comma * i) / 12) : 1);
     const ratios = Array.from(
       { length: notes },
       (_, i) =>
-        (equivalence(Math.pow(generator, i), 2) / (1 + (comma * i) / 12)) *
+        equivalence(Math.pow(generator, i), 2) *
+        tempered(i) *
         Math.pow(2, Math.floor(i / 12))
     );
     const angles = ratios.map((ratio) => angle(ratio)).sort();
