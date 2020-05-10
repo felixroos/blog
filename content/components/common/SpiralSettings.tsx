@@ -1,5 +1,5 @@
-import React from "react"
-import Slider from "@material-ui/core/Slider"
+import React from 'react';
+import Slider from '@material-ui/core/Slider';
 
 export default function SpiralSettings({ state, setState, hideZoom }) {
   return (
@@ -19,7 +19,7 @@ export default function SpiralSettings({ state, setState, hideZoom }) {
       <label>
         Spin {state.spin}
         <Slider
-          min={-1}
+          min={-0.25}
           max={1}
           step={0.01}
           value={state.spin}
@@ -45,9 +45,9 @@ export default function SpiralSettings({ state, setState, hideZoom }) {
           value={state.strokeWidth}
           onChange={(e, v) => setState({ strokeWidth: v })}
         />
-      </label>
+      </label><br/>
       <label>
-        {state.min} - {state.max} rotations
+      octaves {state.min} - {state.max}
         <Slider
           min={0}
           max={12}
@@ -57,5 +57,5 @@ export default function SpiralSettings({ state, setState, hideZoom }) {
         />
       </label>
     </>
-  )
+  );
 }

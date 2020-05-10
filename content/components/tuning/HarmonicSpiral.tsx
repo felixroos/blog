@@ -1,9 +1,12 @@
 import React from 'react';
 import Spiral, { SpiralProps, Line } from '../common/Spiral';
-import { angle, frequencyColor } from '../tuning/tuning';
+import { angle as _angle, frequencyColor } from '../tuning/tuning';
 
 export default function HarmonicSpiral(props: SpiralProps) {
-  const { min, max, onTrigger, hideLabels, hideLines } = props;
+  let { min, max, onTrigger, hideLabels, hideLines, compression } = props;
+  compression = compression || 1;
+  const compress = (angle) => (compression + angle - 1) / compression;
+  const angle = (n) => _angle(compress(n));
   function getLines(): Line[] {
     if (hideLines) {
       return [];
@@ -11,7 +14,7 @@ export default function HarmonicSpiral(props: SpiralProps) {
     return Array.from(
       { length: Math.pow(2, max - 1) - Math.pow(2, min) + 1 },
       (_, i) => i + Math.pow(2, min)
-    ).map((n) => [angle(n), angle(n) + 1, frequencyColor(n * 440)]);
+    ).map((n) => [angle(n), angle(n * 2), frequencyColor(n * 440)]);
   }
   function getLabels() {
     if (hideLabels) {

@@ -3,7 +3,9 @@ title: Harmonic Spirals
 date: 2020-05-05
 ---
 
+import Button from '@material-ui/core/Button';
 import Spiral from '../components/common/Spiral.tsx';
+import { easeCubicIn } from 'd3-ease';
 import HarmonicSpiral from '../components/tuning/HarmonicSpiral.tsx';
 import SpiralSettings from '../components/common/SpiralSettings.tsx';
 import { State } from 'react-powerplug';
@@ -29,91 +31,124 @@ const harp =
   }).toMaster();
 
 Let's play [Erv Wilson](http://www.anaphoria.com/harm-subharm.pdf) and create some harmonic spirals.
+Spirals are a good vizualization for pitch, as they convey octave relationships through rotational alignment.
+A Spiral can also be seen as a 2D version of a ([pitch](https://www.researchgate.net/profile/Diana_Deutsch/publication/265168331/figure/fig15/AS:668769319919629@1536458439596/The-helical-model-of-pitch-Musical-pitch-is-shown-as-varying-along-both-a-linear.png))
+helix, where the 3rd dimension of the helix is mapped to the radius of the spiral.
+This gets obvious if we use a logarithmic spiral, which looks like the view inside a helix with a central vanishing point.
 
 ## Harmonic Spiral
 
-<State
-  initial={{
-    zoom: 0.11,
-    spin: 0,
-    precision: 4,
-    min: 0,
-    max: 5,
-    strokeWidth: 3,
-    base: 55,
-    fontSize: 10,
-    logarithmic: false,
-    hideLabels: false,
-    hideLines: false
-  }}
->
-  {({ state, setState }) => (
-    <>
-      <div
-        style={{
-          overflow: 'auto',
-          maxWidth: 900,
-          maxHeight: 700,
-          position: 'relative'
-        }}
-      >
-        <HarmonicSpiral
-          width={600}
-          height={600}
-          stroke="gray"
-          {...state}
-          getRadius={(angle, maxRadius, zoom) => {
-            if (state.logarithmic) {
-              const compensation = 41;
-              return (
-                Math.pow(2, Math.abs(angle)) *
-                Math.abs(state.zoom * compensation)
-              );
-            }
-            return angle * maxRadius * zoom;
-          }}
-          onTrigger={(partial) =>
-            harp.triggerAttackRelease(partial * state.base, 1)
-          }
-        />
-        <div style={{ position: 'absolute', left: 10, bottom: 30 }}>
-          <SimplePopover placement="left-start">
-            <div style={{ width: 300 }}>
-              <SpiralSettings state={state} setState={setState} />
-              <br />
-              <label>
-                <input
-                  type="checkbox"
-                  checked={state.logarithmic}
-                  onChange={(e) => setState({ logarithmic: e.target.checked })}
-                />
-                Logarithmic
-              </label>
-              <br />
-              <label>
-                <input
-                  type="checkbox"
-                  checked={!state.hideLabels}
-                  onChange={(e) => setState({ hideLabels: !e.target.checked })}
-                />
-                Labels
-              </label>
-              <br />
-              <label>
-                <input
-                  type="checkbox"
-                  checked={!state.hideLines}
-                  onChange={(e) => setState({ hideLines: !e.target.checked })}
-                />
-                Lines
-              </label>
+<AnimationFrame>
+  {({ start, time, isRunning }) => (
+    <State
+      initial={{
+        zoom: 0.11,
+        spin: 0,
+        precision: 4,
+        min: 0,
+        max: 5,
+        strokeWidth: 3,
+        base: 55,
+        fontSize: 10,
+        compression: 1,
+        logarithmic: false,
+        hideLabels: false,
+        hideLines: false
+      }}
+    >
+      {({ state, setState }) => {
+        let { zoom, spin, compression, linearity, hideLines } = state;
+        linearity = easeCubicIn(1 - time.progress);
+        if (isRunning && linearity) {
+          hideLines = true;
+          zoom *= Math.pow(10000, linearity);
+          spin -= Math.pow(0.25, linearity);
+          compression *= Math.pow(20000, linearity);
+        }
+        if (!isRunning) {
+          hideLines = hideLines === undefined ? false : state.hideLines;
+        }
+        return (
+          <>
+            <div
+              style={{
+                overflow: 'auto',
+                maxWidth: 900,
+                maxHeight: 700,
+                position: 'relative'
+              }}
+            >
+              <HarmonicSpiral
+                width={600}
+                height={600}
+                stroke="gray"
+                {...state}
+                {...{ zoom, spin, compression, hideLines }}
+                getRadius={(angle, maxRadius, zoom) => {
+                  if (state.logarithmic) {
+                    const compensation = 41;
+                    return (
+                      Math.pow(2, Math.abs(angle)) *
+                      Math.abs(state.zoom * compensation)
+                    );
+                  }
+                  return angle * maxRadius * zoom;
+                }}
+                onTrigger={(partial) =>
+                  harp.triggerAttackRelease(partial * state.base, 1)
+                }
+              />
+              <div style={{ position: 'absolute', left: 10, bottom: 30 }}>
+                <SimplePopover placement="left-start">
+                  <div style={{ width: 300 }}>
+                    <Button color="primary" onClick={() => start(16000)}>
+                      {!isRunning ? 'Play Animation' : 'Stop Animation'}
+                    </Button>
+                    <br />
+                    <SpiralSettings state={state} setState={setState} />
+                    <br />
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={state.logarithmic}
+                        onChange={(e) =>
+                          setState({ logarithmic: e.target.checked })
+                        }
+                      />
+                      Logarithmic
+                    </label>
+                    <br />
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={!state.hideLabels}
+                        onChange={(e) =>
+                          setState({ hideLabels: !e.target.checked })
+                        }
+                      />
+                      Labels
+                    </label>
+                    <br />
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={!state.hideLines}
+                        onChange={(e) =>
+                          setState({ hideLines: !e.target.checked })
+                        }
+                      />
+                      Lines
+                    </label>
+                  </div>
+                </SimplePopover>
+              </div>
             </div>
-          </SimplePopover>
-        </div>
-      </div>
-    </>
+          </>
+        );
+      }}
+    </State>
   )}
-</State>
+</AnimationFrame>
 
 - you can think of this as a number line with a twist
 - starting at 1 (root pitch) in the center, we map one full rotation (=360 degrees) to the multiplication of 2 (octaves)

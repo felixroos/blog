@@ -27,6 +27,7 @@ export interface SpiralProps {
   onTrigger?: (index: number) => void;
   hideLabels?: boolean; // TBD: implement in spiral
   hideLines?: boolean; // TBD: implement in spiral
+  compression?: number; //
 }
 
 export default function Spiral({
@@ -44,10 +45,12 @@ export default function Spiral({
   lines,
   labels,
   fontSize,
-  onTrigger
+  onTrigger,
+  compression
 }: SpiralProps) {
   zoom = zoom || 1;
   spin = spin || 0;
+  compression = compression || 1;
   fontSize = fontSize || 10;
   min = min || 0;
   precision = Math.abs(precision || 1);
@@ -57,6 +60,7 @@ export default function Spiral({
   const center = [width / 2, height / 2];
   let maxRadius = Math.sqrt(width * width + height * height) / 2; // max distance from center (to edge)
   let dots = [];
+  const compress = (angle) => (compression + angle - 1) / compression
   const rad = (angle) =>
     getRadius ? getRadius(angle, maxRadius, zoom) : angle * zoom * maxRadius;
   const maxPositions = 20000; // hard limit to prevent infinite loops of imploding spirals
