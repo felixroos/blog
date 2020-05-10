@@ -38,7 +38,7 @@ Let's play [Erv Wilson](http://www.anaphoria.com/harm-subharm.pdf) and create so
     spin: 0,
     precision: 4,
     min: 0,
-    max: 6,
+    max: 5,
     strokeWidth: 3,
     base: 55,
     fontSize: 10,
@@ -72,7 +72,9 @@ Let's play [Erv Wilson](http://www.anaphoria.com/harm-subharm.pdf) and create so
             }
             return angle * maxRadius * zoom;
           }}
-          onTrigger={(partial) => harp.triggerAttackRelease(partial * state.base, 1)}
+          onTrigger={(partial) =>
+            harp.triggerAttackRelease(partial * state.base, 1)
+          }
         />
         <div style={{ position: 'absolute', left: 10, bottom: 30 }}>
           <SimplePopover placement="left-start">
@@ -122,6 +124,11 @@ Let's play [Erv Wilson](http://www.anaphoria.com/harm-subharm.pdf) and create so
 - it gets even more accurate (but not as compact) if we use a logarithmic spiral
   - its radius gets two times bigger on every rotation.
   - its growth represents the behaviour of frequencies, as we go up the harmonic series.
+
+### TBD
+
+- make harmonic labels/lines work for subharmonic series = negative angles
+- make equivalence factor adjustable (other than 2), which could be used to animate from a number line (equivalence factor approaching infinity) to the spiral (2)
 
 ## Scale Spiral
 
@@ -309,3 +316,12 @@ stacked fifths vs 12edo
 </State>
 
 - Tempered Pythagorean Tuning equals 12edo!!
+
+## TBD
+
+- find unified way to generate those linear scales from generator interval + number of notes + number of notes per octave?!
+  - e.g. generate(4/3, 25, 13) => stacks 24 fourths and packs each 13 fourths into one octave
+  - or generate(3/2, 25, 12) => stacks 25 fifths and packs each 12 fifths into one octave
+- find way to animate between temperment and non temperment
+- find out why tempering Pythagorean tuning results in 12edo (or seems to)
+  - at the first thought I cannot see where the irrationality comes from, as the comma is also just a fraction

@@ -54,18 +54,18 @@ export default function Spiral({
   strokeWidth = strokeWidth || 1;
   width = width || 600;
   height = height || 400;
-  const maxPositions = 20000;
   const center = [width / 2, height / 2];
-  let maxRadius = Math.sqrt(width * width + height * height) / 2;
-  let currentRadius = min * zoom * maxRadius;
+  let maxRadius = Math.sqrt(width * width + height * height) / 2; // max distance from center (to edge)
   let dots = [];
   const rad = (angle) =>
     getRadius ? getRadius(angle, maxRadius, zoom) : angle * zoom * maxRadius;
+  const maxPositions = 20000; // hard limit to prevent infinite loops of imploding spirals
+  let currentRadius = min * zoom * maxRadius;
   while (
     currentRadius < maxPositions &&
     (!dots.length ||
-      (Math.abs(dots[0][1]) <= maxRadius &&
-        (!max || Math.abs(dots[0][0]) <= max)))
+      (Math.abs(dots[0][1]) <= maxRadius && // stop if next radius would be out of view anyway
+        (max === undefined || dots[0][0] <= max))) // if if max rotations are reached (if max is set)
   ) {
     const angle = currentRadius / zoom / maxRadius;
     dots.unshift([angle, rad(angle)]);
