@@ -30,7 +30,7 @@ const harp =
 
 Let's play [Erv Wilson](http://www.anaphoria.com/harm-subharm.pdf) and create some harmonic spirals.
 
-## Linear Harmonic Spiral
+## Harmonic Spiral
 
 <State
   initial={{
@@ -41,7 +41,10 @@ Let's play [Erv Wilson](http://www.anaphoria.com/harm-subharm.pdf) and create so
     max: 6,
     strokeWidth: 3,
     base: 55,
-    fontSize: 14
+    fontSize: 10,
+    logarithmic: false,
+    hideLabels: false,
+    hideLines: false
   }}
 >
   {({ state, setState }) => (
@@ -59,15 +62,49 @@ Let's play [Erv Wilson](http://www.anaphoria.com/harm-subharm.pdf) and create so
           height={600}
           stroke="gray"
           {...state}
-          getRadius={(angle, maxRadius, zoom) =>
-            /*Math.floor(angle)*/ angle * maxRadius * zoom
-          }
-          onTrigger={(i) => harp.triggerAttackRelease((i + 1) * state.base, 1)}
+          getRadius={(angle, maxRadius, zoom) => {
+            if (state.logarithmic) {
+              const compensation = 41;
+              return (
+                Math.pow(2, Math.abs(angle)) *
+                Math.abs(state.zoom * compensation)
+              );
+            }
+            return angle * maxRadius * zoom;
+          }}
+          onTrigger={(partial) => harp.triggerAttackRelease(partial * state.base, 1)}
         />
         <div style={{ position: 'absolute', left: 10, bottom: 30 }}>
           <SimplePopover placement="left-start">
             <div style={{ width: 300 }}>
               <SpiralSettings state={state} setState={setState} />
+              <br />
+              <label>
+                <input
+                  type="checkbox"
+                  checked={state.logarithmic}
+                  onChange={(e) => setState({ logarithmic: e.target.checked })}
+                />
+                Logarithmic
+              </label>
+              <br />
+              <label>
+                <input
+                  type="checkbox"
+                  checked={!state.hideLabels}
+                  onChange={(e) => setState({ hideLabels: !e.target.checked })}
+                />
+                Labels
+              </label>
+              <br />
+              <label>
+                <input
+                  type="checkbox"
+                  checked={!state.hideLines}
+                  onChange={(e) => setState({ hideLines: !e.target.checked })}
+                />
+                Lines
+              </label>
             </div>
           </SimplePopover>
         </div>
@@ -82,62 +119,9 @@ Let's play [Erv Wilson](http://www.anaphoria.com/harm-subharm.pdf) and create so
 - the line extends to infinity, crossing the spiral at octaves of the color
 - all natural numbers will be part of a line
 - the whole image is a dense visualization of the harmonic series from the perspective of octaves
-
-## Logarithmic Harmonic Spiral
-
-It gets even more accurate (but not as compact) if we use a logarithmic spiral:
-
-<State
-  initial={{
-    zoom: 0.85,
-    spin: 0,
-    precision: 0.2,
-    min: 5,
-    max: 11,
-    strokeWidth: 3,
-    stroke: 'gray',
-    width: 600,
-    height: 600,
-    base: 55
-  }}
->
-  {({ state, setState }) => (
-    <>
-      <div
-        style={{
-          overflow: 'auto',
-          maxWidth: 900,
-          maxHeight: 700,
-          position: 'relative'
-        }}
-      >
-        <HarmonicSpiral
-          {...state}
-          onTrigger={(i) => console.log('trigger', i)}
-          getRadius={(angle) =>
-            Math.pow(Math.abs(state.zoom) * 2, Math.abs(angle)) *
-            Math.abs(state.zoom)
-          }
-          onTrigger={(i) => harp.triggerAttackRelease((i + 1) * state.base, 1)}
-        />
-        <div style={{ position: 'absolute', left: 10, bottom: 30 }}>
-          <SimplePopover placement="left-start">
-            <div style={{ width: 300 }}>
-              <SpiralSettings
-                state={state}
-                setState={setState}
-                disableZoom={true}
-              />
-            </div>
-          </SimplePopover>
-        </div>
-      </div>
-    </>
-  )}
-</State>
-
-- Here, the radius gets two times bigger on every rotation.
-- This growth represents the behaviour of frequencies, as we go up the harmonic series.
+- it gets even more accurate (but not as compact) if we use a logarithmic spiral
+  - its radius gets two times bigger on every rotation.
+  - its growth represents the behaviour of frequencies, as we go up the harmonic series.
 
 ## Scale Spiral
 
@@ -157,7 +141,7 @@ stacked fourths vs 12EDO
 >
   {({ state, setState }) => {
     const generator = 4 / 3;
-    const notes = 53;
+    const notes = 54;
     const octaveRadius = 60;
     let ratios = Array.from({ length: notes }, (_, i) =>
       Math.pow(generator, i)
