@@ -16,7 +16,7 @@ export default function SpiralSettings({ state, setState, hideZoom }) {
           />
         </label>
       )}
-      <label>
+      {/* <label>
         Spin {state.spin}
         <Slider
           min={-0.25}
@@ -25,7 +25,7 @@ export default function SpiralSettings({ state, setState, hideZoom }) {
           value={state.spin}
           onChange={(e, v) => setState({ spin: v })}
         />
-      </label>
+      </label> */}
       <label>
         Precision {state.precision}
         <Slider

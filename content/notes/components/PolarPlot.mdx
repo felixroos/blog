@@ -1,0 +1,74 @@
+import PolarPlot from '../../components/common/PolarPlot.tsx';
+import Slider from '@material-ui/core/Slider';
+import { State } from 'react-powerplug';
+import AnimationFrame from '../../components/common/AnimationFrame.tsx';
+
+## PolarPlot
+
+This component plots functions in a polar coordinate system
+
+<AnimationFrame autostart>
+  {({ time }) => (
+    <State initial={{ frequency: 5, rotation: 0, speed: 1 }}>
+      {({ state, setState }) => {
+        const rotation = ((-time.fromStart * state.speed) / 10000) * Math.PI;
+        const limacon = (a = 1, b = 1, offset = 0) => (t) =>
+          a + b * Math.sin(t + offset);
+        const rose = (a, n, offset = 0) => (t) => a * Math.sin(n * t + offset);
+        // dunno how to plot quadratic radius?! dont care for now..
+        /* const lemniscates = (a = 1) => (t) =>
+          Math.sqrt(Math.abs(2 * Math.pow(a, 2) * Math.cos(2 * t))); */
+        return (
+          <>
+            <PolarPlot
+              maxAngle={2 * Math.PI}
+              radius={1}
+              functions={[
+                // (t) => Math.sin(state.frequency * (t + rotation)),
+                // limacon(1, -1),
+                // limacon(1, 1),
+                // limacon(1, 1, Math.PI / 2),
+                // limacon(1, 1, -Math.PI / 2),
+                rose(1, state.frequency, Math.PI * rotation)
+              ]}
+            />
+            <br />
+            <label>
+              frequency {state.frequency}
+              <Slider
+                min={-10}
+                step={0.1}
+                max={10}
+                value={state.frequency}
+                onChange={(e, v) =>
+                  v !== state.frequency && setState({ frequency: v })
+                }
+              />
+            </label>
+            <br />
+            <label>
+              speed {state.speed}
+              <Slider
+                min={0}
+                step={0.01}
+                max={10}
+                value={state.speed}
+                onChange={(e, v) =>
+                  v !== state.maxAngle && setState({ speed: v })
+                }
+              />
+            </label>
+          </>
+        );
+      }}
+    </State>
+  )}
+</AnimationFrame>
+
+## Links
+
+- [graphs (limacon, cardiod, rose curves, lemniscates)](https://www.youtube.com/watch?v=p98hm1Dksew)
+
+## TBD
+
+- [add axis + grid](https://bl.ocks.org/mbostock/4583749)

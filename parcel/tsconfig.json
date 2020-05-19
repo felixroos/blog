@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "jsx": "react",
-    "esModuleInterop": false
+    "esModuleInterop": false,
+    "lib": ["es6", "dom"]
   }
 }

@@ -1,9 +1,10 @@
-import { State } from "react-powerplug"
-import { Note } from "@tonaljs/tonal"
-import { Switch } from "@material-ui/core"
-import { clamp, ratios } from "../../components/tuning/tuning.ts"
-import Monochord from "../../components/tuning/Monochord.tsx"
-import AnimationFrame from "../../components/common/AnimationFrame.tsx"
+import { Fragment } from 'react';
+import { State } from 'react-powerplug';
+import { Note } from '@tonaljs/tonal';
+import { Switch } from '@material-ui/core';
+import { clamp, ratios } from '../../components/tuning/tuning.ts';
+import Monochord from '../../components/tuning/Monochord.tsx';
+import AnimationFrame from '../../components/common/AnimationFrame.tsx';
 
 # Monochord
 
@@ -12,20 +13,20 @@ The numbers describe the fraction of the length on either side.
 
 For example, this is the natural major triad, as it appears in the harmonic series:
 
-<Monochord value={1} base={Note.freq("C4")} disableRight={true} />
+<Monochord value={1} base={Note.freq('C4')} disableRight={true} />
 <br />
-<Monochord value={4 / 5} base={Note.freq("C4")} disableRight={true} />
+<Monochord value={4 / 5} base={Note.freq('C4')} disableRight={true} />
 <br />
-<Monochord value={2 / 3} base={Note.freq("C4")} disableRight={true} />
+<Monochord value={2 / 3} base={Note.freq('C4')} disableRight={true} />
 <br />
 
 Or, the natural minor triad:
 
-<Monochord value={1} base={Note.freq("C4")} disableRight={true} />
+<Monochord value={1} base={Note.freq('C4')} disableRight={true} />
 <br />
-<Monochord value={5 / 6} base={Note.freq("C4")} disableRight={true} />
+<Monochord value={5 / 6} base={Note.freq('C4')} disableRight={true} />
 <br />
-<Monochord value={2 / 3} base={Note.freq("C4")} disableRight={true} />
+<Monochord value={2 / 3} base={Note.freq('C4')} disableRight={true} />
 <br />
 
 # Just Intonation
@@ -37,9 +38,9 @@ I just took the frequency ratios from wikipedia and inverted them, as we are usi
 function JustStrings() {
   return [1, 9 / 8, 5 / 4, 4 / 3, 3 / 2, 5 / 3, 15 / 8, 2]
     .map((r) => 1 / r)
-    .map((p) => (
-      <Monochord value={p} base={Note.freq("C4")} disableRight={true} />
-    ))
+    .map((p, i) => (
+      <Monochord key={i} value={p} base={Note.freq('C4')} disableRight={true} />
+    ));
 }
 ```
 
@@ -47,11 +48,11 @@ function JustStrings() {
   {() =>
     [1, 9 / 8, 5 / 4, 4 / 3, 3 / 2, 5 / 3, 15 / 8, 2]
       .map((r) => 1 / r)
-      .map((p) => (
-        <>
-          <Monochord value={p} base={Note.freq("C4")} disableRight={true} />
+      .map((p, i) => (
+        <Fragment key={i}>
+          <Monochord value={p} base={Note.freq('C4')} disableRight={true} />
           <br />
-        </>
+        </Fragment>
       ))
   }
 </State>
@@ -66,11 +67,11 @@ export function ratios(
   factors = [2 / 3, 4 / 3],
   n = factors.length
 ) {
-  const ratios = [start]
+  const ratios = [start];
   for (let i = 0; i < n; ++i) {
-    ratios.push(ratios[ratios.length - 1] * factors[i % factors.length])
+    ratios.push(ratios[ratios.length - 1] * factors[i % factors.length]);
   }
-  return ratios
+  return ratios;
 }
 ```
 
@@ -94,14 +95,14 @@ This tuning can be obtained by going 6 fifth down and 6 fifths up from the root
       27 / 16,
       81 / 64,
       243 / 128,
-      729 / 512,
-    ].map((r) => 1 / r)
-    return ratios.map((p) => (
-      <>
-        <Monochord value={p} base={Note.freq("C4")} disableRight={true} />
+      729 / 512
+    ].map((r) => 1 / r);
+    return ratios.map((p, i) => (
+      <Fragment key={i}>
+        <Monochord value={p} base={Note.freq('C4')} disableRight={true} />
         <br />
-      </>
-    ))
+      </Fragment>
+    ));
   }}
 </State>
 
@@ -114,18 +115,18 @@ The chinese tuning is similar to the pythagorean tuning:
 <!-- ## 5th up / 4th down -->
 
 ```js
-ratios(1, [2 / 3, 4 / 3], 12)
+ratios(1, [2 / 3, 4 / 3], 12);
 ```
 
 <State initial={{}}>
   {() =>
     ratios(1, [2 / 3, 4 / 3], 12)
       .concat([1 / 2])
-      .map((p) => (
-        <>
-          <Monochord value={p} base={Note.freq("C4")} disableRight={true} />
+      .map((p, i) => (
+        <Fragment key={i}>
+          <Monochord value={p} base={Note.freq('C4')} disableRight={true} />
           <br />
-        </>
+        </Fragment>
       ))
   }
 </State>
@@ -142,8 +143,8 @@ ratios(1 / 2, [3 / 4, 3 / 2], 12)
   {() =>
     ratios(1 / 2, [3 / 4, 3 / 2], 12)
       .concat([1])
-      .map((p) => (
-        <Monochord value={p} base={Note.freq("C4")} disableRight={true} />
+      .map((p,i) => (
+        <Monochord key={i} value={p} base={Note.freq("C4")} disableRight={true} />
       ))
   }
 </State>
@@ -158,8 +159,8 @@ ratios(1 / 2, [4 / 3, 2 / 3], 12)
   {() =>
     ratios(1 / 2, [4 / 3, 2 / 3], 12)
       .concat([1 / 4])
-      .map((p) => (
-        <Monochord value={p} base={Note.freq("C4")} disableRight={true} />
+      .map((p,i) => (
+        <Monochord key={i} value={p} base={Note.freq("C4")} disableRight={true} />
       ))
   }
 </State>

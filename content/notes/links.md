@@ -24,6 +24,7 @@ https://github.com/pshrmn/notes
 
 ## d3
 
+- https://github.com/unkleho/d3-render !!
 - https://observablehq.com/collection/@d3/learn-d3
 - https://medium.com/@enjalot/how-do-you-learn-d3-js-ccffc151419b
 - https://github.com/d3/d3-hierarchy#d3-hierarchy
@@ -42,3 +43,18 @@ https://github.com/pshrmn/notes
 - https://github.com/snabbdom/snabbdom
   - https://github.com/Swizz/snabbdom-pragma
   - 
+
+
+## synths
+
+- https://www.factmag.com/2016/09/15/14-most-important-synths/
+- http://www.synthmania.com/Famous%20Sounds.htm
+
+### Prohpet 5
+
+- [http://sound-force.nl/?page_id=2412](soundforce sfc-5 prophet 5 midi ctrl)
+  - [uk shop](https://www.signalsounds.com/catalogsearch/result/?q=SoundForce)
+- [u-he repro 1 & 5](https://u-he.com/products/repro/)
+  - best emulation of prophet pro one + prophet 5
+  - also runs on linux (could make a standalone prophet)
+- http://blog.dubspot.com/prophet-5-spotlight/

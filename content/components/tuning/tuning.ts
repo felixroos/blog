@@ -135,6 +135,9 @@ export function ratios(start = 1, factors = [2 / 3, 4 / 3], n = factors.length) 
   return ratios;
 }
 
+export const edo12 = (semitones, octaveOffset = 0) =>
+  Math.pow(2, semitones / 12 + octaveOffset);
+
 // divides a frequency by 2 until it is inside one octave above the base
 export function clamp(frequency, base = 440) {
   if (frequency > base * 2) {

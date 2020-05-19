@@ -1,0 +1,71 @@
+import Sketch from '../../components/common/Sketch.tsx';
+import { State } from 'react-powerplug';
+import AnimationFrame from '../../components/common/AnimationFrame.tsx';
+import Slider from '@material-ui/core/Slider';
+
+# p5 sketch
+
+Inspired by [this observable notebook](https://observablehq.com/@makio135/p5), I wanted to be able to embed p5 sketches with react/MDX.
+
+<State initial={{ paused: false, stroke: 100, background: 'black' }}>
+  {({ state, setState }) => {
+    const sketch = (sketch) => {
+      sketch.setup = () => {
+        sketch.createCanvas(600, 400, sketch.WEBGL);
+      };
+      sketch.draw = () => {
+        sketch.background(state.background);
+        sketch.rotateX(sketch.frameCount * 0.01);
+        sketch.rotateY(sketch.frameCount * 0.01);
+        sketch.noFill();
+        sketch.stroke(state.stroke);
+        sketch.torus(100, 50);
+      };
+      if (state.paused) {
+        sketch.noLoop();
+      }
+    };
+    return (
+      <div>
+        <Sketch render={sketch} background={state.background} />
+        <label>
+          Stroke
+          <Slider
+            min={0}
+            max={255}
+            value={state.stroke}
+            onChange={(e, v) => state.stroke !== v && setState({ stroke: v })}
+          />
+        </label>
+        <button onClick={() => setState({ paused: !state.paused })}>
+          toggle animation
+        </button>
+      </div>
+    );
+  }}
+</State>
+
+Code:
+
+```js
+<Sketch
+  render={(sketch) => {
+    sketch.setup = () => {
+      sketch.createCanvas(600, 400, sketch.WEBGL);
+    };
+    sketch.draw = () => {
+      sketch.background(0);
+      sketch.rotateX(sketch.frameCount * 0.01);
+      sketch.rotateY(sketch.frameCount * 0.01);
+      sketch.noFill();
+      sketch.stroke(255);
+      sketch.torus(100, 50);
+    };
+  }}
+/>
+```
+
+## TBD
+
+- find out how to update draw function without ~~resetting instance~~ flickering
+- check out "myCustomRedrawAccordingToNewPropsHandler" of https://www.npmjs.com/package/react-p5-wrapper
