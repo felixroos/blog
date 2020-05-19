@@ -15,6 +15,7 @@ import { Note } from '@tonaljs/tonal';
 import { InlineMath, BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import AnimationFrame from '../components/common/AnimationFrame.tsx';
+import trumpet from '../assets/trumpet.svg';
 import {
   angle,
   frequencyColor,
@@ -401,7 +402,7 @@ Now finally, here's the spiral, labeled with decimal combination:
       [-4, '110'],
       [-5, '101'],
       [-6, '111'],
-      [-3, '100'],
+      [-3, '100']
     ];
     const defaultPitches = [
       [2, -6],
@@ -518,7 +519,6 @@ Now finally, here's the spiral, labeled with decimal combination:
       }
       return number + new Array(fill).join('0');
     };
-    const trumpet = require('../assets/trumpet.svg');
     return (
       <>
         <div
@@ -562,7 +562,8 @@ Now finally, here's the spiral, labeled with decimal combination:
             onChange={(e) => setState({ defaultsOnly: e.target.checked })}
           />
           Defaults Only
-        </label><br/>
+        </label>
+        <br />
         <label>
           <input
             type="checkbox"
