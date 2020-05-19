@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import React, { Suspense, useCallback, useRef, useMemo } from 'react';
 import { Canvas, useFrame } from 'react-three-fiber';
 import Effects from './Effects';
-import './styles.css';
+// import './styles.css';
 
 function Swarm({ count, mouse }) {
   const mesh = useRef();

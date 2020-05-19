@@ -4,8 +4,7 @@
   "private": true,
   "version": "0.0.1",
   "scripts": {
-    "develop": "gatsby develop -p 8080",
-    "develop-80": "sudo npx gatsby develop -p 80",
+    "develop": "gatsby develop",
     "start": "gatsby develop",
     "build": "gatsby build --prefix-paths",
     "clean": "gatsby clean",
