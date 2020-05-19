@@ -100,8 +100,6 @@ Due to the fact that the elongation of the third slide is the same as the elonga
 
 ### Harmonic Spiral
 
-Now finally, here's the spiral, labeled with decimal combination:
-
 <State
   initial={{
     zoom: 1.1,
@@ -114,8 +112,8 @@ Now finally, here's the spiral, labeled with decimal combination:
     fontSize: 12,
     reduce: false,
     temper: false,
-    defaultsOnly: true,
-    showValves: true
+    defaultsOnly: false,
+    showValves: false
   }}
 >
   {({ state, setState }) => {
@@ -300,8 +298,6 @@ Now finally, here's the spiral, labeled with decimal combination:
 
 - as the harmonic series gets denser as we go up, more and more combinations will end up on similar notes in higher registers.
 - most of those pitches will by slightly detuned to each other, depending on the tube length and harmonic
-- there are 8 different combinations
-- the colors group together pitches created with the same valve combination (harmonic group)
 - all the harmonic series start on their second partial (omitting the root partial), as by instrument design, the root partials are not intended to be played and hard to produce, so I omitted them.
 - i have no idea how the exact length ratios of the slides are, I just assumed the roots were tuned to equal temperament. Nevertheless the pattern would look the same, just slightly detuned.
 
