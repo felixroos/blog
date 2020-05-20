@@ -1,0 +1,215 @@
+import canUseDOM from '../../components/canUseDOM.ts';
+import { Score } from '../../components/score/Score.tsx';
+
+# Score
+
+using copy of [react-vexflow](https://github.com/markacola/react-vexflow) (didn't work with import).
+
+possible additions
+
+- [x] omittable clef and or timeSignature (see [this PR](https://github.com/markacola/react-vexflow/pull/4))
+- [ ] change clef/time signature mid score => possibly requires optional object format
+- [x] added accidentals using tonal
+
+<Score
+  width={800}
+  height={110}
+  staves={[
+    ['a3', 'd4', 'e4', 'd4'],
+    ['a4', 'd4', ['e4', 8], ['f4', 8], 'd4'],
+    ['a4', 'a4', 'b4', 'a4'],
+    ['d4', 'e4', ['g4', 2]]
+  ]}
+/>
+<Score
+  width={800}
+  height={110}
+  timeSignature=""
+  clef=""
+  staves={[
+    ['a3', 'd4', 'e4', 'd4'],
+    ['a4', 'd4', ['e4', 8], ['f4', 8], 'd4'],
+    ['a4', 'a4', 'b4', 'a4'],
+    ['d4', 'e4', ['g4', 2]]
+  ]}
+/>
+
+## Tests
+
+### default
+
+<Score
+  width={800}
+  staves={[
+    ['a3', 'd4', 'e4', 'd4'],
+    ['a4', 'd4', ['e4', 8], ['f4', 8], 'd4'],
+    ['a4', 'a4', 'b4', 'a4'],
+    ['d4', 'e4', ['g4', 2]]
+  ]}
+/>
+
+### time signature only
+
+<Score
+  width={800}
+  timeSignature="4/4"
+  clef=""
+  staves={[
+    ['a3', 'd4', 'e4', 'd4'],
+    ['a4', 'd4', ['e4', 8], ['f4', 8], 'd4'],
+    ['a4', 'a4', 'b4', 'a4'],
+    ['d4', 'e4', ['g4', 2]]
+  ]}
+/>
+
+### clef only
+
+<Score
+  width={800}
+  timeSignature=""
+  clef="bass"
+  staves={[
+    ['a3', 'd4', 'e4', 'd4'],
+    ['a4', 'd4', ['e4', 8], ['f4', 8], 'd4'],
+    ['a4', 'a4', 'b4', 'a4'],
+    ['d4', 'e4', ['g4', 2]]
+  ]}
+/>
+
+### no clef no time signature
+
+<Score
+  width={800}
+  timeSignature=""
+  clef=""
+  staves={[
+    ['a3', 'd4', 'e4', 'd4'],
+    ['a4', 'd4', ['e4', 8], ['f4', 8], 'd4'],
+    ['a4', 'a4', 'b4', 'a4'],
+    ['d4', 'e4', ['g4', 2]]
+  ]}
+/>
+
+### multiline
+
+<Score
+  width={800}
+  height={110}
+  staves={[
+    ['a3', 'd4', 'e4', 'd4'],
+    ['a4', 'd4', ['e4', 8], ['f4', 8], 'd4'],
+    ['a4', 'a4', 'b4', 'a4'],
+    ['d4', 'e4', ['g4', 2]]
+  ]}
+/>
+<Score
+  width={800}
+  height={110}
+  timeSignature=""
+  clef=""
+  staves={[
+    ['a3', 'd4', 'e4', 'd4'],
+    ['a4', 'd4', ['e4', 8], ['f4', 8], 'd4'],
+    ['a4', 'a4', 'b4', 'a4'],
+    ['d4', 'e4', ['g4', 2]]
+  ]}
+/>
+
+### different note values
+
+<Score
+  width={800}
+  height={110}
+  staves={[
+    [
+      ['a4', 8],
+      ['b4', 16],
+      ['c5', 16],
+      ['b4', 8],
+      ['a4', 8],
+      ['g4', 4],
+      ['c5', 4]
+    ],
+    [
+      ['e5', 8],
+      ['f5', 8],
+      ['g5', 8],
+      ['a5', 8],
+      ['a4', 16],
+      ['b4', 16],
+      ['c5', 16],
+      ['b4', 16],
+      ['a5', 4]
+    ]
+  ]}
+/>
+
+issues:
+
+- [autobeam](https://github.com/0xfe/vexflow/wiki/Automatic-Beaming) groups only 2 instead of 4 eigths
+- high quarter note always go up => should go down for b4+
+  - this seems to happen only when the note value 4 is explicitly set
+  - works with 'q'...
+
+### rests
+
+<Score
+  width={800}
+  height={110}
+  staves={[
+    [
+      ['b4', 16],
+      ['c5', 16],
+      ['b4', 8],
+      ['a4', 8],
+      ['g4', 4],
+      ['b4', '4r']
+    ],
+    [
+      ['b4', '8r'],
+      ['f5', 8],
+      ['g5', 8],
+      ['a5', 8],
+      ['a4', 16],
+      ['b4', 16],
+      ['c5', 16],
+      ['c4', 16],
+      ['b4', 'q']
+    ]
+  ]}
+/>
+
+### accidentals
+
+<Score
+  width={800}
+  height={110}
+  staves={[
+    [
+      ['b4', 16],
+      ['c#/5', 16],
+      ['b4', 8],
+      ['a4', 4],
+      ['ab4', 4],
+      ['b4', '4r']
+    ],
+    [
+      ['b4', '8r'],
+      ['f5', 8],
+      ['g5', 8],
+      ['a5', 8],
+      ['a4', 16],
+      ['b4', 16],
+      ['c5', 16],
+      ['c4', 16],
+      ['b4', 'q']
+    ]
+  ]}
+/>
+
+- TBD: global accidentals?
+- TBD: local accidentals (dont repeat accidentals inside one bar) 
+
+## checkout
+
+- https://github.com/0xfe/vexflow/wiki/Microtonal-Support !

@@ -1,5 +1,5 @@
 module.exports = {
-  pathPrefix: "/blog",
+  pathPrefix: '/blog',
   plugins: [
     {
       resolve: `gatsby-theme-notes`,
@@ -19,9 +19,9 @@ module.exports = {
       options: {
         isTSX: true, // defaults to false
         //jsxPragma: `jsx`, // defaults to "React"
-        allExtensions: true, // defaults to false
-      },
-    },
+        allExtensions: true // defaults to false
+      }
+    }
   ],
   // Customize your site metadata:
   siteMetadata: {
@@ -31,8 +31,8 @@ module.exports = {
     social: [
       {
         name: `github`,
-        url: `https://github.com/felixroos`,
-      },
-    ],
-  },
-}
+        url: `https://github.com/felixroos`
+      }
+    ]
+  }
+};

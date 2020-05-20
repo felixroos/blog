@@ -2787,6 +2787,11 @@
   resolved "https://registry.yarnpkg.com/@types/unist/-/unist-2.0.3.tgz#9c088679876f374eb5983f150d4787aa6fb32d7e"
   integrity sha512-FvUupuM3rlRsRtCN+fDudtmytGO6iHJuuRKS1Ss0pG5z8oX0diNEw94UEL7hgDbpN94rgaK5R7sWm6RrSkZuAQ==
 
+"@types/vexflow@^1.2.35":
+  version "1.2.35"
+  resolved "https://registry.npmjs.org/@types/vexflow/-/vexflow-1.2.35.tgz#8cc6d156be45c95e8d970d76af5179d3d54a7c2a"
+  integrity sha512-Tr0wbUOH6DZm0dGYIuYbhho/KMdvkg9wzsgKkXLc3YwQ6WtcI7SmwkEK47nsjv/6ukPyze+40J7JaqLlqkTVUw==
+
 "@types/vfile-message@*":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@types/vfile-message/-/vfile-message-2.0.0.tgz#690e46af0fdfc1f9faae00cd049cc888957927d5"
@@ -3937,7 +3942,7 @@ braces@^3.0.1, braces@~3.0.2:
 
 "breathing-cube-in-p5-js@https://api.observablehq.com/@hydrosquall/breathing-cube-in-p5-js.tgz":
   version "439.0.0"
-  resolved "https://api.observablehq.com/@hydrosquall/breathing-cube-in-p5-js.tgz#9dd75cfefb47d9a9a713a19b828e20cf53699515"
+  resolved "https://api.observablehq.com/@hydrosquall/breathing-cube-in-p5-js.tgz#392bcff638768c6f00dc9ac4b067aaa6757f8af5"
 
 brorand@^1.0.1:
   version "1.1.0"
@@ -16305,6 +16310,11 @@ verror@1.10.0:
     assert-plus "^1.0.0"
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
+
+vexflow@^3.0.9:
+  version "3.0.9"
+  resolved "https://registry.npmjs.org/vexflow/-/vexflow-3.0.9.tgz#85bc89ae5224670d3837d0b34c521b9e69abc89c"
+  integrity sha512-JzDUC3SZvyRxvALv0UrlgCJSH7WzNSShNjXK0rTWqDJscCcytrTWLT3LYtsDvby8qbszdaD708xOe9D79FLTFA==
 
 vfile-location@^2.0.0:
   version "2.0.6"
