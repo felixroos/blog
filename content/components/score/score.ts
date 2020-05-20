@@ -31,7 +31,7 @@ export function renderScore({
   context.setFont('Arial', 10, '').setBackgroundFillStyle('#eed');
   const clefAndTimeWidth =
     (clef ? clefWidth : 0) + (timeSignature ? timeWidth : 0);
-  const staveWidth = (width - clefAndTimeWidth) / staves.length;
+  const staveWidth = (width - clefAndTimeWidth) / staves.length - 1;
 
   let currX = 0;
   let allNotes = [];
@@ -43,6 +43,9 @@ export function renderScore({
       clef && stave.addClef(clef);
       timeSignature && stave.addTimeSignature(timeSignature);
     }
+    const getVexFlowKey = (key) => key.includes('/')
+      ? key
+      : `${Note.get(key).pc}/${Note.get(key).oct}`
     currX += stave.getWidth();
     stave.setContext(context).draw();
     allNotes = allNotes.concat(notes);
@@ -51,20 +54,10 @@ export function renderScore({
       .map((note) =>
         Array.isArray(note) ? { key: note[0], duration: note[1] } : note
       )
-      .map(({ key, ...rest }) =>
-        typeof key === 'string'
-          ? {
-            key: key.includes('/')
-              ? key
-              : `${Note.get(key).pc}/${Note.get(key).oct}`,
-            ...rest
-          }
-          : rest
-      )
       .map(({ key, keys, duration = 'q' }) => {
         keys = key ? [key] : keys;
         const note = new StaveNote({
-          keys,
+          keys: keys.map(key => getVexFlowKey(key)),
           duration: String(duration)
         });
         if (note['dots']) {
