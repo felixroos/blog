@@ -3,22 +3,46 @@ import { Score } from '../../components/score/Score.tsx';
 
 # Score
 
-using copy of [react-vexflow](https://github.com/markacola/react-vexflow) (didn't work with import).
-
-possible additions
-
-- [x] omittable clef and or timeSignature (see [this PR](https://github.com/markacola/react-vexflow/pull/4))
-- [ ] change clef/time signature mid score => possibly requires optional object format
-- [x] added accidentals using tonal
+using copy of [react-vexflow](https://github.com/markacola/react-vexflow) (didn't work with import) with additions (see TBD at bottom of file)
 
 <Score
   width={800}
   height={110}
   staves={[
-    ['a3', 'd4', 'e4', 'd4'],
+    ['ab3', 'd4', 'eb4', 'd4'],
+    ['ab4', 'db4', ['e4', 8], ['f#4', 8], 'd4'],
+    ['ab4', 'a4', 'bb4', 'a4'],
+    ['d4', 'eb4', ['f#4', 2]]
+  ]}
+/>
+<Score
+  width={800}
+  height={110}
+  timeSignature=""
+  clef=""
+  staves={[
+    [
+      { keys: ['a/3', 'd/4', 'e/4'], duration: 2 },
+      { key: 'd4', duration: 2 }
+    ],
     ['a4', 'd4', ['e4', 8], ['f4', 8], 'd4'],
     ['a4', 'a4', 'b4', 'a4'],
     ['d4', 'e4', ['g4', 2]]
+  ]}
+/>
+
+<details>
+<summary>show source</summary>
+
+```js
+<Score
+  width={800}
+  height={110}
+  staves={[
+    ['ab3', 'd4', 'eb4', 'd4'],
+    ['ab4', 'db4', ['e4', 8], ['f#4', 8], 'd4'],
+    ['ab4', 'a4', 'bb4', 'a4'],
+    ['d4', 'eb4', ['f#4', 2]]
   ]}
 />
 <Score
@@ -33,10 +57,26 @@ possible additions
     ['d4', 'e4', ['g4', 2]]
   ]}
 />
+```
+
+</details>
+<br/>
 
 ## Tests
 
-### default
+### simple
+
+<Score
+  width={800}
+  staves={[
+    ['a3', 'd4', 'e4', 'd4'],
+    ['a4', 'd4', ['e4', 8], ['f4', 8], 'd4'],
+    ['a4', 'a4', 'b4', 'a4'],
+    ['d4', 'e4', ['g4', 2]]
+  ]}
+/>
+
+### complex
 
 <Score
   width={800}
@@ -187,8 +227,8 @@ issues:
   staves={[
     [
       ['b4', 16],
-      ['c#/5', 16],
-      ['b4', 8],
+      ['c##/5', 16],
+      ['b#4', 8],
       ['a4', 4],
       ['ab4', 4],
       ['b4', '4r']
@@ -208,8 +248,56 @@ issues:
 />
 
 - TBD: global accidentals?
-- TBD: local accidentals (dont repeat accidentals inside one bar) 
+- TBD: local accidentals (dont repeat accidentals inside one bar)
 
-## checkout
+### chords
 
-- https://github.com/0xfe/vexflow/wiki/Microtonal-Support !
+<Score
+  width={800}
+  height={110}
+  staves={[
+    [
+      { keys: ['f/4', 'a/4', 'c/5', 'e/5'], duration: 2 },
+      { keys: ['g/4', 'b/4', 'd/5', 'f/5'], duration: 2 }
+    ],
+    [{ keys: ['g/4', 'b/4', 'c/5', 'e/5'], duration: 1 }]
+  ]}
+/>
+
+### ties & dots
+
+<Score
+  width={800}
+  height={110}
+  staves={[
+    [
+      { key: 'b4', duration: '4d' },
+      ['g4', 8],
+      { key: 'g4', tie: true, duration: '4d' },
+      ['b4', 8]
+    ],
+    [
+      { key: 'b4', tie: true, duration: '4d' },
+      ['g4', 8],
+      { key: 'g4', tie: true, duration: '2' }
+    ]
+  ]}
+/>
+
+## Feature additions
+
+[my fork](https://github.com/felixroos/react-vexflow)
+
+- [x] omittable clef and or timeSignature ([PR](https://github.com/markacola/react-vexflow/pull/4))
+- [x] added accidentals using tonal
+- [x] chords
+- [x] beams (currently only quarter groups)
+- [x] ties
+- [x] dots
+- [ ] chord symbols
+- [ ] tuplets
+- [ ] generate staves from rhythmical format
+- [ ] jump signs
+- [ ] multiple staves
+- [ ] checkout https://github.com/0xfe/vexflow/wiki/Microtonal-Support !
+- [ ] change clef/time signature mid score
