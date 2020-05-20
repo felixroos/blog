@@ -284,16 +284,36 @@ issues:
   ]}
 />
 
-## Feature additions
+### style
 
-[my fork](https://github.com/felixroos/react-vexflow)
+<Score
+  width={800}
+  height={110}
+  staves={[
+    [
+      { key: 'b4', duration: '4d', style: { fillStyle: 'steelblue' } },
+      { key: 'g4', duration: 8, style: { fillStyle: 'purple' } },
+      { key: 'g4', tie: true, duration: '4d', style: { fillStyle: 'purple' } },
+      { key: 'b4', duration: 8, style: { fillStyle: '#f0a' } }
+    ],
+    [
+      { key: 'b4', tie: true, duration: '4d', style: { fillStyle: '#f0a' } },
+      ['g4', 8],
+      { key: 'g4', tie: true, duration: '2' }
+    ]
+  ]}
+/>
+
+## Feature additions
 
 - [x] omittable clef and or timeSignature ([PR](https://github.com/markacola/react-vexflow/pull/4))
 - [x] added accidentals using tonal
 - [x] chords
 - [x] beams (currently only quarter groups)
 - [x] ties
+- [ ] ties across staff break
 - [x] dots
+- [ ] colors
 - [ ] chord symbols
 - [ ] tuplets
 - [ ] generate staves from rhythmical format
@@ -301,3 +321,5 @@ issues:
 - [ ] multiple staves
 - [ ] checkout https://github.com/0xfe/vexflow/wiki/Microtonal-Support !
 - [ ] change clef/time signature mid score
+- [my fork of react-vexflow](https://github.com/felixroos/react-vexflow)
+  - not used here, could be updated to the current state to make PRs for react-vexflow npm package

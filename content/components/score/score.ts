@@ -54,7 +54,7 @@ export function renderScore({
       .map((note) =>
         Array.isArray(note) ? { key: note[0], duration: note[1] } : note
       )
-      .map(({ key, keys, duration = 'q' }) => {
+      .map(({ key, keys, duration = 'q', style }) => {
         keys = key ? [key] : keys;
         const note = new StaveNote({
           keys: keys.map(key => getVexFlowKey(key)),
@@ -62,6 +62,9 @@ export function renderScore({
         });
         if (note['dots']) {
           note.addDotToAll();
+        }
+        if (style) {
+          note.setKeyStyle(0, style)
         }
         keys.forEach((key, index) => {
           const accidentals = Note.accidentals(key.replace('/', ''));
