@@ -1,68 +1,16 @@
-import canUseDOM from '../../components/canUseDOM.ts';
 import { Score } from '../../components/score/Score.tsx';
 
 # Score
 
-using copy of [react-vexflow](https://github.com/markacola/react-vexflow) (didn't work with import) with additions (see TBD at bottom of file)
+- This component renders the given array of bars into single rowed score
+- Multiple rows work by using multiple component instances => no ties across rows
+- This is a lightweight approach to [json2musicxml](https://github.com/felixroos/json2musicxml), usable for quick and short renderings
+- I started this as an extension of [react-vexflow](https://github.com/markacola/react-vexflow)
+- Also see TBD at bottom of file
 
-<Score
-  width={800}
-  height={110}
-  staves={[
-    ['ab3', 'd4', 'eb4', 'd4'],
-    ['ab4', 'db4', ['e4', 8], ['f#4', 8], 'd4'],
-    ['ab4', 'a4', 'bb4', 'a4'],
-    ['d4', 'eb4', ['f#4', 2]]
-  ]}
-/>
-<Score
-  width={800}
-  height={110}
-  timeSignature=""
-  clef=""
-  staves={[
-    [
-      { keys: ['a4', 'd5', 'e5'], duration: 2 },
-      { key: 'd4', duration: 2 }
-    ],
-    ['a4', 'd4', ['e4', 8], ['f4', 8], 'd4'],
-    ['a4', 'a4', 'b4', 'a4'],
-    ['d4', 'e4', ['g4', 2]]
-  ]}
-/>
+<br />
 
-<details>
-<summary>show source</summary>
-
-```js
-<Score
-  width={800}
-  height={110}
-  staves={[
-    ['ab3', 'd4', 'eb4', 'd4'],
-    ['ab4', 'db4', ['e4', 8], ['f#4', 8], 'd4'],
-    ['ab4', 'a4', 'bb4', 'a4'],
-    ['d4', 'eb4', ['f#4', 2]]
-  ]}
-/>
-<Score
-  width={800}
-  height={110}
-  timeSignature=""
-  clef=""
-  staves={[
-    ['a3', 'd4', 'e4', 'd4'],
-    ['a4', 'd4', ['e4', 8], ['f4', 8], 'd4'],
-    ['a4', 'a4', 'b4', 'a4'],
-    ['d4', 'e4', ['g4', 2]]
-  ]}
-/>
-```
-
-</details>
-<br/>
-
-## Tests
+## Examples
 
 ### simple
 
@@ -81,10 +29,26 @@ using copy of [react-vexflow](https://github.com/markacola/react-vexflow) (didn'
 <Score
   width={800}
   staves={[
-    ['a3', 'd4', 'e4', 'd4'],
-    ['a4', 'd4', ['e4', 8], ['f4', 8], 'd4'],
-    ['a4', 'a4', 'b4', 'a4'],
-    ['d4', 'e4', ['g4', 2]]
+    ['g5', ['d5', 8], ['b4', 8], 'f5', ['d5', 8], ['b4', 8]],
+    [
+      ['e5', 8],
+      ['f5', 8],
+      ['c#5', 8],
+      ['e5', 8],
+      ['d#5', 8],
+      ['c5', 8],
+      ['a4', 8],
+      ['b4', 8]
+    ],
+    [
+      { key: 'b4', tie: true },
+      ['g4', 8],
+      ['e4', 8],
+      ['a4', 8],
+      ['b4', 8],
+      ['g4', 8],
+      ['f4', 8]
+    ]
   ]}
 />
 
@@ -92,13 +56,13 @@ using copy of [react-vexflow](https://github.com/markacola/react-vexflow) (didn'
 
 <Score
   width={800}
-  timeSignature="4/4"
+  timeSignature="3/4"
   clef=""
   staves={[
-    ['a3', 'd4', 'e4', 'd4'],
-    ['a4', 'd4', ['e4', 8], ['f4', 8], 'd4'],
-    ['a4', 'a4', 'b4', 'a4'],
-    ['d4', 'e4', ['g4', 2]]
+    ['a3', 'd4', 'e4'],
+    ['a4', 'd4', ['e4', 8], ['f4', 8]],
+    ['a4', 'a4', 'b4'],
+    ['d4', ['g4', 2]]
   ]}
 />
 
@@ -247,8 +211,6 @@ issues:
   ]}
 />
 
-- TBD: global accidentals?
-- TBD: local accidentals (dont repeat accidentals inside one bar)
 
 ### chords
 
@@ -306,20 +268,29 @@ issues:
 
 ## Feature additions
 
+### Must Have Features
+
+- [ ] try out EasyScore...
 - [x] omittable clef and or timeSignature ([PR](https://github.com/markacola/react-vexflow/pull/4))
 - [x] added accidentals using tonal
 - [x] chords
 - [x] beams (currently only quarter groups)
 - [x] ties
-- [ ] ties across staff break
 - [x] dots
-- [ ] colors
+- [x] colors
+- [ ] global accidentals
+- [ ] auto hide sequential accidentals in same bar
+- [ ] auto add natural sign when same note appeared before with accidental or has global accidental  
 - [ ] chord symbols
+
+### Nice to have
+
 - [ ] tuplets
 - [ ] generate staves from rhythmical format
 - [ ] jump signs
-- [ ] multiple staves
-- [ ] checkout https://github.com/0xfe/vexflow/wiki/Microtonal-Support !
+- [ ] combined staves
+- [ ] multiple connected staff rows (ties across rows)
+- [ ] https://github.com/0xfe/vexflow/wiki/Microtonal-Support
 - [ ] change clef/time signature mid score
-- [my fork of react-vexflow](https://github.com/felixroos/react-vexflow)
-  - not used here, could be updated to the current state to make PRs for react-vexflow npm package
+
+also see [my fork of react-vexflow](https://github.com/felixroos/react-vexflow), which is not used here. It could be updated to the current state to make PRs for react-vexflow npm package

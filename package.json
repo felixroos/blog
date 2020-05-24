@@ -57,6 +57,7 @@
     "react-powerplug": "^1.0.0",
     "react-three-fiber": "^4.2.3",
     "react-use-gesture": "^7.0.13",
+    "rhythmical": "^0.1.6",
     "svg-piano": "0.3.1",
     "three": "^0.116.1",
     "tone": "^13.8.25",

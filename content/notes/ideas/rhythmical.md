@@ -9,6 +9,7 @@
 - If you have questions, arguments, ideas or similar, you leave me a message [at github](https://github.com/felixroos/)
 - [I have implemented the format with many additions](https://felixroos.github.io/rhythmical/)
 
+
 ## [original musicJSON proposal](https://github.com/soundio/music-json#music-json-proposal)
 
 ```json
@@ -65,7 +66,7 @@
 
 ### optimization: value attribute + type
 
-Currently we have chord and note attributes. It would be slicker to have a more open value attribute + an optinal type:
+Currently we have chord and note attributes. It would be slicker to have a more open value attribute + an optional type:
 
 ```json
 [
@@ -145,10 +146,6 @@ Lets add a feature that approaches the way humans read and write music:
 ```
 
 - t can still be set => object is treated absolute
-- v = velocity => defaults to 1
-- d = duration => defaults to 1
-- type = defaults to note
-- introduced unified value attribute
 
 ### conversion to absolute time
 
@@ -413,7 +410,7 @@ Now lets think through how this would be converted to absolute, non nested event
 
 Lets imagine how the algorithm would resolve this nested structure. Note that the following process will not be the end algorithm but just an illustration of how it might work.
 
-The type now affects how children are given their default values. On the outer most event, relative times are calculated.
+The type now affects how children are given their default values. On the outer most event, deafault values are added + the children (layer 2) are treated relative (adding up default values):
 
 ```js
 const peeled = [
@@ -425,28 +422,9 @@ const peeled = [
     type: "relative",
     value: [
       // layer 2
-
-      {
-        t: 0,
-        d: 1,
-        v: 1,
-        type: "absolute",
-        value: ["C3", "E3", "G3"],
-      },
-      {
-        t: 1,
-        d: 1,
-        v: 1,
-        type: "absolute",
-        value: ["C3", "F3", "A3"],
-      },
-      {
-        t: 2,
-        d: 1,
-        v: 1,
-        type: "absolute",
-        value: ["D3", "G3", "B3"],
-      },
+      { t: 0, d: 1, v: 1, type: "absolute", value: ["C3", "E3", "G3"] },
+      { t: 1, d: 1, v: 1, type: "absolute", value: ["C3", "F3", "A3"] },
+      { t: 2, d: 1, v: 1, type: "absolute", value: ["D3", "G3", "B3"] },
     ],
   },
 ]

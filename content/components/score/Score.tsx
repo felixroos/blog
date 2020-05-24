@@ -2,9 +2,7 @@
 import React, { useRef, useEffect } from 'react';
 import Vex from 'vexflow';
 import { renderScore, ScoreProps } from './score';
-
-const VF = Vex.Flow;
-const { Renderer } = VF;
+import canUseDOM from '../../components/canUseDOM';
 
 export function Score(props: ScoreProps) {
   props = {
@@ -18,6 +16,11 @@ export function Score(props: ScoreProps) {
   const container = useRef();
   const rendererRef = useRef<any>();
   useEffect(() => {
+    if (!canUseDOM()) {
+      console.log('score can not be rendered via SSR');
+      return;
+    }
+    const { Renderer } = Vex.Flow;
     rendererRef.current =
       rendererRef.current ||
       new Renderer(container.current, Renderer.Backends.SVG);
