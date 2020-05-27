@@ -1,0 +1,195 @@
+---
+title: Rhythmical Objects
+date: 2020-05-30
+---
+
+In the last post, we implemented the [rhythmical array format](https://github.com/felixroos/rhythmical)
+
+Now, let's look at how the [extended rhythmical format](https://felixroos.github.io/rhythmical/) can be implemented.
+
+## Extended rhythmical Format
+
+With the extended format, we can interweave rhythmical arrays either parallel or sequentially + specify durations:
+
+```js
+{
+  parallel: [
+    [
+      // voice 1 = "melody"
+      [{ sequential: 'F4', duration: 3 }, 'E4'], // bar 1
+      ['F4', ['F4', 'B4']], // bar 2
+      { sequential: 'E4', duration: 2 } // bars 3 & 4
+    ],
+    [
+      // voice 2 = "chords"
+      { parallel: ['D3', 'F3', 'A3'] }, // bar 1
+      { parallel: ['D3', 'G3', 'B3'] }, // bar 2
+      { parallel: ['C3', 'E3', 'G3'], duration: 2 } // bars 3 & 4
+    ]
+  ];
+}
+```
+
+This is just a glimpse of the possibilities for objects. Features can be added easily by adding new properties.
+
+If you think this looks ugly, wait till we throw string syntax (Domain Specific Language) on it..
+
+## Ways of Representation
+
+Let's first go back to the basics. With javascript, we can make use of:
+
+- Strings / Numbers
+- Arrays
+- Objects
+
+For javascript, all of those are treated as Objects, but we care about the syntax here.
+We could represent one note in three different ways:
+
+```js
+"C4 D3 E3" // string
+["C4", "D3", "E3"] // array
+{"sequence": ["C4", "D3", "E3"]} // object
+```
+
+We have a hierarchy of semantical limitation vs syntactical simplicity here:
+
+- Strings are the most limited but most simple: No nesting, but the least characters
+- Arrays are less limited but more verbose: With Nesting, but more syntax
+- Objects are limitless but most verbose: Any properties can be added for extra functionality, but even more syntax
+
+### Domain Specific Language
+
+Using a domain specific language, we could extend the features of the string, e.g adding nesting:
+
+```
+"C4 [D3 E3]"
+```
+
+This is like a simplified JSON syntax, for which we would need to write a parser first.
+But this is a topic for another post.
+
+### Polyphony
+
+Using the Object syntax, we would use polyphony like that:
+
+```js
+{
+  "parallel:" [
+    { "sequential": ["C3", "D3", "E3"] },
+    { "sequential": ["E3", "F3", "G3"] },
+  ]
+}
+```
+
+This meaning is impossible to formulate with just arrays.
+The same end result could be achieved with this notation:
+
+```js
+{
+  "sequential:" [
+    { "parallel": ["C3", "E3"] },
+    { "parallel": ["D3", "F3"] },
+    { "parallel": ["E3", "G3"] },
+  ]
+}
+```
+
+Depending on the context, both ways can be useful:
+
+- the first approach can be used for multiple voices in a piece
+- the second can be used for chords inside a single voice
+
+Of course, we can nest arbitrarily deep if we want. The idea is similar to the parallel/sequential idea of [Lisp as a second Language: Functional Style](http://recherche.ircam.fr/equipes/repmus/LispSecondLanguage/functional/functional.html).
+
+By introducting a default param, we can simplify the snippet:
+
+```js
+{
+  "parallel:" [
+    ["C3", "D3", "E3"],
+    ["E3", "F3", "G3"],
+  ]
+}
+```
+
+Now, all arrays that are not the value of a parallel prop will be seen as sequential.
+
+### Music Interface
+
+As Array and String representations can be converted to Objects, but not necessarily vice versa, we can formulate an interface for the object syntax:
+
+```ts
+export interface MusicObject<T> {
+  sequential?: Music<T>[] | Music<T>; // monophony
+  parallel?: Music<T>[] | Music<T>; // polyphony
+}
+export type Music<T> = T | T[] | MusicObject<T>;
+```
+
+This music object can be extended further when we add features later. The above only supports monophonic and polyphonic children.
+The generic T is the type of the primitive, like string or number.
+
+## Unification
+
+We can now implement a function that unifies Music to MusicObject:
+
+```ts
+const params = { monophony: 'm', polyphony: 'p' };
+export function unify<T>(music: Music<T>): MusicObject<T> {
+  const o = toObject(music);
+  if (o[params.monophony]) {
+    o[params.monophony] = toArray(o[params.monophony]);
+  }
+  if (o[params.polyphony]) {
+    o[params.polyphony] = toArray(o[params.polyphony]);
+  }
+  return o;
+}
+export function toObject(music: Music<any>, param = params['monophony']) {
+  if (typeof music !== 'object' || Array.isArray(music)) {
+    return { [param]: music };
+  }
+  return music;
+}
+export function toArray<T>(array: T): T[] {
+  if (!Array.isArray(array)) {
+    return [array];
+  }
+  return array;
+}
+```
+
+<details>
+<summary>show example tests</summary>
+
+```js
+test('toObject', () => {
+  expect(toObject('')).toEqual({ m: '' });
+  expect(toObject('C')).toEqual({ m: 'C' });
+  expect(toObject({ m: 'C' })).toEqual({ m: 'C' });
+  expect(toObject(['C', 'D'])).toEqual({ m: ['C', 'D'] });
+});
+test('toArray', () => {
+  expect(toArray('')).toEqual(['']);
+  expect(toArray([])).toEqual([]);
+  expect(toArray('C')).toEqual(['C']);
+  expect(toArray({ m: 'C' })).toEqual([{ m: 'C' }]);
+});
+test('unify', () => {
+  expect(unify('')).toEqual({ m: '' });
+  expect(unify('C')).toEqual({ m: ['C'] });
+  expect(unify({ m: 'C' })).toEqual({ m: ['C'] });
+  expect(unify({ m: ['C', 'D'] })).toEqual({ m: ['C', 'D'] });
+  expect(unify(['C', 'D'])).toEqual({ m: ['C', 'D'] });
+  expect(unify({ p: ['C', 'D'] })).toEqual({ p: ['C', 'D'] });
+});
+```
+
+</details>
+
+- When converting from Array or Primitive to Object, we have to chose a property name (param)
+- The default behaviour uses sequential as param, so if we want parallel notes, we need to use an object
+
+## Array flattening with Objects
+
+Now let's look at ways to flat nested `MusicObject`'s.
