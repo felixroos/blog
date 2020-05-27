@@ -138,7 +138,7 @@ So now we keep the nesting information. This is enough information to recreate t
 While the above flat array with indices might be lossless, it is really expensive to work with it, as we do not know how many elements are on each level.
 We could iterate over all elements and count them, but this is rather expensive. To avoid this, we can just keep track of the array lengths:
 
-```txt
+```js
 [
   { value: 'C4', path: [[0, 4]] },
   { value: 'E4', path: [[1, 4], [0, 2]] },
