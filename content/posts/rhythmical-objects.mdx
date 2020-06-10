@@ -378,19 +378,18 @@ Finally, we can add the melody as a second voice:
       {
         duration: 4,
         parallel: [
-          [
-            [
-              ['C4', 'F4', 'Eb4', 'F4'],
-              ['C4', { value: 'r', duration: 3 }]
-            ],
-            [
-              [{ value: 'r', duration: 3 }, 'Eb4'],
-              ['G4', 'r', 'F4', 'r']
-            ]
-          ],
           {
-            instrument: 'drums',
-            value: ['hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh']
+            sequential: [
+              [
+                ['C4', 'F4', 'Eb4', 'F4'],
+                ['C4', { value: 'r', duration: 3 }]
+              ],
+              [
+                [{ value: 'r', duration: 3 }, 'Eb4'],
+                ['G4', 'r', 'F4', 'r']
+              ]
+            ],
+            color: 'darksalmon'
           },
           [
             [
