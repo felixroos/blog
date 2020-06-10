@@ -3,7 +3,6 @@ import { Note, Range } from '@tonaljs/tonal';
 import { scaleLinear } from 'd3-scale';
 import { interpolateBlues } from 'd3-scale-chromatic';
 import { min, max } from 'd3-array';
-console.log(Note.midi('sn'));
 
 export default function PianoRoll(props: PianoRollProps) {
   let {
