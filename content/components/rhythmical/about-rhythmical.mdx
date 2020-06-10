@@ -1,9 +1,8 @@
-import PianoRoll, {
-  rhythmicalRoll
-} from '../components/rhythmical/PianoRoll.tsx';
-import RhythmicalTree from '../components/rhythmical/RhythmicalTree.tsx';
+import PianoRoll from '../components/rhythmical/PianoRoll.tsx';
+import RhythmicalTree from '../components/rhythmical/components/RhythmicalTree.tsx';
 import { rhythmicalScore } from '../components/score/score.ts';
 import { Score } from '../components/score/Score.tsx';
+import { renderRhythmObject } from '../components/rhythmical/rhythmical.ts';
 
 ## About rhythmical
 
@@ -36,7 +35,7 @@ That flat output can easily be played back with [Tone.js](https://github.com/Ton
 
 <PianoRoll
   noteRange={['C4', 'D5']}
-  events={rhythmicalRoll([['C4', ['E4', 'G4'], 'B4', 'D5']])}
+  events={renderRhythmObject([['C4', ['E4', 'G4'], 'B4', 'D5']])}
 />
 
 ... or as a score:
@@ -44,7 +43,7 @@ That flat output can easily be played back with [Tone.js](https://github.com/Ton
 <Score
   width={660}
   height={100}
-  staves={rhythmicalScore([['C4', ['E4', 'G4'], 'B4', 'D5']])}
+  staves={renderRhythmObject([['C4', ['E4', 'G4'], 'B4', 'D5']])}
 />
 
 In my opinion, this is the closest to human way to represent rhythm as a data structure + it is also really easy to understand. The format is strongly influenced by [TidalCycles](https://tidalcycles.org/).

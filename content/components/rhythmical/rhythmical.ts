@@ -1,55 +1,9 @@
-export interface MusicObject<T> {
-  sequential?: Music<T>[] | Music<T>; // monophony
-  parallel?: Music<T>[] | Music<T>; // polyphony
-}
-export type Music<T> = T | T[] | MusicObject<T>;
+import { AgnosticChild, flatObject, ValueChild, toObject, toArray } from './helpers/objects';
+import { sequentialParent, sequentialChild } from './features/sequential';
+import { parallelParent, parallelChild } from './features/parallel';
+import { inheritProperty } from './features/inherit';
 
-const params = { monophony: 'm', polyphony: 'p' };
-export function unify<T>(music: Music<T>): MusicObject<T> {
-  const o = toObject(music);
-  if (o[params.monophony]) {
-    o[params.monophony] = toArray(o[params.monophony]);
-  }
-  if (o[params.polyphony]) {
-    o[params.polyphony] = toArray(o[params.polyphony]);
-  }
-  return o;
-}
-export function toObject(music: Music<any>, param = params['monophony']) {
-  if (typeof music !== 'object' || Array.isArray(music)) {
-    return { [param]: music };
-  }
-  return music;
-}
-export function toArray<T>(array: T): T[] {
-  if (!Array.isArray(array)) {
-    return [array];
-  }
-  return array;
-}
-
-export interface NestedArray<T> extends Array<T | NestedArray<T>> { }
 export type Path = [number, number, number];
-export type FlatItem<T> = { value: T, path: Path[] };
-export function flatArray<T>(array: NestedArray<T>, path: Path[] = [], flat: FlatItem<T>[] = []): FlatItem<T>[] {
-  const getDuration = (array)
-  for (let i = 0; i < array.length; i++) {
-    let value, duration;
-    if (Array.isArray(array[i]) || typeof array[i] !== 'object') {
-      value = array[i];
-      duration = 1;
-    } else {
-      value = array[i]['value'];
-      duration = array[i]['duration'] || 1;
-    }
-    if (typeof value !== 'object') {
-      flat.push({ value, path: path.concat([[i, duration, array.length]]) })
-    } else if (Array.isArray(value)) {
-      flatArray(value as NestedArray<T>, path.concat([[i, duration, array.length]]), flat)
-    }
-  }
-  return flat;
-}
 
 export function getTimeDuration(path: Path[], whole = 1) {
   let time = 0;
@@ -63,57 +17,44 @@ export function getTimeDuration(path: Path[], whole = 1) {
   return [time, duration];
 }
 
-export function flatRhythm<T>(array: NestedArray<T>, whole = 1, keepPath = false) {
-  return flatArray(array).map(({ value, path }) => {
-    let [time, duration] = getTimeDuration(path);
-    return { value, time, duration, ...(keepPath ? { path } : {}) };
-  })
+export function sumDurations<T>(children: AgnosticChild<T>[]) {
+  return children.reduce((sum, child) => sum + (toObject(child).duration || 1), 0)
 }
 
-export function nestArray<T>(items: FlatItem<T>[], fill: any = 0): NestedArray<T> {
-  return items.reduce((nested, item) => {
-    let [index, duration, subdivision] = item.path[0];
-    if (index >= subdivision) {
-      console.error(`invalid path ${item.path[0]} on item`, item);
-      return nested;
+export declare type Feature<T> = (agnostic: AgnosticChild<T>) => AgnosticChild<T>
+
+export function applyFeatures<T>(agnostic: AgnosticChild<T>, features: Feature<T>[]): AgnosticChild<T> {
+  features.forEach(feature => {
+    agnostic = feature(agnostic);
+  });
+  return agnostic;
+}
+
+// flatten rhythmical object format to events with features
+export function flatRhythmObject<T>(agnostic: AgnosticChild<T>, extraFeatures: Feature<T>[] = []): ValueChild<T>[] {
+  return flatObject(agnostic, {
+    getChildren: (agnostic: AgnosticChild<T>) => {
+      const parent = toObject(applyFeatures(agnostic, [sequentialParent, parallelParent, inheritProperty('color'), ...extraFeatures]));
+      const children = (toArray(parent.value) || []);
+      // we need to map children with sequentialChild/parallelChild to ensure values are set before flatObject checks them
+      // => flatObject recursion would stop prematurely if children values are non objects
+      // we could also include this part in sequentialParent but then we would need to cross reference features
+      // => children do not necessarily use the same feature as their parent
+      // so we have to split features into parent / child
+      // => most features should work directly on the parent as they do not mess with the value
+      return children.map((child, i) => applyFeatures(child, [sequentialChild, parallelChild]));
     }
-    if (nested.length && nested.length < subdivision) {
-      console.warn(
-        'ivalid flat array: different divisions on same level > concat',
-        items,
-        nested
-      );
-      nested = nested.concat(
-        (new Array(subdivision - nested.length) as any).fill(fill)
-      );
-    }
-    if (nested.length && nested.length > subdivision) {
-      console.warn(
-        'flat array: different divisions on same level',
-        items,
-        nested
-      );
-    }
-    if (!nested.length && subdivision) {
-      nested = (new Array(subdivision) as any).fill(fill);
-    }
-    if (item.path.length === 1) {
-      if (Math.round(index) === index) {
-        nested[index] = item.value;
-      } else if (item.value !== fill) {
-        console.warn(
-          'fractured path! value "' + item.value + '" !== "' + fill + '"',
-          item
-        );
-      }
-    } else {
-      nested[index] = nestArray(
-        items
-          .filter(i => i.path.length > 1 && i.path[0][0] === index)
-          .map(i => ({ ...i, path: i.path.slice(1) })),
-        fill
-      );
-    }
-    return nested;
-  }, []);
+  });
+}
+
+// calculate time + duration for flat events with paths
+export function renderRhythmObject<T>(agnostic: AgnosticChild<T>, extraFeatures: Feature<T>[] = []) {
+  const root = toObject(agnostic);
+  const totalDuration = 1 / (root.duration || 1); // outer duration
+  return flatRhythmObject(agnostic, extraFeatures).map((event) => {
+    let { path } = event;
+    path = [[0, totalDuration, totalDuration]].concat(path);
+    const [time, duration] = getTimeDuration(path);
+    return ({ ...event, time, duration, path })
+  })
 }

@@ -2,6 +2,7 @@
   "compilerOptions": {
     "jsx": "react",
     "esModuleInterop": true,
+    "target": "ESNext",
     "lib": ["es6", "dom"]
   }
 }

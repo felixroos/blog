@@ -6,6 +6,9 @@ date: 2020-05-24
 import { Rhythm } from 'rhythmical';
 import { Score } from '../components/score/Score.tsx';
 import { rhythmicalScore } from '../components/score/score.ts';
+import { playEvents } from '../components/rhythmical/components/Player.tsx';
+import PlayButton from '../components/rhythmical/components/PlayButton.tsx';
+import { renderRhythmObject } from '../components/rhythmical/rhythmical.ts';
 
 <Score
   width={660}
@@ -28,6 +31,21 @@ import { rhythmicalScore } from '../components/score/score.ts';
     ['b4', ['b4', 'c5'], 'd5', 'e5'],
     ['c5', 'a4', 'a4', 'r']
   ])}
+/>
+<PlayButton
+  events={renderRhythmObject({
+    duration: 16,
+    value: [
+      ['e5', ['b4', 'c5'], 'd5', ['c5', 'b4']],
+      ['a4', ['a4', 'c5'], 'e5', ['d5', 'c5']],
+      ['b4', ['r', 'c5'], 'd5', 'e5'],
+      ['c5', 'a4', 'a4', 'r'],
+      [['r', 'd5'], ['r', 'f5'], 'a5', ['g5', 'f5']],
+      ['e5', ['r', 'c5'], 'e5', ['d5', 'c5']],
+      ['b4', ['b4', 'c5'], 'd5', 'e5'],
+      ['c5', 'a4', 'a4', 'r']
+    ]
+  })}
 />
 
 In this post, I want to find out how I can render [rhythmical format](https://github.com/felixroos/rhythmical) as staff notation.
@@ -426,7 +444,7 @@ events.map(([note, time, duration]) => [note, Math.floor(time), 1 / duration);
 
 </details>
 
-Now, the format is `[note, bar, value]`. 
+Now, the format is `[note, bar, value]`.
 
 This is pretty close to the score format. The last step is to group the notes by bar and apply some (vexflow specific) fixes for rests and quarter notes:
 

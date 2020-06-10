@@ -1,44 +1,8 @@
-import { unify, toObject, toArray, flatArray, getTimeDuration, flatRhythm, nestArray } from './rhythmical';
+import { getTimeDuration, flatRhythmObject } from './rhythmical';
+import { flatRhythmArray } from './deprecated';
+// import { flatRhythmObject } from './deprecated'; // also works, but bad code
+import { toObject } from './helpers/objects';
 
-test('toObject', () => {
-  expect(toObject('')).toEqual({ m: '' });
-  expect(toObject('C')).toEqual({ m: 'C' });
-  expect(toObject({ m: 'C' })).toEqual({ m: 'C' });
-  expect(toObject(['C', 'D'])).toEqual({ m: ['C', 'D'] });
-});
-test('toArray', () => {
-  expect(toArray('')).toEqual(['']);
-  expect(toArray([])).toEqual([]);
-  expect(toArray('C')).toEqual(['C']);
-  expect(toArray({ m: 'C' })).toEqual([{ m: 'C' }]);
-})
-test('unify', () => {
-  expect(unify('')).toEqual({ m: '' });
-  expect(unify('C')).toEqual({ m: ['C'] });
-  expect(unify({ m: 'C' })).toEqual({ m: ['C'] });
-  expect(unify({ m: ['C', 'D'] })).toEqual({ m: ['C', 'D'] });
-  expect(unify(['C', 'D'])).toEqual({ m: ['C', 'D'] });
-  expect(unify({ p: ['C', 'D'] })).toEqual({ p: ['C', 'D'] });
-});
-test('flatArray', () => {
-  expect(flatArray([])).toEqual([]);
-  expect(flatArray(['C'])).toEqual([
-    { value: 'C', path: [[0, 1, 1]] }
-  ]);
-  expect(flatArray(['C', 'D'])).toEqual([
-    { value: 'C', path: [[0, 1, 2]] },
-    { value: 'D', path: [[1, 1, 2]] }
-  ]);
-  expect(flatArray([{ value: 'C4', duration: 3 }, 'D4'])).toEqual([
-    { value: 'C4', path: [[0, 3, 2]] },
-    { value: 'D4', path: [[1, 1, 2]] }
-  ]);
-  expect(flatArray(['C', 'D', ['E', 'F']])).toEqual([
-    { value: 'C', path: [[0, 1, 3]] },
-    { value: 'D', path: [[1, 1, 3]] },
-    { value: 'E', path: [[2, 1, 3], [0, 1, 2]] },
-    { value: 'F', path: [[2, 1, 3], [1, 1, 2]] }]);
-})
 test('getTimeDuration', () => {
   expect(getTimeDuration([[0, 1, 2]])).toEqual([0, 0.5])
   expect(getTimeDuration([[1, 1, 2]])).toEqual([0.5, 0.5])
@@ -47,32 +11,101 @@ test('getTimeDuration', () => {
   expect(getTimeDuration([[1, 1, 2], [0, 2, 2]])).toEqual([0.5, 0.5])
 })
 
-test('flatRhythm', () => {
-  expect(flatRhythm(['C', 'D'])).toEqual([
+test('flatRhythmObject', () => {
+  expect(flatRhythmObject('A')).toEqual([{ value: 'A', path: [[0, 1, 1]] }])
+  expect(flatRhythmObject(['A', 'B'])).toEqual([{ value: 'A', path: [[0, 1, 2]] }, { value: 'B', path: [[1, 1, 2]] }])
+  expect(flatRhythmObject(['A', ['B']])).toEqual([{ value: 'A', path: [[0, 1, 2]] }, { value: 'B', path: [[1, 1, 2], [0, 1, 1]] }])
+  expect(flatRhythmObject(['A', ['B', 'C']])).toEqual([{ value: 'A', path: [[0, 1, 2]] }, { value: 'B', path: [[1, 1, 2], [0, 1, 2]] }, { value: 'C', path: [[1, 1, 2], [1, 1, 2]] }])
+  expect(flatRhythmObject({ value: ['A', ['B', 'C']] })).toEqual([{ value: 'A', path: [[0, 1, 2]] }, { value: 'B', path: [[1, 1, 2], [0, 1, 2]] }, { value: 'C', path: [[1, 1, 2], [1, 1, 2]] }])
+  expect(flatRhythmObject({ sequential: ['A', ['B', 'C']] })).toEqual([{ value: 'A', path: [[0, 1, 2]] }, { value: 'B', path: [[1, 1, 2], [0, 1, 2]] }, { value: 'C', path: [[1, 1, 2], [1, 1, 2]] }])
+  expect(flatRhythmObject({ sequential: ['A', { value: ['B', 'C'] }] })).toEqual([{ value: 'A', path: [[0, 1, 2]] }, { value: 'B', path: [[1, 1, 2], [0, 1, 2]] }, { value: 'C', path: [[1, 1, 2], [1, 1, 2]] }])
+  expect(flatRhythmObject({ sequential: ['A', { sequential: ['B', 'C'] }] })).toEqual([{ value: 'A', path: [[0, 1, 2]] }, { value: 'B', path: [[1, 1, 2], [0, 1, 2]] }, { value: 'C', path: [[1, 1, 2], [1, 1, 2]] }])
+  expect(flatRhythmObject({ parallel: ['B', 'C'] })).toEqual([{ value: 'B', path: [[0, 1, 1]] }, { value: 'C', path: [[0, 1, 1]] }])
+  expect(flatRhythmObject([{ parallel: ['A', 'B'] }])).toEqual([{ value: 'A', path: [[0, 1, 1], [0, 1, 1]] }, { value: 'B', path: [[0, 1, 1], [0, 1, 1]] }])
+
+  // polyphony
+  expect(flatRhythmObject({
+    sequential: [
+      { parallel: ['C3', 'E3'], color: 'white' },
+      { parallel: ['D3', 'F3'], color: 'gray' },
+      { parallel: ['E3', 'G3'], color: 'steelblue' }
+    ]
+  })).toEqual(
+    [{ "value": "C3", "path": [[0, 1, 3], [0, 1, 1]], "color": "white" }, { "value": "E3", "path": [[0, 1, 3], [0, 1, 1]], "color": "white" }, { "value": "D3", "path": [[1, 1, 3], [0, 1, 1]], "color": "gray" }, { "value": "F3", "path": [[1, 1, 3], [0, 1, 1]], "color": "gray" }, { "value": "E3", "path": [[2, 1, 3], [0, 1, 1]], "color": "steelblue" }, { "value": "G3", "path": [[2, 1, 3], [0, 1, 1]], "color": "steelblue" }]
+  );
+  expect(flatRhythmObject({
+    parallel: [
+      { sequential: ['E3', 'F3', 'G3'], color: 'white' },
+      { sequential: ['C3', 'D3', 'E3'], color: 'gray' }
+    ]
+  })).toEqual([{ "value": "E3", "path": [[0, 1, 1], [0, 1, 3]], "color": "white" }, { "value": "F3", "path": [[0, 1, 1], [1, 1, 3]], "color": "white" }, { "value": "G3", "path": [[0, 1, 1], [2, 1, 3]], "color": "white" }, { "value": "C3", "path": [[0, 1, 1], [0, 1, 3]], "color": "gray" }, { "value": "D3", "path": [[0, 1, 1], [1, 1, 3]], "color": "gray" }, { "value": "E3", "path": [[0, 1, 1], [2, 1, 3]], "color": "gray" }])
+
+  expect(toObject({ parallel: 'C' })).toEqual({ parallel: 'C' });
+  const twoChords = [
+    { value: "C", path: [[0, 1, 2], [0, 1, 1]] },
+    { value: "E", path: [[0, 1, 2], [0, 1, 1]] },
+    { value: "G", path: [[0, 1, 2], [0, 1, 1]] },
+    { value: "D", path: [[1, 1, 2], [0, 1, 1]] },
+    { value: "F", path: [[1, 1, 2], [0, 1, 1]] },
+    { value: "A", path: [[1, 1, 2], [0, 1, 1]] }
+  ];
+
+  expect(flatRhythmObject([
+    { parallel: ['C', 'E', 'G'] },
+    { parallel: ['D', 'F', 'A'] },
+  ]
+  )).toEqual(twoChords)
+
+  expect(flatRhythmObject([
+    { value: ['C', 'E', 'G'], type: 'parallel' },
+    { value: ['D', 'F', 'A'], type: 'parallel' },
+  ]
+  )).toEqual(twoChords)
+  expect(flatRhythmObject(['C', ['D', 'E']]))
+    .toEqual([
+      { value: "C", path: [[0, 1, 2]] },
+      { value: "D", path: [[1, 1, 2], [0, 1, 2]] },
+      { value: "E", path: [[1, 1, 2], [1, 1, 2]] }
+    ])
+  expect(flatRhythmObject([{ value: 'C', duration: 2 }, ['D', 'E']]))
+    .toEqual([
+      { value: "C", path: [[0, 2, 3]], duration: 2 },
+      { value: "D", path: [[2, 1, 3], [0, 1, 2]] },
+      { value: "E", path: [[2, 1, 3], [1, 1, 2]] }
+    ])
+  expect(flatRhythmObject({ duration: 2, value: [{ value: 'C', duration: 2 }, ['D', 'E']] }))
+    .toEqual([
+      { value: "C", path: [[0, 2, 3]], duration: 2 },
+      { value: "D", path: [[2, 1, 3], [0, 1, 2]] },
+      { value: "E", path: [[2, 1, 3], [1, 1, 2]] }
+    ])
+  expect(flatRhythmObject(
+    { value: ['C', 'E', 'G'], type: 'parallel' },
+  ))
+    .toEqual([
+      { value: "C", path: [[0, 1, 1]] },
+      { value: "E", path: [[0, 1, 1]] },
+      { value: "G", path: [[0, 1, 1]] }
+    ])
+  expect(flatRhythmObject(
+    { parallel: ['C', 'E', 'G'] },
+  ))
+    .toEqual([
+      { value: "C", path: [[0, 1, 1]] },
+      { value: "E", path: [[0, 1, 1]] },
+      { value: "G", path: [[0, 1, 1]] }
+    ])
+
+})
+
+test('flatRhythmArray', () => {
+  expect(flatRhythmArray(['C', 'D'])).toEqual([
     { value: 'C', time: 0, duration: 0.5 },
     { value: 'D', time: 0.5, duration: 0.5 },
   ])
-  expect(flatRhythm(['C', ['D', 'E']])).toEqual([
+  expect(flatRhythmArray(['C', ['D', 'E']])).toEqual([
     { value: 'C', time: 0, duration: 0.5 },
     { value: 'D', time: 0.5, duration: 0.25 },
     { value: 'E', time: 0.75, duration: 0.25 },
   ])
-})
-
-test('nestArray', () => {
-  expect(nestArray([])).toEqual([]);
-  expect(nestArray([{ value: 'C', path: [[0, 1, 1]] }])).toEqual([
-    'C'
-  ]);
-  expect(nestArray([
-    { value: 'C', path: [[0, 1, 2]] },
-    { value: 'D', path: [[1, 1, 2]] }
-  ])).toEqual(['C', 'D']);
-
-  expect(nestArray([
-    { value: 'C', path: [[0, 1, 3]] },
-    { value: 'D', path: [[1, 1, 3]] },
-    { value: 'E', path: [[2, 1, 3], [0, 1, 2]] },
-    { value: 'F', path: [[2, 1, 3], [1, 1, 2]] }]))
-    .toEqual(['C', 'D', ['E', 'F']]);
 })

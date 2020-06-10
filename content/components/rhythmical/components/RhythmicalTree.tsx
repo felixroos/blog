@@ -1,7 +1,7 @@
 import React from 'react';
 import { select } from 'd3-selection';
 import { cluster, hierarchy } from 'd3-hierarchy';
-import { NestedArray } from './rhythmical';
+import { NestedArray } from '../helpers/arrays';
 
 export default function RhythmicalTree(props) {
   let { width = 600, height = 200, rhythm } = props;

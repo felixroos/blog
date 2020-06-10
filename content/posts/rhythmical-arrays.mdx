@@ -3,45 +3,52 @@ title: Rhythmical Arrays
 date: 2020-05-27
 ---
 
-import PianoRoll, {
-  rhythmicalRoll
-} from '../components/rhythmical/PianoRoll.tsx';
-import { flatRhythm } from '../components/rhythmical/rhythmical.ts';
-import RhythmicalTree from '../components/rhythmical/RhythmicalTree.tsx';
+import PianoRoll from '../components/rhythmical/components/PianoRoll.tsx';
+import Player from '../components/rhythmical/components/Player.tsx';
+import RhythmicalTree from '../components/rhythmical/components/RhythmicalTree.tsx';
 import { rhythmicalScore } from '../components/score/score.ts';
+import { renderRhythmObject } from '../components/rhythmical/rhythmical.ts';
+import { inheritProperty } from '../components/rhythmical/features/inherit.ts';
 import { Score } from '../components/score/Score.tsx';
 import { InlineMath, BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
+import PlayButton from '../components/rhythmical/components/PlayButton.tsx';
 
-<PianoRoll
-  noteRange={['A4', 'A5']}
-  events={rhythmicalRoll([
-    ['e5', ['b4', 'c5'], 'd5', ['c5', 'b4']],
-    ['a4', ['a4', 'c5'], 'e5', ['d5', 'c5']],
-    ['b4', ['r', 'c5'], 'd5', 'e5'],
-    ['c5', 'a4', 'a4', 'r'],
-    [['r', 'd5'], ['r', 'f5'], 'a5', ['g5', 'f5']],
-    ['e5', ['r', 'c5'], 'e5', ['d5', 'c5']],
-    ['b4', ['b4', 'c5'], 'd5', 'e5'],
-    ['c5', 'a4', 'a4', 'r']
-  ])}
+<Player
+  fold={true}
+  events={renderRhythmObject({
+    duration: 14,
+    value: [
+      ['e5', ['b4', 'c5'], 'd5', ['c5', 'b4']],
+      ['a4', ['a4', 'c5'], 'e5', ['d5', 'c5']],
+      ['b4', ['r', 'c5'], 'd5', 'e5'],
+      ['c5', 'a4', 'a4', 'r'],
+      [['r', 'd5'], ['r', 'f5'], 'a5', ['g5', 'f5']],
+      ['e5', ['r', 'c5'], 'e5', ['d5', 'c5']],
+      ['b4', ['b4', 'c5'], 'd5', 'e5'],
+      ['c5', 'a4', 'a4', 'r']
+    ]
+  })}
 />
+
 <details>
   <summary>show source</summary>
 
 ```js
-<PianoRoll
-  noteRange={['A4', 'A5']}
-  events={rhythmicalRoll([
-    ['e5', ['b4', 'c5'], 'd5', ['c5', 'b4']],
-    ['a4', ['a4', 'c5'], 'e5', ['d5', 'c5']],
-    ['b4', ['r', 'c5'], 'd5', 'e5'],
-    ['c5', 'a4', 'a4', 'r'],
-    [['r', 'd5'], ['r', 'f5'], 'a5', ['g5', 'f5']],
-    ['e5', ['r', 'c5'], 'e5', ['d5', 'c5']],
-    ['b4', ['b4', 'c5'], 'd5', 'e5'],
-    ['c5', 'a4', 'a4', 'r']
-  ])}
+<Player
+  events={renderRhythmObject({
+    duration: 16,
+    value: [
+      ['e5', ['b4', 'c5'], 'd5', ['c5', 'b4']],
+      ['a4', ['a4', 'c5'], 'e5', ['d5', 'c5']],
+      ['b4', ['r', 'c5'], 'd5', 'e5'],
+      ['c5', 'a4', 'a4', 'r'],
+      [['r', 'd5'], ['r', 'f5'], 'a5', ['g5', 'f5']],
+      ['e5', ['r', 'c5'], 'e5', ['d5', 'c5']],
+      ['b4', ['b4', 'c5'], 'd5', 'e5'],
+      ['c5', 'a4', 'a4', 'r']
+    ]
+  })}
 />
 ```
 
@@ -92,8 +99,10 @@ We can render this as a piano roll:
 
 <PianoRoll
   noteRange={['C4', 'D5']}
-  events={rhythmicalRoll(['C4', ['E4', 'G4'], 'B4', 'D5'])}
+  center={0}
+  events={renderRhythmObject(['C4', ['E4', 'G4'], 'B4', 'D5'])}
 />
+<br />
 
 ... or as a score:
 
@@ -101,6 +110,15 @@ We can render this as a piano roll:
   width={660}
   height={100}
   staves={rhythmicalScore([['C4', ['E4', 'G4'], 'B4', 'D5']])}
+/>
+
+... or play it back
+
+<PlayButton
+  events={renderRhythmObject({
+    duration: 4,
+    value: ['C4', ['E4', 'G4'], 'B4', 'D5']
+  })}
 />
 
 Now we want to find out how this transformation can be done.
@@ -141,8 +159,20 @@ We could iterate over all elements and count them, but this is rather expensive.
 ```js
 [
   { value: 'C4', path: [[0, 4]] },
-  { value: 'E4', path: [[1, 4], [0, 2]] },
-  { value: 'G4', path: [[1, 4], [1, 2]] },
+  {
+    value: 'E4',
+    path: [
+      [1, 4],
+      [0, 2]
+    ]
+  },
+  {
+    value: 'G4',
+    path: [
+      [1, 4],
+      [1, 2]
+    ]
+  },
   { value: 'B4', path: [[2, 4]] },
   { value: 'D5', path: [[3, 4]] }
 ];
@@ -264,7 +294,7 @@ Of course we could directly calculate the time and duration in the process of fl
 We can now combine flatArray with getTimeDuration:
 
 ```ts
-export function flatRhythm<T>(array: NestedArray<T>, whole = 1) {
+export function flatRhythmArray<T>(array: NestedArray<T>, whole = 1) {
   return flatArray(array).map(({ value, path }) => {
     let [time, duration] = getTimeDuration(path);
     return { value, time, duration };
@@ -276,12 +306,12 @@ export function flatRhythm<T>(array: NestedArray<T>, whole = 1) {
 <summary>show example tests</summary>
 
 ```ts
-test('flatRhythm', () => {
-  expect(flatRhythm(['C', 'D'])).toEqual([
+test('flatRhythmArray', () => {
+  expect(flatRhythmArray(['C', 'D'])).toEqual([
     { value: 'C', time: 0, duration: 0.5 },
     { value: 'D', time: 0.5, duration: 0.5 }
   ]);
-  expect(flatRhythm(['C', ['D', 'E']])).toEqual([
+  expect(flatRhythmArray(['C', ['D', 'E']])).toEqual([
     { value: 'C', time: 0, duration: 0.5 },
     { value: 'D', time: 0.5, duration: 0.25 },
     { value: 'E', time: 0.75, duration: 0.25 }
@@ -372,6 +402,12 @@ For example, without durations, we cannot represent this:
       ['D4', 'q']
     ]
   ]}
+/>
+<PlayButton
+  events={renderRhythmObject({
+    duration: 2,
+    value: [{ value: 'C4', duration: 3 }, 'D4']
+  })}
 />
 
 So we need some way to specify durations. We could use objects with duration and value:

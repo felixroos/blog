@@ -2156,19 +2156,19 @@
     modularscale "^2.0.1"
     object-assign "^4.1.1"
 
-"@tonaljs/abc-notation@^3.5.0":
-  version "3.5.0"
-  resolved "https://registry.npmjs.org/@tonaljs/abc-notation/-/abc-notation-3.5.0.tgz#642243237eea2a632840ac15ff095e0d1d47393b"
-  integrity sha512-gxECJbFk3Tyun87fqeGP6DVtNijx4nHEl5A77s/xwAwR3MhnvR8nPsOpHjWb4y9V0Msu2N+JMiUyOr+vzKHcFQ==
+"@tonaljs/abc-notation@^3.5.4":
+  version "3.5.4"
+  resolved "https://registry.npmjs.org/@tonaljs/abc-notation/-/abc-notation-3.5.4.tgz#b90568a0c7440cf0969b6e8d46ab2b403e6d9e27"
+  integrity sha512-vRFDKxLOY2n3GR6NSzl+9OpAO3Bbw54XupfF5obOztaMHGMW3CoCnv7D2YUPNtvWvEKnKAC4LjU6/VZFOxqk6Q==
   dependencies:
-    "@tonaljs/core" "^3.5.0"
+    "@tonaljs/core" "^3.5.3"
 
-"@tonaljs/array@^3.2.5":
-  version "3.2.5"
-  resolved "https://registry.npmjs.org/@tonaljs/array/-/array-3.2.5.tgz#73dcd57bbf9c1cf2b4446efd5634c8ffa75af03f"
-  integrity sha512-8It+4lUFeG0gUyPIL6t/MXwJPMMAgSN2drHR5Dug5ZmBctr8TmKPwiED5VW7SMPeLnVCWfgTkufbvdBS4cdLjg==
+"@tonaljs/array@^3.2.8":
+  version "3.2.8"
+  resolved "https://registry.npmjs.org/@tonaljs/array/-/array-3.2.8.tgz#735ff3f3a7732f630a9ed33aa093679cb6426ec3"
+  integrity sha512-c0q1ENeUPfWKtM7iqyZdd2z+HzcjN+EUQRrz4//t+JRWaUL4pHQh5eccIhXhPPtOppj8/CYQClFtJ+F4VOPMBQ==
   dependencies:
-    "@tonaljs/core" "^3.5.0"
+    "@tonaljs/core" "^3.5.3"
 
 "@tonaljs/chord-detect@^3.5.1":
   version "3.5.1"
@@ -2179,6 +2179,15 @@
     "@tonaljs/core" "^3.5.0"
     "@tonaljs/pcset" "^3.5.0"
 
+"@tonaljs/chord-detect@^3.5.5":
+  version "3.5.5"
+  resolved "https://registry.npmjs.org/@tonaljs/chord-detect/-/chord-detect-3.5.5.tgz#da7ff00e555a43766861101f36e2416b0325c2ce"
+  integrity sha512-gein2dvDLT9/onDjKOWDYf24U6/wBMEfVZcxtYhEscZ+ZyopDYt/3kjcfSfT/sUCM0Gr4SnYF+78SKmVHf52ug==
+  dependencies:
+    "@tonaljs/chord-type" "^3.5.5"
+    "@tonaljs/core" "^3.5.3"
+    "@tonaljs/pcset" "^3.5.3"
+
 "@tonaljs/chord-type@^3.5.1":
   version "3.5.1"
   resolved "https://registry.npmjs.org/@tonaljs/chord-type/-/chord-type-3.5.1.tgz#e571e45e1249880cde5043bdd6d5a97fd8272006"
@@ -2186,6 +2195,14 @@
   dependencies:
     "@tonaljs/core" "^3.5.0"
     "@tonaljs/pcset" "^3.5.0"
+
+"@tonaljs/chord-type@^3.5.5":
+  version "3.5.5"
+  resolved "https://registry.npmjs.org/@tonaljs/chord-type/-/chord-type-3.5.5.tgz#ee5c8d021193ec0a50aa13cec322610ec720f2c6"
+  integrity sha512-udl0xbNVpWgDreSILUFKGwDPvEuI10gnthevJffG5L2i49KU2MC/5Fe26xS15MO4R4XNXMOppCxiqx7TLB1P2w==
+  dependencies:
+    "@tonaljs/core" "^3.5.3"
+    "@tonaljs/pcset" "^3.5.3"
 
 "@tonaljs/chord@^3.5.1":
   version "3.5.1"
@@ -2199,59 +2216,81 @@
     "@tonaljs/pcset" "^3.5.0"
     "@tonaljs/scale-type" "^3.5.0"
 
+"@tonaljs/chord@^3.6.5":
+  version "3.6.5"
+  resolved "https://registry.npmjs.org/@tonaljs/chord/-/chord-3.6.5.tgz#9f19b5c04558eefb66e64de41452f2f7514513ac"
+  integrity sha512-ecSD45hHwVD6uvhqQIAGZJZEHSlChztv3IzXyfWJwPmKhzlzJ69ngnbU9yFg0w3NVrBhI9CFeeMI5dC1LnR05Q==
+  dependencies:
+    "@tonaljs/chord-detect" "^3.5.5"
+    "@tonaljs/chord-type" "^3.5.5"
+    "@tonaljs/collection" "^3.5.3"
+    "@tonaljs/core" "^3.5.3"
+    "@tonaljs/pcset" "^3.5.3"
+    "@tonaljs/scale-type" "^3.5.4"
+
 "@tonaljs/collection@^3.5.0":
   version "3.5.0"
   resolved "https://registry.npmjs.org/@tonaljs/collection/-/collection-3.5.0.tgz#b0fded1f626ed43f583bd84626b742a31fdfeb8b"
   integrity sha512-Y1p5IzKV43dkQR1fzbQU3I6KYP0o+H2Yo5klEbLp5hh5vZpa/NPHRYnJOxjdejL+C3Pl47oLc1UgK1HG7dwYUA==
+
+"@tonaljs/collection@^3.5.3":
+  version "3.5.3"
+  resolved "https://registry.npmjs.org/@tonaljs/collection/-/collection-3.5.3.tgz#2e8c7e688b4707460d7ad3c8caedd2f2b9df9cc1"
+  integrity sha512-RzEsHhbaZCAREWy0XuNRkHO//RgpoTw3FeWA7aeCyuVr2B36neLDnihBmo9T6KZBO/hSLcmPQy/NOEcvhsaVuA==
 
 "@tonaljs/core@^3.5.0":
   version "3.5.0"
   resolved "https://registry.npmjs.org/@tonaljs/core/-/core-3.5.0.tgz#d69eb0a2ee288b4c03b6e8c7268b8ae466aeaa2a"
   integrity sha512-GVhtW3UDVS/mvC3bRp18BoQtUP+wmEROT0WHmCEBoyQQcYFDmtqkHDvSs065tq+1QuaMY77nxHXsC067oBivaQ==
 
-"@tonaljs/duration-value@^3.6.0":
-  version "3.6.0"
-  resolved "https://registry.npmjs.org/@tonaljs/duration-value/-/duration-value-3.6.0.tgz#6fa4eac3d28164a8cf938d128acfa846e8b1f2f6"
-  integrity sha512-rhiqaWvYBmzBP3nI8ScykyuofcL77PcbFLku8ftKIo3SU07D+plWkIipqR9GYykAjk/4ST3mKBEoJB1Q2qPKDA==
+"@tonaljs/core@^3.5.3":
+  version "3.5.3"
+  resolved "https://registry.npmjs.org/@tonaljs/core/-/core-3.5.3.tgz#ff279659884a3918b4ee522395e6ca3bad40001c"
+  integrity sha512-FekC8POq8tEJnMlBy93xfvjhb9/OPgdc7x6zw2DmZVJHDBZDseZoDEAPm+L5dHUbnBwJAEM/ZMmv2Csq7sFdhw==
 
-"@tonaljs/interval@^3.5.0":
-  version "3.5.0"
-  resolved "https://registry.npmjs.org/@tonaljs/interval/-/interval-3.5.0.tgz#ee2eaac6bd1eb90bd1e642d4d2cd3edb32dbc8c9"
-  integrity sha512-G9CbhXoPnepoIn1ZwXA6ZTW6CkttM72PNhJ9o8wpnAtLsuFrPgE8YgwlcfhbVc5rfKqQjz/6bqMdTBvKw+FJ3g==
-  dependencies:
-    "@tonaljs/core" "^3.5.0"
+"@tonaljs/duration-value@^3.6.3":
+  version "3.6.3"
+  resolved "https://registry.npmjs.org/@tonaljs/duration-value/-/duration-value-3.6.3.tgz#be9bac2c44649722b12d6e6e4cb163be0792b7a0"
+  integrity sha512-y+jFjfb5Knu9QR+w8n3YnWqTaJmeDJr5SYLZZiG/BMvIr7BX40hma/F7IdQ6fi6e0gD+cm0VNCTlTDXVnUmdww==
 
-"@tonaljs/key@^3.5.1":
-  version "3.5.1"
-  resolved "https://registry.npmjs.org/@tonaljs/key/-/key-3.5.1.tgz#229ff0ef4e10ec19d5baf79163fd889b159a45be"
-  integrity sha512-FW3eB3KYpCryT9Mm9XJuZf4eBlrAEA28fh4SecoI9T4WZbGdExGe1xWkCGY7rVcHe/Xg33vnwpGRlFiCeDs88Q==
+"@tonaljs/interval@^3.5.3":
+  version "3.5.3"
+  resolved "https://registry.npmjs.org/@tonaljs/interval/-/interval-3.5.3.tgz#875053fa941c234b657ce0cd970263eb67c879a9"
+  integrity sha512-N5nn+vqrea1k6ERfcbBwp30rduC05x/NLwEN5W0F25u4NNzf4G5gkDgsnHjnqpYzckeidDVrzISgMmQ88ycJpA==
   dependencies:
-    "@tonaljs/core" "^3.5.0"
-    "@tonaljs/note" "^3.5.0"
-    "@tonaljs/roman-numeral" "^3.5.0"
+    "@tonaljs/core" "^3.5.3"
 
-"@tonaljs/midi@^3.5.0":
-  version "3.5.0"
-  resolved "https://registry.npmjs.org/@tonaljs/midi/-/midi-3.5.0.tgz#45a66968ffa1fcc3029b476173dc22a25d45511e"
-  integrity sha512-9UUzlDYLwVOlo/GlAN8zzT3HAA/VqRFeE3DqZhpRRu2NYnVrnc3LOUzh28japBOoU0mDKLRk8FVhKriLfDuXdQ==
+"@tonaljs/key@^4.0.1":
+  version "4.0.1"
+  resolved "https://registry.npmjs.org/@tonaljs/key/-/key-4.0.1.tgz#80a6fce5ec0b2e3fac6d6bca9c9b5113ed355a13"
+  integrity sha512-vHBnwKpaFyuKqeH1J/XRRf6+SOdEwIKvBgPIPR8NqCYOguozU0V/2ByHnDlNPIJZ/Ls3kNXdz7BfEZNEaa9kLg==
   dependencies:
-    "@tonaljs/core" "^3.5.0"
+    "@tonaljs/core" "^3.5.3"
+    "@tonaljs/note" "^3.5.3"
+    "@tonaljs/roman-numeral" "^3.5.3"
 
-"@tonaljs/mode@^3.5.0":
-  version "3.5.0"
-  resolved "https://registry.npmjs.org/@tonaljs/mode/-/mode-3.5.0.tgz#08627e7bdb5aab87767b41ec4a2775bd434866ca"
-  integrity sha512-cBgecTDyZD678v5Ct5Y6Bh8FWNnCgHntjsAdKD9vpEsPYx750tgzNo8ZzmdPis6XtpeQz3aEVt2jnZyl955I6A==
+"@tonaljs/midi@^3.5.3":
+  version "3.5.3"
+  resolved "https://registry.npmjs.org/@tonaljs/midi/-/midi-3.5.3.tgz#0b5c15bce7a259d5d29e5e29335e3a419898f56a"
+  integrity sha512-xc/MwuNOS90F5DCcjrxcMyHcCXnq6wmPyE/CubPm+6Deemqn+5OEnzvUQujDnW/+O//Gk4+ROIPPvWq1ifSV5w==
   dependencies:
-    "@tonaljs/core" "^3.5.0"
-    "@tonaljs/pcset" "^3.5.0"
+    "@tonaljs/core" "^3.5.3"
 
-"@tonaljs/note@^3.5.0":
-  version "3.5.0"
-  resolved "https://registry.npmjs.org/@tonaljs/note/-/note-3.5.0.tgz#ad33e216d3d90fcb54b39e64019fe2e78aac3cd8"
-  integrity sha512-QiqJI00JLaXFOp11Nr2HGlYbaqSpAtK7cxr7WwWxl0SldYsoGyQpUMONqLELJh81rbgoIgqLd1dkQeT0o84QwQ==
+"@tonaljs/mode@^3.5.3":
+  version "3.5.3"
+  resolved "https://registry.npmjs.org/@tonaljs/mode/-/mode-3.5.3.tgz#c31fb28cff4aa3bd8afeb4f1754a2d6dbf507e82"
+  integrity sha512-sJfHA0kKewPj3DRi7Jw7FSyPk4Cm6awno2E59RXuPq+isIpf1sLH9bN1JlvI+xGYkWv15N4RLdr8NeFRHDoYeQ==
   dependencies:
-    "@tonaljs/core" "^3.5.0"
-    "@tonaljs/midi" "^3.5.0"
+    "@tonaljs/core" "^3.5.3"
+    "@tonaljs/pcset" "^3.5.3"
+
+"@tonaljs/note@^3.5.3":
+  version "3.5.3"
+  resolved "https://registry.npmjs.org/@tonaljs/note/-/note-3.5.3.tgz#dd4637e2ec486f1efb6cad8b1efa08d3a0eb15d4"
+  integrity sha512-UPOHFrVHwtJQMllM66RDG4sH6d3OP7X5H7eJVzclEhRjb1OGqz2HVSLjZw8C3LMr2kgRoICge+wOaYrOUfMBQw==
+  dependencies:
+    "@tonaljs/core" "^3.5.3"
+    "@tonaljs/midi" "^3.5.3"
 
 "@tonaljs/pcset@^3.5.0":
   version "3.5.0"
@@ -2261,29 +2300,37 @@
     "@tonaljs/collection" "^3.5.0"
     "@tonaljs/core" "^3.5.0"
 
-"@tonaljs/progression@^3.5.1":
-  version "3.5.1"
-  resolved "https://registry.npmjs.org/@tonaljs/progression/-/progression-3.5.1.tgz#da2f06b58df4a7d63ba17ee927b92569728f52aa"
-  integrity sha512-xeSJ77k/MaXirAE74YeRITi57Pm254ZCKdzOrtVqYBJz/WN8XggbpWReSAVkj7nBOukcv4V2f7Y1nyqdI2Ykqw==
+"@tonaljs/pcset@^3.5.3":
+  version "3.5.3"
+  resolved "https://registry.npmjs.org/@tonaljs/pcset/-/pcset-3.5.3.tgz#c41203a7e7700057146c17be39044694a81c9888"
+  integrity sha512-DOqgF+WLZijXMX1hNycmlGFsOOrYC6bjAHAFvlVjjG+3+qMOwPscIFla4xW+CMcI4VKdfWW5mlUEsbWsPsdTUQ==
   dependencies:
-    "@tonaljs/chord" "^3.5.1"
-    "@tonaljs/core" "^3.5.0"
-    "@tonaljs/roman-numeral" "^3.5.0"
+    "@tonaljs/collection" "^3.5.3"
+    "@tonaljs/core" "^3.5.3"
 
-"@tonaljs/range@^3.5.0":
-  version "3.5.0"
-  resolved "https://registry.npmjs.org/@tonaljs/range/-/range-3.5.0.tgz#d15a7ac9e96f4a1d680ed550114708265a80c4a5"
-  integrity sha512-rR4kvRqWiPsweGWijkRow1kYkIP4lsg3gucziIBvLx0TT8wtQmgWLRaevDh79+mVfjSPU6Uvjke0XFMLaqTvCg==
+"@tonaljs/progression@^3.5.7":
+  version "3.5.7"
+  resolved "https://registry.npmjs.org/@tonaljs/progression/-/progression-3.5.7.tgz#3436d49c1ceacc415a3c0cefd613a8deee6dc2b0"
+  integrity sha512-fByJjaicrD7YBoQzCic+5fnf1QXPTN4BBIKMmv4/bpM54xvjZ6W61t6wImqQJf3QtSZqoXnuUF+NaCl5GdUaMQ==
   dependencies:
-    "@tonaljs/collection" "^3.5.0"
-    "@tonaljs/midi" "^3.5.0"
+    "@tonaljs/chord" "^3.6.5"
+    "@tonaljs/core" "^3.5.3"
+    "@tonaljs/roman-numeral" "^3.5.3"
 
-"@tonaljs/roman-numeral@^3.5.0":
-  version "3.5.0"
-  resolved "https://registry.npmjs.org/@tonaljs/roman-numeral/-/roman-numeral-3.5.0.tgz#e08548b5a19a49674ae2f45de5630a79775c6a49"
-  integrity sha512-DXuupn8/uQWUhLXg//aYJJ3P2uirDdyd3pp4e7JkqNxaCDjjJNziZdaoItMl7NWMqZvTlKoIxxf9ojecZcyuEA==
+"@tonaljs/range@^3.5.3":
+  version "3.5.3"
+  resolved "https://registry.npmjs.org/@tonaljs/range/-/range-3.5.3.tgz#1306f62ecaf10198fe577c9d5c929edf130d1f04"
+  integrity sha512-isMgF4OKKOajy1UoqYQUXhMZUWVUX7/1aTl3XNp21AJZ5wcESxxUj/UUCBLNEI0pqq6M30AxIiGaUBIHdMbyFg==
   dependencies:
-    "@tonaljs/core" "^3.5.0"
+    "@tonaljs/collection" "^3.5.3"
+    "@tonaljs/midi" "^3.5.3"
+
+"@tonaljs/roman-numeral@^3.5.3":
+  version "3.5.3"
+  resolved "https://registry.npmjs.org/@tonaljs/roman-numeral/-/roman-numeral-3.5.3.tgz#b8d8b82c163afed812635f98579b480ef7a004d3"
+  integrity sha512-lRsjo2Y95+pPGGpbS/SO22bns6revimiDq4EvNGZhJc4ey6JoOTck+Yd0GVnAxwiObgSSYoGk5Em4QXbxkpC7w==
+  dependencies:
+    "@tonaljs/core" "^3.5.3"
 
 "@tonaljs/scale-type@^3.5.0":
   version "3.5.0"
@@ -2293,41 +2340,55 @@
     "@tonaljs/core" "^3.5.0"
     "@tonaljs/pcset" "^3.5.0"
 
-"@tonaljs/scale@^3.5.1":
-  version "3.5.1"
-  resolved "https://registry.npmjs.org/@tonaljs/scale/-/scale-3.5.1.tgz#d7dd505fc7437de7626c9ef383ade9c45cda174c"
-  integrity sha512-+1nGkuLFWiSy82vgASUhDFqDegH6sWZpIRJsvoyjU/aQoAKyN6cw71nak6kPeR4M0+UQ17B8zgybBSVaE7pEEw==
+"@tonaljs/scale-type@^3.5.4":
+  version "3.5.4"
+  resolved "https://registry.npmjs.org/@tonaljs/scale-type/-/scale-type-3.5.4.tgz#4d9e239231a26937430fa9d609c54e22a36549c0"
+  integrity sha512-XLE2RqRlVl+wD8hgd9iKkzYArxrS60422bS0azSY/lLKC+N3Fcg7lncfW5NkbZ4srDs5Dt+qsYmlfvOrYzDOmw==
   dependencies:
-    "@tonaljs/chord-type" "^3.5.1"
-    "@tonaljs/collection" "^3.5.0"
-    "@tonaljs/core" "^3.5.0"
-    "@tonaljs/note" "^3.5.0"
-    "@tonaljs/pcset" "^3.5.0"
-    "@tonaljs/scale-type" "^3.5.0"
+    "@tonaljs/core" "^3.5.3"
+    "@tonaljs/pcset" "^3.5.3"
 
-"@tonaljs/tonal@^3.6.0":
-  version "3.6.0"
-  resolved "https://registry.npmjs.org/@tonaljs/tonal/-/tonal-3.6.0.tgz#72318048076d182f7c857e188e936d42e6952adb"
-  integrity sha512-9z5Cn8zG0AdI5LDAm1nSR/ZqekGvUCBhpc4cnMY5L2gfFfzXdmJNjrC3pERYO6uMAb/ft9qteD1NFWo5E5f0Pw==
+"@tonaljs/scale@^3.5.6":
+  version "3.5.6"
+  resolved "https://registry.npmjs.org/@tonaljs/scale/-/scale-3.5.6.tgz#9a1b9e58e70290f61dabee679b3ffba78a840a1a"
+  integrity sha512-yNS4nqjeU5YvCldVBZLL6UhNW+dOiGiZ6enzseI6ye14O6uNERoOrWRXtLfM5UnxfUB4kkVgwgFc0v9JmWBVSg==
   dependencies:
-    "@tonaljs/abc-notation" "^3.5.0"
-    "@tonaljs/array" "^3.2.5"
-    "@tonaljs/chord" "^3.5.1"
-    "@tonaljs/chord-type" "^3.5.1"
-    "@tonaljs/collection" "^3.5.0"
-    "@tonaljs/core" "^3.5.0"
-    "@tonaljs/duration-value" "^3.6.0"
-    "@tonaljs/interval" "^3.5.0"
-    "@tonaljs/key" "^3.5.1"
-    "@tonaljs/midi" "^3.5.0"
-    "@tonaljs/mode" "^3.5.0"
-    "@tonaljs/note" "^3.5.0"
-    "@tonaljs/pcset" "^3.5.0"
-    "@tonaljs/progression" "^3.5.1"
-    "@tonaljs/range" "^3.5.0"
-    "@tonaljs/roman-numeral" "^3.5.0"
-    "@tonaljs/scale" "^3.5.1"
-    "@tonaljs/scale-type" "^3.5.0"
+    "@tonaljs/chord-type" "^3.5.5"
+    "@tonaljs/collection" "^3.5.3"
+    "@tonaljs/core" "^3.5.3"
+    "@tonaljs/note" "^3.5.3"
+    "@tonaljs/pcset" "^3.5.3"
+    "@tonaljs/scale-type" "^3.5.4"
+
+"@tonaljs/time-signature@^3.6.3":
+  version "3.6.3"
+  resolved "https://registry.npmjs.org/@tonaljs/time-signature/-/time-signature-3.6.3.tgz#613655f18c3c7228436bb8ea1f97511c85dde34f"
+  integrity sha512-M1WNX6btgY53NDV6/aNZl6wAzRbjam3P2edSf1+ptZ0PZEayf/eCx8A0A2oXHFpOT+p/D2SV2EWGrTGtlu1E+Q==
+
+"@tonaljs/tonal@^4.0.1":
+  version "4.0.1"
+  resolved "https://registry.npmjs.org/@tonaljs/tonal/-/tonal-4.0.1.tgz#fc73e34e9000fc81194482479db1cf49426b1990"
+  integrity sha512-rRibp4Mpmlb5KnmtKhJCT9lJhhN06VonzzkUUIlWK5TOCYnTDVxCwjWUsANi2JAP3Pxc2M1O+G8y49PEHRU54g==
+  dependencies:
+    "@tonaljs/abc-notation" "^3.5.4"
+    "@tonaljs/array" "^3.2.8"
+    "@tonaljs/chord" "^3.6.5"
+    "@tonaljs/chord-type" "^3.5.5"
+    "@tonaljs/collection" "^3.5.3"
+    "@tonaljs/core" "^3.5.3"
+    "@tonaljs/duration-value" "^3.6.3"
+    "@tonaljs/interval" "^3.5.3"
+    "@tonaljs/key" "^4.0.1"
+    "@tonaljs/midi" "^3.5.3"
+    "@tonaljs/mode" "^3.5.3"
+    "@tonaljs/note" "^3.5.3"
+    "@tonaljs/pcset" "^3.5.3"
+    "@tonaljs/progression" "^3.5.7"
+    "@tonaljs/range" "^3.5.3"
+    "@tonaljs/roman-numeral" "^3.5.3"
+    "@tonaljs/scale" "^3.5.6"
+    "@tonaljs/scale-type" "^3.5.4"
+    "@tonaljs/time-signature" "^3.6.3"
 
 "@types/babel__core@^7.1.0":
   version "7.1.7"
