@@ -6,28 +6,26 @@ import drums from '../../../assets/samples/tidal/tidal';
 import * as Tone from 'tone';
 import { useState, useRef } from 'react';
 
-export default function PlayButton({ events, instruments, draw }) {
+export default function PlayButton({ events, instruments, draw, loop }) {
   const [part, setPart] = useState<any>(false);
   const drawLoop = useRef<any>();
+  function stop() {
+    drawLoop.current && drawLoop.current.stop();
+    part.stop();
+    Tone.Transport.stop();
+    setPart(false);
+  }
+  function start() {
+    setPart(
+      playEvents(events, {
+        instruments: instruments || { synth, drums },
+        loop
+      })
+    );
+    drawLoop.current = drawCallback(draw);
+  }
   return (
-    <Fab
-      color="primary"
-      onClick={() => {
-        if (!part) {
-          setPart(
-            playEvents(events, {
-              instruments: instruments || { synth, drums }
-            })
-          );
-          drawLoop.current = drawCallback(draw);
-        } else {
-          drawLoop.current && drawLoop.current.stop();
-          part.stop();
-          Tone.Transport.stop();
-          setPart(false);
-        }
-      }}
-    >
+    <Fab color="primary" onClick={() => (part ? stop() : start())}>
       {!part ? <PlayArrowIcon /> : <StopIcon />}
     </Fab>
   );

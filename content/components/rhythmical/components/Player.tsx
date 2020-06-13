@@ -22,9 +22,11 @@ export function playEvents(
     duration?: number;
     instrument?;
     instruments?: any[];
+    loop?: boolean;
   } = {}
 ) {
   let {
+    loop = true,
     instruments = { synth },
     duration = max(events.map((e) => e.time + e.duration))
   } = config;
@@ -38,7 +40,7 @@ export function playEvents(
       time
     );
   }, events).start(0);
-  part.loop = true;
+  part.loop = loop;
   part.loopEnd = duration;
   Tone.Transport.start('+0.1');
   return part;

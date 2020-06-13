@@ -20,3 +20,8 @@ export function rainbow(note: string, rotate = 180) {
 export function sinebow(note: string, rotate = 180) {
   return new TinyColor(interpolateSinebow(Note.chroma(note) / 12) + rotate / 360)
 }
+
+// divide chroma decimal by number of ones to get relative darkness
+export function chromaDarkness(chroma) {
+  return parseInt(chroma, 2) / (chroma.split('').filter(d => d === '1').join('').length)
+}

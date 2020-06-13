@@ -6,3 +6,16 @@
 
  https://jackschaedler.github.io/circles-sines-signals/dft_introduction.html
 */
+
+import { select } from 'd3-selection';
+
+export default function D3Shell({ render }) {
+  return (
+    <div
+      style={{ width: '100%', overflow: 'auto' }}
+      ref={(el) => {
+        render && render(select(el));
+      }}
+    />
+  );
+}
