@@ -1,3 +1,4 @@
+import React from 'react';
 import canUseDOM from '../canUseDOM';
 const ReactJson = canUseDOM() ? require('react-json-view').default : null;
 
