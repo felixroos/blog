@@ -15,10 +15,41 @@ import {
   parseTransitions,
   includesTransitions,
   averageRegularity,
-  parseSongs,
   unique
 } from './analytics';
-import SongTable from './SongTable';
+import DynamicTable from '../common/DynamicTable';
+
+const stringSort = (a, b) => ('' + a).localeCompare(b);
+
+const songFields = [
+  /* {
+    property: 'index',
+    resolve: (_, index) => index,
+    sort: (a, b) => b - a
+  }, */
+  {
+    property: 'title',
+    sort: stringSort
+  },
+  {
+    property: 'composer',
+    sort: stringSort
+  },
+  {
+    property: 'key',
+    sort: stringSort
+  },
+  {
+    property: 'style',
+    sort: stringSort
+  }
+];
+const regularityField = {
+  property: 'regularity',
+  display: (v) => `${Math.round(v * 10000) / 100}%`,
+  sort: (a, b) => b - a,
+  defaultOrder: 'desc'
+};
 
 export function RealReader({ url }) {
   const playlist = iRealReader(decodeURI(url));
@@ -199,7 +230,13 @@ export function RealRanking(props) {
           });
         }}
       />
-      {!!selected.length && <SongTable songs={filteredSongs} />}
+      {!!selected.length && (
+        <DynamicTable
+          orderedBy="title"
+          fields={songFields}
+          rows={filteredSongs}
+        />
+      )}
     </>
   );
 }
@@ -244,22 +281,17 @@ export function RealChords(props) {
       </label>
       {filteredSongs.length} matching Songs
       <div style={{ overflow: 'auto', clear: 'both', maxHeight: '310px' }}>
-        <SongTable
-          songs={filteredSongs
-            .map((song) => {
-              const regularity =
-                Math.round(
-                  averageRegularity(
-                    parseChords([song], relative).map((t) => t.value),
-                    chords
-                  ) * 10000
-                ) / 100;
-              return {
-                ...song,
-                regularity,
-                title: `${regularity}%: ${song.title}`
-              };
-            })
+        <DynamicTable
+          orderedBy="regularity"
+          fields={[regularityField, ...songFields]}
+          rows={filteredSongs
+            .map((song) => ({
+              ...song,
+              regularity: averageRegularity(
+                parseChords([song], relative).map((t) => t.value),
+                chords
+              )
+            }))
             .sort((a, b) => b.regularity - a.regularity)}
         />
       </div>
@@ -308,22 +340,17 @@ export function RealTransitions(props) {
       </label>
       {filteredSongs.length} matching Songs
       <div style={{ overflow: 'auto', maxHeight: '310px' }}>
-        <SongTable
-          songs={filteredSongs
-            .map((song) => {
-              const regularity =
-                Math.round(
-                  averageRegularity(
-                    parseTransitions([song], relative).map((t) => t.value),
-                    transitions
-                  ) * 10000
-                ) / 100;
-              return {
-                ...song,
-                regularity,
-                title: `${regularity}%: ${song.title}`
-              };
-            })
+        <DynamicTable
+          orderedBy="regularity"
+          fields={[regularityField, ...songFields]}
+          rows={filteredSongs
+            .map((song) => ({
+              ...song,
+              regularity: averageRegularity(
+                parseTransitions([song], relative).map((t) => t.value),
+                transitions
+              )
+            }))
             .sort((a, b) => b.regularity - a.regularity)}
         />
       </div>
@@ -338,16 +365,21 @@ export function RealDiversity(props) {
       <RealSongs url={props.url} onChange={(list) => setSongs(list.songs)} />
       <div style={{ overflow: 'auto', maxHeight: '310px' }}>
         {songs.length} Songs
-        <SongTable
-          songs={songs
-            .map((song) => {
-              const uniqueChords = unique(song.music.measures.flat()).length;
-              return {
-                ...song,
-                title: `${uniqueChords}: ${song.title}`,
-                uniqueChords
-              };
-            })
+        <DynamicTable
+          orderedBy="uniqueChords"
+          fields={[
+            {
+              property: 'uniqueChords',
+              sort: (a, b) => b - a,
+              defaultOrder: 'desc'
+            },
+            ...songFields
+          ]}
+          rows={songs
+            .map((song) => ({
+              ...song,
+              uniqueChords: unique(song.music.measures.flat()).length
+            }))
             .sort((a, b) => b.uniqueChords - a.uniqueChords)}
         />
       </div>

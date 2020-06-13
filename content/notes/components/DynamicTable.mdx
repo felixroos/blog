@@ -1,0 +1,15 @@
+import DynamicTable from '../../components/common/DynamicTable.tsx';
+
+<DynamicTable
+  debug={true}
+  orderedBy="age"
+  fields={[
+    'foo',
+    { property: 'age', sort: (a, b) => b - a, defaultOrder: 'desc' },
+    { property: 'bar', label: 'BAR', display: (v) => v || '-' }
+  ]}
+  rows={[
+    { foo: 'XX', bar: 'YES', age: 12 },
+    { foo: 'XX', age: 10 }
+  ]}
+/>
