@@ -9,10 +9,7 @@ export default () => (
   <Fragment>
     This is where{' '}
     <Styled.a href="https://github.com/felixroos/">felixroos</Styled.a> writes
-    about music and coding and stuff that he finds interesting.{' '}
-    <Styled.a href={`https://github.com/felixroos/notes/toc`}>
-      Table of Contents
-    </Styled.a>
+    about music and coding and stuff that he finds interesting.
     <br />
   </Fragment>
 );
