@@ -10,7 +10,7 @@ export default () => (
     This is where{' '}
     <Styled.a href="https://github.com/felixroos/">felixroos</Styled.a> writes
     about music and coding and stuff that he finds interesting.{' '}
-    <Styled.a href={`${window.location.origin}/notes/toc`}>
+    <Styled.a href={`https://github.com/felixroos/notes/toc`}>
       Table of Contents
     </Styled.a>
     <br />
