@@ -6,7 +6,7 @@
 
  https://jackschaedler.github.io/circles-sines-signals/dft_introduction.html
 */
-
+import React from 'react';
 import { select } from 'd3-selection';
 
 export default function D3Shell({ render }) {

@@ -1,5 +1,6 @@
+import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, createStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -9,10 +10,18 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import JSONViewer from './JSONViewer';
+import Toolbar from '@material-ui/core/Toolbar';
+import {
+  Typography,
+  Tooltip,
+  IconButton,
+  Theme,
+  lighten
+} from '@material-ui/core';
 
 const useStyles = makeStyles({
   table: {
-    minWidth: 650
+    minWidth: 400
   },
   visuallyHidden: {
     border: 0,
@@ -42,15 +51,17 @@ declare interface FieldConfig {
 }
 
 export default function DynamicTable({
-  fields: _fields,
+  cols: _cols,
   rows: _rows,
   debug = false,
-  orderedBy = ''
+  orderedBy = '',
+  heading = ''
 }: {
-  fields: Array<string | FieldConfig>;
+  cols: Array<string | FieldConfig>;
   rows: Object[];
   debug?: boolean;
   orderedBy?: string;
+  heading?: string;
 }) {
   const [rows, setRows] = useState(_rows);
   useEffect(() => {
@@ -58,7 +69,7 @@ export default function DynamicTable({
   }, [_rows]);
   const classes = useStyles();
   // unify field
-  const fields: FieldConfig[] = _fields
+  const cols: FieldConfig[] = _cols
     .map((field) => (typeof field === 'string' ? { property: field } : field))
     .map((field) => ({
       align: 'left',
@@ -71,7 +82,7 @@ export default function DynamicTable({
   let defaultOrder: Order = 'asc';
   if (orderedBy) {
     defaultOrder =
-      fields.find(({ property }) => property === orderedBy)?.defaultOrder ||
+      cols.find(({ property }) => property === orderedBy)?.defaultOrder ||
       'asc';
   }
   const [order, setOrder] = useState<Order>(defaultOrder);
@@ -95,6 +106,7 @@ export default function DynamicTable({
     <>
       {debug && <JSONViewer json={rows} collapsed={false} />}
       <TableContainer component={Paper}>
+        {heading && <EnhancedTableToolbar numSelected={0} heading={heading} />}
         <Table
           className={classes.table}
           size="small"
@@ -102,8 +114,15 @@ export default function DynamicTable({
         >
           <TableHead>
             <TableRow>
-              {fields.map((field) => {
-                const { property, label, align, heading, sort, defaultOrder } = field;
+              {cols.map((field) => {
+                const {
+                  property,
+                  label,
+                  align,
+                  heading,
+                  sort,
+                  defaultOrder
+                } = field;
                 return (
                   <TableCell
                     style={{ cursor: 'pointer' }}
@@ -132,8 +151,13 @@ export default function DynamicTable({
           <TableBody>
             {rows.map((row, index) => (
               <TableRow key={index}>
-                {fields.map(({ property, align, display, resolve }) => (
-                  <TableCell component="th" scope="row" align={align}>
+                {cols.map(({ property, align, display, resolve }) => (
+                  <TableCell
+                    key={property}
+                    component="th"
+                    scope="row"
+                    align={align}
+                  >
                     {display(resolve(row, index, rows))}
                   </TableCell>
                 ))}
@@ -145,3 +169,77 @@ export default function DynamicTable({
     </>
   );
 }
+const useToolbarStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      paddingLeft: theme.spacing(2),
+      paddingRight: theme.spacing(1)
+    },
+    highlight:
+      theme.palette.type === 'light'
+        ? {
+            color: theme.palette.secondary.main,
+            backgroundColor: lighten(theme.palette.secondary.light, 0.85)
+          }
+        : {
+            color: theme.palette.text.primary,
+            backgroundColor: theme.palette.secondary.dark
+          },
+    title: {
+      flex: '1 1 100%'
+    }
+  })
+);
+interface EnhancedTableToolbarProps {
+  numSelected: number;
+  heading: string;
+}
+const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
+  const classes = useToolbarStyles();
+  const { numSelected, heading = '' } = props;
+
+  return (
+    <Toolbar
+      className={clsx(classes.root, {
+        [classes.highlight]: numSelected > 0
+      })}
+    >
+      {numSelected > 0 ? (
+        <Typography
+          className={classes.title}
+          color="inherit"
+          variant="subtitle1"
+          component="div"
+        >
+          {numSelected} selected
+        </Typography>
+      ) : (
+        <Typography
+          className={classes.title}
+          variant="h6"
+          id="tableTitle"
+          component="div"
+        >
+          {heading}
+        </Typography>
+      )}
+      {/* {numSelected > 0 ? (
+        <Tooltip title="Delete">
+          <IconButton aria-label="delete">
+            <DeleteIcon />
+          </IconButton>
+        </Tooltip>
+      ) : (
+        <Tooltip title="Filter list">
+          <IconButton aria-label="filter list">
+            <FilterListIcon />
+          </IconButton>
+        </Tooltip>
+      )} */}
+    </Toolbar>
+  );
+};
+
+export const sortString = (a, b) => ('' + a).localeCompare(b);
+export const sortNumber = (a, b) => a - b;
+export const sortBoolean = (a, b) => (a && !b ? -1 : 1);

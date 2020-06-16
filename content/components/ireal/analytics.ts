@@ -29,7 +29,7 @@ export function getChord(_chord) {
   const symbol = chord.replace(/[A-G][b#]*/g, '');
   return {
     root: chord.replace(symbol, ''),
-    symbol: symbol || 'M',
+    symbol: !symbol || symbol === '^' ? 'M' : symbol,
     bass
   };
 }

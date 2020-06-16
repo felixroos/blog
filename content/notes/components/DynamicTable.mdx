@@ -1,15 +1,185 @@
 import DynamicTable from '../../components/common/DynamicTable.tsx';
 
+# DynamicTable
+
+This component wraps the [material-ui Table](https://material-ui.com/components/tables/#table) component to easily list arrays of objects.
+It includes many ideas from [ec.components](https://entrecode.github.io/ec.components/) ec-list.
+
+## Simple Table
+
+As a table consists of cols and rows, we need at least pass those two props:
+
+```js
 <DynamicTable
-  debug={true}
+  cols={['name', 'age']}
+  rows={[
+    { name: 'Tom', age: 16, foo: true },
+    { name: 'Dylan', age: 12 },
+    { name: 'Bob', age: 31 }
+  ]}
+/>
+```
+
+- cols is an array of either a string (property name) or an object for further customization
+
+## col options
+
+If we use an objects for a column, we can customize its behaviour:
+
+### label
+
+Controls the label of the column header:
+
+<DynamicTable
+  rows={[
+    { name: 'Tom', age: 16 },
+    { name: 'Dylan', age: 12 },
+    { name: 'Bob', age: 31 }
+  ]}
+  cols={[{ property: 'name', label: 'Forename' }, 'age']}
+/>
+
+### display
+
+Accepts a custom display rendering function (also accepts JSX):
+
+<DynamicTable
+  rows={[
+    { name: 'Tom', age: 16 },
+    { name: 'Dylan', age: 12 },
+    { name: 'Bob', age: 31 }
+  ]}
+  cols={[
+    'name',
+    { property: 'age', display: (v) => <strong>{v} Years</strong> }
+  ]}
+/>
+
+### sort
+
+Each field that has a sort function will be sortable by clicking the column header:
+
+<DynamicTable
+  rows={[
+    { name: 'Tom', age: 16 },
+    { name: 'Dylan', age: 12 },
+    { name: 'Bob', age: 31 }
+  ]}
+  cols={[
+    'name',
+    { property: 'age', sort: (a, b) => a - b, display: (v) => v + ' Years' }
+  ]}
+/>
+
+- If the column header is clicked again, the order is simply reversed (as indicated by the arrow).
+
+### defaultOrder
+
+If a field is sorted, the arrow points up by default, which stands for **asc**ending order.
+To invert the arrow, we can specify the defaultOrder to **desc**ending:
+
+<DynamicTable
+  rows={[
+    { name: 'Tom', age: 16 },
+    { name: 'Dylan', age: 12 },
+    { name: 'Bob', age: 31 }
+  ]}
+  cols={[
+    'name',
+    {
+      property: 'age',
+      display: (v) => v + ' Years',
+      defaultOrder: 'desc',
+      sort: (a, b) => b - a
+    }
+  ]}
+/>
+
+- You have to make sure the sort function reflects the defaultOrder
+
+### resolve
+
+Allows creating "virtual" fields that do not exist on the rows:
+
+<DynamicTable
+  rows={[
+    { name: 'Tom', age: 16 },
+    { name: 'Dylan', age: 12 },
+    { name: 'Bob', age: 31 }
+  ]}
+  cols={[
+    'name',
+    {
+      property: 'age',
+      defaultOrder: 'desc',
+      sort: (a, b) => b - a
+    },
+    {
+      property: 'is over 16?',
+      resolve: ({ age }) => age >= 16,
+      display: (v) => (v ? 'YES' : 'NO'),
+      sort: (a, b) => (a && !b ? -1 : 1)
+    }
+  ]}
+/>
+
+- This makes the field also usable for sorting
+
+## Direct props
+
+Here are the direct props of the component:
+
+### orderedBy
+
+If the rows you pass are already ordered by a property:
+
+<DynamicTable
   orderedBy="age"
-  fields={[
-    'foo',
-    { property: 'age', sort: (a, b) => b - a, defaultOrder: 'desc' },
-    { property: 'bar', label: 'BAR', display: (v) => v || '-' }
+  cols={[
+    'name',
+    {
+      property: 'age',
+      defaultOrder: 'desc',
+      sort: (a, b) => b - a
+    },
+    {
+      property: 'is over 16?',
+      resolve: ({ age }) => age >= 16,
+      display: (v) => (v ? 'YES' : 'NO'),
+      sort: (a, b) => (a && !b ? -1 : 1)
+    }
   ]}
   rows={[
-    { foo: 'XX', bar: 'YES', age: 12 },
-    { foo: 'XX', age: 10 }
+    { name: 'Tom', age: 16 },
+    { name: 'Dylan', age: 12 },
+    { name: 'Bob', age: 31 }
+  ].sort((a, b) => b.age - a.age)}
+/>
+
+### heading
+
+Shows a table header:
+
+<DynamicTable
+  heading="I was so much older then, I'm younger than that now"
+  orderedBy="age"
+  cols={[
+    'name',
+    {
+      property: 'age',
+      defaultOrder: 'desc',
+      sort: (a, b) => b - a
+    },
+    {
+      property: 'is over 16?',
+      resolve: ({ age }) => age >= 16,
+      display: (v) => (v ? 'YES' : 'NO'),
+      sort: (a, b) => (a && !b ? -1 : 1)
+    }
   ]}
+  rows={[
+    { name: 'Tom', age: 16 },
+    { name: 'Dylan', age: 12 },
+    { name: 'Bob', age: 31 }
+  ].sort((a, b) => b.age - a.age)}
 />

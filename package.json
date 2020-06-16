@@ -26,6 +26,7 @@
     "@types/react-dom": "^16.9.6",
     "@types/vexflow": "^1.2.35",
     "breathing-cube-in-p5-js": "https://api.observablehq.com/@hydrosquall/breathing-cube-in-p5-js.tgz",
+    "clsx": "^1.1.1",
     "d3": "^5.16.0",
     "d3-array": "^2.4.0",
     "d3-axis": "^1.0.12",

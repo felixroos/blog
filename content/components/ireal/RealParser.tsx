@@ -17,39 +17,40 @@ import {
   averageRegularity,
   unique
 } from './analytics';
-import DynamicTable from '../common/DynamicTable';
-
-const stringSort = (a, b) => ('' + a).localeCompare(b);
+import DynamicTable, { sortString } from '../common/DynamicTable';
 
 const songFields = [
-  /* {
-    property: 'index',
-    resolve: (_, index) => index,
-    sort: (a, b) => b - a
-  }, */
   {
     property: 'title',
-    sort: stringSort
+    sort: sortString
   },
   {
     property: 'composer',
-    sort: stringSort
+    sort: sortString
   },
   {
     property: 'key',
-    sort: stringSort
+    sort: sortString
   },
   {
     property: 'style',
-    sort: stringSort
+    sort: sortString
   }
 ];
-const regularityField = {
+
+function scaleValue(value: number, start: number, end: number) {
+  if ([value, start, end].map((v) => typeof v).includes('undefined')) {
+    return value;
+  }
+  return (value - start) / (end - start);
+}
+
+const regularityField = (start?, end?) => ({
   property: 'regularity',
-  display: (v) => `${Math.round(v * 10000) / 100}%`,
+  display: (v) => `${Math.round(scaleValue(v, start, end) * 10000) / 100}%`,
   sort: (a, b) => b - a,
   defaultOrder: 'desc'
-};
+});
 
 export function RealReader({ url }) {
   const playlist = iRealReader(decodeURI(url));
@@ -233,7 +234,7 @@ export function RealRanking(props) {
       {!!selected.length && (
         <DynamicTable
           orderedBy="title"
-          fields={songFields}
+          cols={songFields}
           rows={filteredSongs}
         />
       )}
@@ -245,11 +246,31 @@ export function RealChords(props) {
   const [songs, setSongs] = useState([]);
   const [chords, setChords] = useState([]);
   const [relative, setRelative] = useState(true);
+  const [normalize, setNormalize] = useState(true);
   const [selected, setSelected] = useState([]);
   useEffect(() => {
     setChords(parseChords(songs, relative).slice(0, 45));
   }, [songs, relative]);
-  const filteredSongs = songs.filter(includesChords(selected, relative));
+  let [start, end] = [Infinity, 0];
+  const filteredSongs = songs
+    .filter(includesChords(selected, relative))
+    .map((song) => {
+      const regularity = averageRegularity(
+        parseChords([song], relative).map((t) => t.value),
+        chords
+      );
+      start = start < regularity ? start : regularity;
+      end = end > regularity ? end : regularity;
+      return {
+        ...song,
+        regularity
+      };
+    });
+  if (!normalize) {
+    start = undefined;
+    end = undefined;
+  }
+  // const regularityBounds = filteredSongs
   return (
     <>
       <RealSongs url={props.url} onChange={(list) => setSongs(list.songs)} />
@@ -271,28 +292,30 @@ export function RealChords(props) {
           });
         }}
       />
-      <label style={{ float: 'right' }}>
-        <input
-          type="checkbox"
-          checked={relative}
-          onChange={(e) => setRelative(e.target.checked)}
-        />
-        Relative
-      </label>
+      <div style={{ float: 'right' }}>
+        <label>
+          <input
+            type="checkbox"
+            checked={normalize}
+            onChange={(e) => setNormalize(e.target.checked)}
+          />
+          Normalize
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={relative}
+            onChange={(e) => setRelative(e.target.checked)}
+          />
+          Relative
+        </label>
+      </div>
       {filteredSongs.length} matching Songs
       <div style={{ overflow: 'auto', clear: 'both', maxHeight: '310px' }}>
         <DynamicTable
           orderedBy="regularity"
-          fields={[regularityField, ...songFields]}
-          rows={filteredSongs
-            .map((song) => ({
-              ...song,
-              regularity: averageRegularity(
-                parseChords([song], relative).map((t) => t.value),
-                chords
-              )
-            }))
-            .sort((a, b) => b.regularity - a.regularity)}
+          cols={[regularityField(start, end), ...songFields]}
+          rows={filteredSongs.sort((a, b) => b.regularity - a.regularity)}
         />
       </div>
     </>
@@ -303,12 +326,31 @@ export function RealTransitions(props) {
   const [songs, setSongs] = useState([]);
   const [transitions, setTransitions] = useState([]);
   const [relative, setRelative] = useState(true);
+  const [normalize, setNormalize] = useState(true);
   const [selected, setSelected] = useState([]);
   useEffect(() => {
     const t = parseTransitions(songs, relative).slice(0, 45);
     setTransitions(t);
   }, [songs, relative]);
-  const filteredSongs = songs.filter(includesTransitions(selected, relative));
+  let [start, end] = [Infinity, 0];
+  const filteredSongs = songs
+    .filter(includesTransitions(selected, relative))
+    .map((song) => {
+      const regularity = averageRegularity(
+        parseTransitions([song], relative).map((t) => t.value),
+        transitions
+      );
+      start = start < regularity ? start : regularity;
+      end = end > regularity ? end : regularity;
+      return {
+        ...song,
+        regularity
+      };
+    });
+  if (!normalize) {
+    start = undefined;
+    end = undefined;
+  }
   return (
     <>
       <RealSongs url={props.url} onChange={(list) => setSongs(list.songs)} />
@@ -330,28 +372,30 @@ export function RealTransitions(props) {
           });
         }}
       />
-      <label style={{ float: 'right' }}>
-        <input
-          type="checkbox"
-          checked={relative}
-          onChange={(e) => setRelative(e.target.checked)}
-        />
-        Relative
-      </label>
+      <div style={{ float: 'right' }}>
+        <label>
+          <input
+            type="checkbox"
+            checked={normalize}
+            onChange={(e) => setNormalize(e.target.checked)}
+          />
+          Normalize
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={relative}
+            onChange={(e) => setRelative(e.target.checked)}
+          />
+          Relative
+        </label>
+      </div>
       {filteredSongs.length} matching Songs
       <div style={{ overflow: 'auto', maxHeight: '310px' }}>
         <DynamicTable
           orderedBy="regularity"
-          fields={[regularityField, ...songFields]}
-          rows={filteredSongs
-            .map((song) => ({
-              ...song,
-              regularity: averageRegularity(
-                parseTransitions([song], relative).map((t) => t.value),
-                transitions
-              )
-            }))
-            .sort((a, b) => b.regularity - a.regularity)}
+          cols={[regularityField(start, end), ...songFields]}
+          rows={filteredSongs.sort((a, b) => b.regularity - a.regularity)}
         />
       </div>
     </>
@@ -367,11 +411,11 @@ export function RealDiversity(props) {
         {songs.length} Songs
         <DynamicTable
           orderedBy="uniqueChords"
-          fields={[
+          cols={[
             {
               property: 'uniqueChords',
-              sort: (a, b) => b - a,
-              defaultOrder: 'desc'
+              sort: (a, b) => a - b,
+              defaultOrder: 'asc'
             },
             ...songFields
           ]}
