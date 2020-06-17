@@ -1,0 +1,377 @@
+---
+title: Voicing Permutation
+date: 2020-06-17
+---
+
+import { State } from 'react-powerplug';
+import { Synth, PolySynth } from 'tone';
+import { Chord } from '@tonaljs/tonal';
+import { Harmony } from './voicing/Harmony.ts';
+import { Voicing } from './voicing/Voicing.ts';
+import Keyboard from '../components/Keyboard.tsx';
+const isBrowser = typeof window !== 'undefined';
+const poly = isBrowser && new PolySynth(6, Synth, { volume: -12 }).toMaster();
+import DynamicTable from '../components/common/DynamicTable.tsx';
+import { min, max } from 'd3-array';
+
+<State
+  initial={{
+    wave: 'fmsine',
+    sortBy: 'topMidi',
+    tonic: 'D',
+    symbol: '-9',
+    bottomPitches: '',
+    maxNotes: 5,
+    minNotes: 5,
+    defaultDistances: '1-7',
+    bottomDistances: '5-15 2-8',
+    topDistances: '3-7',
+    arpeggioInterval: 200,
+    bottomDegrees: '1 3,5,7',
+    topDegrees: ''
+  }}
+>
+  {({ state, setState }) => {
+    const chord = Chord.getChord(
+      Harmony.irealToTonal[state.symbol],
+      state.tonic
+    );
+    const options = {
+      ...state,
+      range: ['A1', 'C5'],
+      notes: [state.minNotes, state.maxNotes] || 5,
+      bottomPitches: state.bottomPitches ? state.bottomPitches.split(' ') : [],
+      topPitches: state.topPitches ? state.topPitches.split(' ') : [],
+      bottomDegrees: state.bottomDegrees
+        ? state.bottomDegrees
+            .trim()
+            .split(' ')
+            .map((d) => d.split(',').map((_d) => parseInt(_d)))
+        : [],
+      topDegrees: state.topDegrees
+        ? state.topDegrees
+            .trim()
+            .split(' ')
+            .map((d) => d.split(',').map((_d) => parseInt(_d)))
+        : [],
+      bottomDistances: state.bottomDistances
+        ? state.bottomDistances
+            .trim()
+            .split(' ')
+            .map((d) => d.split('-').map((d) => parseInt(d)))
+        : [],
+      topDistances: state.topDistances
+        ? state.topDistances
+            .trim()
+            .split(' ')
+            .map((d) => d.split('-').map((d) => parseInt(d)))
+        : [],
+      defaultDistances: state.defaultDistances
+        ? state.defaultDistances
+            .trim()
+            .split('-')
+            .map((d) => parseInt(d))
+        : []
+    };
+    let voicings = Voicing.getCombinations(state.tonic + state.symbol, options);
+    const flatMidi = voicings.flat().map((n) => Note.midi(n));
+    const range = [min(flatMidi), max(flatMidi)].map((midi) =>
+      Note.fromMidi(midi)
+    );
+    //.map((note) => Note.simplify(note));
+    return (
+      <>
+        <p>Enter a chord symbol to see all voicings that match the rules:</p>
+        <label>
+          <select
+            value={state.tonic}
+            onChange={(e) => setState({ ...state, tonic: e.target.value })}
+          >
+            <option>C</option>
+            <option>C#</option>
+            <option>Db</option>
+            <option>D</option>
+            <option>D#</option>
+            <option>Eb</option>
+            <option>E</option>
+            <option>F</option>
+            <option>F#</option>
+            <option>Gb</option>
+            <option>G</option>
+            <option>G#</option>
+            <option>Ab</option>
+            <option>A</option>
+            <option>A#</option>
+            <option>Bb</option>
+            <option>B</option>
+          </select>
+          <select
+            value={state.symbol}
+            onChange={(e) => setState({ ...state, symbol: e.target.value })}
+          >
+            <option>^</option>
+            <option>sus4</option>
+            <option>sus2</option>
+            <option>2</option>
+            <option>^#5</option>
+            <option>6</option>
+            <option>^7</option>
+            <option>^7#5</option>
+            <option>^7#11</option>
+            <option>^9</option>
+            <option>^9#11</option>
+            <option>^13</option>
+            <option>7</option>
+            <option>7sus4</option>
+            <option>7sus</option>
+            <option>7b5</option>
+            <option>7#5</option>
+            <option>7+</option>
+            <option>7#9</option>
+            <option>7b9</option>
+            <option>7#11</option>
+            <option>7b13</option>
+            <option>7b9b5</option>
+            <option>7b9sus</option>
+            <option>7b9#5</option>
+            <option>7#9b5</option>
+            <option>7b9#9</option>
+            <option>7#9#5</option>
+            <option>7b9b13</option>
+            <option>7b9#11</option>
+            <option>7#9#11</option>
+            <option>9</option>
+            <option>9sus</option>
+            <option>9#5</option>
+            <option>9b5</option>
+            <option>9#11</option>
+            <option>13</option>
+            <option>13sus</option>
+            <option>13#9</option>
+            <option>13b9</option>
+            <option>13#11</option>
+            <option>11</option>
+            <option>-</option>
+            <option>-6</option>
+            <option>-#5</option>
+            <option>-b6</option>
+            <option>-7</option>
+            <option>-^7</option>
+            <option>-9</option>
+            <option>-^9</option>
+            <option>-11</option>
+            <option>h</option>
+            <option>h7</option>
+            <option>-7b5</option>
+            <option>o</option>
+            <option>o7</option>
+          </select>{' '}
+        </label>
+        <br />
+        <label title="minimum number of notes">
+          <input
+            type="number"
+            min="1"
+            max="8"
+            value={state.minNotes}
+            onChange={(e) => setState({ ...state, minNotes: e.target.value })}
+          />{' '}
+          -
+          <input
+            type="number"
+            min="1"
+            max="8"
+            value={state.maxNotes}
+            onChange={(e) => setState({ ...state, maxNotes: e.target.value })}
+          />
+          notes
+        </label>
+        <br />
+        <label title="min-max distances between the notes in semitones from the bottom up. all remaining will default to minDistance-maxDistance">
+          <input
+            type="text"
+            id="bottomDistances"
+            value={state.bottomDistances}
+            onChange={(e) =>
+              setState({ ...state, bottomDistances: e.target.value })
+            }
+          />
+          bottomDistances (min0-max0 min1-max1 ...){' '}
+        </label>
+        <br />
+        <label title="default min-max distance between notes. in semitones. can be overridden by bottomDistances / topDistances">
+          <input
+            type="text"
+            id="defaultDistances"
+            value={state.defaultDistances}
+            onChange={(e) =>
+              setState({ ...state, defaultDistances: e.target.value })
+            }
+          />{' '}
+          defaultDistances (min-max semitones)
+        </label>
+        <br />
+        <label title="min-max distances between the notes in semitones to the top. all remaining will default to minDistance-maxDistance">
+          <input
+            type="text"
+            id="topDistances"
+            value={state.topDistances}
+            onChange={(e) =>
+              setState({ ...state, topDistances: e.target.value })
+            }
+          />{' '}
+          topDistance(s) (... minTop-maxTop){' '}
+        </label>
+        <br />
+        <label title="all degree options for the bottom note. number(s, space seperated)">
+          <input
+            type="text"
+            id="bottomDegrees"
+            value={state.bottomDegrees}
+            onChange={(e) =>
+              setState({ ...state, bottomDegrees: e.target.value })
+            }
+          />{' '}
+          bottomDegree(s) (1-7)
+        </label>
+        <br />
+        <label title="all degree options for the top note. number(s, space seperated)">
+          <input
+            type="text"
+            id="topDegrees"
+            value={state.topDegrees}
+            onChange={(e) => setState({ ...state, topDegrees: e.target.value })}
+          />{' '}
+          topDegree(s) (1-7)
+        </label>
+        <br />
+        <label title="time between each note in ms. choose 0 to play all at once.">
+          <input
+            type="number"
+            id="arpeggioInterval"
+            value={state.arpeggioInterval}
+            onChange={(e) =>
+              setState({ ...state, arpeggioInterval: e.target.value })
+            }
+            min="0"
+            max="1000"
+          />
+          arpeggio (ms){' '}
+        </label>
+        <br />
+        <label>
+          <select
+            id="sortBy"
+            value={state.sortBy}
+            onChange={(e) => setState({ ...state, sortBy: e.target.value })}
+          >
+            <option value="topMidi">top note</option>
+            <option value="bottomMidi">bottom note</option>
+            <option value="midiMedian">median note</option>
+            <option value="topDegree">top degree</option>
+            <option value="bottomDegree">bottom degree</option>
+            <option value="semitoneSpread">spread</option>
+            <option value="avgSpread">average spread</option>
+            <option value="leapSemitones">leap</option>
+            <option value="maxDistance">maxDistance</option>
+            <option value="minDistance">minDistance</option>
+          </select>
+          sort by{' '}
+        </label>
+        <br />
+        <label>
+          <select
+            value={state.wave}
+            onChange={(e) => setState({ ...state, wave: e.target.value })}
+          >
+            <option value="sine">sine</option>
+            <option value="triangle">triangle</option>
+            <option value="sawtooth">sawtooth</option>
+            <option value="square">square</option>
+            <option value="pwm">pwm</option>
+            <option value="pulse">pulse</option>
+            <option value="fmsine">fmsine</option>
+            <option value="fmtriangle">fmtriangle</option>
+            <option value="fmsawtooth">fmsawtooth</option>
+            <option value="fmsquare">fmsquare</option>
+            <option value="amsine">amsine</option>
+            <option value="amtriangle">amtriangle</option>
+            <option value="amsawtooth">amsawtooth</option>
+            <option value="amsquare">amsquare</option>
+            <option value="fatsine">fatsine</option>
+            <option value="fattriangle">fattriangle</option>
+            <option value="fatsawtooth">fatsawtooth</option>
+            <option value="fatsquare">fatsquare</option>
+          </select>{' '}
+          oscillator wave
+        </label>
+        <DynamicTable
+          cols={[
+            {
+              property: 'keys',
+              resolve: (notes) => notes,
+              display: (keys) => (
+                <div
+                  onMouseDown={(e) => {
+                    console.log('mousedown', keys);
+                    e.stopPropagation();
+                    // e.stopImmediatePropagation();
+                    e.preventDefault();
+                    poly.triggerAttack(keys);
+                  }}
+                  onMouseUp={(e) => poly.releaseAll()}
+                  onMouseLeave={(e) => poly.releaseAll()}
+                >
+                  <Keyboard
+                    mouseControl={false}
+                    keyControl={false}
+                    options={{
+                      scaleX: 0.4,
+                      scaleY: 0.4,
+                      range,
+                      colorize: [
+                        {
+                          keys,
+                          color: 'steelblue'
+                        }
+                      ]
+                    }}
+                  />
+                </div>
+              )
+            },
+            {
+              property: 'structure',
+              resolve: (keys) => {
+                const { steps, intervals } = Voicing.analyze(keys, state.tonic);
+                return (
+                  <>
+                    {keys.join(' ')}
+                    <br />
+                    {steps.join(' ')}
+                    <br />
+                    {intervals.join(' ')}
+                  </>
+                );
+              }
+            },
+            /*{
+              property: 'spread',
+              resolve: (keys) => Voicing.analyze(keys, state.tonic).spread
+            },
+            {
+              property: 'leap',
+              resolve: (keys) => Voicing.analyze(keys, state.tonic).leap
+            },*/
+            {
+              property: 'midi median',
+              resolve: (keys) => Voicing.analyze(keys, state.tonic).midiMedian,
+              sort: (a, b) => a - b
+            }
+          ]}
+          rows={voicings}
+        />
+      </>
+    );
+  }}
+</State>

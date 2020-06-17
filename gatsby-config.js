@@ -5,14 +5,14 @@ module.exports = {
       resolve: `gatsby-theme-notes`,
       options: {
         // basePath defaults to `/`
-        basePath: `/notes`,
-      },
+        basePath: `/notes`
+      }
     },
     {
       resolve: `gatsby-theme-blog`,
       options: {
-        mdxOtherwiseConfigured: false,
-      },
+        mdxOtherwiseConfigured: false
+      }
     },
     {
       resolve: `gatsby-plugin-typescript`,
@@ -21,7 +21,8 @@ module.exports = {
         //jsxPragma: `jsx`, // defaults to "React"
         allExtensions: true // defaults to false
       }
-    }
+    },
+    { resolve: 'gatsby-theme-material-ui' }
   ],
   // Customize your site metadata:
   siteMetadata: {

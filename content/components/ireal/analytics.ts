@@ -7,6 +7,25 @@ export function unique(values = []) {
   return values.filter((c, i, a) => a.indexOf(c) === i)
 }
 
+export function countUniques(objects: Object[], props: string[]): { [key: string]: { value: any, count: number }[] } {
+  const uniques = props.reduce((p, key) => ({ ...p, [key]: [] }), {});
+  for (let i = 0; i < objects.length; ++i) {
+    for (let j = 0; j < props.length; ++j) {
+      const toMatch = objects[i][props[j]];
+      let match = uniques[props[j]].find(({ value }) => toMatch === value);
+      if (!match) {
+        match = { value: toMatch, count: 1 };
+        uniques[props[j]].push(match);
+      }
+      match.count += 1;
+    }
+  }
+  props.forEach(prop => {
+    uniques[prop] = uniques[prop].sort((a, b) => b.count - a.count)
+  })
+  return uniques;
+}
+
 export function countUnique<T>(values: T[] = []): CountedSet<T> {
   return unique(values)
     .map((value, i, set) => {
