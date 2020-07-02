@@ -5,7 +5,7 @@ export default function Sidebar({ checkboxes }) {
   const [state, setState] = useState<any>({});
   return (
     <FormGroup row>
-      {checkboxes.map((checkbox, index) => {
+      {(checkboxes || []).map((checkbox, index) => {
         const key = `checkbox-${index}`;
         return (
           <FormControlLabel
