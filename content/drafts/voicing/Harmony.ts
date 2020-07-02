@@ -1,6 +1,7 @@
-import { Interval, Chord, Note } from '@tonaljs/tonal';
+import { Interval, Note, Range, Chord, Collection } from '@tonaljs/tonal';
 
 export class Harmony {
+  // CHORD additions
   // mapping for ireal chords to tonal symbols, see getTonalChord
   static irealToTonal = {
     "^7": "M7",
@@ -81,6 +82,25 @@ export class Harmony {
     }
     return match[0];
   }
+  // Chord.inversions
+  static chordInversions(symbol, tonic, range) {
+    const pitches = Chord.getChord(symbol, tonic).notes.map(note => Note.get(note).pc);
+    const notesInRange = Range.chromatic(range).filter(Harmony.byPitches(pitches));
+    const inversions = notesInRange.length - pitches.length + 1;
+    if (inversions <= 0) {
+      return [];
+    }
+    return Array.from({ length: notesInRange.length - pitches.length + 1 }, (_, i) => Collection.rotate(i, notesInRange).slice(0, pitches.length))
+  }
+  /*
+    Harmony.chordInversions('-7', 'D', ['D3', 'A4'])
+    [
+      ["D3", "F3", "A3", "C4"],
+      ["F3", "A3", "C4", "D4"],
+      ["A3", "C4", "D4", "F4"],
+      ["C4", "D4", "F4", "A4"]
+    ]
+  */
   static tokenizeChord(chord: string) {
     if (!chord) {
       return null;
@@ -94,6 +114,7 @@ export class Harmony {
     }
     return [root, symbol];
   }
+  // add ireal chords to tonal
   static getTonalChord(chord: string) {
     if (!chord) {
       return null;
@@ -111,30 +132,10 @@ export class Harmony {
     }
     return root + symbol;
   }
-  /** Returns true if the given degree is present in the intervals */
-  static hasDegree(degree, intervals) {
-    return !!Harmony.findDegree(degree, intervals);
-  }
-  static findDegree(degreeOrStep: number | string, intervalsOrSteps: string[]) {
-    const intervals = intervalsOrSteps.map(i => Harmony.isInterval(i) ? i : Harmony.getIntervalFromStep(i));
-    if (typeof degreeOrStep === 'number') { // is degree
-      const degree = Math.abs(degreeOrStep);
-      return intervals.find(i => {
-        i = Harmony.minInterval(i, 'up');
-        if (!steps[i]) {
-          console.error('interval', i, 'is not valid', intervals);
-        }
-        return !!(steps[i].find(step => Harmony.getDegreeFromStep(step) === degree));
-      });
-    }
-    // is step
-    const step = Harmony.getStep(degreeOrStep);
-    return intervals.find(i => i.includes(step) ||
-      i === Harmony.getIntervalFromStep(step));
-  }
+  // INTERVAL ADDITIONS
   // use Interval.ic?
   static minInterval(interval, direction?: intervalDirection, noUnison?) {
-    interval = Harmony.fixInterval(interval, true);
+    interval = Harmony.reduceInterval(interval, true);
     if (direction) {
       return Harmony.forceDirection(interval, direction, noUnison)
     }
@@ -144,8 +145,8 @@ export class Harmony {
     }
     return interval;
   }
-  /** Transforms interval into one octave (octave+ get octaved down) */
-  static fixInterval(interval = '', simplify = false) {
+  /** Reduces interval into one octave (octave+ get octaved down) */
+  static reduceInterval(interval = '', simplify = false) {
     let fix: { [key: string]: string } = {
       '0A': '1P',
       '-0A': '1P',
@@ -203,86 +204,19 @@ export class Harmony {
     }
     return Interval.invert(interval);
   }
-  /** Returns interval from step */
-  static getIntervalFromStep(step: string | number) {
-    step = Harmony.getStep(step);
-    const interval = Object.keys(steps)
-      .find(i => steps[i].includes(step));
-    if (!interval) {
-      // console.warn(`step ${step} has no defined inteval`);
-    }
-    return interval;
-  }
-  static getStep(step: string | number) {
-    if (typeof step === 'number' && step < 0) {
-      step = 'b' + (step * -1);
-    }
-    return step + ''; // to string
-  }
-  static isInRange(note, range: string[]) {
-    return Interval.semitones(Interval.distance(note, range[0])) <= 0 && Interval.semitones(Interval.distance(note, range[1])) >= 0;
-  }
-  static noteArray(range) {
-    const slots = Interval.semitones(Interval.distance(range[0], range[1]) + '');
-    return new Array(slots + 1)
-      .fill('')
-      .map((v, i) => Note.transpose(range[0], Interval.fromSemitones(i)) + '')
-      .map(n => Note.simplify(n))
-  }
-  static getPitchesInRange(pitches: string[], range: string[]) {
-    return Harmony.noteArray(range).filter(n => pitches.find(p => Note.chroma(p) === Note.chroma(n)));
-    // return noteArray(range).filter(n => pitches.find(p => Note.pc(p) === Note.pc(n)));
-  }
-  /** Returns degree from step */
-  static getDegreeFromStep(step: string) {
-    step = Harmony.getStep(step);
-    const match = step.match(/([1-9])+/);
-    if (!match || !match.length) {
-      return 0;
-    }
-    return parseInt(match[0], 10);
-  }
   static isInterval(interval) {
     return typeof Interval.semitones(interval) === 'number';
   }
-  static getDegreeInChord(degree, chord) {
-    chord = Harmony.getTonalChord(chord);
-    const intervals = Chord.get(chord).intervals;
-    const tokens = Chord.tokenize(chord);
-    return Note.transpose(tokens[0], Harmony.findDegree(degree, intervals));
+  // RANGE ADDITIONS
+  // Range.includes(note, range) => true if note is inside range
+  static isInRange(note, range: string[]) {
+    const m = Note.midi(note);
+    return Note.midi(range[0]) <= m && m <= Note.midi(range[1]);
   }
-  static getStepFromInterval(interval, min = false) {
-    const step = steps[interval] || [];
-    if (min) {
-      return step[1] || step[0] || 0;
-    }
-    return step[0] || 0;
-  }
-  static getDegreeFromInterval(interval = '-1', simplify = false) {
-    const fixed = Harmony.fixInterval(interval + '', simplify) || '';
-    const match = fixed.match(/[-]?([1-9])+/);
-    if (!match) {
-      return 0;
-    }
-    return Math.abs(parseInt(match[0], 10));
+  // Range.byPitches
+  static byPitches(pitches) {
+    const chromas = pitches.map(pitch => Note.chroma(pitch));
+    return (note) => chromas.includes(Note.chroma(note))
   }
 }
 export declare type intervalDirection = 'up' | 'down';
-
-const steps = {
-  '1P': ['1', '8'],
-  '2m': ['b9', 'b2'],
-  '2M': ['9', '2',],
-  '2A': ['#9', '#2'],
-  '3m': ['b3'],
-  '3M': ['3'],
-  '4P': ['11', '4'],
-  '4A': ['#11', '#4'],
-  '5d': ['b5'],
-  '5P': ['5'],
-  '5A': ['#5'],
-  '6m': ['b13', 'b6'],
-  '6M': ['13', '6'],
-  '7m': ['b7'],
-  '7M': ['7', '^7', 'maj7']
-};

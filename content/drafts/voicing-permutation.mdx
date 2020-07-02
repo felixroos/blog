@@ -1,7 +1,60 @@
 ---
 title: Voicing Permutation
 date: 2020-06-17
+draft: true
 ---
+
+```js
+const rules = [
+  {
+    // as no voices are specified, this is a general rule
+    min: 2, // min notes (can only be set as general)
+    max: 3, // max notes (can only be set as general)
+    distance: [1, 7] // general distance (can be overridden)
+  },
+  {
+    voices: [0], // this rule is only for the first (lowest) note
+    degrees: [1], // only root is allowed for lowest note
+    distance: [5, 15] // min 5, max 15 semitones distance from lowest to second lowest note
+  },
+  {
+    voices: [1], // this rule is only for the second (second lowest) note
+    degrees: [3, 5, 7], // only the thid, fifth and seventh may be used here
+    distance: [2, 8] // min 2, max 8 semitones distance from second lowest to third lowest
+  },
+  {
+    voices: [-2], // this rule applies to the second highest note (like first param of JS slice)
+    distance: [3, 7] // min 3, max 7 distance from second highest to highest note
+  }
+];
+// rules for negative indices cannot be evaluated until a solution is found (top note is clear)
+// future idea: add reverse flag that starts from top note (positive index rules are applied on solution)
+// using multiple voices:
+const rules2 = [
+  {
+    voices: [1, 2], // this rule is only for the second (second lowest) note
+    degrees: [3, 7], // use third or seventh (any order)
+    distance: [2, 8] // distances for 1->2 and 2->3 or distance between 1 and 2 ?? (more powerful)
+  }
+];
+// idea: distance is applied between the selected voices (single voice selections like [0] do not accept/ignore distance)
+// => this allows settings distances between non adjacent notes! like
+const rules3 = [
+  {
+    voices: [0],
+    notes: ['C3']
+  },
+  {
+    voices: [0, 2],
+    distance: [8, 8]
+  },
+  {
+    voices: [0, 1, 2],
+    distance: [3, 5]
+  }
+];
+// those rules allow e.g. [[C3,Eb3,A3],[C3,E3,A3],[C3,F3,A3]]
+```
 
 import { State } from 'react-powerplug';
 import { Synth, PolySynth } from 'tone';
@@ -313,7 +366,6 @@ import { min, max } from 'd3-array';
               display: (keys) => (
                 <div
                   onMouseDown={(e) => {
-                    console.log('mousedown', keys);
                     e.stopPropagation();
                     // e.stopImmediatePropagation();
                     e.preventDefault();

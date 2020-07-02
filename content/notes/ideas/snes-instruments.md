@@ -1,4 +1,16 @@
-taken from notes
+new insights:
+
+- according to [this thread](https://chipmusic.org/forums/topic/24209/it2amk-good-alternative-to-snesmod/), the tool [it2amk](https://github.com/vince94/it2amk) can be used to convert tracker files (.it) to brrs or maybe spcs?!.
+- as [snes_spc_js](https://github.com/cosinusoidally/snes_spc_js) accepts spc files, i could basically use a tracker to make music for the browser!?
+- taking that a step further (maybe just a little far fantasy), i could port it2amk from [python to js](https://github.com/qquick/Transcrypt) + write a rhythmical to .it file generator to then play realistic snes sounds in the browser without any strings attached...
+- https://jyosh1.github.io/it2amk/it2amk_readme_files/setup_and_basic_usage.html
+- https://jyosh1.github.io/it2amk/it2amk_readme_files/advanced_usage.html
+- https://jyosh1.github.io/it2amk/it2amk_readme_files/list_of_supported_features.html
+- also see [video tutorial](https://www.youtube.com/watch?v=h4FZ0D5TZs8)
+- .it files https://ftp.modland.com/pub/favourites/Impulsetracker/
+- https://int10h.org/blog/categories/fonts/
+- 
+WOW: https://mmontag.github.io/chip-player-js/browse?play=Nintendo%20SNES%2FSuper%20Mario%20World%2F10b%20Super%20Mario%20Bros.%20Remix.spc
 
 # Instruments
 
@@ -10,16 +22,16 @@ SPC files are the soundtrack files from SNES games.
 
 ### Ripping OSTs
 
- Soundtracks for most games have already been ripped and can be dowonload at [zophar](https://www.zophar.net/music/nintendo-snes-spc) or [snesmusic.org](http://snesmusic.org). See MEGA/chipmusic/sheets/*/spc folders. Otherwise, emulators like Snes9x support dumping SPC files (Option>Save SPC File at Next Note-On).
+Soundtracks for most games have already been ripped and can be dowonload at [zophar](https://www.zophar.net/music/nintendo-snes-spc) or [snesmusic.org](http://snesmusic.org). See MEGA/chipmusic/sheets/\*/spc folders. Otherwise, emulators like Snes9x support dumping SPC files (Option>Save SPC File at Next Note-On).
 
- ### Playing OSTs
+### Playing OSTs
 
- - Audio Overload is a good piece of software to play SPC files directly. It even supports channel splitting to listen to parts > good for transcribing.
- - SPC700 PLAYER (open with wine) displays which samples are used (press right arrow twice)
+- Audio Overload is a good piece of software to play SPC files directly. It even supports channel splitting to listen to parts > good for transcribing.
+- SPC700 PLAYER (open with wine) displays which samples are used (press right arrow twice)
 
- ### Converting to MIDI
+### Converting to MIDI
 
- Tools like nintspc (see MEGA/chipmusic/software/spc2midi) can be used to convert spc files to midi:
+Tools like nintspc (see MEGA/chipmusic/software/spc2midi) can be used to convert spc files to midi:
 
 ```
 nintspc file.scp file.mid
@@ -35,14 +47,13 @@ The above command converts all spc files in the working folder to midi (expects 
 
 Alternative: [vgmtrans](https://github.com/vgmtrans/vgmtrans), currently not working with wine + build fails due to qt5 not found bla.
 
-
 ### Converting to Sheet
 
 The midi files can then be opened by Musescore which will try to convert the midi to a sheet. This looks crappy most of the time but is a good starting point. Alternatively, use your goold old ears + Audio Overload.
 
 #### Other Sheet Music Resources
 
-[ninsheetmusic](https://www.ninsheetmusic.org) has many sheets, arranged by users. By using Finale Notepad (free), the *.mus* files can be converted to music xml format, which can be opened by e.g. musescore to further edit.
+[ninsheetmusic](https://www.ninsheetmusic.org) has many sheets, arranged by users. By using Finale Notepad (free), the _.mus_ files can be converted to music xml format, which can be opened by e.g. musescore to further edit.
 
 ### Ripping Instruments
 
@@ -52,11 +63,11 @@ The vst [c700](http://picopicose.com/how_to_use_the_c700_eng.html) (MEGA/chipmus
 
 #### split700
 
-Alternatively, you can use [split700](https://github.com/gocha/split700) to generate brr or wav files for spcs. 
+Alternatively, you can use [split700](https://github.com/gocha/split700) to generate brr or wav files for spcs.
 The binary is only available for windows, but i [built it from source](https://preshing.com/20170511/how-to-build-a-cmake-based-project/) (MEGA/chipmusic/software/split700-2.0/build). The bins are also in the bin folder.
 
 ```sh
-split700 -L --wav *.spc 
+split700 -L --wav *.spc
 ```
 
 #### [snesbrr](https://github.com/boldowa/snesbrr)

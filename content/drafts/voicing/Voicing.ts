@@ -1,6 +1,8 @@
-import { Permutation } from './../../components/combinatorial-search/Permutation';
+import { Permutation } from '../../components/combinatorial-search/Permutation';
 import { Harmony, intervalDirection } from './Harmony';
-import { Chord, Note, Interval } from '@tonaljs/tonal';
+import { Chord, Note, Interval, Range } from '@tonaljs/tonal';
+import { Degree } from './Degree';
+import { Step } from './Step';
 
 export class Voicing {
   static getCombinations(chord, options: VoicingValidation = {}) {
@@ -8,7 +10,7 @@ export class Voicing {
     if (options.bottomDegrees && options.bottomDegrees.length) {
       options.bottomPitches = (options.bottomPitches || []).concat(
         (options.bottomDegrees as number[][])
-          .map(degrees => degrees.map(degree => Harmony.getDegreeInChord(degree, chord)))
+          .map(degrees => degrees.map(degree => Degree.inChord(degree, chord)))
       );
     }
     if (options.topDegrees && options.topDegrees.length && typeof options.topDegrees[0] === 'number') {
@@ -17,7 +19,7 @@ export class Voicing {
     if (options.topDegrees && options.topDegrees.length) {
       options.topPitches = (options.topPitches || []).concat(
         (options.topDegrees as number[][])
-          .map(p => p.map(degree => Harmony.getDegreeInChord(degree, chord)))
+          .map(p => p.map(degree => Degree.inChord(degree, chord)))
       );
     }
     return Voicing.absolute({ ...Voicing.getPitches(chord, options), ...options, root });
@@ -73,7 +75,7 @@ export class Voicing {
     if (!maxNotes) {
       maxNotes = pitches.length;
     }
-    const allowedNotes = Harmony.getPitchesInRange(pitches, range);
+    const allowedNotes = Range.chromatic(range).filter(Harmony.byPitches(pitches));
     return Permutation.search(
       (path: string[], solutions) => {
         if (!path.length) { // no notes picked yet
@@ -213,12 +215,12 @@ export class Voicing {
     const notes = Chord.get(chord).notes;
     const intervals = Chord.get(chord).intervals;
     let requiredSteps = [3, 7, 'b5', 6].slice(0, Math.max(voices, 2)); // order is important
-    if (!Harmony.hasDegree(3, intervals)) {
+    if (!Degree.find(3, intervals)) {
       requiredSteps.push(4); // fixes m6 chords
     }
     let required = requiredSteps.reduce((req, degree) => {
-      if (Harmony.hasDegree(degree, intervals)) {
-        req.push(Harmony.getDegreeInChord(degree, chord));
+      if (!!Degree.find(degree, intervals)) {
+        req.push(Degree.inChord(degree, chord));
       }
       return req;
     }, []);
@@ -247,7 +249,7 @@ export class Voicing {
   }
   static analyze(voicing, root) { // voicing with first note as bass
     const pitches = voicing.map(note => Note.get(note).pc);
-    const steps = pitches.map(pitch => Harmony.getStepFromInterval(Interval.distance(root, pitch)));
+    const steps = pitches.map(pitch => Step.fromInterval(Interval.distance(root, pitch)));
     const intervals = voicing.reduce((intervals, note, index) => index ? intervals.concat(
       [Interval.distance(voicing[index - 1] as string, note as string)]
     ) : [], []);
@@ -261,8 +263,8 @@ export class Voicing {
     const leapSemitones = maxDistance - minDistance;
     const leap = Interval.fromSemitones(leapSemitones);
     const topMidi = Note.midi(voicing[voicing.length - 1]);
-    const topDegree = Harmony.getDegreeFromInterval(Interval.distance(root, pitches[pitches.length - 1]));
-    const bottomDegree = Harmony.getDegreeFromInterval(Interval.distance(root, pitches[0]));
+    const topDegree = Degree.fromInterval(Interval.distance(root, pitches[pitches.length - 1]));
+    const bottomDegree = Degree.fromInterval(Interval.distance(root, pitches[0]));
     const bottomMidi = Note.midi(voicing[0]);
     const midiMedian = voicing.reduce((sum, note) => sum + Note.midi(note), 0) / voicing.length;
     // TODO:

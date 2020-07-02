@@ -5,8 +5,8 @@ import DynamicTable, {
 } from '../../../content/components/common/DynamicTable';
 import { countUniques } from '../../../content/components/ireal/analytics';
 import iRealReader from 'ireal-reader';
-import Layout from './Layout';
-import Sidebar from './Sidebar';
+import Layout from '../Layout';
+import Sidebar from '../Sidebar';
 
 const { songs } = iRealReader(decodeURI(standards));
 

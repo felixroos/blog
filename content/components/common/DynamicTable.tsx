@@ -61,7 +61,7 @@ export default function DynamicTable({
   rows: Object[];
   debug?: boolean;
   orderedBy?: string;
-  heading?: string;
+  heading?: React.ReactNode;
 }) {
   const [rows, setRows] = useState(_rows);
   useEffect(() => {
