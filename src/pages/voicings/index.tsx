@@ -53,7 +53,7 @@ export default function Voicings() {
       : []
   };
   let voicings = Voicing.getCombinations(state.tonic + state.symbol, options);
-  const flatMidi = (voicings as any).flat().map((n) => Note.midi(n));
+  const flatMidi = [].concat.apply([], voicings).map((n) => Note.midi(n));
   const range = [min(flatMidi), max(flatMidi)].map((midi) =>
     Note.fromMidi(+midi)
   );
