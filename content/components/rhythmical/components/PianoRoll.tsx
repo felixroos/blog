@@ -27,9 +27,7 @@ export default function PianoRoll(props: PianoRollProps) {
     .map((e) => e.value)
     .filter((v, i, e) => e.indexOf(v) === i)
     .sort((a, b) => Note.midi(b) - Note.midi(a));
-  const uniqueNoteLanes = uniqueLanes
-    .filter((n) => !!Note.name(n))
-    .map((note) => note.toUpperCase());
+  const uniqueNoteLanes = uniqueLanes.filter((n) => !!Note.name(n));
   const uniqueRhythmLanes = uniqueLanes.filter((n) => !Note.name(n));
 
   const maxTime = max(events.map((e) => e.time + e.duration));
@@ -46,11 +44,13 @@ export default function PianoRoll(props: PianoRollProps) {
           // must match by midi to also detect enharmonic equivalents
         )
       : uniqueNoteLanes
-    ).concat(
-      rhythmLanes
-        ? rhythmLanes.filter((key) => uniqueRhythmLanes.indexOf(key) !== -1)
-        : uniqueRhythmLanes.reverse()
-    );
+    )
+      .map((note) => Note.midi(note) + '')
+      .concat(
+        rhythmLanes
+          ? rhythmLanes.filter((key) => uniqueRhythmLanes.indexOf(key) !== -1)
+          : uniqueRhythmLanes.reverse()
+      );
   } else {
     const midiRange = noteRange
       ? noteRange.map((n) => Note.midi(n))
@@ -61,7 +61,7 @@ export default function PianoRoll(props: PianoRollProps) {
     noteLanes = (noteLanes
       ? noteLanes
       : Range.chromatic(midiRange.reverse().map((m) => Note.fromMidi(m)))
-    ).map((note) => note.toUpperCase());
+    ).map((note) => Note.midi(note) + '');
     lanes = noteLanes.concat(rhythmLanes || uniqueRhythmLanes.reverse());
   }
 
@@ -79,12 +79,11 @@ export default function PianoRoll(props: PianoRollProps) {
   const renderedEvents = events.filter(
     ({ value, time, duration }) =>
       hiddenSymbols.indexOf(value) === -1 &&
-      (lanes.indexOf(value) !== -1 || lanes.indexOf(value.toUpperCase()) !== -1)
+      lanes.indexOf(Note.midi(value) ? Note.midi(value) + '' : value) !== -1
   );
   const timeOffset = length(time) % width;
 
   const ppl = height / lanes.length;
-
   function renderLanes(offset = 0) {
     return (
       <g>
@@ -99,7 +98,7 @@ export default function PianoRoll(props: PianoRollProps) {
               return;
             }
             value = Note.midi(value)
-              ? Note.simplify(value).toUpperCase() // fixes case problems
+              ? Note.midi(value) + '' // fixes case problems
               : value;
             const index = lanes.indexOf(value);
             const isActive =
