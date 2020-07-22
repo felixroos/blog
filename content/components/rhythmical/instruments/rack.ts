@@ -3,7 +3,7 @@ import Tone from 'tone';
 //TBD add transpose option for keys
 
 export function rack(samples: { [key: string]: any }, options = {}) {
-  options = { volume: -12, attack: 0.05, ...options }
+  options = { volume: -12, attack: 0.01, ...options }
   let players = new Tone.Players(samples, options);
 
   const s = {

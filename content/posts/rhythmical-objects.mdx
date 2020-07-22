@@ -14,12 +14,17 @@ import { InlineMath, BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import { interpolateRainbow } from 'd3-scale-chromatic';
 import { Note } from '@tonaljs/tonal';
+import drums from '../instruments/tidal';
+import piano from '../instruments/tinypiano';
+import { sampler } from '../components/rhythmical/instruments/sampler.ts';
 
 <Player
   fold={true}
+  instruments={{ piano, drums }}
   events={renderRhythmObject(
     {
       duration: 14,
+      instrument: 'piano',
       parallel: [
         [
           ['e5', ['b4', 'c5'], 'd5', ['c5', 'b4']],

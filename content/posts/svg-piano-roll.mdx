@@ -13,12 +13,13 @@ import { stack, equivalence } from '../components/tuning/tuning.ts';
 import PianoRoll from '../components/rhythmical/components/PianoRoll.tsx';
 import { inheritProperty } from '../components/rhythmical/features/inherit.ts';
 import { State } from 'react-powerplug';
-import drums from '../assets/samples/tidal/tidal.ts';
+import drums from '../instruments/tidal';
 
 After playback was implemented in the last post, we can now feed our eyes with some colored bars:
 
 <Player
   fold={true}
+  instruments={{ synth, drums }}
   rhythmLanes={['sn', 'hh', 'cp', 'bd', 'cm']}
   events={renderRhythmObject(
     {

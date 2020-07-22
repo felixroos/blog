@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ValueChild } from '../helpers/objects';
 import * as Tone from 'tone';
 import canUseDOM from '../../canUseDOM';
@@ -10,7 +10,7 @@ const { PolySynth, Synth } = Tone;
 
 export const synth =
   canUseDOM() &&
-  new PolySynth(6, Synth, {
+  new PolySynth(12, Synth, {
     volume: -16,
     envelope: { attack: 0.01, decay: 0.2, sustain: 0.5, release: 0.1 },
     oscillator: { type: 'fmtriangle' }

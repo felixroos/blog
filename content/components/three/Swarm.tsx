@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+/* import * as THREE from 'three';
 import React, { Suspense, useCallback, useRef, useMemo } from 'react';
 import { Canvas, useFrame } from 'react-three-fiber';
 import Effects from './Effects';
@@ -91,3 +91,4 @@ export default function SwarmApp() {
     </div>
   );
 }
+ */

@@ -49,10 +49,10 @@ export function renderScore({
         timeSignature && stave.addTimeSignature(timeSignature);
       }
       if (setBegBarType) {
-        stave.setBegBarType(VF.Barline.type[setBegBarType]);
+        stave.setBegBarType(VF.Barline.type[setBegBarType] as any);
       }
       if (setEndBarType) {
-        stave.setEndBarType(VF.Barline.type[setEndBarType]);
+        stave.setEndBarType(VF.Barline.type[setEndBarType] as any);
       }
       const getVexFlowKey = (key) => key.includes('/')
         ? key
@@ -117,6 +117,16 @@ export function rhythmicalScore(rhythm: NestedRhythm<string>) {
   return Rhythm.render(rhythm, rhythm.length)
     .map((e) => ([e.value, Math.floor(e.time), 1 / e.duration]))
     .reduce((groups: any[][], [note, bar, duration]) => {
+      let tie = false;
+      if (note === '_') {
+        let lastNote;
+        if (groups.length && groups[groups.length - 1].length) {
+          const lastGroup = groups[groups.length - 1];
+          lastNote = lastGroup[lastGroup.length - 1];
+        }
+        note = lastNote ? lastNote.key : 'r';
+        tie = lastNote ? true : false;
+      }
       if (!groups.length || bar > groups.length - 1) {
         groups.push([]);
       }
@@ -127,7 +137,7 @@ export function rhythmicalScore(rhythm: NestedRhythm<string>) {
         duration = duration + 'r';
         note = 'b4';
       }
-      groups[groups.length - 1].push([note, duration]);
+      groups[groups.length - 1].push({ key: note, duration, tie });
       return groups;
     }, []);
 }

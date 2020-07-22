@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+/* import React, { useRef, useEffect } from 'react';
 import canUseDOM from '../canUseDOM';
 
 // renders p5 sketch
@@ -30,3 +30,4 @@ export default function Sketch({ render: sketch, background }) {
   useEffect(() => () => instance.current && instance.current.remove(), []);
   return <div ref={elementRef} style={{ background }} />;
 }
+ */
