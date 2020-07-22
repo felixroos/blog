@@ -1,0 +1,81 @@
+## ties
+
+```js
+renderRhythmObject({
+  duration: 4,
+  value: [
+    ['C', 'E'],
+    ['_', 'D']
+  ]
+});
+// renders to
+[
+  { value: 'C', duration: 1 },
+  { value: 'E', duration: 2 },
+  { value: 'D', duration: 1 }
+];
+```
+
+## velocity
+
+- multiply down
+
+## chords
+
+- resolve chord symbols to polyphonic notes
+
+## nudge
+
+- allows microadjustment of notes
+- time and duration of siblings might be affected too
+
+## swing
+
+- nudges every second attack, inside a specified grid size
+
+## string notation
+
+like tidal
+
+## event buffer
+
+- instead of rendering a whole piece, just repeat a short time loop e.g. 1 second
+- prerender only the events for the next cycle
+- allows creating endlessly alternating loops
+- similar to how tidal does it
+- needs some way of handling render state
+- could use a generator function
+- more dynamic & manipulation friendly system
+
+## polymeter
+
+the event buffer would be good to render polymeters in a performant way
+
+```js
+{
+  polymeter: [
+    ['C', 'D'],
+    ['E', 'F', 'G']
+  ];
+}
+```
+
+behaves like
+
+```js
+[
+  { polyphonic: ['C','E'] },
+  { polyphonic: ['D','F'] }, // first loop finished
+  { polyphonic: ['C','G'] }, // second loop finished
+  { polyphonic: ['D','E'] }, // first loop finished
+  { polyphonic: ['C','F'] },
+  { polyphonic: ['D','G'] }, // first + second loop finished
+]
+```
+
+- a polymeter different pulse lengths (2 & 3 above) will repeat with a cycle length of their least common multiple (6 above)
+
+https://tidalcycles.org/index.php/What_is_a_pattern%3F
+
+
+try to use https://github.com/gibber-cc/tidal.pegjs with tonejs! (and use as plugin for rhythmical later)

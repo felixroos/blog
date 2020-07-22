@@ -1,0 +1,70 @@
+import { interpolateSinebow } from 'd3-scale-chromatic';
+
+# Color
+
+This is a color, using css in JS via JSX:
+
+<div
+  style={{
+    background: 'steelblue',
+    width: 20,
+    height: 40,
+    borderRadius: 30,
+    margin: 10
+  }}
+></div>
+
+These are multiple colors using JSX:
+
+<div style={{ display: 'flex' }}>
+  {Array.from({ length: 10 }, (_, i) => (
+    <div
+      style={{
+        background: interpolateSinebow(i / 10),
+        width: 20,
+        height: 40,
+        borderRadius: 30,
+        margin: 10
+      }}
+    ></div>
+  ))}
+</div>
+
+## State
+
+These are dynamic colors:
+
+import Slider from '@material-ui/core/Slider';
+import { State } from 'react-powerplug';
+
+<State initial={{ length: 5 }}>
+  {({ state, setState }) => (
+    <>
+      <Slider
+        min={1}
+        max={10}
+        step={1}
+        style={{ width: 350 }}
+        value={state.length}
+        onChange={(e, v) =>
+          setState({
+            length: v
+          })
+        }
+      />
+      <div style={{ display: 'flex' }}>
+        {Array.from({ length: state.length }, (_, i) => (
+          <div
+            style={{
+              background: interpolateSinebow(i / state.length),
+              width: 20,
+              height: 40,
+              borderRadius: 30,
+              margin: 10
+            }}
+          ></div>
+        ))}
+      </div>
+    </>
+  )}
+</State>
