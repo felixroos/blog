@@ -43,6 +43,7 @@
     "gatsby": "^2.19.45",
     "gatsby-cli": "^2.11.3",
     "gatsby-plugin-typescript": "^2.3.1",
+    "gatsby-plugin-webpack-bundle-analyzer": "^1.0.5",
     "gatsby-theme-blog": "^1.4.30",
     "gatsby-theme-material-ui": "^1.0.10",
     "gatsby-theme-notes": "^1.2.22",
@@ -73,6 +74,10 @@
   },
   "devDependencies": {
     "gatsby-plugin-goatcounter": "^0.3.1",
-    "node-fetch": "^2.6.0"
+    "mp3-cutter": "^1.0.6",
+    "node-fetch": "^2.6.0",
+    "node-lame": "^1.2.2",
+    "webpack-cli": "^3.3.12",
+    "yargs": "^15.4.0"
   }
 }

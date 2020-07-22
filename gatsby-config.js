@@ -1,6 +1,7 @@
 module.exports = {
   pathPrefix: '/blog',
   plugins: [
+    'gatsby-plugin-webpack-bundle-analyzer',
     {
       resolve: `gatsby-plugin-goatcounter`,
       options: {
@@ -22,7 +23,7 @@ module.exports = {
         // for testing the integration locally.
         // TIP: set up a `Additional Site` in your GoatCounter settings
         // and use its code conditionally when you `allowLocal`, example below
-        allowLocal: true,
+        allowLocal: false,
         // Override the default localStorage key more below
         localStorageKey: 'skipgc',
         // Set to boolean true to enable referrer set via URL parameters
@@ -37,8 +38,8 @@ module.exports = {
         // browser address bar as well.
         // This is to prevent ref tracking ending up in your users bookmarks.
         // All parameters other than `ref` and all `utm_` will stay intact
-        urlCleanup: false,
-      },
+        urlCleanup: false
+      }
     },
     {
       resolve: `gatsby-theme-notes`,
