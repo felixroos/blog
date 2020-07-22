@@ -13,7 +13,7 @@ import { Score } from '../components/score/Score.tsx';
 In modern music, ties across barlines are a common way of adding interest to a melody. For example, take the beginning of the tune "Blue Monk" by Thelonious Monk:
 
 <Score
-  width={660}
+  width={600}
   height={100}
   staves={[
     [
@@ -181,14 +181,14 @@ export function rhythmicalScore(rhythm: NestedRhythm<string>) {
 Now the tie symbol works in the score:
 
 <Score
-  width={660}
+  width={600}
   height={100}
   staves={rhythmicalScore([[['d4', 'eb4', 'e4', 'f4'], '_']])}
 />
 
 ```js
 <Score
-  width={660}
+  width={600}
   height={100}
   staves={rhythmicalScore([[['d4', 'eb4', 'e4', 'f4'], '_']])}
 />

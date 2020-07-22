@@ -11,7 +11,7 @@ import PlayButton from '../components/rhythmical/components/PlayButton.tsx';
 import { renderRhythmObject } from '../components/rhythmical/rhythmical.ts';
 
 <Score
-  width={660}
+  width={600}
   height={100}
   staves={rhythmicalScore([
     ['e5', ['b4', 'c5'], 'd5', ['c5', 'b4']],
@@ -21,7 +21,7 @@ import { renderRhythmObject } from '../components/rhythmical/rhythmical.ts';
   ])}
 />
 <Score
-  width={660}
+  width={600}
   height={100}
   timeSignature=""
   clef=""
@@ -142,7 +142,7 @@ I already did a basic implementation of a [score rendering component](../notes/c
 For example, this is the classic tetris melody:
 
 <Score
-  width={660}
+  width={600}
   height={100}
   staves={[
     {
@@ -180,7 +180,7 @@ For example, this is the classic tetris melody:
   ]}
 />
 <Score
-  width={660}
+  width={600}
   height={100}
   timeSignature=""
   clef=""
@@ -227,7 +227,7 @@ For example, this is the classic tetris melody:
 ```js
 
 <Score
-  width={660}
+  width={600}
   height={100}
   staves={[
     {
@@ -265,7 +265,7 @@ For example, this is the classic tetris melody:
   ]}
 />
 <Score
-  width={660}
+  width={600}
   height={100}
   timeSignature=""
   clef=""
@@ -538,7 +538,7 @@ events.reduce((groups, [note, bar, value]) => {
 This is it! We can test if it really works by throwing this into the Score component:
 
 <Score
-  width={660}
+  width={600}
   height={100}
   staves={[
     [
@@ -573,7 +573,7 @@ This is it! We can test if it really works by throwing this into the Score compo
   ]}
 />
 <Score
-  width={660}
+  width={600}
   height={100}
   timeSignature=""
   clef=""
@@ -616,7 +616,7 @@ This is it! We can test if it really works by throwing this into the Score compo
 ```js
 
 <Score
-  width={660}
+  width={600}
   height={100}
   staves={[
     [
@@ -651,7 +651,7 @@ This is it! We can test if it really works by throwing this into the Score compo
   ]}
 />
 <Score
-  width={660}
+  width={600}
   height={100}
   timeSignature=""
   clef=""
@@ -720,7 +720,7 @@ export function rhythmicalScore(rhythm: NestedRhythm<string>) {
 This function is now usable with the score component directly:
 
 <Score
-  width={660}
+  width={600}
   height={100}
   staves={rhythmicalScore([
     ['e5', ['b4', 'c5'], 'd5', ['c5', 'b4']],
@@ -730,7 +730,7 @@ This function is now usable with the score component directly:
   ])}
 />
 <Score
-  width={660}
+  width={600}
   height={100}
   timeSignature=""
   clef=""
@@ -747,7 +747,7 @@ This function is now usable with the score component directly:
 
 ```js
 <Score
-  width={660}
+  width={600}
   height={100}
   staves={rhythmicalScore([
     ['e5', ['b4', 'c5'], 'd5', ['c5', 'b4']],
@@ -757,7 +757,7 @@ This function is now usable with the score component directly:
   ])}
 />
 <Score
-  width={660}
+  width={600}
   height={100}
   timeSignature=""
   clef=""
@@ -779,7 +779,7 @@ Now compare the source above to the non-rhythmical version:
 
 ```js
 <Score
-  width={660}
+  width={600}
   height={100}
   staves={[
       [
@@ -814,7 +814,7 @@ Now compare the source above to the non-rhythmical version:
   ]}
 />
 <Score
-  width={660}
+  width={600}
   height={100}
   timeSignature=""
   clef=""

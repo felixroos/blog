@@ -1,0 +1,114 @@
+---
+title: Rhythmical Grooves
+date: 2020-07-10
+---
+
+import Player, { synth } from '../components/rhythmical/components/Player.tsx';
+import { renderRhythmObject } from '../components/rhythmical/rhythmical.ts';
+import { inheritProperty } from '../components/rhythmical/features/inherit.ts';
+import { Scale } from '@tonaljs/tonal';
+import { State } from 'react-powerplug';
+import { MK2md2 } from '../instruments/rhodes';
+import NoteSelect from '../components/NoteSelect.tsx';
+import Grid from '@material-ui/core/Grid';
+
+Let's try to find a way to define grooves that can be used for all kinds of musical material
+
+<State initial={{ scale: 'major', root: 'F' }}>
+  {({ state, setState }) => (
+    <>
+      <NoteSelect
+        value={state.root}
+        onChange={(v) => setState({ root: v })}
+        notes={[
+          'C',
+          'Db',
+          'D',
+          'Eb',
+          'E',
+          'F',
+          'Gb',
+          'G',
+          'Ab',
+          'A',
+          'Bb',
+          'B'
+        ]}
+      />
+      <select
+        value={state.scale}
+        onChange={(e) => setState({ scale: e.target.value })}
+      >
+        {Scale.names()
+          .filter((_scale) => Scale.get(`C ${_scale}`).notes.length === 7)
+          .map((_scale, index) => (
+            <option key={index}>{_scale}</option>
+          ))}
+      </select>
+      <Player
+        instruments={{ piano, drums }}
+        fold={false}
+        events={renderRhythmObject(
+          {
+            duration: 4,
+            parallel: [
+              {
+                octave: 4,
+                sequential: [
+                  3,
+                  [
+                    [5, 6],
+                    [4, 5]
+                  ]
+                ]
+              },
+              {
+                octave: 3,
+                sequential: [
+                  { parallel: [3, 5] },
+                  {
+                    parallel: [
+                      [5, 4],
+                      [7, 6]
+                    ]
+                  }
+                ]
+              },
+              { octave: 2, sequential: [1, 2, 3, 5] },
+              {
+                instrument: 'drums',
+                parallel: [
+                  ['bd', 'sn', 'bd', 'sn'],
+                  ['hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh']
+                ]
+              }
+            ]
+          },
+          [inheritProperty('instrument'), inheritProperty('octave')]
+        ).map((e) => ({
+          ...e,
+          value:
+            typeof e.value === 'number'
+              ? Scale.get(`${state.root}${e.octave || 3} ${state.scale}`).notes[
+                  e.value - 1
+                ]
+              : e.value
+        }))}
+      />
+      <Grid container>
+        {Note.names().map((note) => (
+          <Grid key={note} item style={{ width: '12.5%' }}>
+            {note}
+          </Grid>
+        ))}
+      </Grid>
+    </>
+  )}
+</State>
+
+## groove mining
+
+https://magenta.tensorflow.org/datasets/e-gmd
+
+- native instruments
+- drumgenius
