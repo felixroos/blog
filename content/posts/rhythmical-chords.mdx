@@ -29,9 +29,6 @@ Disclaimer: To get the most out of this post, you might want to read those posts
 
 - [Rhythmical Arrays](https://felixroos.github.io/blog/rhythmical-arrays/)
 - [Rhythmical Objects](https://felixroos.github.io/blog/rhythmical-objects/)
-- ([Tone.js Playback](https://felixroos.github.io/blog/rhythmical-playback/))
-- ([SVG Piano Roll Component](https://felixroos.github.io/blog/svg-piano-roll/))
-- ([Sampled Instruments](https://felixroos.github.io/blog/sampler-instruments/))
 
 After this post, we will be able play chords like this:
 
@@ -53,7 +50,7 @@ After this post, we will be able play chords like this:
     ]
   })
     .reduce(tieReducer, [])
-    .reduce(voicingReducer(lefthand, ['G4', 'G6']), [])}
+    .reduce(voicingReducer(lefthand, ['G3', 'G5']), [])}
 />
 
 <details>
@@ -148,6 +145,8 @@ renderRhythmObject({
 
 Result:
 
+<div style={{maxHeight:400,overflow:'auto',borderRadius:10,marginBottom:10}}>
+
 ```js
 [
   {
@@ -197,6 +196,8 @@ Result:
   }
 ];
 ```
+
+</div>
 
 ...which we can now play back:
 
@@ -308,6 +309,8 @@ export const lefthand = {
 These are typical [rootless lefthand voicings](https://www.youtube.com/watch?v=5uoD6LfaDoE).
 If we now want to resolve chords with good voice leading, we can do it like this:
 
+<div style={{maxHeight:400,overflow:'auto',borderRadius:10,marginBottom:10}}>
+
 ```ts
 import { Chord, Note } from '@tonaljs/tonal';
 
@@ -349,6 +352,8 @@ export const voicingDictionaryReducer = (dictionary) => (events, event) => {
     .concat(notes.map((note) => ({ ...event, value: note })));
 };
 ```
+
+</div>
 
 Now, a 251 sounds like this:
 
@@ -622,19 +627,25 @@ Now those 3 voicings are all possible Cm7 voicings inside the given range, using
 
 After some back and forth, I ended up implementing the method like this:
 
+<div style="max-height:400px;overflow:auto;border-radius:10px;margin-bottom:10px">
+
 ```js
 import { Chord, Range, Note, Interval } from '@tonaljs/tonal';
 
 export function voicingsInRange(chord, dictionary, range) {
   const { tonic, aliases } = Chord.get(chord);
   // find equivalent symbol that is used as a key in dictionary:
-  const symbol = Object.keys(dictionary).find(_symbol => aliases.includes(_symbol));
+  const symbol = Object.keys(dictionary).find((_symbol) =>
+    aliases.includes(_symbol)
+  );
   // resolve array of interval arrays for the wanted symbol
-  const voicings = dictionary[symbol].map(intervals => intervals.split(' '));
-  const notesInRange = Range.chromatic(range) // gives array of notes inside range
+  const voicings = dictionary[symbol].map((intervals) => intervals.split(' '));
+  const notesInRange = Range.chromatic(range); // gives array of notes inside range
   return voicings.reduce((voiced, voicing) => {
     // transpose intervals relative to first interval (e.g. 3m 5P > 1P 3M)
-    const relativeIntervals = voicing.map(interval => Interval.substract(interval, voicing[0]));
+    const relativeIntervals = voicing.map((interval) =>
+      Interval.substract(interval, voicing[0])
+    );
     // interval from bottom to top note
     const voicingSpan = relativeIntervals[relativeIntervals.length - 1];
     // get enharmonic correct pitch class the bottom note
@@ -642,16 +653,24 @@ export function voicingsInRange(chord, dictionary, range) {
     // get all possible start notes for voicing
     const starts = notesInRange
       // only get the start notes:
-      .filter(note => Note.chroma(note) === Note.chroma(bottomPitchClass))
+      .filter((note) => Note.chroma(note) === Note.chroma(bottomPitchClass))
       // filter out start notes that will overshoot the top end of the range
-      .filter(note => Note.midi(Note.transpose(note, voicingSpan)) <= Note.midi(range[1]))
+      .filter(
+        (note) =>
+          Note.midi(Note.transpose(note, voicingSpan)) <= Note.midi(range[1])
+      )
       // replace Range.chromatic notes with the correct enharmonic equivalents
-      .map(note => enharmonicEquivalent(note, bottomPitchClass))
+      .map((note) => enharmonicEquivalent(note, bottomPitchClass));
     // render one voicing for each start note
-    const notes = starts.map(start => relativeIntervals.map(interval => Note.transpose(start, interval)));
+    const notes = starts.map((start) =>
+      relativeIntervals.map((interval) => Note.transpose(start, interval))
+    );
     return voiced.concat(notes);
-  }, [])
+  }, []);
+}
 ```
+
+</div>
 
 using [Range.chromatic](https://github.com/tonaljs/tonal/tree/master/packages/range) to create the range + a custom enharmonicEquivalent function to get the accidentals right.
 
@@ -660,6 +679,8 @@ using [Range.chromatic](https://github.com/tonaljs/tonal/tree/master/packages/ra
 One tricky part of the implementation above was the enharmonicEquivalent method.
 
 To understand the problem, let's try to create an edge case, by rendering the chord Fm7b5 with a specific voicing:
+
+<div style="max-height:400px;overflow:auto;border-radius:10px;margin-bottom:10px">
 
 ```js
 const tonic = 'F';
@@ -694,6 +715,8 @@ const notes = starts.map((start) =>
 // but we want ['Cb3','Eb3','F3','Ab3']
 ```
 
+</div>
+
 So the last piece of the puzzle is a function that turns the B2 to a Cb3 before calculating the notes.
 
 My first attempt at this was just swapping the octave number:
@@ -727,6 +750,8 @@ export function enharmonicEquivalent(note: string, pitchClass: string): string {
 // enharmonicEquivalent('B2', 'Cb') => Cb3 => fine
 // enharmonicEquivalent('C2', 'B#') => B#1 => fine
 ```
+
+### Conclusion
 
 Finally the "problematic" chord progression sounds like this:
 
@@ -774,9 +799,7 @@ Finally the "problematic" chord progression sounds like this:
 </details>
 <br />
 
-### Conclusion
-
-Now this seems to work perfectly, the only jump remains at the repetition, which could by regenerating the voicing each round, which I will implement in the future.
+Now this seems to work perfectly, the only jump remains at the repetition, which could be fixed by regenerating the voicing each round, which I will implement in the future.
 
 Now to close the gap, here's the basic cadence again, this time generated algorithmically:
 
@@ -840,9 +863,8 @@ Let's try some autumn leaves (with more voicings added to the dictionary):
     ]
   })
     .reduce(tieReducer, [])
-    .reduce(voicingReducer(lefthand, ['E3', 'G5']), [])}
+    .reduce(voicingReducer(lefthand, ['D3', 'E5']), [])}
 />
-
 
 <details>
   <summary>show source</summary>
@@ -870,11 +892,12 @@ Let's try some autumn leaves (with more voicings added to the dictionary):
 ```
 
 </details>
+<br/>
 
 ## TBD
 
 - error handling !
+- remove hard coded bass from voicingReducer => add bassReducer
+- add filterReducer + combineReducers => apply voicing reducer only to chords
 - add duplicateReducer (removes duplicate events) => remove notes that are covered by melody
 - add rangeReducer (remove notes outside a certain range) => remove notes above melody
-- add filterReducer + combineReducers => apply voicing reducer only to chords
-- remove hard coded bass from voicingReducer => add bassReducer
