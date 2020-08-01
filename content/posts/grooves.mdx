@@ -12,7 +12,23 @@ import { MK2md2 } from '../instruments/rhodes';
 import NoteSelect from '../components/NoteSelect.tsx';
 import Grid from '@material-ui/core/Grid';
 
-Let's try to find a way to define grooves that can be used for all kinds of musical material
+Let's try to find a way to define grooves that can be used for all kinds of musical material.
+
+## Dynamic Events
+
+There is one important playback feature that I have not implemented yet: changing events while playback:
+
+```ts
+useEffect(() => {
+  if (!part) {
+    return;
+  }
+  part.removeAll();
+  events.forEach((e) => part.add(e.time, e));
+}, [events]);
+```
+
+The above react hook will replace the current events of a part when the events change. This enables us to edit a loop while it plays:
 
 <State initial={{ scale: 'major', root: 'F' }}>
   {({ state, setState }) => (
@@ -95,20 +111,15 @@ Let's try to find a way to define grooves that can be used for all kinds of musi
               : e.value
         }))}
       />
-      <Grid container>
+      {/* <Grid container>
         {Note.names().map((note) => (
           <Grid key={note} item style={{ width: '12.5%' }}>
             {note}
           </Grid>
         ))}
-      </Grid>
+      </Grid> */}
     </>
   )}
 </State>
 
-## groove mining
-
-https://magenta.tensorflow.org/datasets/e-gmd
-
-- native instruments
-- drumgenius
+If you change the key or scale from the dropdown above, the playback will directly adapt almost instantly. Sometimes, events may be dropped. I suppose this happens when all events have been removed, but the new ones haven't been added yet.

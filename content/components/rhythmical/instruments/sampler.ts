@@ -7,16 +7,18 @@ export function sampler(samples, options = {}) {
   options = { volume: -12, attack: 0.01, ...options }
   let sampler = new Tone.Sampler(samples, options);
   const s = {
-    triggerAttackRelease: (note, duration, velocity) => {
+    triggerAttackRelease: (note, duration, time, velocity) => {
       if (typeof note === 'number') {
-        sampler.triggerAttackRelease(note, duration, velocity);
+        sampler.triggerAttackRelease(note, duration, time);
         return;
       }
       if (options['transpose']) {
         note = Distance.transpose(note, Interval.fromSemitones(options['transpose']));
       }
-      sampler.triggerAttackRelease(Note.simplify(note), duration, velocity);
+      sampler.triggerAttackRelease(Note.simplify(note), duration, time, velocity);
     },
+    triggerAttack: sampler.triggerAttack,
+    triggerRelease: sampler.triggerAttack,
     connect: (dest) => { sampler.connect(dest); return s },
     toMaster: () => { sampler.toMaster(); return s },
   }

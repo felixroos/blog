@@ -37,7 +37,8 @@ export function playEvents(
     pickInstrument(event.instrument, instruments).triggerAttackRelease(
       event.value,
       event.duration,
-      time
+      time,
+      event.velocity || 0.9
     );
   }, events).start(0);
   part.loop = loop;
@@ -83,7 +84,10 @@ export default function Player(props) {
   return (
     <>
       <PianoRoll {...props} time={time} />
-      <PlayButton {...props} draw={setTime} />
+      <div style={{ float: 'right' }}>
+        <PlayButton {...props} draw={setTime} />
+      </div>
+      <div style={{ clear: 'both' }} />
     </>
   );
 }

@@ -16,10 +16,6 @@ export default function PlayButton({ events, instruments, draw, loop }) {
     part.removeAll();
     events.forEach((e) => part.add(e.time, e));
   }, [events]);
-  /* useEffect(() => {
-    return () => stop();
-  }); */
-
   function stop() {
     drawLoop.current && drawLoop.current.stop();
     part && part.stop();

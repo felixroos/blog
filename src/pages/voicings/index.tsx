@@ -285,7 +285,7 @@ export default function Voicings() {
           <br />
           <ul>
             <li>Beautify Interface</li>
-            <li>Steps are buggy => test</li>
+            <li>Steps are buggy - test</li>
             <li>
               Reimplement rules, use array of objects with voices as selector
             </li>

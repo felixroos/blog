@@ -1,0 +1,53 @@
+
+### The one voice leading trick pianists don't want you to know
+
+One trick to pull this off, is to switch range while staying on a chord, basically playing the same chord twice, going in the preferred direction at the second time:
+
+<Player
+  fold={false}
+  instruments={{ tinypiano }}
+  events={renderRhythmObject(
+    {
+      duration: 20,
+      sequential: [
+        { color: interpolateWarm(0 / 6), sequential: [['Fm7', 'Bb7'], 'Eb^7'] },
+        {
+          color: interpolateWarm(1 / 6),
+          sequential: [['Ebm7', 'Ab7'], 'Db^7']
+        },
+        {
+          color: interpolateWarm(2 / 6),
+          sequential: ['C#m7', 'F#7', 'Cb^7', 'B^7']
+        },
+        {
+          color: interpolateWarm(3 / 6),
+          sequential: [['Bm7', 'E7'], 'A^7']
+        },
+        { color: interpolateWarm(4 / 6), sequential: [['Am7', 'D7'], 'G^7'] },
+        { color: interpolateWarm(5 / 6), sequential: [['Gm7', 'C7'], 'F^7'] }
+      ]
+    },
+    [inheritProperty('color')]
+  ).reduce(voicingDictionaryReducer(lefthandBad), [])}
+/>
+
+```js
+[
+  [['Fm7', 'Bb7'], 'Eb^7'],
+  [['Ebm7', 'Ab7'], 'Db^7'],
+  ['C#m7', 'F#7', 'Cb^7', 'B^7'],
+  [['Bm7', 'E7'], 'A^7'],
+  [['Am7', 'D7'], 'G^7'],
+  [['Gm7', 'C7'], 'F^7']
+];
+```
+
+- here we are forcing the motion down, by using a whole step root motion
+- as we are transposing from the third octave of the root note, the voicing will flip as soon as we pass C
+- ...which happens when we get to B^7, where a disjoint will be created
+- we can temporarily surpass this, by using Cb^7 which will be one octave lower
+
+This will smoothen the motion, as the range adjustment is made while the harmony is idle, which results in less changes per time.
+
+I won't implement this "trick" here, as it is really tricky to implement and probably would need a seperate post.
+

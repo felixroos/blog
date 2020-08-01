@@ -129,7 +129,7 @@ export function Urn({
                 marginRight: 10,
                 paddingLeft: 5,
                 fontSize: "20px",
-                width: 30,
+                width: 50,
               }}
               onChange={e =>
                 e.target.value && setSize(parseInt(e.target.value))
@@ -175,7 +175,7 @@ export function Urn({
           style={{
             border: "0px solid gray",
             maxHeight: 290,
-            width: 50 * (size || colors.length),
+            width: 54 * (size || colors.length),
             overflow: "auto",
             padding: 10,
             marginBottom: 20,
