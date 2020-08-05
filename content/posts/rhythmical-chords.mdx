@@ -6,21 +6,20 @@ date: 2020-07-30
 import {
   chordReducer,
   voicingDictionaryReducer,
-  lefthandBad
+  lefthandBad,
+  voicingReducer
 } from '../components/voicing-permutation/old.ts';
 import { tieReducer } from '../components/rhythmical/reducers.ts';
 import { renderRhythmObject } from '../components/rhythmical/rhythmical.ts';
 import { inheritProperty } from '../components/rhythmical/features/inherit.ts';
 import {
   lefthand,
-  voicingsInRange,
-  voicingReducer
+  voicingsInRange
 } from '../components/rhythmical/dictionary/voicings.ts';
 import Player from '../components/rhythmical/components/Player.tsx';
 import tinypiano from '../instruments/tinypiano';
 import { interpolateWarm } from 'd3-scale-chromatic';
 import drums from '../instruments/tidal';
-// import { MK2md2 } from '../instruments/rhodes';
 
 To bring rhythmical one step closer to being a hackable backing track player, I want to implement one of the most important things: chord symbols.
 
@@ -48,7 +47,7 @@ After this post, we will be able play chords like this:
       ['Bbm7', 'Eb7', 'Ab^7', ['Gm7b5', 'C7b9']]
     ]
   })
-    .reduce(tieReducer, [])
+    .reduce(tieReducer(), [])
     .reduce(voicingReducer(lefthand, ['G3', 'G5']), [])}
 />
 
@@ -73,7 +72,7 @@ After this post, we will be able play chords like this:
       ['Bbm7', 'Eb7', 'Ab^7', ['Gm7b5', 'C7b9']]
     ]
   })
-    .reduce(tieReducer, [])
+    .reduce(tieReducer(), [])
     .reduce(voicingReducer(lefthand, ['G3', 'G5']), [])}
 />
 ```
@@ -295,7 +294,7 @@ This can be done via [combinatorial search](https://felixroos.github.io/blog/com
 
 ## Implementing a Voicing Dictionary
 
-A (small fragment) of a voicing dictionary could look like this:
+A small fragment of a voicing dictionary could look like this:
 
 ```js
 export const lefthand = {
@@ -305,7 +304,7 @@ export const lefthand = {
 };
 ```
 
-These are typical [rootless lefthand voicings](https://www.youtube.com/watch?v=5uoD6LfaDoE).
+These are typical [rootless lefthand voicings](https://www.youtube.com/watch?v=5uoD6LfaDoE), notated using .
 If we now want to resolve chords with good voice leading, we can do it like this:
 
 <div style={{maxHeight:400,overflow:'auto',borderRadius:10,marginBottom:10}}>
@@ -489,7 +488,7 @@ if (!events.length) {
 
 </details>
 
-Now we reach to lowest possible note (Bb2) on the second Cm7 (the long one). This is kind of low, but still more or less acceptable. What's less acceptable, is the last chord:
+Now we reach the lowest possible note (Bb2) on the second Cm7 (the long one). This is kind of low, but still more or less acceptable. What's less acceptable, is the last chord:
 
 I've set up the Bm7 to create a disjoint after the low Cm7. It may not sound unpleasant but for the goal of smooth voice leading, the Bm7 goes higher than it should.
 
@@ -861,7 +860,7 @@ Let's try some autumn leaves (with more voicings added to the dictionary):
       ['Am7b5', 'D7b13', 'Gm6', '_']
     ]
   })
-    .reduce(tieReducer, [])
+    .reduce(tieReducer(), [])
     .reduce(voicingReducer(lefthand, ['D3', 'E5']), [])}
 />
 
@@ -885,7 +884,7 @@ Let's try some autumn leaves (with more voicings added to the dictionary):
       ['Am7b5', 'D7b13', 'Gm6', '_']
     ]
   })
-    .reduce(tieReducer, [])
+    .reduce(tieReducer(), [])
     .reduce(voicingReducer(lefthand, ['E3', 'G5']), [])}
 />
 ```

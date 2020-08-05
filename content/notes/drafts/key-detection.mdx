@@ -1,0 +1,229 @@
+# Key Detection
+
+import Player from '../../components/rhythmical/components/Player.tsx';
+import { renderRhythmObject } from '../../components/rhythmical/rhythmical.ts';
+import { tieReducer } from '../../components/rhythmical/reducers.ts';
+import {
+  lefthand,
+  voicings
+} from '../../components/rhythmical/dictionary/voicings.ts';
+
+Lets say we have chords
+
+<Player
+  fold={false}
+  events={renderRhythmObject({
+    duration: 64,
+    sequential: [
+      ['Fm7', 'Bbm7', 'Eb7', 'Ab^7'],
+      ['Db^7', ['Dm7', 'G7'], 'C^7', '_'],
+      ['Cm7', 'Fm7', 'Bb7', 'Eb^7'],
+      ['Ab^7', ['Am7', 'D7'], 'G^7', '_'],
+      ['Am7', 'D7', 'G^7', '_'],
+      ['F#m7b5', 'B7b9', 'E^7', 'C7b13'],
+      ['Fm7', 'Bbm7', 'Eb7', 'Ab^7'],
+      ['Db^7', 'DbmM7', 'Cm7', 'Bo7'],
+      ['Bbm7', 'Eb7', 'Ab^7', ['Gm7b5', 'C7b9']]
+    ]
+  })
+    .reduce(tieReducer(), [])
+    .reduce(voicingReducer(lefthand, ['G3', 'G5']), [])}
+/>
+
+```js
+renderRhythmObject({
+  duration: 64,
+  sequential: [
+    ['Fm7', 'Bbm7', 'Eb7', 'Ab^7'],
+    ['Db^7', ['Dm7', 'G7'], 'C^7', '_'],
+    ['Cm7', 'Fm7', 'Bb7', 'Eb^7'],
+    ['Ab^7', ['Am7', 'D7'], 'G^7', '_'],
+    ['Am7', 'D7', 'G^7', '_'],
+    ['F#m7b5', 'B7b9', 'E^7', 'C7b13'],
+    ['Fm7', 'Bbm7', 'Eb7', 'Ab^7'],
+    ['Db^7', 'DbmM7', 'Cm7', 'Bo7'],
+    ['Bbm7', 'Eb7', 'Ab^7', ['Gm7b5', 'C7b9']]
+  ]
+});
+```
+
+the first 8 rendered events, before any reducers are applied, look like this:
+
+<pre>
+  {JSON.stringify(
+    renderRhythmObject({
+      duration: 9 * 4,
+      sequential: [
+        ['Fm7', 'Bbm7', 'Eb7', 'Ab^7'],
+        ['Db^7', ['Dm7', 'G7'], 'C^7', '_'],
+        ['Cm7', 'Fm7', 'Bb7', 'Eb^7'],
+        ['Ab^7', ['Am7', 'D7'], 'G^7', '_'],
+        ['Am7', 'D7', 'G^7', '_'],
+        ['F#m7b5', 'B7b9', 'E^7', 'C7b13'],
+        ['Fm7', 'Bbm7', 'Eb7', 'Ab^7'],
+        ['Db^7', 'DbmM7', 'Cm7', 'Bo7'],
+        ['Bbm7', 'Eb7', 'Ab^7', ['Gm7b5', 'C7b9']]
+      ]
+    })
+      .map((e) =>
+        Object.entries(e).reduce(
+          (o, [key, value]) => ({
+            ...o,
+            ...(key !== 'path' ? { [key]: value } : {})
+          }),
+          {}
+        )
+      )
+      .slice(0, 8),
+    null,
+    2
+  )}
+</pre>
+
+How on earth do we find out which scales are the best?
+
+### available scales
+
+For simplicity, let's limit the scales we check for to only major scales.
+
+### concept
+
+we could
+
+1. find scales that contain the chord (parent scales)
+2. sort scales by "reach", meaning most subsequent siblings that all have that parent scale
+3. decide which scale fits best
+
+### example
+
+with only major or harmonic minor scales, those are the possibilities for the first 8 chords:
+
+- Fm7 => Eb major, Ab major, Db major
+- Bbm7 => Ab major, Gb major, Db major
+- Eb7 => Ab major
+- Ab^7 => Ab major, Eb major
+- Db^7 => Db major, Ab major
+- Dm7 => C major, Bb major, F major
+- G7 => C major
+- C^7 => C major, G major
+- C^7 => C major, G major
+
+### flood fill
+
+let's try a "flood fill", beginning with the first:
+
+- Fm7 => Eb major, Ab major, Db major
+
+now, for each of those 3 scales, we can count how many siblings also have that parent scale:
+
+- Eb major: 0 => next sibling does not have Eb major => stop
+- Ab major: 4 => next 4 siblings all have Ab major
+- Db major: 1 => only the next sibling has Db major
+
+So for the first chord, Ab major is the best choice, because the next 4 chords also represent Ab major.
+For this first chord, we can now notate ['Ab major', [0, 5]] which is [scale, [relativeIndex, size]]
+
+We could repeat this for each chord, creating a scale map:
+
+```js
+[
+  [
+    // Fm7 scales with reach (including Fm7 itself)
+    ['Ab major', 0, 5], //Ab major last 5 chords, starting here (0)
+    ['Db major', 0, 2],
+    ['Eb major', 0, 1]
+  ],
+  [
+    // Bbm7 scales
+    ['Ab major', 1, 5], //Ab major lasts 5 chords, started last chord (1)
+    ['Db major', 1, 2],
+    ['Gb major', 0, 1]
+  ],
+  [
+    // Eb7 scales
+    ['Ab major', 2, 5] //this is chord 3/5 for Ab major
+  ],
+  [
+    // Ab^7
+    ['Ab major', 3, 5], //this is chord 4/5 for Ab major
+    ['Eb major', 0, 1]
+  ],
+  [
+    // Db^7
+    ['Ab major', 4, 5], //this is the last Ab major chord
+    ['Db major', 0, 1]
+  ],
+  [
+    // Dm7
+    ['C major', 0, 4], // c major starts now
+    ['Bb major', 0, 1],
+    ['F major', 0, 1]
+  ],
+  [
+    // G7
+    ['C major', -1, 4]
+  ],
+  [
+    // C^7
+    ['C major', -2, 4],
+    ['G major', 0, 1]
+  ],
+  [
+    // C^7 again
+    ['C major', -2, 4],
+    ['G major', 0, 1]
+  ]
+];
+```
+
+- could also use time + duration instead of indices for future considerations
+- as soon as non diatonic chords appear, we need either more scales, or alternative strats
+
+## Implementation
+
+```js
+getParentScales('Bbm7', ['major', 'harmonic minor']);
+// ['Ab major', 'Gb major', 'Db major', 'F harmonic minor']
+
+const chords = chordEvents.map((e) => getParentScales(chordEvent.value));
+/*
+[
+  ['Ab major', 'Eb major', 'Db major', 'C harmonic minor']
+  ['Ab major', 'Gb major', 'Db major', 'F harmonic minor'],
+  ['Ab major', 'Ab harmonic minor'],
+  ['Ab major', 'Eb major', 'C harmonic minor'],
+  ['Db major', 'Ab major', 'F harmonic minor']
+]
+*/
+
+const scales = chords.forEach((chordScales, i) => {
+  // chordScales = ['Ab major', 'Eb major', 'Db major', 'C harmonic minor']
+  // i = 0
+
+  // returns slice region that contains uninterrupted value
+  function fill2D(value: string, i: number, layers: string[][]) {
+    let reach = [0, 0]; // [behind, ahead]
+    index = i;
+    while (index - 1 >= 0 && layers[index - 1].includes(value)) {
+      index -= 1;
+      reach[0] += 1;
+    }
+    let index = i;
+    while (index + 1 < layers.length && layers[index + 1].includes(value)) {
+      index += 1;
+      reach[1] += 1;
+    }
+    return [i - reach[0], i + reach[1] + 1]; // [start, size] (like slice params)
+  }
+  // fill2D('blue', 1, [['red','yellow'],['blue','yellow'],['blue','yellow']]) => [1,2]
+  // fill2D('blue', 2, [['red','yellow'],['blue','yellow'],['blue','yellow']]) => [1,2]
+  // fill2D('yellow', 0, [['red','yellow'],['blue','yellow'],['blue','yellow']]) => [0,3]
+  // fill2D('yellow', 2, [['red','yellow'],['blue','yellow'],['blue','yellow']]) => [0,3]
+
+  const reaches = chordScales
+    .map(fill2D(chordScale, i, chordScales))
+    .map(([start, size], i) => [chordScales[i], size]);
+  return Object.sort(([i, a], [j, b]) => b - a)[0][0];
+  // [['Ab major', 4], ['Eb major', 1], ['Db major', 0], ['C harmonic minor', 0]]
+});
+```

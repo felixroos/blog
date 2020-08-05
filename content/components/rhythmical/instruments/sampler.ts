@@ -3,7 +3,7 @@ import { Distance, Interval, Note } from 'tonal';
 import Tone from 'tone';
 
 export function sampler(samples, options = {}) {
-  console.log('init sampler samples: ', samples.length);
+  // console.log('init sampler samples: ', samples.length);
   options = { volume: -12, attack: 0.01, ...options }
   let sampler = new Tone.Sampler(samples, options);
   const s = {

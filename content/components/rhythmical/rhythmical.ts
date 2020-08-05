@@ -58,3 +58,37 @@ export function renderRhythmObject<T>(agnostic: AgnosticChild<T>, extraFeatures:
     return ({ ...event, time, duration, path })
   })
 }
+
+
+export function renderRhythm<T>(agnostic: AgnosticChild<T>, rhythmPlugins = []) {
+  const root = toObject(agnostic);
+  const totalDuration = 1 / (root.duration || 1); // outer duration
+  return flatObject(agnostic, {
+    getChildren: rhythmChildren,
+    // dont stop recursion if child has parallel or sequential props
+    isDeep: child => ['value', 'parallel', 'sequential'] // this spares the sequential child mess from earlier
+      .reduce((deep, prop) => deep || (child[prop] && typeof child[prop] === 'object'), false),
+      // apply features to children
+    mapChild: renderRhythmPlugins(rhythmPlugins),
+  }).map((event) => {
+    let { path } = event;
+    path = [[0, totalDuration, totalDuration]].concat(path);
+    const [time, duration] = getTimeDuration(path);
+    return ({ ...event, time, duration, path })
+  })
+}
+
+function renderRhythmPlugins(rhythmPlugins = []) {
+  return (props) => {
+    rhythmPlugins.forEach(plugin => {
+      props.child = plugin(props)
+    });
+    return props.child;
+  }
+}
+
+function rhythmChildren<T>(agnostic: AgnosticChild<T>) {
+  const parent = toObject(applyFeatures(agnostic, [sequentialParent, parallelParent]));
+  const children = (toArray(parent.value) || []);
+  return children;
+}

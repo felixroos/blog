@@ -1,5 +1,5 @@
 import { TinyColor } from "@ctrl/tinycolor"
-import { Note } from "@tonaljs/tonal"
+import { Note, Collection } from "@tonaljs/tonal"
 import { interpolateRainbow, interpolateSinebow, interpolateWarm } from 'd3-scale-chromatic'
 
 export function noteColor(note: string, rotate = 0): TinyColor {
@@ -24,4 +24,42 @@ export function sinebow(note: string, rotate = 180) {
 // divide chroma decimal by number of ones to get relative darkness
 export function chromaDarkness(chroma) {
   return parseInt(chroma, 2) / (chroma.split('').filter(d => d === '1').join('').length)
+}
+
+export function chromaDiff(chromaA, chromaB) {
+  const [a, b] = [chromaA, chromaB].map(chroma => chroma.split(''));
+  return a.reduce((diff, digit, i) => diff + (digit !== b[i] ? 1 : 0), 0);
+}
+
+export function circle(rotation = 0) {
+  return Collection.rotate(
+    rotation + 6,
+    Array.from({ length: 12 }, (_, i) => Note.transposeFifths('C', i - 6))
+  );
+}
+
+export function harmonicDegree(pitch, rotate = 0.55, flip = true) {
+  const chroma = Note.chroma(pitch);
+  const circleChromas = Array.from({ length: 12 }, (_, i) => (i * 5) % 12);
+  const deg = (circleChromas.indexOf(chroma) / 12 + rotate) % 1;
+  if (flip) {
+    return 1 - deg;
+  }
+  return deg;
+}
+
+export function averageDegree(pitches, rotate, flip) {
+  return pitches.map(pitch => harmonicDegree(pitch, rotate, flip))
+    .reduce((sum, degree) => sum + degree, 0) / pitches.length;
+}
+
+export function harmonicChroma(notes) {
+  const chromas = notes.map(note => Note.chroma(note));
+  // const circleChromas = circle().map(note => Note.chroma(note));
+  const circleChromas = Array.from({ length: 12 }, (_, i) => (i * 5) % 12);
+  return circleChromas.reduce((chroma, circleChroma) => chroma + '' + (chromas.includes(circleChroma) ? '1' : '0'), '')
+}
+
+export function chromaCenter(chroma) {
+  return chroma.split('').reduce((sum, digit, index) => sum + (digit === '1' ? index : 0), 0) / 12;
 }

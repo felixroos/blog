@@ -15,6 +15,11 @@ export const lefthand = {
   'm6': ['3m 5P 6M 9M', '6M 9M 10m 12P'],
 }
 
+export const triads = {
+  M: ['1P 3M 5P', '3M 5P 8P', '5P 8P 10M'],
+  m: ['1P 3m 5P', '3m 5P 8P', '5P 8P 10m'],
+}
+
 export function enharmonicEquivalent(note: string, pitchClass: string): string {
   const { alt, letter } = Note.get(pitchClass);
   let { oct } = Note.get(note);
@@ -70,7 +75,7 @@ export const topNoteSort = (events) => {
   return (a, b) => diff(a) - diff(b);
 }
 
-export const voicingReducer = (dictionary, range, sorter = topNoteSort) => (events, event) => {
+export const voicings = (dictionary, range, sorter = topNoteSort) => (events, event) => {
   if (typeof event.value !== 'string') {
     return events
   }
@@ -81,14 +86,14 @@ export const voicingReducer = (dictionary, range, sorter = topNoteSort) => (even
     console.log(`no voicings found for chord "${event.value}"`);
     return events;
   }
-  const bass = tonic + '2';
   let notes;
-  if (!events.length) {
+  const lastVoiced = events.filter(e => !!e.chord);
+  if (!lastVoiced.length) {
     notes = voicings[Math.ceil(voicings.length / 2)];
   } else {
     // calculates the distance between the last note and the given voicings top note
     // sort voicings with differ
-    notes = voicings.sort(sorter(events))[0];
+    notes = voicings.sort(sorter(lastVoiced))[0];
   }
-  return events.concat([{ ...event, value: bass }]).concat(notes.map((note) => ({ ...event, value: note })));
+  return events.concat(notes.map((note) => ({ ...event, value: note, chord: event.value })));
 }

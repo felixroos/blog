@@ -16,10 +16,14 @@ export type AgnosticChild<T> = ValueChild<T> | T[] | T;
 
 export function flatObject<T>(agnostic: AgnosticChild<T>, props: FlatObjectProps<T> = {}): ValueChild<T>[] {
   const getChildren: ChildrenResolver<T> = props.getChildren || getChildrenWithPath;
+  const isDeep: (child: ValueChild<T>) => boolean = props.isDeep || (child => child.value && typeof child.value === 'object');
   let flat: ValueChild<T>[] = [];
   const children = getChildren(agnostic, props);
-  children.forEach((child) => {
-    if (child.value && typeof child.value === 'object') {
+  children.forEach((child, index) => {
+    if (typeof props.mapChild === 'function') {
+      child = props.mapChild({ child, isLeaf: !isDeep(child), index, props, siblings: children, parent: agnostic });
+    }
+    if (isDeep(child)) {
       flat = flat.concat(flatObject(child, props));
     } else {
       flat.push(child);

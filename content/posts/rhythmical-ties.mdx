@@ -82,7 +82,10 @@ The last event would not be suitable for playback, as "\_" is not a valid note n
 To fix that, we can apply a tie by adding its duration to the preceeding event:
 
 ```js
-function tieReducer(events, event, index, array) {
+const tieReducer = (filter) => (events, event, index, array) => {
+  if (filter) {
+    array = array.filter(filter);
+  }
   // check if next event is a tie
   if (index + 1 < array.length && array[index + 1].value === '_') {
     return events.concat([
@@ -93,12 +96,12 @@ function tieReducer(events, event, index, array) {
     return events; // ignore tie
   }
   return events.concat([event]); // next event is no tie
-}
+};
 // to apply the reducer, we use it with reduce on the rendered events:
 renderRhythmObject({
   duration: 8,
   sequential: [['d4', 'eb4', 'e4', 'f4'], '_']
-}).reduce(tieReducer, []);
+}).reduce(tieReducer(), []);
 ```
 
 Result (again without path):
@@ -136,7 +139,7 @@ These events are now suitable for playback:
   events={renderRhythmObject({
     duration: 2,
     sequential: [['d4', 'eb4', 'e4', 'f4'], '_']
-  }).reduce(tieReducer, [])}
+  }).reduce(tieReducer(), [])}
 />
 
 Forgive me that this example doesn't swing like it should.. you have to wait for that feature to be implemented...
@@ -193,7 +196,6 @@ Now the tie symbol works in the score:
   staves={rhythmicalScore([[['d4', 'eb4', 'e4', 'f4'], '_']])}
 />
 ```
-
 
 ## sandman
 
@@ -357,7 +359,7 @@ Now here's a more sophisticated (non swung) example:
       }
     ]
   })
-    .reduce(tieReducer, [])
+    .reduce(tieReducer(), [])
     .map((event) => ({
       ...event,
       value:

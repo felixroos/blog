@@ -14,3 +14,9 @@ export function inheritProperty<T>(property) {
     }
   }
 }
+
+export function inherit(property) {
+  return ({ child, parent }) => {
+    return { ...child, [property]: child[property] ?? parent[property] };
+  }
+}

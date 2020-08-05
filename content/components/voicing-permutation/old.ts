@@ -1,5 +1,6 @@
 import { Chord, Note } from '@tonaljs/tonal';
 import { ValueChild } from '../rhythmical/helpers/objects';
+import { voicingsInRange, topNoteSort } from '../rhythmical/dictionary/voicings';
 
 export const lefthandBad = {
   "m7": ['3m 5P 7m 9M', '-2M 2M 3m 5P', '7m 9M 10m 12P'],
@@ -43,5 +44,30 @@ export const voicingDictionaryReducer = (dictionary) => (events, event) => {
   const notes = intervals.map((interval) =>
     Note.transpose(root, interval)
   );
+  return events.concat([{ ...event, value: bass }]).concat(notes.map((note) => ({ ...event, value: note })));
+}
+
+// old version with bass note
+
+export const voicingReducer = (dictionary, range, sorter = topNoteSort) => (events, event) => {
+  if (typeof event.value !== 'string') {
+    return events
+  }
+  let voicings = voicingsInRange(event.value, dictionary, range);
+  const { tonic, aliases } = Chord.get(event.value);
+  const symbol = Object.keys(dictionary).find(_symbol => aliases.includes(_symbol));
+  if (!symbol) {
+    console.log(`no voicings found for chord "${event.value}"`);
+    return events;
+  }
+  const bass = tonic + '2';
+  let notes;
+  if (!events.length) {
+    notes = voicings[Math.ceil(voicings.length / 2)];
+  } else {
+    // calculates the distance between the last note and the given voicings top note
+    // sort voicings with differ
+    notes = voicings.sort(sorter(events))[0];
+  }
   return events.concat([{ ...event, value: bass }]).concat(notes.map((note) => ({ ...event, value: note })));
 }

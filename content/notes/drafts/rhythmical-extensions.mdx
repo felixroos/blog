@@ -1,3 +1,55 @@
+## tracks reducer
+
+be able to transform one event array multiple times for different purposes:
+
+- chords 
+- basslines
+- "meta" events like boxes or detected seven note scales
+
+## editor
+
+- textarea under player, updates on key shortcut or button click
+
+## add group boxes
+
+- like in rhythmical REPL
+- add an event for each group (ignore in playback, just for viz)
+- each group event is also visualized as a box
+
+## advanced colorization
+
+colorize by.. 
+
+- nesting deepness
+- pitch
+- degree in current scale / chord
+- related chroma(s) (or related 7 note scales)
+
+## midi importer
+
+- be able to transform midi data to rhythmical events
+- maybe add a feature that allows setting a time value and not use nesting:
+
+```js
+{
+  duration: 4,
+  midi: [ // [time, value, duration]
+    [0, 'D4', 1],
+    [0, 'F4', 1],
+    [0, 'A4', 1],
+    [1, 'G4', 1],
+    [1, 'B4', 1],
+    [1, 'D4', 1],
+    [2, 'C4', 2],
+    [2, 'E4', 2],
+    [2, 'G4', 2],
+  ];
+}
+```
+
+=> this allows importing any premade midi melody from notation programs etc..
+=> just insert midi + add chords => done song..
+
 ## ties
 
 ```js
@@ -19,6 +71,7 @@ renderRhythmObject({
 ## velocity
 
 - multiply down
+- already added to sampler => add to all other instruments
 
 ## chords
 
@@ -64,18 +117,17 @@ behaves like
 
 ```js
 [
-  { polyphonic: ['C','E'] },
-  { polyphonic: ['D','F'] }, // first loop finished
-  { polyphonic: ['C','G'] }, // second loop finished
-  { polyphonic: ['D','E'] }, // first loop finished
-  { polyphonic: ['C','F'] },
-  { polyphonic: ['D','G'] }, // first + second loop finished
-]
+  { polyphonic: ['C', 'E'] },
+  { polyphonic: ['D', 'F'] }, // first loop finished
+  { polyphonic: ['C', 'G'] }, // second loop finished
+  { polyphonic: ['D', 'E'] }, // first loop finished
+  { polyphonic: ['C', 'F'] },
+  { polyphonic: ['D', 'G'] } // first + second loop finished
+];
 ```
 
 - a polymeter different pulse lengths (2 & 3 above) will repeat with a cycle length of their least common multiple (6 above)
 
 https://tidalcycles.org/index.php/What_is_a_pattern%3F
-
 
 try to use https://github.com/gibber-cc/tidal.pegjs with tonejs! (and use as plugin for rhythmical later)

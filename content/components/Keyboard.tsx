@@ -13,6 +13,7 @@ export default function Keyboard({
 }: any) {
   const active = useRef([]);
   const [colorized, setColorized] = useState([]);
+  mouseControl = mouseControl ?? true;
   const onDrag = useGesture({
     onDragStart: ({ down, args: [key] }) =>
       mouseControl && down && activate(key),

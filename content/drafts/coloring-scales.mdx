@@ -3,22 +3,103 @@ title: Coloring Scales
 date: 2020-06-13
 ---
 
+import { Fragment } from 'react';
+import { Score } from '../components/score/Score.tsx';
+import { rhythmicalScore } from '../components/score/score.ts';
+import {
+  Scale,
+  Chord,
+  ChordType,
+  Note,
+  PcSet,
+  Collection
+} from '@tonaljs/tonal';
+import { Rhythm } from 'rhythmical';
+import Grid from '@material-ui/core/Grid';
+import {
+  chromaDarkness,
+  chromaDiff,
+  circle,
+  harmonicChroma,
+  harmonicDegree,
+  averageDegree
+} from '../components/coloring-pitches/noteColor.ts';
+import { playEvents } from '../components/rhythmical/components/Player.tsx';
+import PlayButton from '../components/rhythmical/components/PlayButton.tsx';
+import { renderRhythmObject } from '../components/rhythmical/rhythmical.ts';
+import { interpolateWarm, interpolateSinebow } from 'd3-scale-chromatic';
+import ConnectedCircle from '../components/common/ConnectedCircle';
+import { frequencyColor } from '../components/tuning/tuning.ts';
+import { mean } from 'd3-array';
+
 After we found a basic way of coloring pitches, let's now look at ways to color scales and chords.
+
+## Harmonic Note Coloring
+
+It would be good if harmonically similar notes had also similar colors.
+
+The harmonic similarity can be determined by the distance in the circle of fifths:
+
+<ConnectedCircle
+  nodes={circle().map((note, i, notes) => ({
+    id: Note.chroma(note),
+    label: Note.get(note).pc,
+    value: i / notes.length,
+    fill: interpolateSinebow(harmonicDegree(note))
+  }))}
+  links={[]}
+  sets={[]}
+  r={120}
+/>
+
+```js
+const harmonicColor = (note) => interpolateSinebow(harmonicDegree(note));
+export function harmonicDegree(pitch, rotate = 0.55, flip = true) {
+  const chroma = Note.chroma(pitch); // e.g. 0 for C and 2 for D
+  // get chromas of circle of fourths = [0, 5, 10, 3, 8, 1, 6, 11, 4, 9, 2, 7]
+  const circleChromas = Array.from({ length: 12 }, (_, i) => (i * 5) % 12);
+  const deg = (circleChromas.indexOf(chroma) / 12 + rotate) % 1;
+  if (flip) {
+    return 1 - deg;
+  }
+  return deg;
+}
+```
+
+The harmonic degree is basically the index of the chroma in the circle of fifth, scaled between 0 and 1.
+
+## Harmonic Scale Coloring
+
+We could now get the color of a scale by calculating the average harmonic degree of all notes:
+
+```js
+import { mean } from 'd3-array';
+const scaleColor = interpolateSinebow(
+  mean(Scale.get(`${note}4 major`).notes.map((pitch) => harmonicDegree(pitch)))
+);
+```
+
+<ConnectedCircle
+  nodes={circle().map((note, i, notes) => ({
+    id: Note.chroma(note),
+    label: Note.get(note).pc,
+    value: i / notes.length,
+    fill: interpolateSinebow(
+      mean(
+        Scale.get(`${note}4 major`).notes.map((pitch) => harmonicDegree(pitch))
+      )
+    )
+  }))}
+  links={[]}
+  sets={[]}
+  r={120}
+/>
+
+Unfortunately, this creates really ambiguous colors, with similarities between chromatics.
 
 ## Light vs Dark Scales
 
 In music school, I learned about the lightness of the modes, from light to dark:
-
-import { Fragment } from 'react';
-import { Score } from '../components/score/Score.tsx';
-import { rhythmicalScore } from '../components/score/score.ts';
-import { Scale, Chord, ChordType } from '@tonaljs/tonal';
-import { Rhythm } from 'rhythmical';
-import Grid from '@material-ui/core/Grid';
-import { chromaDarkness } from '../components/coloring-pitches/noteColor.ts';
-import { playEvents } from '../components/rhythmical/components/Player.tsx';
-import PlayButton from '../components/rhythmical/components/PlayButton.tsx';
-import { renderRhythmObject } from '../components/rhythmical/rhythmical.ts';
 
 <div>
   {[
