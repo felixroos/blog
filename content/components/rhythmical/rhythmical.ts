@@ -68,7 +68,8 @@ export function renderRhythm<T>(agnostic: AgnosticChild<T>, rhythmPlugins = []) 
     // dont stop recursion if child has parallel or sequential props
     isDeep: child => ['value', 'parallel', 'sequential'] // this spares the sequential child mess from earlier
       .reduce((deep, prop) => deep || (child[prop] && typeof child[prop] === 'object'), false),
-      // apply features to children
+    // apply features to children
+    /* ({ child }) => sequentialChild(child), ({ child }) => parallelChild(child), */
     mapChild: renderRhythmPlugins(rhythmPlugins),
   }).map((event) => {
     let { path } = event;

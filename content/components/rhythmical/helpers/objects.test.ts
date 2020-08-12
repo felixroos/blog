@@ -57,4 +57,16 @@ test('flatObject', () => {
     { value: "D", level: 1 },
     { value: "E", level: 1 }
   ])
+  expect(flatObject(['C', ['D', 'E']], {
+    mapChild: ({ child, props, isLeaf }) => {
+      if (!isLeaf) {
+        return child;
+      }
+      props.count = (props.count || 0) + 1
+      return { value: child.value, count: props.count }
+    }
+  }).map(({ value, count }) => [value, count])).toEqual([["C", 1], ["D", 2], ["E", 3]])
+  expect(flatObject([1, [2, 3], [4, 5, 6]], {
+    isDeep: (child) => Array.isArray(child.value) && child.value.length > 2,
+  }).map(({ value }) => (value))).toEqual([1, [2, 3], 4, 5, 6])
 })

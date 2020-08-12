@@ -2,7 +2,7 @@ import canUseDOM from '../components/canUseDOM'
 import { sampler } from '../components/rhythmical/instruments/sampler';
 
 export default {
-  load: (onload) => {
+  load: (onload?) => {
     const samples = {
       C1: "../samples/piano/C1.mp3",
       C2: "../samples/piano/C2.mp3",

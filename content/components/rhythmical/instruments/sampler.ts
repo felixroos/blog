@@ -7,7 +7,7 @@ export function sampler(samples, options = {}) {
   options = { volume: -12, attack: 0.01, ...options }
   let sampler = new Tone.Sampler(samples, options);
   const s = {
-    triggerAttackRelease: (note, duration, time, velocity) => {
+    triggerAttackRelease: (note, duration, time?, velocity?) => {
       if (typeof note === 'number') {
         sampler.triggerAttackRelease(note, duration, time);
         return;

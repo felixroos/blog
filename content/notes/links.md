@@ -1,8 +1,9 @@
-
 - https://www.hackster.io/Netcamprojects/arduino-powered-player-pianos-and-player-xylophones-d4e36d- https://under-construction.club/
 - http://modernplayerpiano.com/
 - https://www.noteflight.com/
-- 
+- https://www.npr.org/sections/therecord/2015/06/02/411473508/how-well-can-you-hear-audio-quality
+- https://flatfiv.co/products/piano-technique-intensive (code it)
+
 ## People
 
 - alex mclean - tidalcycles creator https://slab.org/
@@ -45,10 +46,10 @@ https://github.com/pshrmn/notes
 - connect symbols (chords & scales) in a graph network, use shortest paths as progressions
 
 ## view libs
+
 - https://github.com/snabbdom/snabbdom
   - https://github.com/Swizz/snabbdom-pragma
-  - 
-
+  -
 
 ## synths
 
