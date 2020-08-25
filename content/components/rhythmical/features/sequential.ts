@@ -28,7 +28,10 @@ export function sequentialParent<T>(agnostic: AgnosticChild<T>, childFeatures: F
     return parent;
   }
   const children = toArray(parent.value || []) as AgnosticChild<T>[];
-  const duration = sumDurations(children);
+  const parentDuration = (parent.duration || 1);
+  // this "fix" could be a bad idea, i did it beacuse durations on sequential parents didnt work 
+  // => see oye como va example in rhythmical objects post without / parentDuration
+  const duration = sumDurations(children) / parentDuration;
   return {
     ...parent, value: children.map((child: AgnosticChild<T>, i: number) => {
       let path: [number, number, number];

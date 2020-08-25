@@ -19,15 +19,13 @@ import {
   pitchesInRange,
   colorID,
   permutate,
-  unique,
-  maxItems,
   flatTree
 } from '../components/combinatorial-search/pitchPermutation';
 import Keyboard from '../components/Keyboard.tsx';
 import { Range, Note } from '@tonaljs/tonal';
 import PermutationTree from '../components/combinatorial-search/PermutationTree.tsx';
 import VoicingPermutator from '../components/combinatorial-search/VoicingPermutator.tsx';
-import tinypiano from '../instruments/tinypiano';
+import tinypiano from '../instruments/tinypiano.ts';
 import Player from '../components/rhythmical/components/Player.tsx';
 import { renderRhythm } from '../components/rhythmical/rhythmical.ts';
 import { inherit } from '../components/rhythmical/features/inherit.ts';
@@ -1028,3 +1026,8 @@ As this post now exceeds the magical limit of 1000 lines (only the MDX part), I 
 - write rhythmical plugin that generate voicing permutations
 - think about different ways to sort voicings
 - read bill evans voicing book and apply rules
+- http://www.thejazzpianosite.com/jazz-piano-lessons/jazz-chord-voicings/chord-voicing-rules/
+- https://en.wikipedia.org/wiki/Voicing_(music)
+- use https://observablehq.com/@d3/d3-hierarchy?collection=@d3/d3-hierarchy e.g. path
+- or https://observablehq.com/@d3/collapsible-tree?collection=@d3/d3-hierarchy
+- maybe even replace flatObject with d3.hierarchy https://github.com/d3/d3-hierarchy#hierarchy

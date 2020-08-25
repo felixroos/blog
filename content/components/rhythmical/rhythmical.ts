@@ -7,12 +7,10 @@ export type Path = [number, number, number];
 
 export function getTimeDuration(path: Path[], whole = 1) {
   let time = 0;
-  let duration = 0;
-  let subdivision = whole;
+  let duration = whole;
   for (let i = 0; i < path.length; i++) {
-    subdivision *= 1 / path[i][2];
-    time += path[i][0] * subdivision;
-    duration = path[i][1] * subdivision;
+    time = time + path[i][0] / path[i][2] * duration
+    duration *= path[i][1] / path[i][2];
   }
   return [time, duration];
 }
@@ -49,11 +47,8 @@ export function flatRhythmObject<T>(agnostic: AgnosticChild<T>, extraFeatures: F
 
 // calculate time + duration for flat events with paths
 export function renderRhythmObject<T>(agnostic: AgnosticChild<T>, extraFeatures: Feature<T>[] = []) {
-  const root = toObject(agnostic);
-  const totalDuration = 1 / (root.duration || 1); // outer duration
   return flatRhythmObject(agnostic, extraFeatures).map((event) => {
     let { path } = event;
-    path = [[0, totalDuration, totalDuration]].concat(path);
     const [time, duration] = getTimeDuration(path);
     return ({ ...event, time, duration, path })
   })

@@ -1,0 +1,423 @@
+---
+title: Rhythmical Trees
+date: 2020-08-25
+---
+
+Ok, maybe I slipped and accidentally rewrote the rhythmical core code..
+It feels like I am rewriting it all over [again](https://github.com/felixroos/jazzband) and [again](https://github.com/felixroos/rhythmical) and [again](https://felixroos.github.io/rhythmical/) and [again](https://felixroos.github.io/blog/rhythmical-arrays/).
+
+And here I am, with rewrite number 4!
+
+## History
+
+Before I present my new approach, a little history of my (re)writes:
+
+### 1. jazzband
+
+This is where I had the initial idea of using nested arrays for rhythms.
+The [core](https://github.com/felixroos/jazzband/blob/master/src/Pulse.ts#L26) [method](https://github.com/felixroos/jazzband/blob/master/src/Pulse.ts#L71) was already recursive, but really cluttered with stuff.
+I [used the recursive callback](https://github.com/felixroos/jazzband/blob/master/src/musicians/Pianist.ts#L40) to play notes directly without any event logic at all.
+
+### 2. rhythmical
+
+After jazzband worked as a proof of concept, it started to get messy and I pulled it apart into [seperate modules](https://github.com/felixroos/jazzband/issues/7#issuecomment-669776176).
+One of it was [rhythmical](https://github.com/felixroos/rhythmical) where I [wrote it the second time](https://github.com/felixroos/rhythmical/blob/master/src/Rhythm.ts#L521).
+This was the first time I had the idea of flattening nested arrays to event arrays, which seperated rendering from playback. The flattening code still looks quite messy, using giant reduce blocks and twisted logic all over the place.
+
+### 3. rhythmical REPL
+
+When I realized I could not use polyphony with just nested arrays, I [rewrote](https://github.com/felixroos/rhythmical/blob/master/src/Music.ts#L133) rhythmical again while creating a [REPL](https://felixroos.github.io/rhythmical/)
+based on [these ideas](https://felixroos.github.io/blog/notes/ideas/rhythmical).
+In addition to the array format, it now supported objects which could add polyphony and extra functionality.
+Besides the added features, the code is still a pretty unreadable reduce block.
+
+### 4. rhythmical blog rewrite
+
+As I wrote about rhythmical [here](https://felixroos.github.io/blog/rhythmical-arrays/), I rewrote its core again to fix the messy plugin injection.
+I basically encapsulated the object flattening from the rhythmical part via function params.
+Although I did not yet implement all of the REPL features, the code now looks much cleaner and readable.
+
+### 5. now
+
+After having played around with d3-hierarchies, as part of my [voicing permutation post](https://felixroos.github.io/blog/voicing-permutation/),
+I could not resist to reimplement it with the d3 methods. One thing I always imagined is to vizualize rhythmical hierarchically, which is what d3 can do really good.
+The funny thing: it took my only 10 minutes to do the whole rewrite 😲
+
+## Rewrite #4: using d3-hierarchy
+
+import { rhythmEvents } from '../components/rhythmical/hierarchy.ts';
+import { renderRhythm } from '../components/rhythmical/rhythmical.ts';
+import tinypiano from '../instruments/tinypiano.ts';
+import Player from '../components/rhythmical/components/Player.tsx';
+
+Let's finally look at the rewrite!
+
+### rhythmChildren + rhythmHierarchy
+
+Using [d3-hierarchy#hierarchy](https://github.com/d3/d3-hierarchy#hierarchy),
+we can create a tree from a rhythmical object like this:
+
+```js
+import { hierarchy } from 'd3-hierarchy';
+
+export function rhythmChildren(node) {
+  return Array.isArray(node) ? node : node.parallel || node.sequential;
+}
+export function rhythmHierarchy(rhythm) {
+  return hierarchy(rhythm, rhythmChildren);
+}
+```
+
+This is like [flatObject](http://localhost:8000/rhythmical-objects/#flattening-nested-objects) with getChildren, minus the messy extra stuff.
+Instead of an object, we get a d3 hierarchy node, with [all the sugar methods](https://github.com/d3/d3-hierarchy#node_ancestors).
+
+### rhythmEvents
+
+We can render the flat events by using the .each method:
+
+```js
+export function rhythmEvents(rhythm) {
+  let flat = [];
+  const root = rhythmHierarchy(rhythm);
+  const rootDuration = root.data.duration || root.children?.length || 1;
+  root.eachBefore((node) => {
+    const path = rhythmPath(node);
+    flat.push({
+      value: node.data,
+      path,
+      ...pathTimeDuration(path, rootDuration)
+    });
+  });
+  return flat;
+}
+```
+
+### rhythmPath
+
+The path can be calculated easily by reducing a nodes ancestors, summing all sibling durations:
+
+```js
+export function rhythmPath(node: HierarchyNode<any>): Path[] {
+  return node
+    .ancestors()
+    .reduce((path, { children: siblings, parent, data }, i, all) => {
+      if (!i) {
+        // first ancestor is node itself => ignore
+        return path;
+      }
+      const durations = siblings.map(({ data }) => data.duration ?? 1);
+      const parentDuration = parent ? parent.data?.duration || 1 : 1;
+      const index = siblings.indexOf(all[i - 1]);
+      const position = sum(durations.slice(0, index));
+      const total = sum(durations);
+      let currentPath;
+      if (data.parallel) {
+        // parallel path
+        currentPath = [0, parentDuration * durations[index], max(durations)];
+      } else {
+        // sequential path
+        currentPath = [position, durations[index], total];
+      }
+      return [currentPath, ...path];
+    }, []);
+}
+```
+
+I also fixed a bug in the [time and duration calculation](https://felixroos.github.io/blog/rhythmical-arrays/#calculating-absolute-time--duration-from-paths),
+where setting durations on non-leaves did not work properly. It now looks:
+
+```js
+export function pathTimeDuration(path: Path[], whole = 1) {
+  let time = 0;
+  let duration = whole;
+  for (let i = 0; i < path.length; i++) {
+    time = time + (path[i][0] / path[i][2]) * duration;
+    duration *= path[i][1] / path[i][2];
+  }
+  return { time, duration };
+}
+```
+
+This is it! Less than 50 lines of code, and much cleaner.
+
+### Playback
+
+The events can finally be thrown to our Player:
+
+<!--<Player
+  fold={true}
+  instruments={{ tinypiano }}
+  events={rhythmEvents([
+    { duration: 3, sequential: ['a3', 'c4', 'bb3'] },
+    'b3'
+  ])}
+/>-->
+
+<Player
+  fold={true}
+  instruments={{ tinypiano }}
+  events={rhythmEvents({
+    duration: 16,
+    instrument: 'piano',
+    parallel: [
+      [
+        ['e5', ['b4', 'c5'], 'd5', ['c5', 'b4']],
+        ['a4', ['a4', 'c5'], 'e5', ['d5', 'c5']],
+        ['b4', ['r', 'c5'], 'd5', 'e5'],
+        ['c5', 'a4', 'a4', 'r'],
+        [['r', 'd5'], ['r', 'f5'], 'a5', ['g5', 'f5']],
+        ['e5', ['r', 'c5'], 'e5', ['d5', 'c5']],
+        ['b4', ['b4', 'c5'], 'd5', 'e5'],
+        ['c5', 'a4', 'a4', 'r']
+      ],
+      [
+        ['e2', 'e3', 'e2', 'e3', 'e2', 'e3', 'e2', 'e3'],
+        ['a2', 'a3', 'a2', 'a3', 'a2', 'a3', 'a2', 'a3'],
+        ['g#2', 'g#3', 'g#2', 'g#3', 'e2', 'e3', 'e2', 'e3'],
+        ['a2', 'a3', 'a2', 'a3', 'a2', 'a3', 'b1', 'c2'],
+        ['d2', 'd3', 'd2', 'd3', 'd2', 'd3', 'd2', 'd3'],
+        ['c2', 'c3', 'c2', 'c3', 'c2', 'c3', 'c2', 'c3'],
+        ['b1', 'b2', 'b1', 'b2', 'e2', 'e3', 'e2', 'e3'],
+        ['a1', 'a2', 'a1', 'a2', 'a1', 'a2', 'a1', 'a2']
+      ]
+    ]
+  })}
+/>
+
+<details>
+  <summary>show source</summary>
+
+```js
+<Player
+  fold={true}
+  instruments={{ tinypiano }}
+  events={rhythmEvents({
+    duration: 32,
+    parallel: [
+      [
+        ['e5', ['b4', 'c5'], 'd5', ['c5', 'b4']],
+        ['a4', ['a4', 'c5'], 'e5', ['d5', 'c5']],
+        ['b4', ['r', 'c5'], 'd5', 'e5'],
+        ['c5', 'a4', 'a4', 'r'],
+        [['r', 'd5'], ['r', 'f5'], 'a5', ['g5', 'f5']],
+        ['e5', ['r', 'c5'], 'e5', ['d5', 'c5']],
+        ['b4', ['b4', 'c5'], 'd5', 'e5'],
+        ['c5', 'a4', 'a4', 'r']
+      ],
+      [
+        ['e2', 'e3', 'e2', 'e3', 'e2', 'e3', 'e2', 'e3'],
+        ['a2', 'a3', 'a2', 'a3', 'a2', 'a3', 'a2', 'a3'],
+        ['g#2', 'g#3', 'g#2', 'g#3', 'e2', 'e3', 'e2', 'e3'],
+        ['a2', 'a3', 'a2', 'a3', 'a2', 'a3', 'b1', 'c2'],
+        ['d2', 'd3', 'd2', 'd3', 'd2', 'd3', 'd2', 'd3'],
+        ['c2', 'c3', 'c2', 'c3', 'c2', 'c3', 'c2', 'c3'],
+        ['b1', 'b2', 'b1', 'b2', 'e2', 'e3', 'e2', 'e3'],
+        ['a1', 'a2', 'a1', 'a2', 'a1', 'a2', 'a1', 'a2']
+      ]
+    ]
+  })}
+/>
+```
+
+</details>
+
+It' so much cleaner, as the hierarchy method spares all the messy unification as it's all unified to the data prop.
+
+## Rewrite #5: Zippers
+
+Ok, this is not really a rewrite, but using the same approach above with another library..
+
+After doing some research on trees, I decided to try another library, as d3-hierarchy does not support tree manipulation + is not immutable.
+Luckily, there is [zipper](https://github.com/tommikaikkonen/zippa), which allows traversing and mutating trees in a functional way.
+
+To make a zipper, the functions `isBranch`, `getChildren` and `makeNode` are needed (this strongly reminds me of `isDeep`, `getChildren` and `mapChild` in my [newer flatObject implementation](https://felixroos.github.io/blog/rhythmical-reducers/#back-to-the-basics)):
+
+```js
+import { makeZipper, preWalk } from 'zippa';
+
+function rhythmChildren(node) {
+  return Array.isArray(node)
+    ? node
+    : node.parallel || node.sequential || node.children;
+}
+const isBranch = (node) => !!rhythmChildren(node);
+
+function makeNode(oldParent, children) {
+  // this function will only run on branches (has children => is not a primitive)
+  if (Array.isArray(oldParent)) {
+    return children;
+  }
+  if (oldParent.parallel) {
+    return { ...oldParent, parallel: children };
+  }
+  return { ...oldParent, sequential: children };
+}
+
+export const RhythmZipper = makeZipper(isBranch, rhythmChildren, makeNode);
+```
+
+This RhythmZipper function can now be used to create a zipper tree from a rhythmical object:
+
+```js
+const tree = RhythmZipper.from({
+  parallel: [
+    ['a', 'b', 'c'],
+    {
+      sequential: ['d', ['e', 'f']]
+    }
+  ]
+});
+```
+
+To manipulate the tree we can write a map function like this:
+
+```js
+const mapLeafs = (mapFn) =>
+  preWalk((node) => {
+    const t = RhythmZipper.from(node);
+    if (t.isLeaf()) {
+      return t.edit(mapFn).item;
+    }
+    return node;
+  });
+
+const edited = mapLeafs((leaf) => leaf + '4')(tree).value();
+```
+
+Result:
+
+```json
+{
+  "parallel": [
+    ["a4", "b4", "c4"],
+    {
+      "sequential": ["d4", ["e4", "f4"]]
+    }
+  ]
+}
+```
+
+This is stunning! With less than 45 lines, I implemented immutable nested tree manipulation for rhythmical.
+
+### renderEvents
+
+Unfortunately, [something is missing](https://github.com/tommikaikkonen/zippa/issues/2) for the rendering of the events
+
+import { renderEvents } from '../components/rhythmical/RhythmZipper.ts'
+
+<Player
+  fold={true}
+  instruments={{ tinypiano }}
+  events={renderEvents({
+    duration: 16,
+    instrument: 'piano',
+    parallel: [
+      [
+        ['e5', ['b4', 'c5'], 'd5', ['c5', 'b4']],
+        ['a4', ['a4', 'c5'], 'e5', ['d5', 'c5']],
+        ['b4', ['r', 'c5'], 'd5', 'e5'],
+        ['c5', 'a4', 'a4', 'r'],
+        [['r', 'd5'], ['r', 'f5'], 'a5', ['g5', 'f5']],
+        ['e5', ['r', 'c5'], 'e5', ['d5', 'c5']],
+        ['b4', ['b4', 'c5'], 'd5', 'e5'],
+        ['c5', 'a4', 'a4', 'r']
+      ],
+      [
+        ['e2', 'e3', 'e2', 'e3', 'e2', 'e3', 'e2', 'e3'],
+        ['a2', 'a3', 'a2', 'a3', 'a2', 'a3', 'a2', 'a3'],
+        ['g#2', 'g#3', 'g#2', 'g#3', 'e2', 'e3', 'e2', 'e3'],
+        ['a2', 'a3', 'a2', 'a3', 'a2', 'a3', 'b1', 'c2'],
+        ['d2', 'd3', 'd2', 'd3', 'd2', 'd3', 'd2', 'd3'],
+        ['c2', 'c3', 'c2', 'c3', 'c2', 'c3', 'c2', 'c3'],
+        ['b1', 'b2', 'b1', 'b2', 'e2', 'e3', 'e2', 'e3'],
+        ['a1', 'a2', 'a1', 'a2', 'a1', 'a2', 'a1', 'a2']
+      ]
+    ]
+  })}
+/>
+
+### TBD: implement plugins
+
+
+
+## Tree manipulation
+
+To fit the plugin system in there, we need some way to manipulate trees in an immutable way.
+Sadly, this [is not directly supported](https://github.com/d3/d3-hierarchy/issues/139#issuecomment-524638341) by d3-hierarchy.
+So let's implement this ourselves.
+
+### hierarchy as JSON
+
+To manipulate a node, it would be good if we had a uniformed json.
+We can recreate the hierarchy function like this:
+
+```js
+function hierarchyJSON(node, getChildren = n => n.children) {
+  const children = getChildren(node);
+  const node = {
+    data: node.data || node;
+  }
+  if(!children) {
+    return node;
+  }
+  return {
+    ...node,
+    children: children.map(child => hierarchyJSON(child, getChildren))
+  }
+}
+```
+
+To convert a node to raw JSON, we can do:
+
+```js
+hierarchyJSON(node.data);
+```
+
+### imagined node.map
+
+This method is not available to d3-hierarchy, but would be really useful. For example we could inherit like this:
+
+```js
+// root = d3 hierarchy node
+function inheritProperty(root, property) {
+  // this map method does not exist..
+  return root.map((node) => {
+    return hierarchy({
+      ...node.copy(), // copy content
+      [property]: node[property] ?? node.parent?.[property]
+    });
+  });
+}
+```
+
+The .map method will then return a new hierarchy with the mapped nodes.
+
+### bass and chords
+
+```js
+const chords = [['D-7', 'G7'], 'C^7'];
+let voicing; // keeps track of latest voicings
+const voicings = rhythmHierarchy(chords).map((node) => {
+  if (!node.height) {
+    voicing = {
+      chord: node.data, // remember chord symbol
+      parallel: getNextVoicing(node.data, voicing)
+    };
+    return voicing;
+  }
+  return node;
+});
+const bassNotes = rhythmHierarchy(chords).map((node) => {
+  if (!node.height) {
+    return getBassNote(node.data);
+  }
+  return node;
+});
+```
+
+- https://github.com/d3/d3-hierarchy/issues/139#issuecomment-524638341
+- https://github.com/d3/d3-hierarchy/issues/95#issuecomment-477081807
+- tries https://www.youtube.com/watch?v=7XmS8McW_1U&list=PLWKjhJtqVAbkso-IbgiiP48n-O-JQA9PJ&index=10&t=0s
+- https://gist.github.com/trafficinc/1229e9ef2916f4e9616dd463673d663f
+- https://github.com/afiore/arboreal
+- https://de.wikipedia.org/wiki/Trie

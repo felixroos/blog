@@ -15,7 +15,7 @@ import 'katex/dist/katex.min.css';
 import { interpolateRainbow } from 'd3-scale-chromatic';
 import { Note } from '@tonaljs/tonal';
 import drums from '../instruments/tidal';
-import { piano } from '../instruments/tinypiano';
+import piano from '../instruments/tinypiano.ts';
 import { sampler } from '../components/rhythmical/instruments/sampler.ts';
 
 <Player
@@ -269,7 +269,7 @@ The groove goes like this:
   center={0}
   events={renderRhythmObject({
     duration: 4,
-    value: [
+    sequential: [
       [
         ['B4', 'r', 'B4', 'r'],
         ['r', 'B4', 'r', 'B4']
@@ -316,6 +316,7 @@ const groove = [
 <Player
   height={100}
   center={0}
+  instruments={{ synth, drums }}
   events={(() => {
     const chord = { parallel: ['C3', 'Eb3', 'G3'] };
     return renderRhythmObject(

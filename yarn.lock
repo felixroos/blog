@@ -14968,6 +14968,11 @@ railroad-diagrams@^1.0.0:
   resolved "https://registry.npmjs.org/railroad-diagrams/-/railroad-diagrams-1.0.0.tgz#eb7e6267548ddedfb899c1b90e57374559cddb7e"
   integrity sha1-635iZ1SN3t+4mcG5Dlc3RVnN234=
 
+ramda@^0.21.0:
+  version "0.21.0"
+  resolved "https://registry.npmjs.org/ramda/-/ramda-0.21.0.tgz#a001abedb3ff61077d4ff1d577d44de77e8d0a35"
+  integrity sha1-oAGr7bP/YQd9T/HVd9RN536NCjU=
+
 randexp@0.4.6:
   version "0.4.6"
   resolved "https://registry.npmjs.org/randexp/-/randexp-0.4.6.tgz#e986ad5e5e31dae13ddd6f7b3019aa7c87f60ca3"
@@ -18939,6 +18944,13 @@ yurnalist@^1.1.2:
     semver "^6.3.0"
     strip-ansi "^5.2.0"
     strip-bom "^4.0.0"
+
+zippa@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.npmjs.org/zippa/-/zippa-0.3.1.tgz#27d18e8f93ba0a87ae04678c30fa6be38f119a1b"
+  integrity sha1-J9GOj5O6CoeuBGeMMPpr448Rmhs=
+  dependencies:
+    ramda "^0.21.0"
 
 zwitch@^1.0.0:
   version "1.0.5"

@@ -19,10 +19,14 @@ export default function PianoRoll(props: PianoRollProps) {
     center = 0.5,
     events
   } = props;
-  const deepest = max(events.map((e) => (e.path ? e.path.length : 1)));
+  const leaves = events.filter((e) =>
+    ['string', 'number'].includes(typeof e.value)
+  );
+  // const nodes = events.filter((e) => !['string', 'number'].includes(typeof e.value));
+  const deepest = max(leaves.map((e) => (e.path ? e.path.length : 1)));
   center = center * width;
   // get all unique event values
-  const uniqueLanes = events
+  const uniqueLanes = leaves
     .filter(({ value }) => hiddenSymbols.indexOf(value) === -1)
     .map((e) => e.value)
     .filter((v, i, e) => e.indexOf(v) === i)
@@ -30,7 +34,7 @@ export default function PianoRoll(props: PianoRollProps) {
   const uniqueNoteLanes = uniqueLanes.filter((n) => !!Note.name(n));
   const uniqueRhythmLanes = uniqueLanes.filter((n) => !Note.name(n));
 
-  const maxTime = max(events.map((e) => e.time + e.duration));
+  const maxTime = max(leaves.map((e) => e.time + e.duration));
 
   timeRange = timeRange ? [timeRange[0], timeRange[1]] : [0, maxTime];
   // create lanes for all possible event values
@@ -75,8 +79,8 @@ export default function PianoRoll(props: PianoRollProps) {
 
   const barThickness = round(y(1) - strokeWidth);
 
-  // render only events that are in sight + not a hiddenSymbol
-  const renderedEvents = events.filter(
+  // render only leaves that are in sight + not a hiddenSymbol
+  const renderedEvents = leaves.filter(
     ({ value, time, duration }) =>
       hiddenSymbols.indexOf(value) === -1 &&
       lanes.indexOf(Note.midi(value) ? Note.midi(value) + '' : value) !== -1

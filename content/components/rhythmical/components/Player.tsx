@@ -25,13 +25,19 @@ export function playEvents(
     loop?: boolean;
   } = {}
 ) {
+  const playableEvents = events.filter(
+    (e) => ['string', 'number'].includes(typeof e.value) // && e.value !== 'r'
+  );
   let {
     loop = true,
     instruments = { synth },
-    duration = max(events.map((e) => e.time + e.duration))
+    duration = max(playableEvents.map((e) => e.time + e.duration))
   } = config;
   const part = new Tone.Part((time, event) => {
-    if (event.value === 'r') {
+    if (
+      event.value === 'r' ||
+      !['string', 'number'].includes(typeof event.value)
+    ) {
       return;
     }
     pickInstrument(event.instrument, instruments).triggerAttackRelease(
@@ -40,7 +46,7 @@ export function playEvents(
       time,
       event.velocity || 0.9
     );
-  }, events).start(0);
+  }, playableEvents).start(0);
   part.loop = loop;
   part.loopEnd = duration;
   Tone.Transport.start('+0.1');

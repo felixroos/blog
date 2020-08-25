@@ -69,7 +69,8 @@
     "svg-piano": "0.3.1",
     "three": "^0.116.1",
     "tone": "^13.8.25",
-    "vexflow": "^3.0.9"
+    "vexflow": "^3.0.9",
+    "zippa": "^0.3.1"
   },
   "devDependencies": {
     "axios": "^0.19.2",
