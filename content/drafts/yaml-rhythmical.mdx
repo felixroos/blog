@@ -3,8 +3,16 @@ title: yaml rhythmical
 date: 2020-03-25
 ---
 
-
 ## yaml
+
+import YAML from 'yaml';
+import Player from '../components/rhythmical/components/Player.tsx';
+import drums from '../instruments/tidal';
+import { piano } from '../instruments/piano.ts';
+import { inherit } from '../components/rhythmical/features/inherit.ts';
+import swimming from '../components/rhythmical/tunes/swimming.ts';
+
+<Player fold={true} instruments={{ piano }} events={renderRhythm(swimming)} />
 
 ```yaml
 ---

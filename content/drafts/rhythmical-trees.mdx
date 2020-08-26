@@ -3,6 +3,36 @@ title: Rhythmical Trees
 date: 2020-08-25
 ---
 
+import { piano } from '../instruments/piano.ts';
+import { MK2md2 } from '../instruments/rhodes.ts';
+import swimming from '../components/rhythmical/tunes/swimming.ts';
+import { marblemachine } from '../components/rhythmical/tunes/marblemachine.ts';
+import { rhythmEvents } from '../components/rhythmical/hierarchy.ts';
+import { renderRhythm } from '../components/rhythmical/rhythmical.ts';
+import tinypiano from '../instruments/tinypiano.ts';
+import Player from '../components/rhythmical/components/Player.tsx';
+
+export const x = console.log(marblemachine);
+
+<Player
+  fold={true}
+  instruments={{ MK2md2 }}
+  events={renderRhythm(marblemachine, [inherit('transpose')])
+    .reduce(tieReducer(), [])
+    .map(({ value, transpose, ...event }) => ({
+      ...event,
+      value: Note.midi(value)
+        ? Note.transpose(value, Interval.fromSemitones(transpose))
+        : value
+    }))}
+/>
+
+<!--<Player
+  fold={true}
+  instruments={{ MK2md2 }}
+  events={rhythmEvents(swimming, [inherit('velocity')])}
+/>-->
+
 Ok, maybe I slipped and accidentally rewrote the rhythmical core code..
 It feels like I am rewriting it all over [again](https://github.com/felixroos/jazzband) and [again](https://github.com/felixroos/rhythmical) and [again](https://felixroos.github.io/rhythmical/) and [again](https://felixroos.github.io/blog/rhythmical-arrays/).
 
@@ -44,11 +74,6 @@ I could not resist to reimplement it with the d3 methods. One thing I always ima
 The funny thing: it took my only 10 minutes to do the whole rewrite 😲
 
 ## Rewrite #4: using d3-hierarchy
-
-import { rhythmEvents } from '../components/rhythmical/hierarchy.ts';
-import { renderRhythm } from '../components/rhythmical/rhythmical.ts';
-import tinypiano from '../instruments/tinypiano.ts';
-import Player from '../components/rhythmical/components/Player.tsx';
 
 Let's finally look at the rewrite!
 
@@ -303,7 +328,7 @@ This is stunning! With less than 45 lines, I implemented immutable nested tree m
 
 Unfortunately, [something is missing](https://github.com/tommikaikkonen/zippa/issues/2) for the rendering of the events
 
-import { renderEvents } from '../components/rhythmical/RhythmZipper.ts'
+import { renderEvents } from '../components/rhythmical/RhythmZipper.ts';
 
 <Player
   fold={true}
@@ -337,8 +362,6 @@ import { renderEvents } from '../components/rhythmical/RhythmZipper.ts'
 />
 
 ### TBD: implement plugins
-
-
 
 ## Tree manipulation
 

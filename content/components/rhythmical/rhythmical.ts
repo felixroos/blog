@@ -47,9 +47,11 @@ export function flatRhythmObject<T>(agnostic: AgnosticChild<T>, extraFeatures: F
 
 // calculate time + duration for flat events with paths
 export function renderRhythmObject<T>(agnostic: AgnosticChild<T>, extraFeatures: Feature<T>[] = []) {
+  const root = toObject(agnostic);
+  const totalDuration = (root.duration || 1); // outer duration
   return flatRhythmObject(agnostic, extraFeatures).map((event) => {
     let { path } = event;
-    const [time, duration] = getTimeDuration(path);
+    const [time, duration] = getTimeDuration(path, totalDuration);
     return ({ ...event, time, duration, path })
   })
 }
@@ -57,19 +59,18 @@ export function renderRhythmObject<T>(agnostic: AgnosticChild<T>, extraFeatures:
 
 export function renderRhythm<T>(agnostic: AgnosticChild<T>, rhythmPlugins = []) {
   const root = toObject(agnostic);
-  const totalDuration = 1 / (root.duration || 1); // outer duration
+  const totalDuration = (root.duration || 1); // outer duration
   return flatObject(agnostic, {
     getChildren: rhythmChildren,
     // dont stop recursion if child has parallel or sequential props
-    isDeep: child => ['value', 'parallel', 'sequential'] // this spares the sequential child mess from earlier
+    isDeep: child => !!child && ['value', 'parallel', 'sequential'] // this spares the sequential child mess from earlier
       .reduce((deep, prop) => deep || (child[prop] && typeof child[prop] === 'object'), false),
     // apply features to children
     /* ({ child }) => sequentialChild(child), ({ child }) => parallelChild(child), */
     mapChild: renderRhythmPlugins(rhythmPlugins),
   }).map((event) => {
-    let { path } = event;
-    path = [[0, totalDuration, totalDuration]].concat(path);
-    const [time, duration] = getTimeDuration(path);
+    const path = event?.path || [[0, 1, 1]];
+    const [time, duration] = getTimeDuration(path, totalDuration);
     return ({ ...event, time, duration, path })
   })
 }

@@ -1,5 +1,5 @@
 import { AgnosticChild, ValueChild, toObject, toArray } from '../helpers/objects';
-import { max } from 'd3-array';
+import { max, sum } from 'd3-array';
 
 // unifies to {value:[],type:'parallel'} if object with type parallel
 export function parallelChild<T>(agnostic: AgnosticChild<T>): AgnosticChild<T> {
@@ -25,16 +25,17 @@ export function parallelParent<T>(agnostic: AgnosticChild<T>): AgnosticChild<T> 
     return _parent;
   }
   const parent = toObject(_parent);
-  const children = toArray(parent.value || []);
-  const maxDuration = max(children.map(c => toObject(c).duration || 1));
+  const children = toArray(parent.value || []) as any;
+  const durations = children.map((child) => toObject(child).duration ?? 1);
+  const maxDuration = max(durations);
   return {
-    ...parent, value: children.map((child: ValueChild<T>, i: number) => {
+    ...parent, value: children.map((child: ValueChild<T>, index: number) => {
       child = toObject<T>(child);
       let path: [number, number, number];
       path = (parent.path || []).concat([
-        [0, (parent.duration || 1), maxDuration]
+        [0, durations[index], maxDuration]
       ])
-      return { ...toObject(child), path }
+      return { ...child, path }
     })
   }
 }

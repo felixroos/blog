@@ -9,7 +9,7 @@ export function sampler(samples, options = {}) {
   const s = {
     triggerAttackRelease: (note, duration, time?, velocity?) => {
       if (typeof note === 'number') {
-        sampler.triggerAttackRelease(note, duration, time);
+        sampler.triggerAttackRelease(note, duration, time, velocity);
         return;
       }
       if (options['transpose']) {

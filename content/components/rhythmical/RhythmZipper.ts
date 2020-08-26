@@ -123,7 +123,7 @@ export function test() {
 
 
 
-
+/* 
 const SimpleZipper = makeZipper(
   n => !!n.children?.length,
   n => n?.children,
@@ -147,4 +147,4 @@ console.log(s.next().next().next().path.parentItems)
 
 const t = mapLeafs(leaf => leaf + '4')(SimpleZipper)(s).value();
 
-console.log(t);
+console.log(t); */

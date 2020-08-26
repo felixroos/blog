@@ -616,7 +616,7 @@ export function renderRhythm<T>(
   rhythmPlugins = []
 ) {
   const root = toObject(agnostic);
-  const totalDuration = 1 / (root.duration || 1); // outer duration
+  const totalDuration = (root.duration || 1); // outer duration
   return flatObject(agnostic, {
     getChildren: rhythmChildren,
     // dont stop recursion if child has parallel or sequential props
@@ -631,8 +631,7 @@ export function renderRhythm<T>(
     mapChild: renderRhythmPlugins(rhythmPlugins)
   }).map((event) => {
     let { path } = event;
-    path = [[0, totalDuration, totalDuration]].concat(path);
-    const [time, duration] = getTimeDuration(path);
+    const [time, duration] = getTimeDuration(path, totalDuration);
     return { ...event, time, duration, path };
   });
 }

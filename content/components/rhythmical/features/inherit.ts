@@ -17,7 +17,7 @@ export function inheritProperty<T>(property) {
 
 export function inherit(property) {
   return ({ child, parent }) => {
-    if (child[property] ?? parent[property]) {
+    if (child?.[property] ?? parent?.[property]) {
       return { ...child, [property]: child[property] ?? parent[property] };
     }
     return child;

@@ -6,19 +6,23 @@ export type EventFilter = (event: ValueChild<string>, index: number, array: Valu
 
 
 export const tieReducer: (filter?: EventFilter) => EventReducer = (filter) => (events, event, index, array) => {
-  // check if next event is a tie
   if (filter) {
     array = array.filter(filter);
   }
-  if (index + 1 < array.length && array[index + 1].value === '_') {
-    return events.concat([
-      { ...event, duration: event.duration + array[index + 1].duration }
-    ]); // adds duration of next event to current
-  }
-  if (event.value === '_') {
+  const isTie = (i) => i < array.length && array[i].value === '_';
+  if (isTie(index)) {
     return events; // ignore tie
+  } else if (!isTie(index + 1)) {
+    return events.concat([event]);
   }
-  return events.concat([event]); // next event is no tie
+  // upcoming tie(s) => add to duration
+  let duration = event.duration;
+  while (isTie(++index)) {
+    duration += array[index].duration;
+  }
+  return events.concat([
+    { ...event, duration }
+  ]); // update duration including tie(s)
 }
 
 export const bassNotes: EventReducer = (events, event, index, array) => {
