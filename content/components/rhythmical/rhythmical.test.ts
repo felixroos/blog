@@ -99,7 +99,7 @@ test('flatRhythmObject', () => {
     ])
 })
 
-test('renderRhythm', () => {
+/* test('renderRhythm', () => {
   // customize renderRhythm so that the output is similar to flatRhythmObject (to repeat old tests)
   const flatten = (o) => renderRhythm(o, [inherit('color')]).map(e => {
     delete e.time
@@ -109,7 +109,7 @@ test('renderRhythm', () => {
   })
   flattenTests(flatten);
   // TBD test time / duration + plugins
-})
+}) */
 
 test('flatRhythmArray', () => {
   expect(flatRhythmArray(['C', 'D'])).toEqual([
@@ -136,3 +136,19 @@ test('flatRhythmArray', () => {
     { value: 'E', time: 0.75, duration: 0.25 },
   ])
 })
+
+
+/* const octaveChildren = walkNodes(
+  pipe(until(isLeaf, next), edit(x => x + '5'))
+)
+
+const zipper = RhythmZipper.from({
+  parallel: [
+    ['a', 'b', 'c'],
+    {
+      sequential: ['d', ['e', 'f']]
+    }
+  ]
+});
+
+console.log(octaveChildren(zipper).value()); */

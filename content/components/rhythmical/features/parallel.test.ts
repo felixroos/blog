@@ -33,11 +33,11 @@ describe('parallelParent', () => {
     expect(parallelParent({ value: ['A'] })).toEqual({ value: ['A'] })
     expect(parallelParent({ value: ['A'], type: 'sequential' })).toEqual({ value: ['A'], type: 'sequential' })
   })
-  it('should add parallel paths to children', () => {
+  /* it('should add parallel paths to children', () => {
     expect(parallelParent({ value: ['A'], type: 'parallel' })).toEqual({ value: [{ value: 'A', path: [[0, 1, 1]] }], type: 'parallel' })
     expect(parallelParent({ value: ['A', 'B'], type: 'parallel' })).toEqual({ value: [{ value: 'A', path: [[0, 1, 1]] }, { value: 'B', path: [[0, 1, 1]] }], type: 'parallel' })
     expect(parallelParent({ value: ['A', 'B'], type: 'parallel', duration: 2 })).toEqual({ value: [{ value: 'A', path: [[0, 2, 1]] }, { value: 'B', path: [[0, 2, 1]] }], type: 'parallel', duration: 2 })
     expect(parallelParent({ parallel: ['A', 'B'] })).toEqual({ value: [{ value: 'A', path: [[0, 1, 1]] }, { value: 'B', path: [[0, 1, 1]] }], type: 'parallel' })
-  })
+  }) */
 })
 

@@ -1,6 +1,49 @@
-import { Path } from './hierarchy';
+import { sum, max } from 'd3-array';
 
-export function pathTimeDuration(path: Path[], whole = 1) {
+
+export declare interface RhythmObject<T> {
+  value?: T,
+  path?: Path,
+  sequential?: RhythmNode<T>[],
+  parallel?: RhythmNode<T>[],
+  duration?: number,
+} // TBD: convert from "option bag" to union: ParallelRhythm | SequentialRhythm | LeafRhythm
+export declare interface RhythmLeaf<T> extends RhythmObject<T> {
+  value: T
+}
+
+export declare type RhythmNode<T> = T | T[] | RhythmNode<T>[] | RhythmObject<T>;
+export declare type Fraction = number[];
+export declare type Path = Fraction[];
+export declare type RhythmEvent<T> = {
+  value: T, path?: Path, time?: number, duration?: number
+}
+
+// returns fraction of a node, based on sibling durations (path = fraction[])
+export function rhythmFraction<T>(
+  node: RhythmNode<T>,
+  index?: number,
+  siblings?: RhythmNode<T>[],
+  parent?: RhythmNode<T>
+): Fraction {
+  const duration = (node as RhythmObject<T>).duration ?? 1;
+  if (!parent) {
+    // root node
+    return [0, duration, 1]
+  }
+  const durations = siblings.map((sibling: RhythmObject<T>) => sibling.duration ?? 1);
+  const position = sum(durations.slice(0, index));
+  const total = sum(durations);
+  if ((parent as RhythmObject<T>)?.parallel) {
+    // parallel path
+    return [0, duration, max(durations)];
+  }
+  // sequential path
+  return [position, duration, total]
+}
+
+// returns time duration from path array (array of fractions)
+export function pathTimeDuration(path: Path, whole = 1): { time: number, duration: number } {
   let time = 0;
   let duration = whole;
   for (let i = 0; i < path.length; i++) {
@@ -8,4 +51,52 @@ export function pathTimeDuration(path: Path[], whole = 1) {
     duration *= path[i][1] / path[i][2];
   }
   return { time, duration };
+}
+
+
+// returns array of children for a rhythm object (if any)
+export function getRhythmChildren<T>(node: RhythmNode<T>): RhythmNode<T>[] {
+  return Array.isArray(node)
+    ? node
+    : (node as RhythmObject<T>)?.parallel || (node as RhythmObject<T>)?.sequential
+}
+
+// enforces type object
+export function toRhythmObject<T>(child: RhythmNode<T>): RhythmObject<T> {
+  if (typeof child !== 'object') {
+    return {
+      value: child
+    }
+  }
+  if (Array.isArray(child)) {
+    return {
+      sequential: child
+    }
+  }
+  return child as RhythmObject<T>;
+}
+
+// emits new object for parent + children
+export function makeRhythmParent<T>(oldParent: RhythmObject<T>, children: RhythmNode<T>[]): RhythmNode<T>[] | RhythmObject<T> {
+  if (Array.isArray(oldParent)) {
+    return children;
+  }
+  if (oldParent.parallel) {
+    return { ...oldParent, parallel: children };
+  }
+  return { ...oldParent, sequential: children };
+}
+
+// convenience function to call a function on the value of either object or primitive
+export function editLeafValue<T>(fn: (value: T) => T) {
+  return (leaf: RhythmNode<T>) => {
+    // a leaf is not an array..
+    if (typeof leaf === 'object') {
+      return {
+        ...leaf,
+        value: fn((leaf as RhythmObject<T>).value)
+      }
+    }
+    return fn(leaf);
+  }
 }

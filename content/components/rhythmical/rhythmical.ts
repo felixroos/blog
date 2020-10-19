@@ -1,3 +1,4 @@
+import { __, curry } from 'ramda';
 import { AgnosticChild, flatObject, ValueChild, toObject, toArray } from './helpers/objects';
 import { sequentialParent, sequentialChild } from './features/sequential';
 import { parallelParent, parallelChild } from './features/parallel';
@@ -89,3 +90,6 @@ function rhythmChildren<T>(agnostic: AgnosticChild<T>) {
   const children = (toArray(parent.value) || []);
   return children;
 }
+
+
+export const flatRhythm = curry((plugins, rhythm) => renderRhythm(rhythm, plugins));

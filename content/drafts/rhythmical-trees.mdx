@@ -6,31 +6,47 @@ date: 2020-08-25
 import { piano } from '../instruments/piano.ts';
 import { MK2md2 } from '../instruments/rhodes.ts';
 import swimming from '../components/rhythmical/tunes/swimming.ts';
+import tetris from '../components/rhythmical/tunes/tetris.ts';
+import tetrisQuiet from '../components/rhythmical/tunes/tetrisQuiet.ts';
 import { marblemachine } from '../components/rhythmical/tunes/marblemachine.ts';
 import { rhythmEvents } from '../components/rhythmical/hierarchy.ts';
-import { renderRhythm } from '../components/rhythmical/rhythmical.ts';
+import { flatEvents } from '../components/rhythmical/walker.ts';
+import { renderRhythm, flatRhythm } from '../components/rhythmical/rhythmical.ts';
+import { renderEvents } from '../components/rhythmical/RhythmZipper.ts';
+import { digRhythm } from '../components/rhythmical/digRhythm.ts';
+import { transpose, transposeEvents, transposeEvent } from '../components/rhythmical/features/transpose.ts';
+import { tieEvents } from '../components/rhythmical/reducers.ts';
+import { inheritProp, inherit } from '../components/rhythmical/features/inherit.ts';
 import tinypiano from '../instruments/tinypiano.ts';
 import Player from '../components/rhythmical/components/Player.tsx';
+import compose from 'ramda/src/compose';
+import pipe from 'ramda/src/pipe';
+import map from 'ramda/src/map';
 
-export const x = console.log(marblemachine);
+<!--<Player fold={true} instruments={{ MK2md2 }} events={renderEvents(tetris)} />-->
+
+<Player fold={true} instruments={{ MK2md2 }} events={digRhythm(swimming)} />
+
+bamm..
+
+<Player fold={true} instruments={{ MK2md2 }} events={flatEvents(swimming)} />
 
 <Player
   fold={true}
   instruments={{ MK2md2 }}
-  events={renderRhythm(marblemachine, [inherit('transpose')])
-    .reduce(tieReducer(), [])
-    .map(({ value, transpose, ...event }) => ({
-      ...event,
-      value: Note.midi(value)
-        ? Note.transpose(value, Interval.fromSemitones(transpose))
-        : value
-    }))}
+  events={pipe(flatEvents, tieEvents, map(transposeEvent('7M')))(marblemachine)}
+/>
+
+<Player
+  fold={true}
+  instruments={{ MK2md2 }}
+  events={pipe(renderEvents, tieEvents, map(transposeEvent('7m')))(marblemachine)}
 />
 
 <!--<Player
   fold={true}
   instruments={{ MK2md2 }}
-  events={rhythmEvents(swimming, [inherit('velocity')])}
+  events={pipe(flatRhythm([]), tieEvents, transposeEvents('7m'))(marblemachine)}
 />-->
 
 Ok, maybe I slipped and accidentally rewrote the rhythmical core code..
@@ -109,8 +125,7 @@ export function rhythmEvents(rhythm) {
     const path = rhythmPath(node);
     flat.push({
       value: node.data,
-      path,
-      ...pathTimeDuration(path, rootDuration)
+      ...pathTimeDuration(path, rootDuration),
     });
   });
   return flat;
@@ -123,28 +138,26 @@ The path can be calculated easily by reducing a nodes ancestors, summing all sib
 
 ```js
 export function rhythmPath(node: HierarchyNode<any>): Path[] {
-  return node
-    .ancestors()
-    .reduce((path, { children: siblings, parent, data }, i, all) => {
-      if (!i) {
-        // first ancestor is node itself => ignore
-        return path;
-      }
-      const durations = siblings.map(({ data }) => data.duration ?? 1);
-      const parentDuration = parent ? parent.data?.duration || 1 : 1;
-      const index = siblings.indexOf(all[i - 1]);
-      const position = sum(durations.slice(0, index));
-      const total = sum(durations);
-      let currentPath;
-      if (data.parallel) {
-        // parallel path
-        currentPath = [0, parentDuration * durations[index], max(durations)];
-      } else {
-        // sequential path
-        currentPath = [position, durations[index], total];
-      }
-      return [currentPath, ...path];
-    }, []);
+  return node.ancestors().reduce((path, { children: siblings, parent, data }, i, all) => {
+    if (!i) {
+      // first ancestor is node itself => ignore
+      return path;
+    }
+    const durations = siblings.map(({ data }) => data.duration ?? 1);
+    const parentDuration = parent ? parent.data?.duration || 1 : 1;
+    const index = siblings.indexOf(all[i - 1]);
+    const position = sum(durations.slice(0, index));
+    const total = sum(durations);
+    let currentPath;
+    if (data.parallel) {
+      // parallel path
+      currentPath = [0, parentDuration * durations[index], max(durations)];
+    } else {
+      // sequential path
+      currentPath = [position, durations[index], total];
+    }
+    return [currentPath, ...path];
+  }, []);
 }
 ```
 
@@ -178,82 +191,36 @@ The events can finally be thrown to our Player:
   ])}
 />-->
 
-<Player
-  fold={true}
-  instruments={{ tinypiano }}
-  events={rhythmEvents({
-    duration: 16,
-    instrument: 'piano',
-    parallel: [
-      [
-        ['e5', ['b4', 'c5'], 'd5', ['c5', 'b4']],
-        ['a4', ['a4', 'c5'], 'e5', ['d5', 'c5']],
-        ['b4', ['r', 'c5'], 'd5', 'e5'],
-        ['c5', 'a4', 'a4', 'r'],
-        [['r', 'd5'], ['r', 'f5'], 'a5', ['g5', 'f5']],
-        ['e5', ['r', 'c5'], 'e5', ['d5', 'c5']],
-        ['b4', ['b4', 'c5'], 'd5', 'e5'],
-        ['c5', 'a4', 'a4', 'r']
-      ],
-      [
-        ['e2', 'e3', 'e2', 'e3', 'e2', 'e3', 'e2', 'e3'],
-        ['a2', 'a3', 'a2', 'a3', 'a2', 'a3', 'a2', 'a3'],
-        ['g#2', 'g#3', 'g#2', 'g#3', 'e2', 'e3', 'e2', 'e3'],
-        ['a2', 'a3', 'a2', 'a3', 'a2', 'a3', 'b1', 'c2'],
-        ['d2', 'd3', 'd2', 'd3', 'd2', 'd3', 'd2', 'd3'],
-        ['c2', 'c3', 'c2', 'c3', 'c2', 'c3', 'c2', 'c3'],
-        ['b1', 'b2', 'b1', 'b2', 'e2', 'e3', 'e2', 'e3'],
-        ['a1', 'a2', 'a1', 'a2', 'a1', 'a2', 'a1', 'a2']
-      ]
-    ]
-  })}
-/>
+<Player fold={true} instruments={{ tinypiano }} events={rhythmEvents(tetris)} />
 
 <details>
   <summary>show source</summary>
 
+
 ```js
-<Player
-  fold={true}
-  instruments={{ tinypiano }}
-  events={rhythmEvents({
-    duration: 32,
-    parallel: [
-      [
-        ['e5', ['b4', 'c5'], 'd5', ['c5', 'b4']],
-        ['a4', ['a4', 'c5'], 'e5', ['d5', 'c5']],
-        ['b4', ['r', 'c5'], 'd5', 'e5'],
-        ['c5', 'a4', 'a4', 'r'],
-        [['r', 'd5'], ['r', 'f5'], 'a5', ['g5', 'f5']],
-        ['e5', ['r', 'c5'], 'e5', ['d5', 'c5']],
-        ['b4', ['b4', 'c5'], 'd5', 'e5'],
-        ['c5', 'a4', 'a4', 'r']
-      ],
-      [
-        ['e2', 'e3', 'e2', 'e3', 'e2', 'e3', 'e2', 'e3'],
-        ['a2', 'a3', 'a2', 'a3', 'a2', 'a3', 'a2', 'a3'],
-        ['g#2', 'g#3', 'g#2', 'g#3', 'e2', 'e3', 'e2', 'e3'],
-        ['a2', 'a3', 'a2', 'a3', 'a2', 'a3', 'b1', 'c2'],
-        ['d2', 'd3', 'd2', 'd3', 'd2', 'd3', 'd2', 'd3'],
-        ['c2', 'c3', 'c2', 'c3', 'c2', 'c3', 'c2', 'c3'],
-        ['b1', 'b2', 'b1', 'b2', 'e2', 'e3', 'e2', 'e3'],
-        ['a1', 'a2', 'a1', 'a2', 'a1', 'a2', 'a1', 'a2']
-      ]
-    ]
-  })}
-/>
+<Player fold={true} instruments={{ tinypiano }} events={rhythmEvents(tetris)} />
 ```
 
 </details>
 
+
 It' so much cleaner, as the hierarchy method spares all the messy unification as it's all unified to the data prop.
+
+### Problem
+
+To fit the plugin system in there, we need some way to manipulate trees in an immutable way.
+Sadly, this [is not directly supported](https://github.com/d3/d3-hierarchy/issues/139#issuecomment-524638341) by d3-hierarchy.
+So... let's rewrite this again...
 
 ## Rewrite #5: Zippers
 
 Ok, this is not really a rewrite, but using the same approach above with another library..
 
-After doing some research on trees, I decided to try another library, as d3-hierarchy does not support tree manipulation + is not immutable.
-Luckily, there is [zipper](https://github.com/tommikaikkonen/zippa), which allows traversing and mutating trees in a functional way.
+After doing some research on trees, I found out about the [the zipper](https://www.st.cs.uni-saarland.de/edu/seminare/2005/advanced-fp/docs/huet-zipper.pdf),
+which is a really clever way to traverse trees. This data structure is more known in functional programming circles like
+[clojure](https://clojure.github.io/clojure/clojure.zip-api.html) or [haskell](http://learnyouahaskell.com/zippers). But luckily, somebody already wrote a JS implementation: [zippa](https://github.com/tommikaikkonen/zippa).
+
+### Creating a RhythmZipper
 
 To make a zipper, the functions `isBranch`, `getChildren` and `makeNode` are needed (this strongly reminds me of `isDeep`, `getChildren` and `mapChild` in my [newer flatObject implementation](https://felixroos.github.io/blog/rhythmical-reducers/#back-to-the-basics)):
 
@@ -261,9 +228,7 @@ To make a zipper, the functions `isBranch`, `getChildren` and `makeNode` are nee
 import { makeZipper, preWalk } from 'zippa';
 
 function rhythmChildren(node) {
-  return Array.isArray(node)
-    ? node
-    : node.parallel || node.sequential || node.children;
+  return Array.isArray(node) ? node : node.parallel || node.sequential || node.children;
 }
 const isBranch = (node) => !!rhythmChildren(node);
 
@@ -288,86 +253,286 @@ const tree = RhythmZipper.from({
   parallel: [
     ['a', 'b', 'c'],
     {
-      sequential: ['d', ['e', 'f']]
-    }
-  ]
+      sequential: ['d', ['e', 'f']],
+    },
+  ],
 });
+tree.next().next().value(); // 'a'
 ```
 
-To manipulate the tree we can write a map function like this:
+### Walking in Rhythm
+
+So now we have created the tree, let's get [walking in rhythm](https://www.youtube.com/watch?v=oeyL1yVY_6Q).
+
+Unfortunately, [something is missing](https://github.com/tommikaikkonen/zippa/issues/2) from the [walk methods](https://tommikaikkonen.github.io/zippa/#walk).
+
+After some fiddling with functional style, I found a pretty easy way of walking using [ramdas](https://ramdajs.com/) [pipe](https://ramdajs.com/docs/#pipe) + [until](https://ramdajs.com/docs/#until):
 
 ```js
-const mapLeafs = (mapFn) =>
-  preWalk((node) => {
-    const t = RhythmZipper.from(node);
-    if (t.isLeaf()) {
-      return t.edit(mapFn).item;
-    }
-    return node;
-  });
+const { isEnd, next, root } = zip;
+import pipe from 'ramda/src/pipe';
 
-const edited = mapLeafs((leaf) => leaf + '4')(tree).value();
+const walkZipper = curry(
+  //
+  (fn, zipper) => pipe(until(isEnd, pipe(fn, next)), root)(zipper)
+);
 ```
 
-Result:
+1. calls fn + next until the end is eached
+2. when the end is reached, calls root the get the whole tree
+3. using curry, we can allow partial application
 
-```json
+Using that, we can map over leafs like this:
+
+```js
+// call walkZipper with first argument only (partial application)
+const octaveChildren = walkZipper(
+  pipe(
+    until(isLeaf, next), // next until leaf is reached
+    edit((x) => x + '4') // append 4 to all leafs
+  )
+);
+octaveChildren(tree).value(); // apply second argument to get result
+```
+
+result:
+
+```js
 {
-  "parallel": [
-    ["a4", "b4", "c4"],
-    {
-      "sequential": ["d4", ["e4", "f4"]]
-    }
-  ]
+  parallel: [['a4', 'b4', 'c4'], { sequential: ['d4', ['e4', 'f4']] }];
 }
 ```
 
-This is stunning! With less than 45 lines, I implemented immutable nested tree manipulation for rhythmical.
+To simplify the edit logic, we could encapsulate the leaf walking like this:
 
-### renderEvents
+```js
+export const walkZipperLeafs = curry(
+  //
+  (fn, zipper) => walkZipper(pipe(until(isLeaf, next), fn), zipper)
+);
+```
 
-Unfortunately, [something is missing](https://github.com/tommikaikkonen/zippa/issues/2) for the rendering of the events
+This snippet shows how powerful functional programming is in terms of feature composition!
+Using this, our octave mapping looks like that:
 
-import { renderEvents } from '../components/rhythmical/RhythmZipper.ts';
+```js
+const octaveChildren = walkZipperLeafs(edit((x) => x + '4'));
+octaveChildren(tree).value(); // same as above
+```
+
+Neat! Now we could start implementing plugins as simple mapping functions.
+But before we do that, let's make sure we are able to get flat events out first..
+
+### Rendering Events
+
+Now let's try to flatten the tree using zipper:
+
+```js
+export function renderEvents(rhythm) {
+  const tree = RhythmZipper.from(rhythm);
+  const { getChildren } = tree.meta;
+  const rootDuration = tree.value()?.duration || getChildren(rhythm)?.length || 1;
+  const events = [];
+  walkZipperLeafs((node) => {
+    events.push({
+      value: node.value(), // item is pritimive (as it's a leaf)
+      ...pathTimeDuration(rhythmPath(node), rootDuration),
+    });
+    return node;
+  }, tree);
+  return events;
+}
+```
+
+This is really similar to the d3 implementation above, using walkZipperLeafs instead of eachBefore.
+
+I have no clue if functional purists now might be offended by the way I push the events to a higher scope, but frankly, I don't care.
+Maybe I will also write a reduce function that returns an accumulated value...
+
+<!--
+path,
+// ...(typeof node.value() === 'object' ? node.value() : { value: node.value() }),
+-->
+
+The path calculation is also similar, but instead of the ancestors function, we use ramda to traverse the parents:
+
+```js
+export function rhythmPath(node): Path[] {
+  const path = [];
+  until(
+    isTop,
+    pipe((n) => {
+      // called for each parent
+      const { getChildren } = n.meta;
+      const parent = n.up();
+      const siblings = getChildren(parent.value());
+      const durations = siblings.map((sibling) => sibling.duration ?? 1);
+      const currentDuration = n.value()?.duration ?? 1;
+      const index = n.path.left.length;
+      const position = sum(durations.slice(0, index));
+      const total = sum(durations);
+      let currentPath;
+      if (parent.value()?.parallel) {
+        // parallel path
+        currentPath = [0, currentDuration, max(durations)];
+      } else {
+        // sequential path
+        currentPath = [position, currentDuration, total];
+      }
+      path.unshift(currentPath);
+      return n;
+    }, up)
+  )(node);
+  return path;
+}
+```
+
+That's it! Let's do the tetris test:
+
+<Player fold={true} instruments={{ tinypiano }} events={renderEvents(tetris)} />
+
+```js
+<Player fold={true} instruments={{ tinypiano }} events={renderEvents(tetris)} />
+```
+
+Now we have all the tools to write some plugins.
+
+### transpose plugin
+
+Let's start with transpose, as it is relatively simple:
+
+```js
+import { zip } from 'zippa';
+export const transpose = curry(
+  //
+  (interval, rhythm) =>
+    walkRhythmLeafs(
+      zip.edit((leaf) => (Note.midi(leaf) ? Note.transpose(leaf, interval) : leaf)),
+      rhythm
+    )
+);
+// helper:
+export const walkRhythmLeafs = curry(
+  //
+  (fn, rhythm) => walkZipperLeafs(fn, RhythmZipper(rhythm)).value()
+); // this helper is useful for most plugins
+```
+
+<Player fold={true} instruments={{ tinypiano }} events={pipe(transpose('-3M'), renderEvents)(tetris)} />
+
+```js
+<Player fold={true} instruments={{ tinypiano }} events={pipe(transpose('-3M'), renderEvents)(tetris)} />
+```
+
+Note the usage of pipe to apply the plugin! Without it:
+
+```js
+<Player fold={true} instruments={{ tinypiano }} events={transpose('-3M', renderEvents(tetris))} />
+```
+
+Later, when we have more and more plugins, pipe (or [compose](https://ramdajs.com/docs/#compose)) will be really useful to keep it readable.
+
+### inherit plugin
+
+Now on to an even more helpful plugin: inheritance of properties ([read this](https://felixroos.github.io/blog/rhythmical-objects/#inheritance)).
+This is a little bit trickier, as we need to pass a property value from the parent down to the child.
+
+```js
+export const inheritProp = curry(
+  //
+  (property, rhythm) =>
+    walkRhythm((zipper) => {
+      const parentValue = zipper.up()?.value(); // get parentValue
+      if (parentValue?.[property] === undefined) {
+        return zipper; // no parent value => do nothing
+      }
+      return zip.edit((item) => {
+        const childObj = objectify(item); // make object
+        return { ...childObj, [property]: childObj[property] ?? parentValue?.[property] };
+      })(zipper);
+    }, rhythm)
+);
+// helpers
+export const walkRhythm = curry((fn, rhythm) => walkZipper(fn, RhythmZipper(rhythm)).value());
+//
+export function objectify(item) {
+  if (Array.isArray(item)) {
+    return { sequential: item };
+  } else if (typeof item === 'object') {
+    return item;
+  }
+  return { value: item };
+}
+```
+
+<Player fold={true} instruments={{ tinypiano }} events={pipe(inheritProp('velocity'), renderEvents)(tetrisQuiet)} />
+
+```js
+<Player fold={true} instruments={{ tinypiano }} events={pipe(inheritProp('velocity'), renderEvents)(tetrisQuiet)} />
+```
+
+### problem: leaf objects
+
+In our inherit function, we are forcing the child to be an object. We need this to be able to set the parent property.
+Before that, all of our leafs were primitve values, but now, we need to consider objects too..
+
+As flat events will also have the value property, I will use that to specify leaf values.
+
+To fix that, we need to adjust the transpose plugin to allow objects:
+
+```js
+export const transpose = curry((interval, rhythm) =>
+  walkRhythmLeafs(
+    editLeaf((leaf) => (Note.midi(leaf) ? Note.transpose(leaf, interval) : leaf)),
+    rhythm
+  )
+);
+// helpers
+export const editLeafValue = (fn) => (leaf) => {
+  // a leaf is not an array..
+  if (typeof leaf === 'object') {
+    return {
+      ...leaf,
+      value: fn(leaf.value),
+    };
+  }
+  return fn(leaf);
+};
+export const editLeaf = (fn) => pipe(editLeafValue, zip.edit)(fn);
+```
+
+transpose now basically stays the same but we are using editLeaf instead of zip.edit.
+This is another mind blowing use of functional programming (maybe just for me, as i am still new to it).
+
+The second fix needs to be done for the rendering:
+
+```js
+events.push({
+  /* value: node.value(), */ // before
+  ...(typeof node.value() === 'object' ? node.value() : { value: node.value() }), // now
+  ...pathTimeDuration(path, rootDuration),
+});
+```
+
+I really like combining destructuring with ternary operation.. This should do the trick! Now we are able to combine both plugins:
 
 <Player
   fold={true}
   instruments={{ tinypiano }}
-  events={renderEvents({
-    duration: 16,
-    instrument: 'piano',
-    parallel: [
-      [
-        ['e5', ['b4', 'c5'], 'd5', ['c5', 'b4']],
-        ['a4', ['a4', 'c5'], 'e5', ['d5', 'c5']],
-        ['b4', ['r', 'c5'], 'd5', 'e5'],
-        ['c5', 'a4', 'a4', 'r'],
-        [['r', 'd5'], ['r', 'f5'], 'a5', ['g5', 'f5']],
-        ['e5', ['r', 'c5'], 'e5', ['d5', 'c5']],
-        ['b4', ['b4', 'c5'], 'd5', 'e5'],
-        ['c5', 'a4', 'a4', 'r']
-      ],
-      [
-        ['e2', 'e3', 'e2', 'e3', 'e2', 'e3', 'e2', 'e3'],
-        ['a2', 'a3', 'a2', 'a3', 'a2', 'a3', 'a2', 'a3'],
-        ['g#2', 'g#3', 'g#2', 'g#3', 'e2', 'e3', 'e2', 'e3'],
-        ['a2', 'a3', 'a2', 'a3', 'a2', 'a3', 'b1', 'c2'],
-        ['d2', 'd3', 'd2', 'd3', 'd2', 'd3', 'd2', 'd3'],
-        ['c2', 'c3', 'c2', 'c3', 'c2', 'c3', 'c2', 'c3'],
-        ['b1', 'b2', 'b1', 'b2', 'e2', 'e3', 'e2', 'e3'],
-        ['a1', 'a2', 'a1', 'a2', 'a1', 'a2', 'a1', 'a2']
-      ]
-    ]
-  })}
+  events={pipe(inheritProp('velocity'), transpose('2m'), renderEvents)(tetrisQuiet)}
 />
 
-### TBD: implement plugins
+```js
+<Player
+  fold={true}
+  instruments={{ tinypiano }}
+  events={pipe(inheritProp('velocity'), transpose('2m'), renderEvents)(tetrisQuiet)}
+/>
+```
 
-## Tree manipulation
+### voicing plugin
 
-To fit the plugin system in there, we need some way to manipulate trees in an immutable way.
-Sadly, this [is not directly supported](https://github.com/d3/d3-hierarchy/issues/139#issuecomment-524638341) by d3-hierarchy.
-So let's implement this ourselves.
+## old stuff
 
 ### hierarchy as JSON
 
@@ -407,7 +572,7 @@ function inheritProperty(root, property) {
   return root.map((node) => {
     return hierarchy({
       ...node.copy(), // copy content
-      [property]: node[property] ?? node.parent?.[property]
+      [property]: node[property] ?? node.parent?.[property],
     });
   });
 }
@@ -424,7 +589,7 @@ const voicings = rhythmHierarchy(chords).map((node) => {
   if (!node.height) {
     voicing = {
       chord: node.data, // remember chord symbol
-      parallel: getNextVoicing(node.data, voicing)
+      parallel: getNextVoicing(node.data, voicing),
     };
     return voicing;
   }
@@ -444,3 +609,5 @@ const bassNotes = rhythmHierarchy(chords).map((node) => {
 - https://gist.github.com/trafficinc/1229e9ef2916f4e9616dd463673d663f
 - https://github.com/afiore/arboreal
 - https://de.wikipedia.org/wiki/Trie
+
+<Player fold={true} instruments={{ MK2md2 }} events={rhythmEvents(swimming, [inherit('velocity')])} />

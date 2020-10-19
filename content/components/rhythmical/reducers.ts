@@ -1,9 +1,11 @@
+import { curry } from 'ramda';
 import { Harmony } from './../../drafts/voicing/Harmony';
 import { ValueChild } from './helpers/objects';
 
 export type EventReducer = (events: ValueChild<string>[], event: ValueChild<string>, index: number, array: ValueChild<string>[]) => ValueChild<string>[];
 export type EventFilter = (event: ValueChild<string>, index: number, array: ValueChild<string>[]) => boolean;
 
+export const applyReducer = curry((reducer, events) => events.reduce(reducer, []));
 
 export const tieReducer: (filter?: EventFilter) => EventReducer = (filter) => (events, event, index, array) => {
   if (filter) {
@@ -24,6 +26,8 @@ export const tieReducer: (filter?: EventFilter) => EventReducer = (filter) => (e
     { ...event, duration }
   ]); // update duration including tie(s)
 }
+
+export const tieEvents = applyReducer(tieReducer());
 
 export const bassNotes: EventReducer = (events, event, index, array) => {
   if (typeof event.value !== 'string') {
@@ -60,3 +64,4 @@ export const applyReducers: (keepEventsWithoutReducer: boolean) => EventReducer 
   }
   return events;
 };
+
