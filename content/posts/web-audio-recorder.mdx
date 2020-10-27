@@ -88,31 +88,38 @@ function useUserMedia(constraints) {
 To record audio, we can now pass our stream to the [MediaRecorder API](https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder), also wrapped with a hook:
 
 ```js
-function useMediaRecorder({ onStart, onStop, onData, constraints }) {
-  const [recorder, setRecorder] = useState();
-  const { getStream } = useUserMedia(constraints);
+export function useMediaRecorder({ onStart, onStop, onData }: { onStart?: any, onStop?: any, onData?: any }) {
+  const [recorder, setRecorder] = useState<any>();
+  const [state, setState] = useState<string>('inactive');
+  const { getStream } = useUserMedia({ audio: true, video: false });
   const audioChunks = useRef([]); // this will contain the recorded chunks
-  async function start(timeslices) {
-    const stream = await getStream(); // request stream using our custom hook
-    audioChunks.current = []; // clear audio chunks
+  async function start(timeslices?, _stream?) {
+    const stream = _stream || await getStream(true); // request stream using our custom hook
+    audioChunks.current = [];
     const _recorder = new MediaRecorder(stream);
-    setRecorder(_recorder);
-    onStart && onStart(_recorder); // callback
+    onStart && onStart(_recorder);
     _recorder.start(timeslices); // start recording with timeslices
+    setRecorder(_recorder);
+    setState(_recorder.state);
     // called every timeslices (ms)
     _recorder.addEventListener('dataavailable', (event) => {
-      audioChunks.current.push(event.data); // push new chunk
-      onData && onData(event.data, audioChunks.current); // callback
+      audioChunks.current.push(event.data);
+      onData && onData(event, audioChunks.current);
     });
-    _recorder.addEventListener('stop', () => onStop && onStop(audioChunks.current)); // callback
+    _recorder.addEventListener('stop', () => {
+      onStop && onStop(audioChunks.current);
+      setState(_recorder.state);
+    });
   }
-  function stop() {
+  async function stop() {
     if (recorder) {
       recorder.stop();
+      (await getStream()).getTracks().forEach(track => track.stop());
     }
   }
-  return { start, stop };
+  return { start, stop, state };
 }
+
 ```
 
 ### Usage in the App
@@ -138,6 +145,10 @@ const App = () => {
   );
 };
 ```
+
+Result:
+
+<Recorder hideWaveform={true} />
 
 ## Displaying an audio waveform
 

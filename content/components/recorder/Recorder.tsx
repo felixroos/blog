@@ -2,25 +2,75 @@ import React, { useState } from 'react';
 import canUseDOM from '../canUseDOM';
 import { Waveform } from '../Waveform';
 import { useMediaRecorder } from './useMediaRecorder';
+import Fab from '@material-ui/core/Fab';
+import StopIcon from '@material-ui/icons/Stop';
+import MicIcon from '@material-ui/icons/Mic';
+import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+import BackspaceIcon from '@material-ui/icons/Backspace';
+import { useAudio } from './useAudio';
 
-export const Recorder = () => {
+export const Recorder = ({ hideWaveform }: { hideWaveform?: boolean }) => {
   const [pcm, setPcm] = useState<Float32Array | undefined>();
-  const { start, stop } = useMediaRecorder({
+  const { audio, setAudio, state: audioState } = useAudio();
+
+  const { start, stop, state } = useMediaRecorder({
     onStop: async (audioChunks) => {
       const audioBlob = new Blob(audioChunks);
       setPcm(await getPCM(audioBlob));
       const audioUrl = URL.createObjectURL(audioBlob);
-      const audio = new Audio(audioUrl);
-      audio.play();
+      const _audio = new Audio(audioUrl);
+      setAudio(_audio);
+    },
+    onData: async (_, audioChunks) => {
+      const audioBlob = new Blob(audioChunks);
+      setPcm(await getPCM(audioBlob));
     },
   });
   return (
-    <>
-      <button onClick={() => start(200)}>record</button>
-      <button onClick={() => stop()}>stop</button>
+    <React.Fragment>
+      {state === 'inactive' && !audio && (
+        <Fab color="primary" onClick={() => start(200)}>
+          <MicIcon />
+        </Fab>
+      )}
+      {state === 'recording' && (
+        <Fab color="primary" onClick={() => stop()}>
+          <StopIcon />
+        </Fab>
+      )}
+      {audio && audioState === 'pause' && (
+        <Fab color="primary" onClick={() => audio.play()}>
+          <PlayArrowIcon />
+        </Fab>
+      )}
+      {audio && audioState !== 'pause' && (
+        <Fab
+          color="primary"
+          onClick={() => {
+            audio.pause();
+            audio.currentTime = 0;
+          }}
+        >
+          <StopIcon />
+        </Fab>
+      )}
+      {audio && (
+        <Fab
+          color="primary"
+          onClick={() => {
+            audio?.pause();
+            setAudio(undefined);
+            setPcm(undefined);
+          }}
+          style={{ marginLeft: 10 }}
+        >
+          <BackspaceIcon />
+        </Fab>
+      )}
       <br />
-      {pcm && <Waveform pcm={pcm} />}
-    </>
+      <br />
+      {pcm && !hideWaveform && <Waveform pcm={pcm} />}
+    </React.Fragment>
   );
 };
 

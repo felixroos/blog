@@ -16,7 +16,7 @@ export function Waveform({ pcm, playhead }: { pcm?: Float32Array; playhead?: any
       style: { width, height, ...style },
     };
   }
-  return <canvas ref={setCanvasRef} {...prettyCanvas(640, 200, { backgroundColor: '#BFBFBF' })} />;
+  return <canvas ref={setCanvasRef} {...prettyCanvas(640, 200, { /* backgroundColor: '#BFBFBF' */ })} />;
 }
 
 function drawPCM(values, canvas, playhead) {
@@ -42,8 +42,8 @@ function drawPCM(values, canvas, playhead) {
   averageValues.forEach((value, index) => {
     const height = (((value / max) * clientHeight) / 2) * 0.9;
     ctx.beginPath();
-    ctx.strokeStyle = `#3535C3`;
-    ctx.fillStyle = `#6464D8`;
+    ctx.strokeStyle = `#2D2F37`;
+    ctx.fillStyle = `#4752B1`;
     const args = [index * blockSize, clientHeight / 2 - (absoluteValues ? height / 2 : 0), blockSize, height];
     const borderRadius = Math.floor(Math.min(args[2], args[3]) / 2);
     ctx.fillRect(index * blockSize, clientHeight / 2 - (absoluteValues ? height / 2 : 0), blockSize, height);
