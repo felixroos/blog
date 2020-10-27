@@ -65,7 +65,7 @@ export default function useFrame(callback, autostart = false) {
 
   React.useEffect(() => {
     autostart && start();
-    return () => stop()
+    return () => stop() // TODO: cancelAnimationFrame
   }, []); // Make sure the effect runs only once
   return { start, stop, toggle, isRunning };
 }

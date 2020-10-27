@@ -5,7 +5,7 @@
   "version": "0.0.1",
   "scripts": {
     "develop": "gatsby develop",
-    "start": "gatsby develop",
+    "start": "gatsby develop --host=0.0.0.0 -p 8000",
     "build": "gatsby build --prefix-paths",
     "clean": "gatsby clean",
     "deploy": "gatsby clean && npm run build && gh-pages -d public -b gh-pages"

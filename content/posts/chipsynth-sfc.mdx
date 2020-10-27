@@ -50,7 +50,7 @@ For some SPC files, it is possible to generate midi! Checkout [these](https://gi
 For example to convert a nintendo flavoured SPC, you can use nintspc:
 
 ```sh
-for f in *.spc; do "path/to/spc/files" "$f" "$f.mid" --loop 1;done
+for f in *.spc; do "path/to/nintspc" "$f" "$f.mid" --loop 1;done
 ```
 
 The generated midi files will contain up to 8 tracks that represent the notes SPC tracks.
