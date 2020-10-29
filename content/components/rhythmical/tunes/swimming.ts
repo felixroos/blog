@@ -90,7 +90,7 @@ const swimming = {
   ]
 }
 
-console.log(digRhythm(swimming))
+// console.log(digRhythm(swimming))
 
 export default swimming
 

@@ -1,33 +1,11 @@
 ---
-title: Rhythmical Trees
+title: Rhythmical Reimplementation
 date: 2020-08-25
 ---
 
-import { piano } from '../instruments/piano.ts';
-import { MK2md2 } from '../instruments/rhodes.ts';
-import swimming from '../components/rhythmical/tunes/swimming.ts';
-import tetris from '../components/rhythmical/tunes/tetris.ts';
-import tetrisQuiet from '../components/rhythmical/tunes/tetrisQuiet.ts';
-import { marblemachine } from '../components/rhythmical/tunes/marblemachine.ts';
-import { rhythmEvents } from '../components/rhythmical/hierarchy.ts';
-import { flatEvents } from '../components/rhythmical/walker.ts';
-import { renderRhythm, flatRhythm } from '../components/rhythmical/rhythmical.ts';
-import { renderEvents } from '../components/rhythmical/RhythmZipper.ts';
-import { digRhythm } from '../components/rhythmical/digRhythm.ts';
-import { transpose, transposeEvents, transposeEvent } from '../components/rhythmical/features/transpose.ts';
-import { tieEvents } from '../components/rhythmical/reducers.ts';
-import { inheritProp, inherit } from '../components/rhythmical/features/inherit.ts';
-import tinypiano from '../instruments/tinypiano.ts';
-import Player from '../components/rhythmical/components/Player.tsx';
-import compose from 'ramda/src/compose';
-import pipe from 'ramda/src/pipe';
-import map from 'ramda/src/map';
-
-<!--<Player fold={true} instruments={{ MK2md2 }} events={renderEvents(tetris)} />-->
+## TBD
 
 <Player fold={true} instruments={{ MK2md2 }} events={digRhythm(swimming)} />
-
-bamm..
 
 <Player fold={true} instruments={{ MK2md2 }} events={flatEvents(swimming)} />
 

@@ -1,6 +1,5 @@
 import { sum, max } from 'd3-array';
 
-
 export declare interface RhythmObject<T> {
   value?: T,
   path?: Path,
@@ -77,7 +76,7 @@ export function toRhythmObject<T>(child: RhythmNode<T>): RhythmObject<T> {
 }
 
 // emits new object for parent + children
-export function makeRhythmParent<T>(oldParent: RhythmObject<T>, children: RhythmNode<T>[]): RhythmNode<T>[] | RhythmObject<T> {
+export function makeRhythmParent<T>(oldParent: RhythmObject<T> | RhythmNode<T>[], children: RhythmNode<T>[]): RhythmNode<T>[] | RhythmObject<T> {
   if (Array.isArray(oldParent)) {
     return children;
   }
@@ -99,4 +98,95 @@ export function editLeafValue<T>(fn: (value: T) => T) {
     }
     return fn(leaf);
   }
+}
+
+declare type MapRhythmFn<T> = (rhythm: RhythmNode<T>, state?: any) => [RhythmNode<T>, any];
+
+/// EXPERIMENTAL SECTION
+
+export function mapRhythm<T>(mapFn: MapRhythmFn<T>, rhythm: RhythmNode<T>, state?: any) {
+  [rhythm, state] = mapFn(rhythm, state);
+  const children = getRhythmChildren(rhythm);
+  if (!children) {
+    return rhythm;
+  }
+  return makeRhythmParent(rhythm, children.map(child => mapRhythm(mapFn, child, state)))
+}
+
+
+///
+
+declare type ChildrenGetter<S> = (hierarchy: S) => S[];
+declare type ParentFactory<S> = (hierarchy: S, children: S[]) => S;
+declare type NodeMapFn<S> = (hierarchy: S, index: number, siblings?: S[]) => S;
+
+export function mapHierarchy<S>(
+  getChildren: ChildrenGetter<S>,
+  makeParent: ParentFactory<S>,
+  mapFn: NodeMapFn<S>,
+  hierarchy: S,
+  index?: number,
+  siblings?: S[]
+) {
+  hierarchy = mapFn(hierarchy, index, siblings);
+  const children = getChildren(hierarchy);
+  if (!children?.length) {
+    return hierarchy;
+  }
+  return makeParent(
+    hierarchy,
+    children.map((...args) => mapHierarchy(getChildren, makeParent, mapFn, ...args))
+  );
+}
+
+function rhythmTreeChildren<T, S>({ data, ...props }: { data: RhythmNode<T> } & S) {
+  return getRhythmChildren<T>(data)?.map(child => ({ data: child, ...props }));
+}
+function rhythmTreeParent<T, S>({ data, ...props }: { data: RhythmNode<T> } & S, children: Array<{ data: RhythmNode<T> } & S>) {
+  return {
+    data: makeRhythmParent(data, children.map(({ data }) => data)),
+    ...props
+  };
+}
+
+// TODO maybe write mapRhythm without the abstract mapHierarchy to get better typing results..
+
+export function addColors<T>(rhythm: RhythmNode<T>, scheme: string[]) {
+  const { data } = mapHierarchy<{
+    data: RhythmNode<T>,
+    path: number[][],
+  }>(
+    rhythmTreeChildren,
+    rhythmTreeParent,
+    ({ data, path }, index, children) => {
+      if (children) {
+        path = path.concat([[index, children.length]]);
+      }
+      const color = path?.length ? scheme[path.length - 1] : 'black';
+      return { data: { ...toRhythmObject(data), color }, path }
+    },
+    { data: rhythm, path: [] });
+  return data;
+}
+
+export function colorize<T>(rhythm: RhythmNode<T>, scheme: string[]) {
+  return mapRhythm((node, path = []) => {
+    const children = getRhythmChildren(node);
+    node = toRhythmObject(node);
+    return [
+      { color: path.length ? scheme[path.length - 1] : 'black', ...node, },
+      path.concat(children?.length ? [children.indexOf(node)] : []),
+    ];
+  }, rhythm)
+}
+
+export function pathString(path: [number, number, number][]) {
+  return path.map(p => p.join(':')).join(' ');
+}
+
+export function d3Path(node, path = []) {
+  if (!node.parent) {
+    return path;
+  }
+  return d3Path(node.parent, [node.parent.children.indexOf(node)].concat(path))
 }

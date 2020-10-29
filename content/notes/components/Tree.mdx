@@ -1,0 +1,29 @@
+# Tree
+
+import Tree from '../../components/rhythmical/components/Tree.tsx';
+import { schemeTableau10 } from 'd3-scale-chromatic';
+
+<Tree
+  width={200}
+  data={{
+    name: 'root',
+    color: schemeTableau10[0],
+    children: [
+      {
+        name: 'A',
+        color: schemeTableau10[1],
+      },
+      {
+        name: 'B',
+        color: schemeTableau10[1],
+        children: [
+          { name: 'C', color: schemeTableau10[2] },
+          {
+            name: 'D',
+            color: schemeTableau10[2],
+          },
+        ],
+      },
+    ],
+  }}
+/>

@@ -54,7 +54,7 @@ const regularityField = (start?, end?) => ({
 
 export function RealReader({ url }) {
   const playlist = iRealReader(decodeURI(url));
-  return <JSONViewer json={playlist} />;
+  return <JSONViewer src={playlist} />;
 }
 
 export function getSheet(song, expand?, options?) {
@@ -79,7 +79,7 @@ export function RealRenderer({ url }) {
   const playlist = iRealReader(decodeURI(url));
   const song = playlist.songs[0];
   const sheet = getSheet(song);
-  return <JSONViewer json={sheet} />;
+  return <JSONViewer src={sheet} />;
 }
 
 export function SheetSnippet({ url, expand, options }) {

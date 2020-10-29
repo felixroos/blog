@@ -17,11 +17,11 @@ export default function PianoRoll(props: PianoRollProps) {
     fold = false,
     time = 0,
     center = 0.5,
-    events
+    events,
   } = props;
-  const leaves = events.filter((e) =>
-    ['string', 'number'].includes(typeof e.value)
-  );
+  const isLeaf = (e) => ['string', 'number'].includes(typeof e.value);
+  const leaves = events.filter(isLeaf);
+
   // const nodes = events.filter((e) => !['string', 'number'].includes(typeof e.value));
   const deepest = max(leaves.map((e) => (e.path ? e.path.length : 1)));
   center = center * width;
@@ -43,30 +43,59 @@ export default function PianoRoll(props: PianoRollProps) {
     // lanes = uniqueLanes;
     lanes = (noteLanes
       ? noteLanes.filter(
-          (note) =>
-            uniqueNoteLanes.find((used) => Note.midi(used) === Note.midi(note))
+          (note) => uniqueNoteLanes.find((used) => Note.midi(used) === Note.midi(note))
           // must match by midi to also detect enharmonic equivalents
         )
       : uniqueNoteLanes
     )
       .map((note) => Note.midi(note) + '')
       .concat(
-        rhythmLanes
-          ? rhythmLanes.filter((key) => uniqueRhythmLanes.indexOf(key) !== -1)
-          : uniqueRhythmLanes.reverse()
+        rhythmLanes ? rhythmLanes.filter((key) => uniqueRhythmLanes.indexOf(key) !== -1) : uniqueRhythmLanes.reverse()
       );
   } else {
-    const midiRange = noteRange
-      ? noteRange.map((n) => Note.midi(n))
-      : [
-          min(uniqueNoteLanes.map((n) => Note.midi(n))),
-          max(uniqueNoteLanes.map((n) => Note.midi(n)))
-        ];
-    noteLanes = (noteLanes
-      ? noteLanes
-      : Range.chromatic(midiRange.reverse().map((m) => Note.fromMidi(m)))
-    ).map((note) => Note.midi(note) + '');
+    if (uniqueNoteLanes.length) {
+      const midiRange = noteRange
+        ? noteRange.map((n) => Note.midi(n))
+        : [min(uniqueNoteLanes.map((n) => Note.midi(n))), max(uniqueNoteLanes.map((n) => Note.midi(n)))];
+      noteLanes = (noteLanes ? noteLanes : Range.chromatic(midiRange.reverse().map((m) => Note.fromMidi(m)))).map(
+        (note) => Note.midi(note) + ''
+      );
+    } else {
+      // maybe we still want noteLanes event if there are currently no note events
+      noteLanes = noteLanes || [];
+    }
     lanes = noteLanes.concat(rhythmLanes || uniqueRhythmLanes.reverse());
+  }
+
+  let containers = [];
+  if (props.hierarchy) {
+    containers = events
+      .filter((e) => !isLeaf(e))
+      .map((container: any) => ({ ...container, lane: container.lane || `container-${container.path.length}` }));
+
+      // TODO find way to render while still in tree format
+      // below code unnessessarily reconstructs the tree from the paths.. why not simply do this when walking the tree?
+      //console.log('containers',containers);
+    /*.map((container) => {
+        const isChildOf = (parent) => (childCandidate) =>
+          pathString(childCandidate.path).includes(pathString(parent.path));
+        const { start, end, values } = leaves.filter(isChildOf(container)).reduce(
+          ({ start, end, values, minLaneIndex,maxLaneIndex }: any, leaf) => {
+            return {
+              start: start && start < leaf.time ? start : leaf.time,
+              end: end && end > leaf.time + leaf.duration ? end : leaf.time + leaf.duration,
+              minLaneIndex: minLaneIndex === undefined ? lanes.indexOf()
+              maxLaneIndex: maxLaneIndex === undefined ?
+              values: !values.includes(leaf.value) ? values.concat([leaf.value]) : values,
+            };
+          },
+          { values: [] }
+        );
+        return {...container, height:values.length,}
+      }); */
+    lanes = []
+      .concat(containers.map((container) => container.lane).reverse(), lanes)
+      .filter((el, i, a) => a.indexOf(el) === i);
   }
 
   const x = scaleLinear()
@@ -77,83 +106,76 @@ export default function PianoRoll(props: PianoRollProps) {
       .domain([lanes.length, 0])
       .range([height - strokeWidth, strokeWidth]);
 
-  const barThickness = round(y(1) - strokeWidth);
+  const barThickness = (height) => round(y(height) - strokeWidth);
 
   // render only leaves that are in sight + not a hiddenSymbol
-  const renderedEvents = leaves.filter(
-    ({ value, time, duration }) =>
-      hiddenSymbols.indexOf(value) === -1 &&
-      lanes.indexOf(Note.midi(value) ? Note.midi(value) + '' : value) !== -1
-  );
+  const renderedEvents: any = leaves
+    .filter(
+      ({ value, time, duration }) =>
+        hiddenSymbols.indexOf(value) === -1 && lanes.indexOf(Note.midi(value) ? Note.midi(value) + '' : value) !== -1
+    )
+    .map((leaf) => ({ ...leaf, height: 1 }))
+    .concat(containers);
+
   const timeOffset = length(time) % width;
 
   const ppl = height / lanes.length;
   function renderLanes(offset = 0) {
     return (
       <g>
-        {renderedEvents.map(
-          ({ value, time: eventTime, duration, path, color }, i) => {
-            const left = round(x(eventTime + offset) - center);
-            const w = round(length(duration));
-            const isVisible =
-              left < width - strokeWidth + timeOffset &&
-              left + w > strokeWidth + timeOffset;
-            if (!isVisible) {
-              return;
-            }
-            value = Note.midi(value)
-              ? Note.midi(value) + '' // fixes case problems
-              : value;
-            const index = lanes.indexOf(value);
-            const isActive =
-              timeOffset !== 0 &&
-              timeOffset + center > left &&
-              timeOffset + center < left + w;
-            //style={{transition: 'fill .1s out'}}
-            return (
-              <rect
-                rx={ppl / 2}
-                ry={ppl / 2}
-                stroke="black"
-                strokeWidth={strokeWidth}
-                fill={
-                  isActive
-                    ? 'white'
-                    : color ||
-                      interpolateBlues((path ? path.length : 1) / deepest)
-                }
-                key={i}
-                x={left}
-                y={round(y(index))}
-                width={w}
-                height={barThickness}
-              />
-            );
+        {renderedEvents.map(({ value, time: eventTime, duration, path, color, height, lane }, i) => {
+          const left = round(x(eventTime + offset) - center);
+          const w = round(length(duration));
+          const isVisible = left < width - strokeWidth + timeOffset && left + w > strokeWidth + timeOffset;
+          if (!isVisible) {
+            return;
           }
-        )}
+          value = Note.midi(value)
+            ? Note.midi(value) + '' // fixes case problems
+            : value;
+          const index = lanes.indexOf(lane || value);
+          const isActive = timeOffset !== 0 && timeOffset + center > left && timeOffset + center < left + w;
+          //style={{transition: 'fill .1s out'}}
+          return (
+            <rect
+              rx={ppl/2}
+              ry={ppl/2}
+              stroke="black"
+              strokeWidth={strokeWidth}
+              fill={isActive ? 'white' : color || interpolateBlues((path ? path.length : 1) / deepest)}
+              key={i}
+              x={left}
+              y={round(y(index))}
+              width={w}
+              height={barThickness(height || 1)}
+            />
+          );
+        })}
       </g>
     );
+  }
+  const scroll = true;
+  let playheadX, laneOffset;
+  if (scroll) {
+    playheadX = center - round(strokeWidth);
+    laneOffset = -round(timeOffset);
+  } else {
+    laneOffset = -center;
+    playheadX = round(timeOffset);
   }
   return (
     <svg {...{ width, height }}>
       <g
         style={{
-          transform: `translateX(${-round(timeOffset)}px)`,
-          willChange: 'transform'
+          transform: `translateX(${laneOffset}px)`,
+          willChange: 'transform',
         }}
       >
         {renderLanes()}
         {renderLanes(maxTime)}
         {renderLanes(2 * maxTime)}
       </g>
-      <line
-        x1={center - round(strokeWidth)}
-        x2={center - round(strokeWidth)}
-        y1={0}
-        y2={height}
-        strokeWidth={strokeWidth * 2}
-        stroke={'black'}
-      />
+      <line x1={playheadX} x2={playheadX} y1={0} y2={height} strokeWidth={strokeWidth * 2} stroke={'black'} />
     </svg>
   );
 }
@@ -163,6 +185,7 @@ export interface PianoRollProps {
   height?: number;
   hiddenSymbols?: string[];
   fold?: boolean;
+  hierarchy?: boolean; // if true, containers (non leaves) will also be rendered
   time?: number;
   rhythmLanes?: string[]; // extra non note lanes
   noteLanes?: string[]; // custom note lanes

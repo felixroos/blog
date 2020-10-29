@@ -30,7 +30,7 @@ export function applyFeatures<T>(agnostic: AgnosticChild<T>, features: Feature<T
 }
 
 // flatten rhythmical object format to events with features
-export function flatRhythmObject<T>(agnostic: AgnosticChild<T>, extraFeatures: Feature<T>[] = []): ValueChild<T>[] {
+export function flatRhythmObject<T>(agnostic: AgnosticChild<T>, extraFeatures: Feature<T>[] = [], extraProps = {}): ValueChild<T>[] {
   return flatObject(agnostic, {
     getChildren: (agnostic: AgnosticChild<T>) => {
       const parent = toObject(applyFeatures(agnostic, [sequentialParent, parallelParent, inheritProperty('color'), ...extraFeatures]));
@@ -42,15 +42,16 @@ export function flatRhythmObject<T>(agnostic: AgnosticChild<T>, extraFeatures: F
       // so we have to split features into parent / child
       // => most features should work directly on the parent as they do not mess with the value
       return children.map((child, i) => applyFeatures(child, [sequentialChild, parallelChild]));
-    }
+    },
+    ...extraProps
   });
 }
 
 // calculate time + duration for flat events with paths
-export function renderRhythmObject<T>(agnostic: AgnosticChild<T>, extraFeatures: Feature<T>[] = []) {
+export function renderRhythmObject<T>(agnostic: AgnosticChild<T>, extraFeatures: Feature<T>[] = [], extraProps = {}) {
   const root = toObject(agnostic);
   const totalDuration = (root.duration || 1); // outer duration
-  return flatRhythmObject(agnostic, extraFeatures).map((event) => {
+  return flatRhythmObject(agnostic, extraFeatures, extraProps).map((event) => {
     let { path } = event;
     const [time, duration] = getTimeDuration(path, totalDuration);
     return ({ ...event, time, duration, path })
@@ -58,7 +59,7 @@ export function renderRhythmObject<T>(agnostic: AgnosticChild<T>, extraFeatures:
 }
 
 
-export function renderRhythm<T>(agnostic: AgnosticChild<T>, rhythmPlugins = []) {
+export function renderRhythm<T>(agnostic: AgnosticChild<T>, rhythmPlugins = [], extraProps = {}) {
   const root = toObject(agnostic);
   const totalDuration = (root.duration || 1); // outer duration
   return flatObject(agnostic, {
@@ -69,6 +70,7 @@ export function renderRhythm<T>(agnostic: AgnosticChild<T>, rhythmPlugins = []) 
     // apply features to children
     /* ({ child }) => sequentialChild(child), ({ child }) => parallelChild(child), */
     mapChild: renderRhythmPlugins(rhythmPlugins),
+    ...extraProps
   }).map((event) => {
     const path = event?.path || [[0, 1, 1]];
     const [time, duration] = getTimeDuration(path, totalDuration);

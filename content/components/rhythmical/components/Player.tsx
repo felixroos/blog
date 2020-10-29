@@ -13,7 +13,15 @@ export const synth =
   new PolySynth(12, Synth, {
     volume: -16,
     envelope: { attack: 0.01, decay: 0.2, sustain: 0.5, release: 0.1 },
-    oscillator: { type: 'fmtriangle' }
+    oscillator: { type: 'fmtriangle' },
+  }).toMaster();
+
+export const click =
+  canUseDOM() &&
+  new PolySynth(12, Synth, {
+    volume: -16,
+    envelope: { attack: 0.01, decay: 0.1, sustain: 0, release: 0 },
+    oscillator: { type: 'fmtriangle' },
   }).toMaster();
 
 export function playEvents(
@@ -28,16 +36,9 @@ export function playEvents(
   const playableEvents = events.filter(
     (e) => ['string', 'number'].includes(typeof e.value) // && e.value !== 'r'
   );
-  let {
-    loop = true,
-    instruments = { synth },
-    duration = max(playableEvents.map((e) => e.time + e.duration))
-  } = config;
+  let { loop = true, instruments = { synth }, duration = max(playableEvents.map((e) => e.time + e.duration)) } = config;
   const part = new Tone.Part((time, event) => {
-    if (
-      event.value === 'r' ||
-      !['string', 'number'].includes(typeof event.value)
-    ) {
+    if (event.value === 'r' || !['string', 'number'].includes(typeof event.value)) {
       return;
     }
     pickInstrument(event.instrument, instruments).triggerAttackRelease(
@@ -65,13 +66,7 @@ function pickInstrument(instrumentKey, instruments) {
     instrument = instruments[match];
   } else {
     const fallback = availableInstruments[0];
-    console.warn(
-      'instrument ' +
-        instrumentKey +
-        ' was not added to player. using ' +
-        fallback +
-        ' as fallback'
-    );
+    console.warn('instrument ' + instrumentKey + ' was not added to player. using ' + fallback + ' as fallback');
     instrument = instruments[fallback] || synth;
   }
   return instrument;

@@ -104,7 +104,7 @@ export default function DynamicTable({
   }
   return (
     <>
-      {debug && <JSONViewer json={rows} collapsed={false} />}
+      {debug && <JSONViewer src={rows} collapsed={false} />}
       <TableContainer component={Paper}>
         {heading && <EnhancedTableToolbar numSelected={0} heading={heading} />}
         <Table

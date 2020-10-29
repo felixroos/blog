@@ -25,6 +25,9 @@ export function flatObject<T>(agnostic: AgnosticChild<T>, props: FlatObjectProps
     }
     if (isDeep(child)) {
       flat = flat.concat(flatObject(child, props));
+      if (props.includeNonLeaves) {
+        flat.push(child);
+      }
     } else {
       flat.push(child);
     }

@@ -20,6 +20,7 @@ import { sampler } from '../components/rhythmical/instruments/sampler.ts';
 
 <Player
   fold={true}
+  hierarchy={true}
   instruments={{ piano, drums }}
   events={renderRhythmObject(
     {
@@ -61,7 +62,8 @@ import { sampler } from '../components/rhythmical/instruments/sampler.ts';
         }
       ]
     },
-    [inheritProperty('instrument')]
+    [inheritProperty('instrument')],
+    { includeNonLeaves: true }
   )}
 />
 

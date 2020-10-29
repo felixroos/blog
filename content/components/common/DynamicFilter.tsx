@@ -27,7 +27,7 @@ const data = set.sort((a, b) => b.count - a.count).slice(0, 10);
 export default function DynamicFilter({ values }) {
   return (
     <>
-      <JSONViewer json={set} />
+      <JSONViewer src={set} />
       <D3Shell render={(container) => barChart({ container, data })} />
     </>
   );
