@@ -183,10 +183,3 @@ export function colorize<T>(rhythm: RhythmNode<T>, scheme: string[]) {
 export function pathString(path: [number, number, number][]) {
   return path.map(p => p.join(':')).join(' ');
 }
-
-export function d3Path(node, path = []) {
-  if (!node.parent) {
-    return path;
-  }
-  return d3Path(node.parent, [node.parent.children.indexOf(node)].concat(path))
-}

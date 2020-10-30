@@ -26,23 +26,17 @@ import RhythmicalTree, {
   rhythmicalHierarchy,
   rhythmicalTree,
 } from '../components/rhythmical/components/RhythmicalTree.tsx';
-import Tree from '../components/rhythmical/components/Tree.tsx';
+import Tree, { colorizePath } from '../components/rhythmical/components/Tree.tsx';
 import { TreeAnalyzer } from '../components/rhythmical/components/TreeAnalyzer.tsx';
 import { rhythmicalScore } from '../components/score/score.ts';
 import { Score } from '../components/score/Score.tsx';
 import { Color } from '../components/common/Color.tsx';
 import { schemeTableau10 } from 'd3-scale-chromatic';
 import { InlineMath, BlockMath } from 'react-katex';
-import {
-  toRhythmObject,
-  getRhythmChildren,
-  colorize,
-  addColors,
-  pathString,
-  d3Path,
-} from '../components/rhythmical/util';
+import { toRhythmObject, getRhythmChildren, colorize, addColors, pathString } from '../components/rhythmical/util';
 import { State } from 'react-powerplug';
 import Fraction from 'fraction.js';
+import Switch from '@material-ui/core/Switch';
 
 export const bolero = [
   [
@@ -61,7 +55,7 @@ export const bolero = [
 ];
 export const conventionalLabels = ['bolero', '3/4', '1/4', '1/8', '/24'];
 export const absoluteLabels = ['bolero', '3/3', '1/3', '1/6', '/18'];
-export const relativeLabels = ['bolero', '1/2', '1/3', '1/2', '1/3'];
+export const relativeLabels = ['bolero', '1', '1/3', '1/2', '1/3'];
 
 <!--<Player fold={true} instruments={{ MK2md2 }} events={renderEvents(tetris)} />-->
 
@@ -204,51 +198,40 @@ const bolero = [
 <br/>
 
 
-### Calculating Absolute Durations
-
-If we want to calculate the absolute duration of a subdivision, we need to know how long one beat is.
-If we take a tempo of 60bpm, we have:
-
-<BlockMath>{`60 bpm = 60 b/m = 60b/60s = 1b/s`}</BlockMath>
-
-Most of the time, the term beat means one quarter note. With that we can calculate the duration of each subdivision:
-
-<BlockMath>{`1/4 = 1s, 1/8 = 0.5s, 1/24 = 0.16s`}</BlockMath>
-
-### Calculating Absolute Time
-
-If we also knew when each note is played, we have all the information to represent the rhythm as absolute timed events.
-As we already know the durations, this is quite easy. We just have to sum all durations that came before.
-For example, the second 16th triplet in bar 2 begins at:
-
-<BlockMath>{`3/4 + 1/8 + 1/24 = 0.916s`}</BlockMath>
-
-<!-- TBD: make Tree clickable to calculate the selected node's time -->
-
 ## Changing Perspective
 
 Currently we were using the fractions 1/4, 1/8 and 1/24 (1/8/3 = 16th triplets) by convention, as they have a visual representation in the traditional western notation system.
 In a 3 pulse time, this is overcomplicating things as we have no groupings of 4.
-What if we invented a 3/3 meter? As everything is relative, we could just multiply each fraction by 4/3, and get this:
+What if we invented a 3/3 meter?
 
 <!-- TBD: enable changing perspective of any group to any fraction + automatically calculate fractions -->
 
-<Tree
-  width={620}
-  nodeRadius={10}
-  dx={20}
-  columns={[12, 12]}
-  data={rhythmicalTree(bolero, (rhythm, path) => ({
-    ...toRhythmObject(rhythm),
-    color: path.length ? colors[path.length - 1] : 'black',
-    name: absoluteLabels[path.length],
-  }))}
-  hideJson={true}
-/>
+<State initial={{ path: null, node: null, simplify: true }}>
+  {({ state, setState }) => (
+    <React.Fragment>
+      <Tree
+        width={620}
+        nodeRadius={10}
+        dx={20}
+        columns={[12, 12]}
+        data={rhythmicalTree(bolero, (rhythm, path) => ({
+          ...toRhythmObject(rhythm),
+          ...colorizePath(state.node, path, colors, 'lightgray'),
+          name: (state.simplify ? absoluteLabels : conventionalLabels)[path.length],
+        }))}
+        onClick={(node) => setState({ node })}
+        hideJson={true}
+      />
+      <label>
+        simplify
+        <Switch checked={state.simplify} color="primary" onChange={(e) => setState({ simplify: e.target.checked })} />
+      </label>
+    </React.Fragment>
+  )}
+</State>
 
-![bolero](./img/bolero33.png)
-
-This changes just the reference point, while the information stays intact, just more simple.
+As everything is relative, we can simplify the numbers by multiplying each fraction with 4/3!
+This changes just the reference point, while the information stays intact, just more simple (basic fractional algebra).
 Now there is one last step to simplify things even more, arriving at a point where the trees really make sense:
 
 ### Relative Subdivisions
@@ -256,35 +239,53 @@ Now there is one last step to simplify things even more, arriving at a point whe
 In the above trees, the fractions were relative to the "absolute 1". What if we change them to be relative to just their parent?
 Let's find out:
 
-<Tree
-  width={620}
-  nodeRadius={10}
-  dx={20}
-  columns={[12, 12]}
-  data={rhythmicalTree(bolero, (rhythm, path) => ({
-    ...toRhythmObject(rhythm),
-    color: path.length ? colors[path.length - 1] : 'black',
-    name: relativeLabels[path.length],
-  }))}
-  hideJson={true}
-/>
+<State initial={{ path: null, node: null, relative: true }}>
+  {({ state, setState }) => (
+    <React.Fragment>
+      <Tree
+        width={620}
+        nodeRadius={10}
+        dx={20}
+        columns={[12, 12]}
+        data={rhythmicalTree(bolero, (rhythm, path) => ({
+          ...toRhythmObject(rhythm),
+          ...colorizePath(state.node, path, colors, 'lightgray'),
+          name: (!state.relative ? absoluteLabels : relativeLabels)[path.length],
+        }))}
+        onClick={(node) => setState({ node })}
+        hideJson={true}
+      />
+      <label>
+        relative{' '}
+        <Switch checked={state.relative} color="primary" onChange={(e) => setState({ relative: e.target.checked })} />
+      </label>
+      <p>
+        Now we get an interesting effect: the denominators always "coincide" with the amount of elements in a group! To
+        get back to the absolute fraction, we just have to multiply all fractions top down:
+      </p>
+      {!state.node && (
+        <p>
+          <i>Click a node to show its calculation</i>
+        </p>
+      )}
+      {state.node && (
+        <React.Fragment>
+          <BlockMath>{`1 * 1/3 * 1/2 * 1/3 = 1/18`}</BlockMath>
+          <p>... and to get the "conventional" fraction:</p>
+          <BlockMath>{`1/18 * 3/4 = 1/24`}</BlockMath>
+        </React.Fragment>
+      )}
+    </React.Fragment>
+  )}
+</State>
 
-Now we get an interesting effect: the denominators always "coincide" with the amount of elements in a group!
-To get back to the absolute fraction, we just have to multiply all fractions top down, for example to get the absolute fraction of a 16ths triplet (last row):
-
-<BlockMath>{`3/3 * 1/3 * 1/2 * 1/3 = 1/18`}</BlockMath>
-
-... and to get the "conventional" fraction:
-
-<BlockMath>{`1/18 * 3/4 = 1/24`}</BlockMath>
-
-To convert that fraction to the absolute duration, we just need to know the absolute duration of any node.
+Note that the important takeaway is not only simplicity, but also independence, as each node value is now only dependent on its parent!
 
 ### Index Path
 
 We can identify each node in the tree, by a unique index path:
 
-<State initial={{ path: null }}>
+<State initial={{ path: null, node: null }}>
   {({ state, setState }) => (
     <>
       <Tree
@@ -294,7 +295,7 @@ We can identify each node in the tree, by a unique index path:
         columns={[12, 12]}
         data={rhythmicalTree(bolero, (rhythm, path) => ({
           ...toRhythmObject(rhythm),
-          color: path.length ? colors[path.length - 1] : 'black',
+          ...colorizePath(state.node, path, colors, 'lightgray'),
           name: path.length ? path[path.length - 1] : 'bolero',
         }))}
         onClick={(node, setNode) => {
@@ -303,22 +304,21 @@ We can identify each node in the tree, by a unique index path:
             .reverse()
             .slice(1)
             .map((node) => node.data.name);
-          setState({ path });
+          setState({ path, node });
         }}
         hideJson={true}
       />
-      {state.path && (
-        <>
-          <p>path: {state.path.join('-')}</p>
-        </>
-      )}
+      {!state.node && <i>Click a node to see its path</i>}
+      {state.path && <BlockMath>{`path = ${state.path.join(', ')}`}</BlockMath>}
     </>
   )}
 </State>
 
-### Path Fraction
+Now let's use that path and combine it with our relative subdivisions:
 
-if we now divide the index by its relative subdivision, we get this:
+### Path Fractions
+
+If we divide each index by the number of siblings (relative subdivision), we get this:
 
 <State initial={{ path: null, node: null }}>
   {({ state, setState }) => (
@@ -329,7 +329,6 @@ if we now divide the index by its relative subdivision, we get this:
         dx={20}
         columns={[12, 12]}
         onClick={(node) => {
-          console.log('click', node);
           const path = node
             .ancestors()
             .reverse()
@@ -344,32 +343,28 @@ if we now divide the index by its relative subdivision, we get this:
             }, p);
             return sum.add(m);
           }, new Fraction(0));
-          console.log('node', node);
-          console.log(d3Path(node));
           setState({ path, fraction, node });
-        }} // || pathString(state.node.path).includes(pathString(path))
+        }}
         data={rhythmicalTree(bolero, (rhythm, path, parent) => ({
           ...toRhythmObject(rhythm),
-          color:
-            path.length &&
-            (!state.node ||
-              d3Path(state.node)
-                .join(':')
-                .startsWith(path.join(':')))
-              ? colors[path.length - 1]
-              : 'gray',
+          ...colorizePath(state.node, path, colors, 'lightgray'),
           name: parent ? path[path.length - 1] + '/' + getRhythmChildren(parent).length : 'bolero',
         }))}
         hideJson={true}
       />
-      {!state.path && <p>Click a node to show the calculation of its absolute fraction!</p>}
+      {!state.path && (
+        <p>
+          <i>Click a node to show its absolute fraction!</i>
+        </p>
+      )}
       {state.path && (
         <>
-          <p>We can calculate the absolute fraction with the sum of the each node's parent product:</p>
           <BlockMath>{`path = ${state.path
             .map((f) => f.split('/'))
             .map(([a, b]) => `\\frac{${a}}{${b}}`)
             .join(', ')}`}</BlockMath>
+          <p>The top row reflects the index path, while the bottom row reflects the path of subdivisions!</p>
+          <p>We can calculate the absolute fraction like this:</p>
           <BlockMath>
             {`fraction = ${state.path
               .map((f) => f.split('/'))
@@ -377,21 +372,33 @@ if we now divide the index by its relative subdivision, we get this:
                 ([a, b], i, p) =>
                   `${
                     i
-                      ? `(\\frac{${a}}{${b}} * ${p
+                      ? `\\frac{${a}}{${b}}(${p
                           .slice(0, i)
                           .reverse()
                           .map(([x, y]) => `\\frac{1}{${y}}`)
-                          .join('*')})`
+                          .join('')})`
                       : `\\frac{${a}}{${b}}`
                   }`
               )
               .join(' + ')} = \\frac{${state.fraction.n}}{${state.fraction.d}}`}
           </BlockMath>
+          <p></p>
         </>
       )}
     </>
   )}
 </State>
+
+For each node, we multiply its path fraction (before the bracket) with each parent's relative subdivisions
+(inside the brackets). The products are then summed up.
+You can read it the same way your eyes would move along the tree line (oscillating down and up).
+
+## Calculating absolute time
+
+With now have all the ingredients to calculate the absolute time and duration for any node.
+All we need to know, is the absolute duration of the piece, or in fact, any node.
+
+TBD
 
 ### [index, duration, division]
 
@@ -462,6 +469,27 @@ The actual rhythm just switches back and forth between the 8ths and 16ths triple
   })}
 />
 
+### Calculating Absolute Durations
+
+If we want to calculate the absolute duration of a subdivision, we need to know how long one beat is.
+If we take a tempo of 60bpm, we have:
+
+<BlockMath>{`60 bpm = 60 b/m = 60b/60s = 1b/s`}</BlockMath>
+
+Most of the time, the term beat means one quarter note. With that we can calculate the duration of each subdivision:
+
+<BlockMath>{`1/4 = 1s, 1/8 = 0.5s, 1/24 = 0.16s`}</BlockMath>
+
+### Calculating Absolute Time
+
+If we also knew when each note is played, we have all the information to represent the rhythm as absolute timed events.
+As we already know the durations, this is quite easy. We just have to sum all durations that came before.
+For example, the second 16th triplet in bar 2 begins at:
+
+<BlockMath>{`3/4 + 1/8 + 1/24 = 0.916s`}</BlockMath>
+
+<!-- TBD: make Tree clickable to calculate the selected node's time -->
+
 ## Rhythmical > d3-hierarchy
 
 We can convert a the object to d3-hierarchy format like that:
@@ -489,8 +517,6 @@ export function rhythmicalTree<T>(
 ```
 
 ```js
-const conventionalLabels = ['bolero', '3/4', '1/4', '1/8', '/24'];
-
 <Tree
   width={620}
   nodeRadius={10}
@@ -502,7 +528,7 @@ const conventionalLabels = ['bolero', '3/4', '1/4', '1/8', '/24'];
     name: conventionalLabels[path.length],
   }))}
   hideJson={true}
-/>;
+/>
 ```
 
 <Tree

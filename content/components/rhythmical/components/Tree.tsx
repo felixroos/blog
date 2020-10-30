@@ -79,6 +79,7 @@ export default function Tree(props) {
       viewBox={viewBox}
       ref={(el) => {
         const svg = select(el);
+        svg.selectAll('*').remove();
         // lines
         svg
           .append('g')
@@ -143,4 +144,22 @@ export function rhythmicalHierarchy<T>(rhythm: NestedArray<T>) {
       return { name: n };
     }),
   };
+}
+
+export function d3Path(node, path = []) {
+  if (!node.parent) {
+    return path;
+  }
+  return d3Path(node.parent, [node.parent.children.indexOf(node)].concat(path));
+}
+
+export function colorizePath(node, path: number[], colors, fallback) {
+  if (path.length && (!node || d3Path(node).join(':').startsWith(path.join(':')))) {
+    return {
+      color: colors[path.length - 1],
+    };
+  } else if (fallback) {
+    return { color: fallback };
+  }
+  return {};
 }
