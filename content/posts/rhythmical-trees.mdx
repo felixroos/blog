@@ -37,25 +37,7 @@ import { toRhythmObject, getRhythmChildren, colorize, addColors, pathString } fr
 import { State } from 'react-powerplug';
 import Fraction from 'fraction.js';
 import Switch from '@material-ui/core/Switch';
-
-export const bolero = [
-  [
-    ['sn', ['sn', 'sn', 'sn']],
-    ['sn', ['sn', 'sn', 'sn']],
-    ['sn', 'sn'],
-  ],
-  [
-    ['sn', ['sn', 'sn', 'sn']],
-    ['sn', ['sn', 'sn', 'sn']],
-    [
-      ['sn', 'sn', 'sn'],
-      ['sn', 'sn', 'sn'],
-    ],
-  ],
-];
-export const conventionalLabels = ['bolero', '3/4', '1/4', '1/8', '/24'];
-export const absoluteLabels = ['bolero', '3/3', '1/3', '1/6', '/18'];
-export const relativeLabels = ['bolero', '1', '1/3', '1/2', '1/3'];
+import { bolero, conventionalLabels, absoluteLabels, relativeLabels } from '../components/rhythmical/tunes/bolero';
 
 <!--<Player fold={true} instruments={{ MK2md2 }} events={renderEvents(tetris)} />-->
 

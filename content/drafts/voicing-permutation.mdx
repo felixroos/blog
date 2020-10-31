@@ -62,10 +62,11 @@ import { Chord } from '@tonaljs/tonal';
 import { Harmony } from './voicing/Harmony.ts';
 import { Voicing } from './voicing/Voicing.ts';
 import Keyboard from '../components/Keyboard.tsx';
-const isBrowser = typeof window !== 'undefined';
-const poly = isBrowser && new PolySynth(6, Synth, { volume: -12 }).toMaster();
 import DynamicTable from '../components/common/DynamicTable.tsx';
+import canUseDOM from '../components/canUseDOM.ts';
 import { min, max } from 'd3-array';
+
+export const poly = canUseDOM() && new PolySynth(6, Synth, { volume: -12 }).toMaster();
 
 <State
   initial={{

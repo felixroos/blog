@@ -9,15 +9,6 @@ import CardActionArea from '@material-ui/core/CardActionArea';
 import CardMedia from '@material-ui/core/CardMedia';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
-const useStyles = makeStyles({
-  root: {
-    maxWidth: 345
-  },
-  media: {
-    height: 140
-  }
-});
 import open from './audio/Open.m4a';
 import vibrato from './audio/Vibrato.m4a';
 import h1 from './audio/1st Harmonic.m4a';
@@ -35,8 +26,10 @@ import octave from './audio/Octave.m4a';
 import fifth from './audio/Fifth.m4a';
 import fourth from './audio/Fourth.m4a';
 import third from './audio/Third.m4a';
-const harmonics = [h1, h2, h3, h4, h5, h6, h7, h8, h9, h10];
-const intervals = [unison, third, fifth, octave];
+
+export const harmonics = [h1, h2, h3, h4, h5, h6, h7, h8, h9, h10];
+export const intervals = [unison, third, fifth, octave];
+
 
 After fiddling around with digital monochords and cheap web audio sounds,
 I decided to give my build a physical monochord from scrap wood to test if the real world is actually as I imagine it to be, and to give my ears a rest from beep noises.

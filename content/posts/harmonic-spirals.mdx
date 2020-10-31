@@ -13,28 +13,13 @@ import Slider from '@material-ui/core/Slider';
 import Grid from '@material-ui/core/Grid';
 import { Note } from '@tonaljs/tonal';
 import { InlineMath, BlockMath } from 'react-katex';
-import 'katex/dist/katex.min.css';
 import AnimationFrame from '../components/common/AnimationFrame.tsx';
 import trumpet from '../assets/trumpet.svg';
-import {
-  angle,
-  frequencyColor,
-  equivalence,
-  clamp,
-  nearestPitch,
-  edo12
-} from '../components/tuning/tuning.ts';
+import { angle, frequencyColor, equivalence, clamp, nearestPitch, edo12 } from '../components/tuning/tuning.ts';
 import SimplePopover from '../components/common/Popover';
 import * as Tone from 'tone';
 import canUseDOM from '../components/canUseDOM.ts';
-const { PolySynth, Synth } = Tone;
-const harp =
-  canUseDOM() &&
-  new PolySynth(6, Synth, {
-    volume: -16,
-    envelope: { attack: 0.01, decay: 2, sustain: 0, release: 0.1 },
-    oscillator: { type: 'fmtriangle' }
-  }).toMaster();
+import { harp } from '../components/common/harp.ts';
 
 Let's create some harmonic spirals. We can create one by winding the number line like this:
 
@@ -142,7 +127,9 @@ Let's create some harmonic spirals. We can create one by winding the number line
     </State>
 )}
 
+
 </AnimationFrame>
+
 
 - you can think of this as a number line with a twist
 - starting at 1 (root pitch) in the center, we map one full rotation (=360 degrees) to the multiplication of 2 (octaves)
@@ -163,6 +150,7 @@ The following spiral displays stacked fourths, which can be seen as a 3 limit sy
 <details>
   <summary>Click to expand why I chose fourths instead of fifths</summary>
 
+
 I picked fourths, as they grow slower in pitch, compared to fifths.
 This benefits our ears when listening to the non octave reduced pitches
 
@@ -171,6 +159,7 @@ Here is why stacked fourths are just a form of 3-limit:
 <InlineMath>{`{(\\frac{4}{3}})^n = 2^{2n} * 3^{-n}`}</InlineMath>
 
 </details>
+
 
 <State
   initial={{
@@ -183,16 +172,14 @@ Here is why stacked fourths are just a form of 3-limit:
     base: Note.freq('A2'),
     fontSize: 12,
     reduce: false,
-    temper: false
+    temper: false,
   }}
 >
   {({ state, setState }) => {
     const generator = 4 / 3;
     const notes = 54;
     const octaveRadius = 60;
-    let ratios = Array.from({ length: notes }, (_, i) =>
-      Math.pow(generator, i)
-    );
+    let ratios = Array.from({ length: notes }, (_, i) => Math.pow(generator, i));
     const show12EDO = true;
     const eq = state.temper ? 2 : equivalence(Math.pow(generator, 12), 2);
     const comma = 1 - equivalence(Math.pow(generator, 12), 2) / 2;
@@ -214,7 +201,7 @@ Here is why stacked fourths are just a form of 3-limit:
             overflow: 'auto',
             maxWidth: 900,
             maxHeight: 700,
-            position: 'relative'
+            position: 'relative',
           }}
         >
           <Spiral
@@ -229,7 +216,7 @@ Here is why stacked fourths are just a form of 3-limit:
                   ? Array.from({ length: 12 }, (_, i) => [
                       0,
                       angle(Math.pow(2, i / 12) * Math.pow(2, state.max)),
-                      'gray'
+                      'gray',
                     ])
                   : []
               )
@@ -237,18 +224,16 @@ Here is why stacked fourths are just a form of 3-limit:
                 ratios.map((ratio, i) => [
                   angle(ratio * 2),
                   angle(ratio * Math.pow(2, state.max)),
-                  frequencyColor(ratio * state.base)
+                  frequencyColor(ratio * state.base),
                 ])
               )}
             labels={ratios.map((ratio, i) => ({
               label: i + '',
               angle: angle(ratio * 2),
               fill: frequencyColor(ratio * state.base),
-              color: 'black'
+              color: 'black',
             }))}
-            onTrigger={(i) =>
-              harp.triggerAttackRelease(ratios[i] * state.base, 1)
-            }
+            onTrigger={(i) => harp.triggerAttackRelease(ratios[i] * state.base, 1)}
           />
           <div style={{ position: 'absolute', left: 10, bottom: 30 }}>
             <SimplePopover placement="left-start">
@@ -295,6 +280,7 @@ Here is why stacked fourths are just a form of 3-limit:
 <details>
   <summary>Unsolved: Comma Temperament vs Equal Temperament</summary>
 
+
 - We know that when applying fractions/factors of the comma (which is rational), all resulting tempered ratios remain rational.
 - In contrast, standard equal temperament is generated with multiples of the 12th root of 2, which is irrational
 - The question: What's the difference between "comma temperament" and standard equal temperament
@@ -304,6 +290,7 @@ Here is why stacked fourths are just a form of 3-limit:
 <br/>
 <br/>
 
+
 ## Further Reading
 
 - [Erv Wilson Harmonic Spirals](http://www.anaphoria.com/harm-subharm.pdf)
@@ -311,6 +298,7 @@ Here is why stacked fourths are just a form of 3-limit:
 
 <details>
   <summary>TBD</summary>
+
 
 - find unified way to generate those linear scales from generator interval + number of notes + number of notes per octave?!
   - e.g. generate(4/3, 25, 13) => stacks 24 fourths and packs each 13 fourths into one octave
@@ -320,3 +308,4 @@ Here is why stacked fourths are just a form of 3-limit:
   - at the first thought I cannot see where the irrationality comes from, as the comma is also just a fraction
 
 </details>
+
