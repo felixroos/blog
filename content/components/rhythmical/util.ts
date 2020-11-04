@@ -183,3 +183,47 @@ export function colorize<T>(rhythm: RhythmNode<T>, scheme: string[]) {
 export function pathString(path: [number, number, number][]) {
   return path.map(p => p.join(':')).join(' ');
 }
+
+
+// SIMPLE TREE STUFF
+
+export function visitNodes(tree, visitor, getChildren) {
+  visitor(tree);
+  const children = getChildren(tree);
+  if (children?.length) {
+    children.forEach((child) => visitNodes(child, visitor, getChildren));
+  }
+}
+
+export function flatNodes(tree) {
+  const flattened = [];
+  visitNodes(
+    tree, // tree
+    (node) => !Array.isArray(node) && flattened.push(node), // visitor
+    (node) => Array.isArray(node) ? node : [], // getChildren
+  );
+  return flattened;
+}
+
+export function visit(tree, before, after, getChildren, index?, siblings?) {
+  before(tree, index, siblings);
+  const children = getChildren(tree);
+  if (children?.length) {
+    children.forEach((child, i, a) => visit(child, before, after, getChildren, i, a));
+  }
+  after(tree, index, siblings)
+}
+
+export function flat(tree) {
+  const path = [];
+  const flattened = [];
+  visit(
+    tree, // tree
+    (_, index) => index !== undefined && path.push(index) && flattened.push([...path]), // before
+    (_, index) => index !== undefined && path.pop(), // after
+    (node) => Array.isArray(node) ? node : [], // getChildren
+  );
+  return flattened;
+}
+
+console.log('flattened', flat([1, [2, 3], [4, [5, 6]]]))

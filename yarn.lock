@@ -1059,10 +1059,10 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@ctrl/tinycolor@^2.6.1":
-  version "2.6.1"
-  resolved "https://registry.npmjs.org/@ctrl/tinycolor/-/tinycolor-2.6.1.tgz#0e78cc836a1fd997a9a22fa1c26c555411882160"
-  integrity sha512-xKN3lAA+xbNhP+JX3sLhzA65IGiKqun/Yf9jBlZX7Og0SxlCrrqKxqTd6ccn20fv3Cgcvq6KnjPhnmS+v7uAwQ==
+"@ctrl/tinycolor@^3.1.5":
+  version "3.1.6"
+  resolved "https://registry.npmjs.org/@ctrl/tinycolor/-/tinycolor-3.1.6.tgz#2d0ea7d433a34b1682e2e312e8a04812210fcc60"
+  integrity sha512-9RUTT3omv+5mSYFVsX143R7cTDQmT1FibCzoUVmO294mRIT0Sc8dk5srN27BTH0JKzQDWKkNCKh6q/+EkNfpkA==
 
 "@emotion/babel-plugin-jsx-pragmatic@^0.1.5":
   version "0.1.5"
@@ -1841,7 +1841,7 @@
   resolved "https://registry.npmjs.org/@juggle/resize-observer/-/resize-observer-3.2.0.tgz#5e0b448d27fe3091bae6216456512c5904d05661"
   integrity sha512-fsLxt0CHx2HCV9EL8lDoVkwHffsA0snUpddYjdLyXcG5E41xaamn9ZyQqOE9TUJdrRlH8/hjIf+UdOdDeKCUgg==
 
-"@material-ui/core@^4.9.9":
+"@material-ui/core@^4.11.0":
   version "4.11.0"
   resolved "https://registry.npmjs.org/@material-ui/core/-/core-4.11.0.tgz#b69b26e4553c9e53f2bfaf1053e216a0af9be15a"
   integrity sha512-bYo9uIub8wGhZySHqLQ833zi4ZML+XCBE1XwJ8EuUVSpTWWG57Pm+YugQToJNFsEyiKFhPh8DPD0bgupz8n01g==
@@ -1985,7 +1985,7 @@
   dependencies:
     esm "^3.2.25"
 
-"@observablehq/runtime@^4.7.0":
+"@observablehq/runtime@^4.8.0":
   version "4.8.0"
   resolved "https://registry.npmjs.org/@observablehq/runtime/-/runtime-4.8.0.tgz#b09ecaa34dce4c6ef58f2822bc8c0a1e648ddea5"
   integrity sha512-MCWgmzCl1qfLaenod96Vsv2gGm3VJNJsnKn+0dsqBHeLTZR/yF/uofQqHITqlhE94hkQ6RumZyjIuKT9wD9WgA==

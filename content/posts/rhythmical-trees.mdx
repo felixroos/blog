@@ -33,7 +33,15 @@ import { Score } from '../components/score/Score.tsx';
 import { Color } from '../components/common/Color.tsx';
 import { schemeTableau10 } from 'd3-scale-chromatic';
 import { InlineMath, BlockMath } from 'react-katex';
-import { toRhythmObject, getRhythmChildren, colorize, addColors, pathString } from '../components/rhythmical/util';
+import {
+  toRhythmObject,
+  getRhythmChildren,
+  colorize,
+  addColors,
+  pathString,
+  flatNodes,
+  visitNodes,
+} from '../components/rhythmical/util';
 import { State } from 'react-powerplug';
 import Fraction from 'fraction.js';
 import Switch from '@material-ui/core/Switch';
@@ -43,7 +51,7 @@ import { bolero, conventionalLabels, absoluteLabels, relativeLabels } from '../c
 
 After the posts about [Rhythmical Arrays](../rhythmical-arrays/) and [Rhythmical Objects](../rhythmical-objects),
 I want to investigate the actual data structure that is at play: trees.
-This is an attempt to explain why trees are the most elegant way to represent rhythm and music.
+This is an attempt to explain why trees are a really elegant way to represent rhythm and music.
 
 ## Tree Basics
 
@@ -61,7 +69,7 @@ This is a tree:
   hideJson={true}
 />
 
-You can explore it by clicking on different nodes. The color coding should explain itself. If not...
+You can learn the basic terminology by exploration. Just click on different nodes and watch what happens. The color coding should explain itself. If not...
 
 <details>
 <summary>show explanation</summary>
@@ -86,7 +94,7 @@ We can represent the above tree with the following object
 
 ```js
 {
-    name: '3/3',
+    name: '1',
     children: [
       { name: '2', children: [{ name: '5' }, { name: '6' }] },
       { name: '3', children: [{ name: '7' }, { name: '8' }] },
@@ -99,11 +107,13 @@ We can represent the above tree with the following object
 <br/>
 
 
-## Tree vs Score Notation
+## Visual: Tree vs Score
 
-Now that we know trees, we can use them to represent rhythms. Let's pick the common Bolero rhythm:
+Let's ignite a visual explosion of a score notation, using the common Bolero rhythm as an example:
 
 export const colors = schemeTableau10;
+
+### Tree
 
 <Tree
   width={620}
@@ -118,14 +128,18 @@ export const colors = schemeTableau10;
   hideJson={true}
 />
 
+### Score
+
 ![bolero](./img/bolero34.png)
 
-| color                      | division | type          | amount    | visual cue                  |
-| -------------------------- | -------- | ------------- | --------- | --------------------------- |
-| <Color color={colors[0]}/> | 3/4      | bar           | 2 total   | seperated by vertical lines |
-| <Color color={colors[1]}/> | 1/4      | 4ths          | 3 per bar | separated by space          |
-| <Color color={colors[2]}/> | 1/8      | 8ths          | 2 per 4th | connected by first beam     |
-| <Color color={colors[3]}/> | 1/24     | 16th triplets | 3 per 8th | connected by second beam    |
+### Legend
+
+| color                      | value | type          | amount    | visual cue                  |
+| -------------------------- | ----- | ------------- | --------- | --------------------------- |
+| <Color color={colors[0]}/> | 3/4   | bar           | 2 total   | seperated by vertical lines |
+| <Color color={colors[1]}/> | 1/4   | 4ths          | 3 per bar | separated by space          |
+| <Color color={colors[2]}/> | 1/8   | 8ths          | 2 per 4th | connected by first beam     |
+| <Color color={colors[3]}/> | 1/24  | 16th triplets | 3 per 8th | connected by second beam    |
 
 <Player
   instruments={{ drums }}
@@ -145,40 +159,111 @@ export const colors = schemeTableau10;
   events={renderRhythm(addColors({ duration: 6, sequential: bolero }, colors))}
 /> -->
 
-Insights:
+<details>
+  <summary>show insights</summary>
+
 
 - The tree essentially contains the same information as the score, though using less visual encoding (taking more space).
 - Each group represents different subdivisions of time
 - Each member of a group (color) takes the same amount of time!
 - Each fraction is the duration of the member, relative to the length of 4/4
 
-<details>
-  <summary>show source</summary>
+</details>
+<br/>
+<br/>
 
 
-This is the bolero as text:
+## Textual: Nested vs Flat
 
-```js
-const bolero = [
+Let's oppose two possible textual representations of the bolero:
+
+### Nested
+
+As JSON, this is the most compact and readable version I can think of:
+
+```json
+[
   [
-    ['sn', ['sn', 'sn', 'sn']],
-    ['sn', ['sn', 'sn', 'sn']],
-    ['sn', 'sn'],
+    ["sn", ["sn", "sn", "sn"]],
+    ["sn", ["sn", "sn", "sn"]],
+    ["sn", "sn"],
   ],
   [
-    ['sn', ['sn', 'sn', 'sn']],
-    ['sn', ['sn', 'sn', 'sn']],
-    [
-      ['sn', 'sn', 'sn'],
-      ['sn', 'sn', 'sn'],
-    ],
+    ["sn", ["sn", "sn", "sn"]],
+    ["sn", ["sn", "sn", "sn"]],
+    [["sn", "sn", "sn"], ["sn", "sn", "sn"]],
   ],
 ];
 ```
 
-</details>
-<br/>
+The nesting of the braces directly resembles the structure of the tree.
+To understand more about this syntax, check out my post about [Rhythmical Arrays](../rhythmical-arrays).
 
+### Flat
+
+A more machine readable version looks like this:
+
+```json
+[
+  ["sn", 0, 0.75],
+  ["sn", 0.75, 0.25],
+  ["sn", 1, 0.25],
+  ["sn", 1.25, 0.25],
+  ["sn", 1.5, 0.75],
+  ["sn", 2.25, 0.25],
+  ["sn", 2.5, 0.25],
+  ["sn", 2.75, 0.25],
+  ["sn", 3, 0.75],
+  ["sn", 3.75, 0.75],
+  ["sn", 4.5, 0.75],
+  ["sn", 5.25, 0.25],
+  ["sn", 5.5, 0.25],
+  ["sn", 5.75, 0.25],
+  ["sn", 6, 0.75],
+  ["sn", 6.75, 0.25],
+  ["sn", 7, 0.25],
+  ["sn", 7.25, 0.25],
+  ["sn", 7.5, 0.25],
+  ["sn", 7.75, 0.25],
+  ["sn", 8, 0.25],
+  ["sn", 8.25, 0.25],
+  ["sn", 8.5, 0.25],
+  ["sn", 8.75, 0.25]
+]
+```
+
+This is an absolute representation of the bolero at 45 bpm (quite slow, but has the nicest looking floats..).
+The format is `[value, time, duration]`.
+
+_The Goal of this post_: In this post, I want to explain visually how to "harvest" flat events from a tree.
+
+## About Note Values
+
+Let's talk about [Note Values](https://en.wikipedia.org/wiki/Note_value).
+In our example, we use different fractions to express note values. But what do the fractions refer to?
+
+Generally, the note value tells the relation of the notes value to the duration of one bar (in 4/4).
+
+### Calculating Absolute Durations
+
+If we want to calculate the absolute duration of a note value, we need to know how long one beat is.
+If we take a tempo of 60bpm, we have:
+
+<BlockMath>{`60 bpm = 60 b/m = 60b/60s = 1b/s`}</BlockMath>
+
+Most of the time, the term beat means one quarter note. With that we can calculate the duration of each note value:
+
+<BlockMath>{`1/4 = 1s, 1/8 = 0.5s, 1/24 = 0.16s`}</BlockMath>
+
+### Calculating Absolute Time
+
+If we also knew when each note is played, we have all the information to represent the rhythm as absolute timed events.
+As we already know the durations, this is quite easy. We just have to sum all durations that came before.
+In the bolero example, the second 16th triplet in bar 2 begins at:
+
+<BlockMath>{`3/4 + 1/8 + 1/24 = 0.916s`}</BlockMath>
+
+<!-- TBD: make Tree clickable to calculate the selected node's time -->
 
 ## Changing Perspective
 
@@ -221,7 +306,7 @@ Now there is one last step to simplify things even more, arriving at a point whe
 In the above trees, the fractions were relative to the "absolute 1". What if we change them to be relative to just their parent?
 Let's find out:
 
-<State initial={{ path: null, node: null, relative: true }}>
+<State initial={{ path: null, node: null, relative: true, calculation: null }}>
   {({ state, setState }) => (
     <React.Fragment>
       <Tree
@@ -234,7 +319,26 @@ Let's find out:
           ...colorizePath(state.node, path, colors, 'lightgray'),
           name: (!state.relative ? absoluteLabels : relativeLabels)[path.length],
         }))}
-        onClick={(node) => setState({ node })}
+        onClick={(node) => {
+          const path = node
+            .ancestors()
+            .reverse()
+            .slice(1)
+            .map((node) => node.data.name);
+          const pairs = path.map((p) => p.split('/'));
+          const F = (n, d) => new Fraction(n, d);
+          const multiplication = pairs.map(([a, b]) => `\\frac{${a}}{${b || 1}}`).join('*');
+          const p = pairs.reduce((product, [a, b]) => product.mul(F(a, b)), F(1, 1));
+          const c = F(3, 4).mul(F(p.n, p.d));
+          const calculation = (
+            <React.Fragment>
+              <BlockMath>{`${multiplication} = \\frac{${p.n}}{${p.d}}`}</BlockMath>
+              <p>... and to get the "conventional" fraction:</p>
+              <BlockMath>{`\\frac{${p.n}}{${p.d}} * \\frac{3}{4} = \\frac{${c.n}}{${c.d}}`}</BlockMath>
+            </React.Fragment>
+          );
+          setState({ node, pairs, calculation });
+        }}
         hideJson={true}
       />
       <label>
@@ -250,13 +354,7 @@ Let's find out:
           <i>Click a node to show its calculation</i>
         </p>
       )}
-      {state.node && (
-        <React.Fragment>
-          <BlockMath>{`1 * 1/3 * 1/2 * 1/3 = 1/18`}</BlockMath>
-          <p>... and to get the "conventional" fraction:</p>
-          <BlockMath>{`1/18 * 3/4 = 1/24`}</BlockMath>
-        </React.Fragment>
-      )}
+      {state.node && state.calculation}
     </React.Fragment>
   )}
 </State>
@@ -354,11 +452,11 @@ If we divide each index by the number of siblings (relative subdivision), we get
                 ([a, b], i, p) =>
                   `${
                     i
-                      ? `\\frac{${a}}{${b}}(${p
+                      ? `\\frac{${a}}{${b}}*(${p
                           .slice(0, i)
                           .reverse()
                           .map(([x, y]) => `\\frac{1}{${y}}`)
-                          .join('')})`
+                          .join('*')})`
                       : `\\frac{${a}}{${b}}`
                   }`
               )
@@ -375,16 +473,36 @@ For each node, we multiply its path fraction (before the bracket) with each pare
 (inside the brackets). The products are then summed up.
 You can read it the same way your eyes would move along the tree line (oscillating down and up).
 
-## Calculating absolute time
+### Summary
 
-With now have all the ingredients to calculate the absolute time and duration for any node.
-All we need to know, is the absolute duration of the piece, or in fact, any node.
+We can now derive the absolute note value of a tree node from a collection of indices and sibling lengths.
+The next step would be to actually implement a function that does this.
 
-TBD
+## Visiting Tree Nodes
 
-### [index, duration, division]
+If we want to call a function on every node of a tree (= visit), we can do this:
 
-TBD
+```js
+export function visitNodes(tree, visitor, getChildren) {
+  visitor(tree);
+  const children = getChildren(tree);
+  if (children?.length) {
+    children.forEach((child) => visitNodes(child, visitor, getChildren));
+  }
+}
+```
+
+Example usage:
+
+```js
+const flattened = [];
+visitNodes(
+  [1, [2, 3]] // tree
+  (node) => !Array.isArray(node) && flattened.push(node), // visitor: push leaves
+  (node) => (Array.isArray(node) ? node : []), // getChildren
+);
+console.log(flattened); // [1, 2, 3]
+```
 
 ## How musicians read rhythm
 
@@ -450,27 +568,6 @@ The actual rhythm just switches back and forth between the 8ths and 16ths triple
     ],
   })}
 />
-
-### Calculating Absolute Durations
-
-If we want to calculate the absolute duration of a subdivision, we need to know how long one beat is.
-If we take a tempo of 60bpm, we have:
-
-<BlockMath>{`60 bpm = 60 b/m = 60b/60s = 1b/s`}</BlockMath>
-
-Most of the time, the term beat means one quarter note. With that we can calculate the duration of each subdivision:
-
-<BlockMath>{`1/4 = 1s, 1/8 = 0.5s, 1/24 = 0.16s`}</BlockMath>
-
-### Calculating Absolute Time
-
-If we also knew when each note is played, we have all the information to represent the rhythm as absolute timed events.
-As we already know the durations, this is quite easy. We just have to sum all durations that came before.
-For example, the second 16th triplet in bar 2 begins at:
-
-<BlockMath>{`3/4 + 1/8 + 1/24 = 0.916s`}</BlockMath>
-
-<!-- TBD: make Tree clickable to calculate the selected node's time -->
 
 ## Rhythmical > d3-hierarchy
 
@@ -576,3 +673,11 @@ export function rhythmicalTree<T>(
 1. Trees are the shortest and most natural way to represent rhythmical information
 2. As text, they are extremely readable and portable
 3. When implemented correctly, they offer great possibilities for algorithmic composition
+
+## links
+
+- https://github.com/syntax-tree/unist
+- https://astexplorer.net/
+- https://github.com/d3/d3-hierarchy
+- https://github.com/vtrushin/json-to-ast => inspiration for rhythmical DSL
+  - maybe add rhythmical DSL to astexplorer when done? ..

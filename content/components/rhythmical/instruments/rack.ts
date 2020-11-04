@@ -13,12 +13,12 @@ export function rack(samples: { [key: string]: any }, options = {}) {
         console.warn(`key ${key} not found for playback`);
         return;
       }
-      const player = players.get(key);
+      const player = players.get(key); // TODO: rename to players
       player.start(time);
       player.stop(time + duration);
     },
     connect: (dest) => { players.connect(dest); return s },
-    toMaster: () => { players.toMaster(); return s },
+    toMaster: () => { players.toMaster(); return s }, // TODO: rename toDestination
   }
   return s;
 }
