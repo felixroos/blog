@@ -2,7 +2,7 @@ import React from 'react';
 import { select } from 'd3-selection';
 import { cluster, hierarchy } from 'd3-hierarchy';
 import { NestedArray } from '../helpers/arrays';
-import { getRhythmChildren, RhythmNode } from '../util';
+import { getRhythmChildren, makeRhythmParent, RhythmNode, toRhythmObject } from '../util';
 
 export default function RhythmicalTree(props) {
   let { width = 600, height = 200, rhythm } = props;
@@ -66,6 +66,7 @@ export default function RhythmicalTree(props) {
   );
 }
 
+// could be obsolete
 export function tree(rhythm, width = 600) {
   console.log('rh', rhythmicalHierarchy(rhythm));
   const root: any = hierarchy(
@@ -79,7 +80,7 @@ export function tree(rhythm, width = 600) {
   root.dy = width / (root.height + 1);
   return cluster().nodeSize([root.dx, root.dy])(root);
 }
-
+// could be obsolete
 export function rhythmicalHierarchy<T>(rhythm: NestedArray<T>, state = { index: -1 }) {
   state.index += 1;
   return {
@@ -93,22 +94,3 @@ export function rhythmicalHierarchy<T>(rhythm: NestedArray<T>, state = { index: 
   };
 }
 
-export function rhythmicalTree<T>(
-  rhythm: RhythmNode<T>,
-  mapFn?: (rhythm: RhythmNode<T>, path: number[], parent?: RhythmNode<T>) => RhythmNode<T>,
-  path = [],
-  parent?
-) {
-  if (mapFn) {
-    rhythm = mapFn(rhythm, path, parent);
-  }
-  const children = getRhythmChildren(rhythm);
-  if (!children?.length) {
-    return { name: 'leaf', ...rhythm };
-  }
-  return {
-    name: 'parent',
-    children: children.map((child, index) => rhythmicalTree(child, mapFn, path.concat([index]), rhythm)),
-    ...rhythm,
-  };
-}

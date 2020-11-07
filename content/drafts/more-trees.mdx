@@ -1,0 +1,204 @@
+
+## Changing Perspective
+
+Currently we were using the fractions 1/4, 1/8 and 1/24 (1/8/3 = 16th triplets) by convention, as they have a visual representation in the traditional western notation system.
+In a 3 pulse time, this is overcomplicating things as we have no groupings of 4.
+What if we invented a 3/3 meter?
+
+<!-- TBD: enable changing perspective of any group to any fraction + automatically calculate fractions -->
+
+<State initial={{ path: null, node: null, simplify: true }}>
+  {({ state, setState }) => (
+    <React.Fragment>
+      <Tree
+        width={620}
+        nodeRadius={10}
+        dx={20}
+        columns={[12, 12]}
+        data={r2d3(bolero, (rhythm, path) => ({
+          ...toRhythmObject(rhythm),
+          ...colorizePath(state.node, path, colors, 'lightgray'),
+          name: (state.simplify ? absoluteLabels : conventionalLabels)[path.length],
+        }))}
+        onClick={(node) => setState({ node })}
+        hideJson={true}
+      />
+      <label>
+        simplify
+        <Switch checked={state.simplify} color="primary" onChange={(e) => setState({ simplify: e.target.checked })} />
+      </label>
+    </React.Fragment>
+  )}
+</State>
+
+As everything is relative, we can simplify the numbers by multiplying each fraction with 4/3!
+This changes just the reference point, while the information stays intact, just more simple (basic fractional algebra).
+Now there is one last step to simplify things even more, arriving at a point where the trees really make sense:
+
+### Relative Subdivisions
+
+In the above trees, the fractions were relative to the "absolute 1". What if we change them to be relative to just their parent?
+Let's find out:
+
+<State initial={{ path: null, node: null, relative: true, calculation: null }}>
+  {({ state, setState }) => (
+    <React.Fragment>
+      <Tree
+        width={620}
+        nodeRadius={10}
+        dx={20}
+        columns={[12, 12]}
+        data={r2d3(bolero, (rhythm, path) => ({
+          ...toRhythmObject(rhythm),
+          ...colorizePath(state.node, path, colors, 'lightgray'),
+          name: (!state.relative ? absoluteLabels : relativeLabels)[path.length],
+        }))}
+        onClick={(node) => {
+          const path = node
+            .ancestors()
+            .reverse()
+            .slice(1)
+            .map((node) => node.data.name);
+          const pairs = path.map((p) => p.split('/'));
+          const F = (n, d) => new Fraction(n, d);
+          const multiplication = pairs.map(([a, b]) => `\\frac{${a || 1}}{${b || 1}}`).join('*');
+          const p = pairs.reduce((product, [a, b]) => product.mul(F(a, b)), F(1, 1));
+          const c = F(3, 4).mul(F(p.n, p.d));
+          const calculation = (
+            <React.Fragment>
+              <BlockMath>{`${multiplication} = \\frac{${p.n}}{${p.d}}`}</BlockMath>
+              <p>... and to get the "conventional" fraction:</p>
+              <BlockMath>{`\\frac{${p.n}}{${p.d}} * \\frac{3}{4} = \\frac{${c.n}}{${c.d}}`}</BlockMath>
+            </React.Fragment>
+          );
+          setState({ node, pairs, calculation });
+        }}
+        hideJson={true}
+      />
+      <label>
+        relative{' '}
+        <Switch checked={state.relative} color="primary" onChange={(e) => setState({ relative: e.target.checked })} />
+      </label>
+      <p>
+        Now we get an interesting effect: the denominators always "coincide" with the amount of elements in a group! To
+        get back to the absolute fraction, we just have to multiply all fractions top down:
+      </p>
+      {!state.node && (
+        <p>
+          <i>Click a node to show its calculation</i>
+        </p>
+      )}
+      {state.node && state.calculation}
+    </React.Fragment>
+  )}
+</State>
+
+Note that the important takeaway is not only simplicity, but also independence, as each node value is now only dependent on its parent!
+
+### Index Path
+
+We can identify each node in the tree, by a unique index path:
+
+<State initial={{ path: null, node: null }}>
+  {({ state, setState }) => (
+    <>
+      <Tree
+        width={620}
+        nodeRadius={10}
+        dx={20}
+        columns={[12, 12]}
+        data={r2d3(bolero, (rhythm, path) => ({
+          ...toRhythmObject(rhythm),
+          ...colorizePath(state.node, path, colors, 'lightgray'),
+          name: path.length ? path[path.length - 1] : 'bolero',
+        }))}
+        onClick={(node, setNode) => {
+          const path = node
+            .ancestors()
+            .reverse()
+            .slice(1)
+            .map((node) => node.data.name);
+          setState({ path, node });
+        }}
+        hideJson={true}
+      />
+      {!state.node && <i>Click a node to see its path</i>}
+      {state.path && <BlockMath>{`path = ${state.path.join(', ')}`}</BlockMath>}
+    </>
+  )}
+</State>
+
+Now let's use that path and combine it with our relative subdivisions:
+
+### Path Fractions
+
+If we divide each index by the number of siblings (relative subdivision), we get this:
+
+<State initial={{ path: null, node: null }}>
+  {({ state, setState }) => (
+    <>
+      <Tree
+        width={620}
+        nodeRadius={10}
+        dx={20}
+        columns={[12, 12]}
+        onClick={(node) => {
+          const path = node
+            .ancestors()
+            .reverse()
+            .slice(1)
+            .map((node) => node.data.name);
+          const pairs = path.map((p) => p.split('/'));
+          const fractions = pairs.map(([a, b]) => new Fraction(a, b));
+          const fraction = fractions?.reduce((sum, p, i) => {
+            const div = pairs.slice(0, i).map(([_, d]) => d);
+            const m = div.reverse().reduce((product, d) => {
+              return product.div(d);
+            }, p);
+            return sum.add(m);
+          }, new Fraction(0));
+          setState({ path, fraction, node });
+        }}
+        data={r2d3(bolero, (rhythm, path, parent) => ({
+          ...toRhythmObject(rhythm),
+          ...colorizePath(state.node, path, colors, 'lightgray'),
+          name: parent ? path[path.length - 1].join('/') : 'bolero',
+        }))}
+        hideJson={true}
+      />
+      {!state.path && (
+        <p>
+          <i>Click a node to show its absolute fraction!</i>
+        </p>
+      )}
+      {state.path && (
+        <>
+          <BlockMath>{`path = ${state.path
+            .map((f) => f.split('/'))
+            .map(([a, b]) => `\\frac{${a}}{${b}}`)
+            .join(', ')}`}</BlockMath>
+          <p>The top row reflects the index path, while the bottom row reflects the path of subdivisions!</p>
+          <p>We can calculate the absolute fraction like this:</p>
+          <BlockMath>
+            {`fraction = ${state.path
+              .map((f) => f.split('/'))
+              .map(
+                ([a, b], i, p) =>
+                  `${
+                    i
+                      ? `\\frac{${a}}{${b}}*(${p
+                          .slice(0, i)
+                          .reverse()
+                          .map(([x, y]) => `\\frac{1}{${y}}`)
+                          .join('*')})`
+                      : `\\frac{${a}}{${b}}`
+                  }`
+              )
+              .join(' + ')} = \\frac{${state.fraction.n}}{${state.fraction.d}}`}
+          </BlockMath>
+          <p></p>
+        </>
+      )}
+    </>
+  )}
+</State>

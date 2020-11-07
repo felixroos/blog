@@ -1,4 +1,5 @@
 import { Chord, Range, Note, Interval } from '@tonaljs/tonal';
+import { editRhythm, RhythmNode } from '../util';
 
 export const lefthand = {
   m7: ['3m 5P 7m 9M', '7m 9M 10m 12P'],
@@ -96,4 +97,46 @@ export const voicings = (dictionary, range, sorter = topNoteSort) => (events, ev
     notes = voicings.sort(sorter(lastVoiced))[0];
   }
   return events.concat(notes.map((note) => ({ ...event, value: note, chord: event.value })));
+}
+
+// NEW SHIT
+
+export function getBestVoicing(chordSymbol, dictionary, range, sorter, lastVoicing) {
+  let voicings = voicingsInRange(chordSymbol, dictionary, range);
+  const { aliases } = Chord.get(chordSymbol);
+  const symbol = Object.keys(dictionary).find(_symbol => aliases.includes(_symbol));
+  if (!symbol) {
+    console.log(`no voicings found for chord "${chordSymbol}"`);
+    return [];
+  }
+  let notes;
+  if (!lastVoicing?.length) {
+    //notes = voicings[Math.ceil(voicings.length / 2)]; // pick middle voicing..
+    notes = voicings[0]; // pick lowest voicing..
+  } else {
+    // calculates the distance between the last note and the given voicings top note
+    // sort voicings with differ
+    notes = voicings.sort(sorter(lastVoicing))[0];
+  }
+  return notes;
+}
+
+export function topNoteDiff(lastVoicing) {
+  const diff = (voicing) => Math.abs(Note.midi(lastVoicing[lastVoicing.length - 1]) - Note.midi(voicing[voicing.length - 1]));
+  return (a, b) => diff(a) - diff(b)
+}
+
+export function generateVoicings(tree: RhythmNode<string>, dictionary, range, sorter = topNoteDiff) {
+  let lastVoicing = [];
+  return editRhythm(tree, (r, path, parent) => {
+    if (typeof r !== 'string' || !!parent.chord) {
+      return r; // no chord symbol or already part of a voicing
+    }
+    const voicing = getBestVoicing(r, dictionary, range, sorter, lastVoicing);
+    lastVoicing = [...voicing];
+    return {
+      chord: r, // prevent infinite loop
+      parallel: voicing,
+    };
+  })
 }

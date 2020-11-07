@@ -1,0 +1,64 @@
+## How musicians read rhythm
+
+When a musician wants to read and perform a rhythm, he first needs a pulse.
+Most of the time, the pulse will be the quarter notes of the piece.
+To establish that pulse when playing together, musicians will "count in".
+In the bolero example one might count in with a pulse of 60bpm:
+
+<Player
+  instruments={{ drums }}
+  events={renderRhythm({
+    duration: 3.5,
+    parallel: [['bd', 'bd', 'bd']],
+  })}
+/>
+
+Into each pulse now fit 2 8ths notes:
+
+<Player
+  instruments={{ drums }}
+  events={renderRhythm({
+    duration: 3.5,
+    parallel: [
+      ['bd', 'bd', 'bd'],
+      ['ht', 'mt', 'ht', 'mt', 'ht', 'mt'],
+    ],
+  })}
+/>
+
+... and into each 8th notes fit 3 16ths triplets:
+
+<Player
+  instruments={{ drums }}
+  events={renderRhythm({
+    duration: 3.5,
+    parallel: [
+      ['bd', 'bd', 'bd'],
+      ['ht', 'mt', 'ht', 'mt', 'ht', 'mt'],
+      ['hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh'],
+    ],
+  })}
+/>
+
+The actual rhythm just switches back and forth between the 8ths and 16ths triplets:
+
+<Player
+  instruments={{ drums }}
+  events={renderRhythm({
+    duration: 7,
+    parallel: [
+      [
+        ['bd', 'bd', 'bd'],
+        ['bd', 'bd', 'bd'],
+      ],
+      [
+        ['ht', 'r', 'ht', 'r', 'ht', 'mt'],
+        ['ht', 'r', 'ht', 'r', 'r', 'r'],
+      ],
+      [
+        ['r', ['hh', 'hh', 'hh'], 'r', ['hh', 'hh', 'hh'], 'r', 'r'],
+        ['r', ['hh', 'hh', 'hh'], 'r', ['hh', 'hh', 'hh'], ['hh', 'hh', 'hh'], ['hh', 'hh', 'hh']],
+      ],
+    ],
+  })}
+/>

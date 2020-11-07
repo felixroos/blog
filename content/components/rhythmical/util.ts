@@ -184,6 +184,14 @@ export function pathString(path: [number, number, number][]) {
   return path.map(p => p.join(':')).join(' ');
 }
 
+export function indexPathString(path: number[]) {
+  return path?.join(':') || '';
+}
+
+export function haveSameIndices(a: number[], b: number[]) {
+  return indexPathString(a) === indexPathString(b);
+}
+
 
 // SIMPLE TREE STUFF
 
@@ -205,25 +213,111 @@ export function flatNodes(tree) {
   return flattened;
 }
 
-export function visit(tree, before, after, getChildren, index?, siblings?) {
+export function visitTree(tree, before, after, getChildren, index?, siblings?) {
   before(tree, index, siblings);
-  const children = getChildren(tree);
-  if (children?.length) {
-    children.forEach((child, i, a) => visit(child, before, after, getChildren, i, a));
-  }
+  getChildren(tree)?.forEach((child, i, a) => visitTree(child, before, after, getChildren, i, a));
   after(tree, index, siblings)
 }
 
-export function flat(tree) {
-  const path = [];
-  const flattened = [];
-  visit(
-    tree, // tree
-    (_, index) => index !== undefined && path.push(index) && flattened.push([...path]), // before
-    (_, index) => index !== undefined && path.pop(), // after
-    (node) => Array.isArray(node) ? node : [], // getChildren
-  );
-  return flattened;
+export function* walk(getChildren, tree, index?, siblings?) {
+  yield tree;
+  const children = getChildren(tree) || []
+  for (let i = 0; i < children.length; ++i) {
+    yield* walk(getChildren, children[i], i, children)
+  }
 }
 
-console.log('flattened', flat([1, [2, 3], [4, [5, 6]]]))
+
+export function leafIndices(hierarchy) {
+  const path = [];
+  const paths = [];
+  visitTree(
+    hierarchy,
+    (t, i) => i >= 0 && path.push(i) && !Array.isArray(t) && paths.push([...path]),
+    (_, i) => i >= 0 && path.pop(),
+    (node) => (Array.isArray(node) ? node : [])
+  )
+  return paths;
+}
+
+export function leafPaths(hierarchy) {
+  const path = [];
+  const paths = [];
+  visitTree(
+    hierarchy,
+    (t, i, children) => i >= 0 && path.push([i, children.length]) && !Array.isArray(t) && paths.push([...path]),
+    (_, i) => i >= 0 && path.pop(),
+    (node) => (Array.isArray(node) ? node : undefined)
+  );
+  return paths;
+}
+
+/// THIS IS THE HOTTEST SHIT
+
+export function editTree<T>(
+  getChildren: (tree: T) => T[],
+  makeParent: (tree: T, children: T[]) => T,
+  before: (tree: T, index: number, siblings?: T[], parent?: T) => T,
+  after: (tree: T, index: number, siblings?: T[], parent?: T) => T,
+  tree: T,
+  index?: number,
+  siblings?: T[],
+  parent?: T
+) {
+  tree = before(tree, index, siblings, parent);
+  const children = getChildren(tree);
+  if (children?.length) {
+    tree = makeParent(
+      tree,
+      children.map((child, index, siblings) =>
+        editTree(getChildren, makeParent, before, after, child, index, siblings, tree)
+      )
+    );
+  }
+  return after(tree, index, siblings, parent);
+}
+
+// creates d3-hierarchy from RhythmNode. Allows mapping
+
+// r2d3 = rhythm to d3 => map rhythmical object to d3-hierarchy format
+export function r2d3<T>(rhythm: RhythmNode<T>, mapFn?) {
+  let path = [];
+  return editTree<RhythmNode<T>>(
+    getRhythmChildren,
+    (r, children) => ({
+      name: 'parent',
+      children,
+      ...r,
+    }),
+    (r, i, children, parent) => {
+      i !== undefined && path.push([i, children.length]);
+      if (mapFn) {
+        r = mapFn(r, path, parent);
+      }
+      return r;
+    },
+    (r, i) => {
+      i !== undefined && path.pop();
+      return r;
+    },
+    rhythm
+  );
+}
+
+export function editRhythm<T>(rhythm: RhythmNode<T>, before?, after?) {
+  let path = [];
+  return editTree<RhythmNode<T>>(
+    getRhythmChildren,
+    makeRhythmParent,
+    (r, i, _, parent) => {
+      i >= 0 && path.push(i);
+      return before ? before(r, path, parent) : r;
+    },
+    (r, i) => {
+      r = after ? after(r, path, parent) : r;
+      i >= 0 && path.pop();
+      return r;
+    },
+    rhythm
+  );
+}

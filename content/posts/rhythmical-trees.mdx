@@ -3,6 +3,7 @@ title: Rhythmical Trees
 date: 2020-11-01
 ---
 
+import { Chord } from '@tonaljs/tonal';
 import { piano } from '../instruments/piano.ts';
 import { MK2md2 } from '../instruments/rhodes.ts';
 import swimming from '../components/rhythmical/tunes/swimming.ts';
@@ -12,6 +13,7 @@ import { marblemachine } from '../components/rhythmical/tunes/marblemachine.ts';
 import { rhythmEvents } from '../components/rhythmical/hierarchy.ts';
 import { flatEvents } from '../components/rhythmical/walker.ts';
 import { renderRhythm, flatRhythm } from '../components/rhythmical/rhythmical.ts';
+import { generateVoicings, lefthand } from '../components/rhythmical/dictionary/voicings.ts';
 import { renderEvents } from '../components/rhythmical/RhythmZipper.ts';
 import { digRhythm } from '../components/rhythmical/digRhythm.ts';
 import { transpose, transposeEvents, transposeEvent } from '../components/rhythmical/features/transpose.ts';
@@ -22,15 +24,14 @@ import Player, { click } from '../components/rhythmical/components/Player.tsx';
 import compose from 'ramda/src/compose';
 import pipe from 'ramda/src/pipe';
 import map from 'ramda/src/map';
-import RhythmicalTree, {
-  rhythmicalHierarchy,
-  rhythmicalTree,
-} from '../components/rhythmical/components/RhythmicalTree.tsx';
+import RhythmicalTree from '../components/rhythmical/components/RhythmicalTree.tsx';
 import Tree, { colorizePath } from '../components/rhythmical/components/Tree.tsx';
 import { TreeAnalyzer } from '../components/rhythmical/components/TreeAnalyzer.tsx';
 import { rhythmicalScore } from '../components/score/score.ts';
 import { Score } from '../components/score/Score.tsx';
 import { Color } from '../components/common/Color.tsx';
+import TreeVisitor from '../components/common/TreeVisitor.tsx';
+import { useGenerator } from '../components/common/useGenerator.ts';
 import { schemeTableau10 } from 'd3-scale-chromatic';
 import { InlineMath, BlockMath } from 'react-katex';
 import {
@@ -39,19 +40,24 @@ import {
   colorize,
   addColors,
   pathString,
+  haveSameIndices,
   flatNodes,
   visitNodes,
+  r2d3,
+  editRhythm,
 } from '../components/rhythmical/util';
 import { State } from 'react-powerplug';
 import Fraction from 'fraction.js';
 import Switch from '@material-ui/core/Switch';
 import { bolero, conventionalLabels, absoluteLabels, relativeLabels } from '../components/rhythmical/tunes/bolero';
-
-<!--<Player fold={true} instruments={{ MK2md2 }} events={renderEvents(tetris)} />-->
+import { AsciiTree } from '../components/common/AsciiTree.tsx';
+import { AsciiTreeDiff } from '../components/common/AsciiTreeDiff.tsx';
+import * as treeify from 'treeify';
 
 After the posts about [Rhythmical Arrays](../rhythmical-arrays/) and [Rhythmical Objects](../rhythmical-objects),
 I want to investigate the actual data structure that is at play: trees.
 This is an attempt to explain why trees are a really elegant way to represent rhythm and music.
+At the same time, I will try to reimplement the core of rhythmical..
 
 ## Tree Basics
 
@@ -113,14 +119,12 @@ Let's ignite a visual explosion of a score notation, using the common Bolero rhy
 
 export const colors = schemeTableau10;
 
-### Tree
-
 <Tree
   width={620}
   nodeRadius={10}
   dx={20}
   columns={[12, 12]}
-  data={rhythmicalTree(bolero, (rhythm, path) => ({
+  data={r2d3(bolero, (rhythm, path) => ({
     ...toRhythmObject(rhythm),
     color: path.length ? colors[path.length - 1] : 'black',
     name: conventionalLabels[path.length],
@@ -128,11 +132,7 @@ export const colors = schemeTableau10;
   hideJson={true}
 />
 
-### Score
-
 ![bolero](./img/bolero34.png)
-
-### Legend
 
 | color                      | value | type          | amount    | visual cue                  |
 | -------------------------- | ----- | ------------- | --------- | --------------------------- |
@@ -159,19 +159,10 @@ export const colors = schemeTableau10;
   events={renderRhythm(addColors({ duration: 6, sequential: bolero }, colors))}
 /> -->
 
-<details>
-  <summary>show insights</summary>
-
-
 - The tree essentially contains the same information as the score, though using less visual encoding (taking more space).
 - Each group represents different subdivisions of time
 - Each member of a group (color) takes the same amount of time!
 - Each fraction is the duration of the member, relative to the length of 4/4
-
-</details>
-<br/>
-<br/>
-
 
 ## Textual: Nested vs Flat
 
@@ -196,7 +187,9 @@ As JSON, this is the most compact and readable version I can think of:
 ];
 ```
 
-The nesting of the braces directly resembles the structure of the tree.
+![bolero](./img/bolero.png)
+
+The nesting of the braces directly resembles the structure of the notes.
 To understand more about this syntax, check out my post about [Rhythmical Arrays](../rhythmical-arrays).
 
 ### Flat
@@ -233,9 +226,244 @@ A more machine readable version looks like this:
 ```
 
 This is an absolute representation of the bolero at 45 bpm (quite slow, but has the nicest looking floats..).
-The format is `[value, time, duration]`.
+The format is `[value, time, duration]`. While it is readable for machines, it is quite unpractical for humans..
 
-_The Goal of this post_: In this post, I want to explain visually how to "harvest" flat events from a tree.
+_The important question_: How can we transform the first notation into the second?
+With it, the human interface would be the first, while the second one would be used for rendering / playback.
+
+To be able to get the flat representation, we need..
+
+1. to visit all nodes and save the leaves (no children)
+2. a way to calculate the absolute times from the tree structure
+
+## Visiting Tree Nodes
+
+Let's visit all the tree nodes:
+
+<State initial={{ node: null }}>
+  {({ state, setState }) => (
+    <>
+      <TreeVisitor
+        onNext={(_state) => {
+          setState({ node: _state.value });
+        }}
+        tree={(node, visited) =>
+          r2d3(bolero, (rhythm, path, parent) => {
+            path = path.map((p) => p[0]);
+            return {
+              ...toRhythmObject(rhythm),
+              color: haveSameIndices(node?.path, path)
+                ? 'red'
+                : visited.find((v) => haveSameIndices(v.path, path))
+                ? 'lightgray'
+                : path.length
+                ? colors[path.length - 1]
+                : 'black',
+              name: parent ? path[path.length - 1] : 'bolero',
+              path: [...path],
+            };
+          })
+        }
+      />
+      {!state.node && (
+        <p>
+          <i>Click next to walk the tree</i>
+        </p>
+      )}
+      {state.node && <BlockMath>{`path = ${state.node.path.join(', ')}`}</BlockMath>}
+    </>
+  )}
+</State>
+<br />
+
+- Here, the numbers are the indices of the nodes inside their siblings.
+- With them, we can construct a unique path for each node, by collecting all indices from the root to the node
+
+To call a function on every node of a tree (= visit), we can do this:
+
+```js
+export function visitTree(tree, before, after, getChildren, index?, siblings?) {
+  before(tree, index, siblings);
+  getChildren(tree)?.forEach((child, i, a) => visitTree(child, before, after, getChildren, i, a));
+  after(tree, index, siblings);
+}
+```
+
+- The before and after callbacks fire before and after the children of the node have been visited
+- Using the getChildren function, we can stay agnostic about the tree structure. This is inspired by [d3-hierarchy](https://github.com/d3/d3-hierarchy#hierarchy).
+
+We can now use this function to collect our index paths:
+
+```js
+function leafIndices(hierarchy) {
+  const path = [];
+  const paths = [];
+  visitTree(
+    hierarchy,
+    (t, i) => i >= 0 && path.push(i) && !Array.isArray(t) && paths.push([...path]),
+    (_, i) => i >= 0 && path.pop(),
+    (node) => (Array.isArray(node) ? node : undefined)
+  );
+  return paths;
+}
+```
+
+- By adding each index before and removing it again afterwards, we know the current path.
+- We add each path to the paths array when we reached a leaf (no children)
+- If you are a functional purist, you might be offended that the before and after callbacks are impure. But fear not, as I will present an alternative later
+
+If we call that function on the bolero, we get the following paths:
+
+```ts
+expect(
+  leafIndices([
+    [
+      ['sn', ['sn', 'sn', 'sn']],
+      ['sn', ['sn', 'sn', 'sn']],
+      ['sn', 'sn'],
+    ],
+    [
+      ['sn', ['sn', 'sn', 'sn']],
+      ['sn', ['sn', 'sn', 'sn']],
+      [
+        ['sn', 'sn', 'sn'],
+        ['sn', 'sn', 'sn'],
+      ],
+    ],
+  ])
+).toEqual([
+  [0, 0, 0],
+  [0, 0, 1, 0],
+  [0, 0, 1, 1],
+  [0, 0, 1, 2],
+  [0, 1, 0],
+  [0, 1, 1, 0],
+  [0, 1, 1, 1],
+  [0, 1, 1, 2],
+  [0, 2, 0],
+  [0, 2, 1],
+  [1, 0, 0],
+  [1, 0, 1, 0],
+  [1, 0, 1, 1],
+  [1, 0, 1, 2],
+  [1, 1, 0],
+  [1, 1, 1, 0],
+  [1, 1, 1, 1],
+  [1, 1, 1, 2],
+  [1, 2, 0, 0],
+  [1, 2, 0, 1],
+  [1, 2, 0, 2],
+  [1, 2, 1, 0],
+  [1, 2, 1, 1],
+  [1, 2, 1, 2],
+]);
+```
+
+Thats a flat representation.. but somehow useless. We need more information...
+
+### Relative Fraction Paths
+
+If we divide each index by the number of siblings, we can calculate relative fractions:
+
+<State initial={{ node: null, calculation: null }}>
+  {({ state, setState }) => (
+    <>
+      <TreeVisitor
+        onNext={(_state) => {
+          if (!_state?.value) {
+            setState({ node: null, calculation: null });
+            return;
+          }
+          const { path: pairs } = _state.value;
+          const F = (n, d) => new Fraction(n, d);
+          const duration = pairs.map(([a, b]) => `\\frac{${a || 1}}{${b || 1}}`).join('*');
+          const d = pairs.reduce((product, [a, b]) => product.mul(F(1, b)), F(1, 1));
+          const time = pairs
+            .map(([a, b], i, p) =>
+              i
+                ? `\\frac{${a}}{${b}}*(${p
+                    .slice(0, i)
+                    .reverse()
+                    .map(([x, y]) => `\\frac{1}{${y}}`)
+                    .join('*')})`
+                : `\\frac{${a}}{${b}}`
+            )
+            .join(' + ');
+          const t = pairs
+            .map(([a, b]) => F(a, b))
+            .reduce((sum, p, i) => {
+              const div = pairs.slice(0, i).map(([_, d]) => d);
+              const m = div.reverse().reduce((product, d) => {
+                return product.div(d);
+              }, p);
+              return sum.add(m);
+            }, new Fraction(0));
+          const cd = F(6, 4).mul(F(d.n, d.d));
+          const ct = F(6, 4).mul(F(t.n, t.d));
+          const calculation = (
+            <React.Fragment>
+              <p>The following fractions are relative to the complete bolero lengths:</p>
+              <BlockMath>{`duration = ${duration} = \\frac{${d.n}}{${d.d}}`}</BlockMath>
+              <BlockMath>{`time = ${time} = \\frac{${t.n}}{${t.d}}`}</BlockMath>
+              <p>By multiplying with 6/4, we get the conventional fractions:</p>
+              <BlockMath>{`duration * \\frac{6}{4} = \\frac{${d.n}}{${d.d}} * \\frac{6}{4} = \\frac{${cd.n}}{${cd.d}}`}</BlockMath>
+              <BlockMath>{`time * \\frac{6}{4} = \\frac{${t.n}}{${t.d}} * \\frac{6}{4} = \\frac{${ct.n}}{${ct.d}}`}</BlockMath>
+            </React.Fragment>
+          );
+          setState({ node: _state.value, calculation });
+        }}
+        tree={(node, visited) =>
+          r2d3(bolero, (rhythm, path, parent) => {
+            return {
+              ...toRhythmObject(rhythm),
+              color: haveSameIndices(node?.path, path)
+                ? 'red'
+                : visited.find((v) => haveSameIndices(v.path, path))
+                ? 'lightgray'
+                : path.length
+                ? colors[path.length - 1]
+                : 'black',
+              name: parent ? path[path.length - 1].join('/') : 'bolero',
+              path: [...path],
+            };
+          })
+        }
+      />
+      {!state.node && (
+        <p>
+          <i>Click next to walk the tree</i>
+        </p>
+      )}
+      {state.node && (
+        <BlockMath>{`path = ${state.node.path.map(([a, b]) => `\\frac{${a}}{${b}}`).join(', ')}`}</BlockMath>
+      )}
+      {state.calculation && <>{state.calculation}</>}
+    </>
+  )}
+</State>
+<br />
+
+The function is really similar to the leafIndices function. The only difference is that we include push children.length to the path:
+
+```js
+function leafPaths(hierarchy) {
+  const path = [];
+  const paths = [];
+  visitTree(
+    hierarchy,
+    (t, i, children) => i >= 0 && path.push([i, children.length]) && !Array.isArray(t) && paths.push([...path]),
+    (_, i) => i >= 0 && path.pop(),
+    (node) => (Array.isArray(node) ? node : undefined)
+  );
+  return paths;
+}
+```
+
+Now we have a bunch of fractions.. how can we calculate the absolute timing information with them?
+
+## Calculating Absolute Time
+
+If we now know the total length of the piece, we can multiply it with the relative fraction to get the absolute time and duration.
 
 ## About Note Values
 
@@ -265,210 +493,6 @@ In the bolero example, the second 16th triplet in bar 2 begins at:
 
 <!-- TBD: make Tree clickable to calculate the selected node's time -->
 
-## Changing Perspective
-
-Currently we were using the fractions 1/4, 1/8 and 1/24 (1/8/3 = 16th triplets) by convention, as they have a visual representation in the traditional western notation system.
-In a 3 pulse time, this is overcomplicating things as we have no groupings of 4.
-What if we invented a 3/3 meter?
-
-<!-- TBD: enable changing perspective of any group to any fraction + automatically calculate fractions -->
-
-<State initial={{ path: null, node: null, simplify: true }}>
-  {({ state, setState }) => (
-    <React.Fragment>
-      <Tree
-        width={620}
-        nodeRadius={10}
-        dx={20}
-        columns={[12, 12]}
-        data={rhythmicalTree(bolero, (rhythm, path) => ({
-          ...toRhythmObject(rhythm),
-          ...colorizePath(state.node, path, colors, 'lightgray'),
-          name: (state.simplify ? absoluteLabels : conventionalLabels)[path.length],
-        }))}
-        onClick={(node) => setState({ node })}
-        hideJson={true}
-      />
-      <label>
-        simplify
-        <Switch checked={state.simplify} color="primary" onChange={(e) => setState({ simplify: e.target.checked })} />
-      </label>
-    </React.Fragment>
-  )}
-</State>
-
-As everything is relative, we can simplify the numbers by multiplying each fraction with 4/3!
-This changes just the reference point, while the information stays intact, just more simple (basic fractional algebra).
-Now there is one last step to simplify things even more, arriving at a point where the trees really make sense:
-
-### Relative Subdivisions
-
-In the above trees, the fractions were relative to the "absolute 1". What if we change them to be relative to just their parent?
-Let's find out:
-
-<State initial={{ path: null, node: null, relative: true, calculation: null }}>
-  {({ state, setState }) => (
-    <React.Fragment>
-      <Tree
-        width={620}
-        nodeRadius={10}
-        dx={20}
-        columns={[12, 12]}
-        data={rhythmicalTree(bolero, (rhythm, path) => ({
-          ...toRhythmObject(rhythm),
-          ...colorizePath(state.node, path, colors, 'lightgray'),
-          name: (!state.relative ? absoluteLabels : relativeLabels)[path.length],
-        }))}
-        onClick={(node) => {
-          const path = node
-            .ancestors()
-            .reverse()
-            .slice(1)
-            .map((node) => node.data.name);
-          const pairs = path.map((p) => p.split('/'));
-          const F = (n, d) => new Fraction(n, d);
-          const multiplication = pairs.map(([a, b]) => `\\frac{${a}}{${b || 1}}`).join('*');
-          const p = pairs.reduce((product, [a, b]) => product.mul(F(a, b)), F(1, 1));
-          const c = F(3, 4).mul(F(p.n, p.d));
-          const calculation = (
-            <React.Fragment>
-              <BlockMath>{`${multiplication} = \\frac{${p.n}}{${p.d}}`}</BlockMath>
-              <p>... and to get the "conventional" fraction:</p>
-              <BlockMath>{`\\frac{${p.n}}{${p.d}} * \\frac{3}{4} = \\frac{${c.n}}{${c.d}}`}</BlockMath>
-            </React.Fragment>
-          );
-          setState({ node, pairs, calculation });
-        }}
-        hideJson={true}
-      />
-      <label>
-        relative{' '}
-        <Switch checked={state.relative} color="primary" onChange={(e) => setState({ relative: e.target.checked })} />
-      </label>
-      <p>
-        Now we get an interesting effect: the denominators always "coincide" with the amount of elements in a group! To
-        get back to the absolute fraction, we just have to multiply all fractions top down:
-      </p>
-      {!state.node && (
-        <p>
-          <i>Click a node to show its calculation</i>
-        </p>
-      )}
-      {state.node && state.calculation}
-    </React.Fragment>
-  )}
-</State>
-
-Note that the important takeaway is not only simplicity, but also independence, as each node value is now only dependent on its parent!
-
-### Index Path
-
-We can identify each node in the tree, by a unique index path:
-
-<State initial={{ path: null, node: null }}>
-  {({ state, setState }) => (
-    <>
-      <Tree
-        width={620}
-        nodeRadius={10}
-        dx={20}
-        columns={[12, 12]}
-        data={rhythmicalTree(bolero, (rhythm, path) => ({
-          ...toRhythmObject(rhythm),
-          ...colorizePath(state.node, path, colors, 'lightgray'),
-          name: path.length ? path[path.length - 1] : 'bolero',
-        }))}
-        onClick={(node, setNode) => {
-          const path = node
-            .ancestors()
-            .reverse()
-            .slice(1)
-            .map((node) => node.data.name);
-          setState({ path, node });
-        }}
-        hideJson={true}
-      />
-      {!state.node && <i>Click a node to see its path</i>}
-      {state.path && <BlockMath>{`path = ${state.path.join(', ')}`}</BlockMath>}
-    </>
-  )}
-</State>
-
-Now let's use that path and combine it with our relative subdivisions:
-
-### Path Fractions
-
-If we divide each index by the number of siblings (relative subdivision), we get this:
-
-<State initial={{ path: null, node: null }}>
-  {({ state, setState }) => (
-    <>
-      <Tree
-        width={620}
-        nodeRadius={10}
-        dx={20}
-        columns={[12, 12]}
-        onClick={(node) => {
-          const path = node
-            .ancestors()
-            .reverse()
-            .slice(1)
-            .map((node) => node.data.name);
-          const pairs = path.map((p) => p.split('/'));
-          const fractions = pairs.map(([a, b]) => new Fraction(a, b));
-          const fraction = fractions?.reduce((sum, p, i) => {
-            const div = pairs.slice(0, i).map(([_, d]) => d);
-            const m = div.reverse().reduce((product, d) => {
-              return product.div(d);
-            }, p);
-            return sum.add(m);
-          }, new Fraction(0));
-          setState({ path, fraction, node });
-        }}
-        data={rhythmicalTree(bolero, (rhythm, path, parent) => ({
-          ...toRhythmObject(rhythm),
-          ...colorizePath(state.node, path, colors, 'lightgray'),
-          name: parent ? path[path.length - 1] + '/' + getRhythmChildren(parent).length : 'bolero',
-        }))}
-        hideJson={true}
-      />
-      {!state.path && (
-        <p>
-          <i>Click a node to show its absolute fraction!</i>
-        </p>
-      )}
-      {state.path && (
-        <>
-          <BlockMath>{`path = ${state.path
-            .map((f) => f.split('/'))
-            .map(([a, b]) => `\\frac{${a}}{${b}}`)
-            .join(', ')}`}</BlockMath>
-          <p>The top row reflects the index path, while the bottom row reflects the path of subdivisions!</p>
-          <p>We can calculate the absolute fraction like this:</p>
-          <BlockMath>
-            {`fraction = ${state.path
-              .map((f) => f.split('/'))
-              .map(
-                ([a, b], i, p) =>
-                  `${
-                    i
-                      ? `\\frac{${a}}{${b}}*(${p
-                          .slice(0, i)
-                          .reverse()
-                          .map(([x, y]) => `\\frac{1}{${y}}`)
-                          .join('*')})`
-                      : `\\frac{${a}}{${b}}`
-                  }`
-              )
-              .join(' + ')} = \\frac{${state.fraction.n}}{${state.fraction.d}}`}
-          </BlockMath>
-          <p></p>
-        </>
-      )}
-    </>
-  )}
-</State>
-
 For each node, we multiply its path fraction (before the bracket) with each parent's relative subdivisions
 (inside the brackets). The products are then summed up.
 You can read it the same way your eyes would move along the tree line (oscillating down and up).
@@ -478,206 +502,145 @@ You can read it the same way your eyes would move along the tree line (oscillati
 We can now derive the absolute note value of a tree node from a collection of indices and sibling lengths.
 The next step would be to actually implement a function that does this.
 
-## Visiting Tree Nodes
+## TODO: calculate flat events with visitTree
 
-If we want to call a function on every node of a tree (= visit), we can do this:
+...
 
-```js
-export function visitNodes(tree, visitor, getChildren) {
-  visitor(tree);
-  const children = getChildren(tree);
-  if (children?.length) {
-    children.forEach((child) => visitNodes(child, visitor, getChildren));
-  }
-}
-```
+## Editing Nodes
 
-Example usage:
-
-```js
-const flattened = [];
-visitNodes(
-  [1, [2, 3]] // tree
-  (node) => !Array.isArray(node) && flattened.push(node), // visitor: push leaves
-  (node) => (Array.isArray(node) ? node : []), // getChildren
-);
-console.log(flattened); // [1, 2, 3]
-```
-
-## How musicians read rhythm
-
-When a musician wants to read and perform a rhythm, he first needs a pulse.
-Most of the time, the pulse will be the quarter notes of the piece.
-To establish that pulse when playing together, musicians will "count in".
-In the bolero example one might count in with a pulse of 60bpm:
-
-<Player
-  instruments={{ drums }}
-  events={renderRhythm({
-    duration: 3.5,
-    parallel: [['bd', 'bd', 'bd']],
-  })}
-/>
-
-Into each pulse now fit 2 8ths notes:
-
-<Player
-  instruments={{ drums }}
-  events={renderRhythm({
-    duration: 3.5,
-    parallel: [
-      ['bd', 'bd', 'bd'],
-      ['ht', 'mt', 'ht', 'mt', 'ht', 'mt'],
-    ],
-  })}
-/>
-
-... and into each 8th notes fit 3 16ths triplets:
-
-<Player
-  instruments={{ drums }}
-  events={renderRhythm({
-    duration: 3.5,
-    parallel: [
-      ['bd', 'bd', 'bd'],
-      ['ht', 'mt', 'ht', 'mt', 'ht', 'mt'],
-      ['hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh'],
-    ],
-  })}
-/>
-
-The actual rhythm just switches back and forth between the 8ths and 16ths triplets:
-
-<Player
-  instruments={{ drums }}
-  events={renderRhythm({
-    duration: 7,
-    parallel: [
-      [
-        ['bd', 'bd', 'bd'],
-        ['bd', 'bd', 'bd'],
-      ],
-      [
-        ['ht', 'r', 'ht', 'r', 'ht', 'mt'],
-        ['ht', 'r', 'ht', 'r', 'r', 'r'],
-      ],
-      [
-        ['r', ['hh', 'hh', 'hh'], 'r', ['hh', 'hh', 'hh'], 'r', 'r'],
-        ['r', ['hh', 'hh', 'hh'], 'r', ['hh', 'hh', 'hh'], ['hh', 'hh', 'hh'], ['hh', 'hh', 'hh']],
-      ],
-    ],
-  })}
-/>
-
-## Rhythmical > d3-hierarchy
-
-We can convert a the object to d3-hierarchy format like that:
+It would be extremely powerful to be able to edit notes. Like a map function for trees:
 
 ```ts
-export function rhythmicalTree<T>(
-  rhythm: RhythmNode<T>,
-  mapFn?: (rhythm: RhythmNode<T>, path: number[], parent?: RhythmNode<T>) => RhythmNode<T>,
-  path = [],
-  parent?
+export function editTree<T>(
+  getChildren: (tree: T) => T[],
+  makeParent: (tree: T, children: T[]) => T,
+  before: (tree: T, index: number, siblings?: T[], parent?: T) => T,
+  after: (tree: T, index: number, siblings?: T[], parent?: T) => T,
+  tree: T,
+  index?: number,
+  siblings?: T[],
+  parent?: T
 ) {
-  if (mapFn) {
-    rhythm = mapFn(rhythm, path, parent);
+  tree = before(tree, index, siblings, parent);
+  const children = getChildren(tree);
+  if (children?.length) {
+    tree = makeParent(
+      tree,
+      children.map((child, index, siblings) =>
+        editTree(getChildren, makeParent, before, after, child, index, siblings, tree)
+      )
+    );
   }
-  const children = getRhythmChildren(rhythm);
-  if (!children?.length) {
-    return { name: 'leaf', ...rhythm };
-  }
-  return {
-    name: 'parent',
-    children: children.map((child, index) => rhythmicalTree(child, mapFn, path.concat([index]), rhythm)),
-    ...rhythm,
-  };
+  return after(tree, index, siblings, parent);
 }
 ```
 
+This function enables us to walk any tree, no matter which form.
+
+### Editing Rhythm Trees
+
+We can narrow down the abstraction by implementing the first two functions.
+For a rhythmical object, this looks like that:
+
+```ts
+export function editRhythm<T>(rhythm: RhythmNode<T>, before?, after?) {
+  let path = [];
+  return editTree<RhythmNode<T>>(
+    getRhythmChildren, // resolves children of RhythmNode
+    makeRhythmParent, // creates RhythmNode with chilren
+    (r, i, _, parent) => {
+      i >= 0 && path.push(i);
+      return before ? before(r, path, parent) : r;
+    },
+    (r, i) => {
+      r = after ? after(r, path, parent) : r;
+      i >= 0 && path.pop();
+      return r;
+    },
+    rhythm
+  );
+}
+```
+
+### Example: Chord Voicings
+
+Using the above editRhythm function, we could replace chord symbols with [chord voicings](../rhythmical-chords/):
+
+```ts
+export function generateVoicings(tree: RhythmNode<string>, dictionary, range, sorter = topNoteDiff) {
+  let lastVoicing = [];
+  return editRhythm(tree, (r, path, parent) => {
+    if (typeof r !== 'string' || !!parent.chord) {
+      return r; // no chord symbol or already part of a voicing
+    }
+    const voicing = getBestVoicing(r, dictionary, range, sorter, lastVoicing);
+    lastVoicing = [...voicing];
+    return {
+      chord: r, // prevent infinite loop
+      parallel: voicing,
+    };
+  });
+}
+```
+
+<Player
+  instruments={{ piano }}
+  events={renderRhythm(
+    generateVoicings({ duration: 6, sequential: ['C^7', 'Am7', 'Dm7', ['G7', 'G7b9']] }, lefthand, ['G2', 'C5'])
+  )}
+/>
+
 ```js
-<Tree
-  width={620}
-  nodeRadius={10}
-  dx={20}
-  columns={[12, 12]}
-  data={rhythmicalTree(bolero, (rhythm, path) => ({
-    ...toRhythmObject(rhythm),
-    color: path.length ? colors[path.length - 1] : 'black',
-    name: conventionalLabels[path.length],
-  }))}
-  hideJson={true}
+<Player
+  instruments={{ piano }}
+  events={renderRhythm(
+    generateVoicings(
+      {
+        duration: 6,
+        sequential: ['C^7', 'Am7', 'Dm7', ['G7', 'G7b9']],
+      },
+      lefthand,
+      ['G2', 'C5']
+    )
+  )}
 />
 ```
 
-<Tree
-  width={620}
-  nodeRadius={10}
-  dx={20}
-  columns={[12, 12]}
-  data={rhythmicalTree(bolero, (rhythm, path) => ({
-    ...toRhythmObject(rhythm),
-    color: path.length ? colors[path.length - 1] : 'black',
-    name: conventionalLabels[path.length],
-  }))}
-  hideJson={true}
-/>
+## Bonus: Rhythmical > d3-hierarchy
 
-## links / BTD
+Using the editTree function, I was able to convert rhythmical objects to [d3-hierarchy](https://github.com/d3/d3-hierarchy) format like this:
 
-- use https://observablehq.com/@d3/radial-dendrogram
-- implement https://github.com/0xfe/vexflow/wiki/Tuplets for score
-- add paths to trees https://css-tricks.com/svg-path-syntax-illustrated-guide/
-
-## todo
-
-### implement stateful tree walker
-
-- generator function that walks one node per call
-- enables "debugging" tree walker with Tree component
-- could show different states on the side
-- the generator could also be used to run inside a tone.js loop to "buffer" events as long as required
-  - this would eliminate loop errors => for example, the first chord could then be voiced based on the last
-  - the walker could be adjusted to be a "runtime", that allows jumps (to implement control flow)
-  - maybe a zipper like implementation would then be needed
-  - nevertheless, the stateful tree walker should still be implemented!!!
-
-### PianoRoll
-
-- add mode for PianoRoll where non-leaves are rendered => display bolero with group colors
-- add mode for PianoRoll where nothing is scrolling, just the playhead is moving
-- place non-scrolling PianoRoll with 0s on the left under the bolero score to replace colored bars
-- auto select nodes in the graph while playing (to show correlation)
-
-### Tree / RhythmInspector
-
-- adapt rhythmicalHierarchy, making it work with rhythmical objects too (currently array only)
-- add mode for Tree where clicking a node results in all the parent nodes being colored (+ node itself)
-- add RhythmInspector, which is a rhythmical Tree that enables selecting nodes
-
-## RhythmEditor
-
-- add RhythmEditor, which is Player + JSON editor + RhythmInspector, that automatically updates
-- Make RhythmInspector editable
-  - nodes can be disabled (won't play + will loose color)
-  - nodes can be edited => change value, set instrument, velocity, duration etc..
-
-## Score
-
-- improve Score component to allow rhythmical objects too (currently array only)
-- improve Score component to show tuplets
-- replace bolero.png with Score + color note heads + stems + beams according to group
-
-## Claims
-
-1. Trees are the shortest and most natural way to represent rhythmical information
-2. As text, they are extremely readable and portable
-3. When implemented correctly, they offer great possibilities for algorithmic composition
+```ts
+export function r2d3<T>(rhythm: RhythmNode<T>, mapFn?) {
+  let path = [];
+  return editTree<RhythmNode<T>>(
+    getRhythmChildren,
+    (r, children) => ({
+      name: 'parent',
+      children,
+      ...r,
+    }),
+    (r, i, _, parent) => {
+      i !== undefined && path.push(i);
+      if (mapFn) {
+        r = mapFn(r, path, parent);
+      }
+      return r;
+    },
+    (r, i) => {
+      i !== undefined && path.pop();
+      return r;
+    },
+    rhythm
+  );
+}
+```
 
 ## links
 
+- https://github.com/d3/d3-hierarchy
+- https://github.com/tommikaikkonen/zippa
 - https://github.com/syntax-tree/unist
 - https://astexplorer.net/
-- https://github.com/d3/d3-hierarchy
 - https://github.com/vtrushin/json-to-ast => inspiration for rhythmical DSL
   - maybe add rhythmical DSL to astexplorer when done? ..
