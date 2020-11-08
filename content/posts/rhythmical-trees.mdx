@@ -34,18 +34,10 @@ import TreeVisitor from '../components/common/TreeVisitor.tsx';
 import { useGenerator } from '../components/common/useGenerator.ts';
 import { schemeTableau10 } from 'd3-scale-chromatic';
 import { InlineMath, BlockMath } from 'react-katex';
-import {
-  toRhythmObject,
-  getRhythmChildren,
-  colorize,
-  addColors,
-  pathString,
-  haveSameIndices,
-  flatNodes,
-  visitNodes,
-  r2d3,
-  editRhythm,
-} from '../components/rhythmical/util';
+import { toRhythmObject, getRhythmChildren, pathString, haveSameIndices } from '../components/rhythmical/util';
+import { r2d3 } from '../components/rhythmical/r2d3';
+import { colorize } from '../components/rhythmical/colorize';
+import { editRhythm } from '../components/rhythmical/editRhythm';
 import { State } from 'react-powerplug';
 import Fraction from 'fraction.js';
 import Switch from '@material-ui/core/Switch';
@@ -149,15 +141,6 @@ export const colors = schemeTableau10;
   center={0}
   events={renderRhythm(colorize({ duration: 6, sequential: bolero }, colors))}
 />
-
-<!-- <Player
-  instruments={{ drums }}
-  hierarchy={true}
-  height={25}
-  fold={true}
-  center={0}
-  events={renderRhythm(addColors({ duration: 6, sequential: bolero }, colors))}
-/> -->
 
 - The tree essentially contains the same information as the score, though using less visual encoding (taking more space).
 - Each group represents different subdivisions of time
@@ -398,16 +381,18 @@ If we divide each index by the number of siblings, we can calculate relative fra
               }, p);
               return sum.add(m);
             }, new Fraction(0));
+          const whole = 6;
+          const ta = t.mul(6).toFraction(false);
+          const da = d.mul(6).toFraction(false);
           const cd = F(6, 4).mul(F(d.n, d.d));
           const ct = F(6, 4).mul(F(t.n, t.d));
           const calculation = (
             <React.Fragment>
               <p>The following fractions are relative to the complete bolero lengths:</p>
-              <BlockMath>{`duration = ${duration} = \\frac{${d.n}}{${d.d}}`}</BlockMath>
-              <BlockMath>{`time = ${time} = \\frac{${t.n}}{${t.d}}`}</BlockMath>
-              <p>By multiplying with 6/4, we get the conventional fractions:</p>
-              <BlockMath>{`duration * \\frac{6}{4} = \\frac{${d.n}}{${d.d}} * \\frac{6}{4} = \\frac{${cd.n}}{${cd.d}}`}</BlockMath>
-              <BlockMath>{`time * \\frac{6}{4} = \\frac{${t.n}}{${t.d}} * \\frac{6}{4} = \\frac{${ct.n}}{${ct.d}}`}</BlockMath>
+              <BlockMath>{`duration_{r} = ${duration} = \\frac{${d.n}}{${d.d}}`}</BlockMath>
+              <BlockMath>{`time_{r} = ${time} = \\frac{${t.n}}{${t.d}}`}</BlockMath>
+              <BlockMath>{`time_{a} = \\frac{${t.n}}{${t.d}} * 6s = ${ta}s`}</BlockMath>
+              <BlockMath>{`duration_{a} = \\frac{${d.n}}{${d.d}} * 6s = ${da}s`}</BlockMath>
             </React.Fragment>
           );
           setState({ node: _state.value, calculation });
@@ -431,7 +416,7 @@ If we divide each index by the number of siblings, we can calculate relative fra
       />
       {!state.node && (
         <p>
-          <i>Click next to walk the tree</i>
+          <i>Click next to walk the tree (prepare for math...)</i>
         </p>
       )}
       {state.node && (

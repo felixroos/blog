@@ -87,6 +87,7 @@ export const mapRhythm: any = curry((mapFn: any, rhythm) => {
 });
 
 
+
 // transpose test:
 
 const tranposeNode = curry((interval, node) => {
@@ -100,6 +101,8 @@ const tranposeNode = curry((interval, node) => {
   }
   return node;
 })
+
+
 
 const tranposeRhythm = curry((interval, rhythm) => mapRhythm(tranposeNode(interval), rhythm));
 
