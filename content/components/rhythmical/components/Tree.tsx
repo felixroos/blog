@@ -153,6 +153,7 @@ export function d3Path(node, path = []) {
   return d3Path(node.parent, [node.parent.children.indexOf(node)].concat(path));
 }
 
+// deprecated? only used in more-trees draft
 export function colorizePath(node, path: number[], colors, fallback) {
   if (path.length && (!node || d3Path(node).join(':').startsWith(path.join(':')))) {
     return {

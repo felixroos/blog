@@ -11,6 +11,8 @@ function rhythmTreeParent<T, S>({ data, ...props }: { data: RhythmNode<T> } & S,
   };
 }
 
+// this is currently not in use. kept it to show how mapHierarchy can be used..
+
 export function addColors<T>(rhythm: RhythmNode<T>, scheme: string[]) {
   const { data } = mapHierarchy<{
     data: RhythmNode<T>,

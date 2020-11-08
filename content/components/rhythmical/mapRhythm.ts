@@ -9,3 +9,11 @@ export function mapRhythm<T>(mapFn: MapRhythmFn<T>, rhythm: RhythmNode<T>, state
   }
   return makeRhythmParent(rhythm, children.map(child => mapRhythm(mapFn, child, state)))
 }
+
+// other functions that are able to edit a hierarchy:
+/*
+
+- mapHierarchy
+- 
+
+*/

@@ -20,3 +20,9 @@ export function mapHierarchy<S>(
     children.map((...args) => mapHierarchy(getChildren, makeParent, mapFn, ...args))
   );
 }
+
+/* used by
+
+- addColors (unused)
+
+*/

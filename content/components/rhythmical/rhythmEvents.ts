@@ -18,3 +18,9 @@ export function rhythmEvents<T>(rhythm: RhythmNode<T>): RhythmEvent<T>[] {
   );
   return events;
 }
+
+// other function with similar purpose
+
+// - renderEvents of RhythmZipper
+// - digRhythm
+// - reduceRhythm (broken?)

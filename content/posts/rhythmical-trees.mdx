@@ -11,40 +11,21 @@ import tetris from '../components/rhythmical/tunes/tetris.ts';
 import tetrisQuiet from '../components/rhythmical/tunes/tetrisQuiet.ts';
 import { marblemachine } from '../components/rhythmical/tunes/marblemachine.ts';
 import { rhythmEvents } from '../components/rhythmical/hierarchy.ts';
-import { flatEvents } from '../components/rhythmical/walker.ts';
-import { renderRhythm, flatRhythm } from '../components/rhythmical/rhythmical.ts';
+import { renderRhythm } from '../components/rhythmical/rhythmical.ts';
 import { generateVoicings, lefthand } from '../components/rhythmical/dictionary/voicings.ts';
-import { renderEvents } from '../components/rhythmical/RhythmZipper.ts';
-import { digRhythm } from '../components/rhythmical/digRhythm.ts';
-import { transpose, transposeEvents, transposeEvent } from '../components/rhythmical/features/transpose.ts';
-import { tieEvents } from '../components/rhythmical/reducers.ts';
-import { inheritProp, inherit } from '../components/rhythmical/features/inherit.ts';
-import tinypiano from '../instruments/tinypiano.ts';
-import Player, { click } from '../components/rhythmical/components/Player.tsx';
-import compose from 'ramda/src/compose';
-import pipe from 'ramda/src/pipe';
-import map from 'ramda/src/map';
-import RhythmicalTree from '../components/rhythmical/components/RhythmicalTree.tsx';
-import Tree, { colorizePath } from '../components/rhythmical/components/Tree.tsx';
+import Player from '../components/rhythmical/components/Player.tsx';
+import Tree from '../components/rhythmical/components/Tree.tsx';
 import { TreeAnalyzer } from '../components/rhythmical/components/TreeAnalyzer.tsx';
-import { rhythmicalScore } from '../components/score/score.ts';
-import { Score } from '../components/score/Score.tsx';
 import { Color } from '../components/common/Color.tsx';
 import TreeVisitor from '../components/common/TreeVisitor.tsx';
-import { useGenerator } from '../components/common/useGenerator.ts';
 import { schemeTableau10 } from 'd3-scale-chromatic';
-import { InlineMath, BlockMath } from 'react-katex';
-import { toRhythmObject, getRhythmChildren, pathString, haveSameIndices } from '../components/rhythmical/util';
+import { BlockMath } from 'react-katex';
+import { toRhythmObject } from '../components/rhythmical/util';
 import { r2d3 } from '../components/rhythmical/r2d3';
 import { colorize } from '../components/rhythmical/colorize';
-import { editRhythm } from '../components/rhythmical/editRhythm';
 import { State } from 'react-powerplug';
 import Fraction from 'fraction.js';
-import Switch from '@material-ui/core/Switch';
-import { bolero, conventionalLabels, absoluteLabels, relativeLabels } from '../components/rhythmical/tunes/bolero';
-import { AsciiTree } from '../components/common/AsciiTree.tsx';
-import { AsciiTreeDiff } from '../components/common/AsciiTreeDiff.tsx';
-import * as treeify from 'treeify';
+import { bolero, conventionalLabels } from '../components/rhythmical/tunes/bolero';
 
 After the posts about [Rhythmical Arrays](../rhythmical-arrays/) and [Rhythmical Objects](../rhythmical-objects),
 I want to investigate the actual data structure that is at play: trees.
@@ -487,7 +468,7 @@ You can read it the same way your eyes would move along the tree line (oscillati
 We can now derive the absolute note value of a tree node from a collection of indices and sibling lengths.
 The next step would be to actually implement a function that does this.
 
-## TODO: calculate flat events with visitTree
+## TODO calculate flat events with visitTree
 
 ...
 
