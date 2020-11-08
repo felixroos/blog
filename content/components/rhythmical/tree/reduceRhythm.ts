@@ -1,5 +1,7 @@
-import { reduceHierarchy, StateDigger, StateMutator, StateReducer } from './reduceHierarchy';
-import { getRhythmChildren, pathTimeDuration, rhythmFraction, RhythmNode } from './util';
+import { reduceHierarchy, StateDigger, StateReducer } from './reduceHierarchy';
+import { getRhythmChildren, pathTimeDuration, rhythmFraction, RhythmNode } from '../util';
+
+// StateMutator
 
 // this seems to be old..
 

@@ -1,4 +1,4 @@
-import { Fraction, getRhythmChildren, isRhythmLeaf, pathTimeDuration, RhythmEvent, rhythmFraction, RhythmNode, rhythmValue } from './util';
+import { Fraction, getRhythmChildren, isRhythmLeaf, pathTimeDuration, RhythmEvent, rhythmFraction, RhythmNode, rhythmValue } from '../util';
 import { visitTree } from './visitTree';
 
 export function rhythmEvents<T>(rhythm: RhythmNode<T>): RhythmEvent<T>[] {

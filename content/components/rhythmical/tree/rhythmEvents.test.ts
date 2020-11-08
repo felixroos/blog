@@ -1,5 +1,5 @@
 import { rhythmEvents } from './rhythmEvents';
-import { stripEvent } from './util';
+import { stripEvent } from '../util';
 
 test('rhythmEvents', () => {
   expect(rhythmEvents({ duration: 3, sequential: ['a', ['b', 'c'], 'd'] }).map(stripEvent)).toEqual([

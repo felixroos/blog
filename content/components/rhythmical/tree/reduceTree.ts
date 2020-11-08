@@ -1,4 +1,4 @@
-import { rhythmFraction, Fraction, pathTimeDuration } from './util';
+import { rhythmFraction, Fraction, pathTimeDuration } from '../util';
 
 export declare type StandardTree<T> = { data?: T, children?: StandardTree<T>[], [index: string]: any };
 export declare type TreeReducer<T, A> = (accumulator: A, node: T) => A;

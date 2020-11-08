@@ -1,4 +1,4 @@
-import { getRhythmChildren, makeRhythmParent, RhythmNode } from './util';
+import { getRhythmChildren, makeRhythmParent, RhythmNode } from '../util';
 
 declare type MapRhythmFn<T> = (rhythm: RhythmNode<T>, state?: any) => [RhythmNode<T>, any];
 export function mapRhythm<T>(mapFn: MapRhythmFn<T>, rhythm: RhythmNode<T>, state?: any) {

@@ -1,6 +1,5 @@
-import { transpose } from './functional';
 import { curry, pipe } from 'ramda';
-import { pathTimeDuration, rhythmFraction, getRhythmChildren, toRhythmObject, makeRhythmParent, editLeafValue, RhythmNode, RhythmEvent, RhythmObject, RhythmLeaf } from './util';
+import { pathTimeDuration, rhythmFraction, getRhythmChildren, toRhythmObject, makeRhythmParent, editLeafValue, RhythmNode, RhythmEvent, RhythmObject, RhythmLeaf } from '../util';
 import { Note } from '@tonaljs/tonal';
 
 // walks over nested tree object

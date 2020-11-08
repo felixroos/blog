@@ -1,5 +1,5 @@
 import { digRhythm } from './digRhythm';
-import { RhythmNode } from './util';
+import { RhythmNode } from '../util';
 
 test('digRhythm', () => {
   expect(digRhythm({

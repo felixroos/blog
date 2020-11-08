@@ -1,5 +1,5 @@
 import { mapHierarchy } from './mapHierarchy';
-import { getRhythmChildren, makeRhythmParent, RhythmNode, toRhythmObject } from './util';
+import { getRhythmChildren, makeRhythmParent, RhythmNode, toRhythmObject } from '../util';
 
 function rhythmTreeChildren<T, S>({ data, ...props }: { data: RhythmNode<T> } & S) {
   return getRhythmChildren<T>(data)?.map(child => ({ data: child, ...props }));

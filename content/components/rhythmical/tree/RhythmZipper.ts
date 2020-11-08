@@ -1,5 +1,5 @@
 import { makeZipper, zip } from 'zippa';
-import { pathTimeDuration, makeRhythmParent, rhythmFraction, getRhythmChildren, editLeafValue } from './util';
+import { pathTimeDuration, makeRhythmParent, rhythmFraction, getRhythmChildren, editLeafValue } from '../util';
 import { Path, rhythmEvents } from './hierarchy';
 import pipe from 'ramda/src/pipe';
 import until from 'ramda/src/until';

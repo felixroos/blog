@@ -1,5 +1,5 @@
 import { Chord, Range, Note, Interval } from '@tonaljs/tonal';
-import { editRhythm } from '../editRhythm';
+import { editRhythm } from '../tree/editRhythm';
 import { RhythmNode } from '../util';
 
 export const lefthand = {

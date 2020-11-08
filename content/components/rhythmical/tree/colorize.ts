@@ -1,5 +1,5 @@
 import { mapRhythm } from './mapRhythm';
-import { getRhythmChildren, RhythmNode, toRhythmObject } from './util';
+import { getRhythmChildren, RhythmNode, toRhythmObject } from '../util';
 
 export function colorize<T>(rhythm: RhythmNode<T>, scheme: string[]) {
   return mapRhythm((node, path = []) => {

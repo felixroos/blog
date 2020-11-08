@@ -1,5 +1,5 @@
 import { editTree } from './editTree';
-import { getRhythmChildren, makeRhythmParent, RhythmNode } from './util';
+import { getRhythmChildren, makeRhythmParent, RhythmNode } from '../util';
 
 export function editRhythm<T>(rhythm: RhythmNode<T>, before?, after?) {
   let path = [];

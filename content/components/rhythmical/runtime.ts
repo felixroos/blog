@@ -1,6 +1,6 @@
-import { rhythmEvents } from './hierarchy';
-import { flatEvents } from './walker';
-import { renderEvents } from './RhythmZipper';
+import { rhythmEvents } from './tree/hierarchy';
+import { flatEvents } from './tree/walker';
+import { renderEvents } from './tree/RhythmZipper';
 import { renderRhythm } from './rhythmical';
 import tetris from './tunes/tetris';
 

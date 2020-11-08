@@ -1,7 +1,7 @@
 import { toArray, toObject, AgnosticChild } from '../helpers/objects';
 import { curry } from 'ramda';
 import { zip } from 'zippa';
-import { walkRhythm } from '../RhythmZipper';
+import { walkRhythm } from '../tree/RhythmZipper';
 
 export function inheritProperty<T>(property) {
   return (_parent: AgnosticChild<T>): AgnosticChild<T> => {

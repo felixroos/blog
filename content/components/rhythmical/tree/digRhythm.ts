@@ -1,5 +1,5 @@
-import { groupPlugins, HierarchyReducerPlugin, plug, reduceHierarchy, StateDigger, StateReducer } from './deprecated';
-import { getRhythmChildren, pathTimeDuration, rhythmFraction, RhythmNode } from './util';
+import { groupPlugins, HierarchyReducerPlugin, plug, reduceHierarchy, StateDigger, StateReducer } from '../deprecated';
+import { getRhythmChildren, pathTimeDuration, rhythmFraction, RhythmNode } from '../util';
 
 // ALARM: for reduceHierarchy, swapped inner + outer arguments 1 and 3
 // (a,b,c) => ...
