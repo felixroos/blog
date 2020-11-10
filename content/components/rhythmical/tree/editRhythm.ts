@@ -18,3 +18,7 @@ export function editRhythm<T>(rhythm: RhythmNode<T>, before?, after?) {
     rhythm
   );
 }
+
+// used by generateVoicings
+// pro: easy to read
+// contra: impure before / after  

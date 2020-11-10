@@ -4,14 +4,10 @@ import { cluster, hierarchy, tree } from 'd3-hierarchy';
 import { NestedArray } from '../helpers/arrays';
 
 export default function Tree(props) {
-  let { width = 400, height = 300, data, onClick, selected, theme, autoselect, nodeRadius, dx, dy } = props;
+  let { width = 400, height = 300, data, onClick, selected, theme, nodeRadius, dx, dy } = props;
   const h = hierarchy(data);
   //const root = cluster().nodeSize([dx || 40, dy || height / (h.height + 1)])(h);
   const root = tree().nodeSize([dx || 40, dy || height / (h.height + 1)])(h);
-
-  if (!selected && autoselect) {
-    onClick(root);
-  }
   let viewBox, linker;
   viewBox = `${-width / 2} -20 ${width} ${height}`;
   linker = (d: any) => `

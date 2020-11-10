@@ -1,4 +1,4 @@
-import { digRhythm } from './digRhythm';
+import { digRhythm } from './reduceRhythm';
 import { RhythmNode } from '../util';
 
 test('digRhythm', () => {
@@ -39,9 +39,3 @@ test('digRhythm', () => {
       { value: 'Bb3', time: 4, duration: 2 },
     ])
 });
-
-// felix roos dilettant
-// Sir Otto Dix, L'Elefant
-// fElix DiLettant rOoS
-// L'Elefant dix itt
-// Felix dilettant

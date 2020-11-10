@@ -5,13 +5,14 @@ import Chip from '@material-ui/core/Chip';
 import DoneIcon from '@material-ui/icons/Done';
 import CloseIcon from '@material-ui/icons/Close';
 import Grid from '@material-ui/core/Grid';
+import { cluster, hierarchy, tree } from 'd3-hierarchy';
 
 function getSiblings(node) {
   return node?.parent?.children?.map(({ data }) => data.name)?.filter((name) => name !== node.data.name);
 }
 
 export function TreeAnalyzer(props) {
-  const inactiveTheme = {
+  const theme = {
     selected: '#CA3F44',
     parent: '#9E9342', //'#DFDFDF'
     child: '#ACD556', //'#DFDFDF'
@@ -22,17 +23,6 @@ export function TreeAnalyzer(props) {
     default: '#DFDFDF',
   };
   const { data, hideJson, hideChips } = props;
-  const [theme, setTheme] = useState(inactiveTheme);
-  const activeTheme = {
-    selected: '#CA3F44',
-    parent: '#9E9342',
-    child: '#ACD556',
-    sibling: '#72C07D',
-    siblingLink: 'black',
-    parentLink: 'black',
-    childLink: 'black',
-    default: '#DFDFDF',
-  };
   const isActive = (type) =>
     ({
       parent: !!node.parent?.data?.name,
@@ -42,14 +32,14 @@ export function TreeAnalyzer(props) {
     }[type]);
   const controlColors = (types) => {
     return {
-      onMouseEnter: () =>
+      /* onMouseEnter: () =>
         setTheme(types.reduce((theme, type) => ({ ...theme, [type]: activeTheme[type] }), inactiveTheme)),
-      onMouseLeave: () => setTheme(inactiveTheme),
-      style: { backgroundColor: isActive(types[0]) ? theme[types[0]] : inactiveTheme.default, marginBottom: 5 },
+      onMouseLeave: () => setTheme(inactiveTheme), */
+      style: { backgroundColor: isActive(types[0]) ? theme[types[0]] : theme.default, marginBottom: 5 },
     };
   };
   const columns = props.columns || [8, 4];
-  const [node, setNode] = useState<any>();
+  const [node, setNode] = useState<any>(hierarchy(data));
   return (
     <Grid container>
       <Grid item xs={columns[0]}>
@@ -60,7 +50,6 @@ export function TreeAnalyzer(props) {
           }}
           theme={theme}
           selected={node}
-          autoselect={true}
           {...props}
         />
       </Grid>
