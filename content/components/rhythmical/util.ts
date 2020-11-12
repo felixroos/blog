@@ -6,6 +6,7 @@ export declare interface RhythmObject<T> {
   sequential?: RhythmNode<T>[],
   parallel?: RhythmNode<T>[],
   duration?: number,
+  [key: string]: any
 } // TBD: convert from "option bag" to union: ParallelRhythm | SequentialRhythm | LeafRhythm
 export declare interface RhythmLeaf<T> extends RhythmObject<T> {
   value: T
@@ -49,6 +50,10 @@ export function rhythmValue<T>(rhythm: RhythmNode<T>): T {
   return toRhythmObject<T>(rhythm).value;
 }
 
+export function rhythmEvent<T>(rhythm: RhythmNode<T>, path): RhythmEvent<T> {
+  return { value: rhythmValue(rhythm), ...pathTimeDuration(path) }
+}
+
 // returns time duration from path array (array of fractions)
 export function pathTimeDuration(path: Path, whole = 1): { time: number, duration: number } {
   let time = 0;
@@ -80,6 +85,16 @@ export function toRhythmObject<T>(child: RhythmNode<T>): RhythmObject<T> {
     }
   }
   return child as RhythmObject<T>;
+}
+
+export function getRhythmType(rhythm: RhythmNode<any>) {
+  if (Array.isArray(rhythm) || rhythm.sequential?.length) {
+    return 'sequential'
+  }
+  if (rhythm.parallel?.length) {
+    return 'parallel';
+  }
+  return 'leaf';
 }
 
 // emits new object for parent + children

@@ -12,7 +12,8 @@ import tetrisQuiet from '../components/rhythmical/tunes/tetrisQuiet.ts';
 import { marblemachine } from '../components/rhythmical/tunes/marblemachine.ts';
 import { rhythmEvents } from '../components/rhythmical/tree/hierarchy.ts';
 import { renderRhythm } from '../components/rhythmical/rhythmical.ts';
-import { generateVoicings, lefthand } from '../components/rhythmical/dictionary/voicings.ts';
+import { generateVoicings, voicingFactory } from '../components/rhythmical/voicings/generateVoicings.ts';
+import { lefthand } from '../components/rhythmical/voicings/dictionary.ts';
 import Player from '../components/rhythmical/components/Player.tsx';
 import Tree from '../components/rhythmical/components/Tree.tsx';
 import { TreeAnalyzer } from '../components/rhythmical/components/TreeAnalyzer.tsx';
@@ -26,6 +27,7 @@ import { colorize } from '../components/rhythmical/tree/colorize';
 import { State } from 'react-powerplug';
 import Fraction from 'fraction.js';
 import { bolero, conventionalLabels } from '../components/rhythmical/tunes/bolero';
+import R from 'ramda';
 
 After the posts about [Rhythmical Arrays](../rhythmical-arrays/) and [Rhythmical Objects](../rhythmical-objects),
 I want to investigate the actual data structure that is at play: trees.
@@ -327,7 +329,7 @@ Thats a flat representation.. but somehow useless. We need more information...
 
 ### Relative Fraction Paths
 
-If we divide each index by the number of siblings, we can calculate relative fractions:
+If we divide each index by the number of siblings (also called branching factor), we can calculate relative fractions:
 
 <State initial={{ node: null, calculation: null }}>
   {({ state, setState }) => (
@@ -551,26 +553,247 @@ export function generateVoicings(tree: RhythmNode<string>, dictionary, range, so
 
 <Player
   instruments={{ piano }}
-  events={renderRhythm(
-    generateVoicings({ duration: 6, sequential: ['C^7', 'Am7', 'Dm7', ['G7', 'G7b9']] }, lefthand, ['G2', 'C5'])
+  events={R.compose(
+    renderRhythm,
+    voicingFactory(lefthand, ['D3', 'A4'])
+  )({
+    duration: 6,
+    sequential: ['C^7', 'Am7', 'Dm7', ['G7', 'G7b9']],
+  })}
+/>
+
+<Tree
+  width={620}
+  nodeRadius={10}
+  dx={20}
+  columns={[12, 12]}
+  data={r2d3(
+    voicingFactory(lefthand, ['D3', 'A4'])({
+      duration: 6,
+      sequential: ['C^7', 'Am7', 'Dm7', ['G7', 'G7b9']],
+    }),
+    (rhythm, path) => ({
+      ...toRhythmObject(rhythm),
+      color: path.length ? colors[path.length - 1] : 'black',
+      name: toRhythmObject(rhythm).value,
+    })
   )}
+  hideJson={true}
 />
 
 ```js
 <Player
   instruments={{ piano }}
-  events={renderRhythm(
-    generateVoicings(
-      {
-        duration: 6,
-        sequential: ['C^7', 'Am7', 'Dm7', ['G7', 'G7b9']],
-      },
-      lefthand,
-      ['G2', 'C5']
-    )
-  )}
+  events={R.compose(
+    renderRhythm,
+    voicingFactory(lefthand, ['D3', 'A4'])
+  )({
+    duration: 6,
+    sequential: ['C^7', 'Am7', 'Dm7', ['G7', 'G7b9']],
+  })}
 />
 ```
+
+## Possible Plugins
+
+Let's try a solution oriented approach. Following plugins should be possible:
+
+- transposition
+  - runs only on certain target (e.g. node.transpose !== undefined)
+  - edits value of leaf nodes (e.g. 'C3' => 'D3' for transpose = 2)
+  - needs state to remember transpose
+  - if already has transpose in state, add to target transpose
+- chord Voicings
+  - runs only on certain target (e.g. node.type === 'chords')
+  - replaces leaf nodes of target with { sequential: voicing }
+  - needs state to remember latest voicing to decide best voice leading
+- render events
+  - runs over all nodes
+  - needs global state to hold all events
+  - needs local state to hold path (backtraces to parent state)
+
+## Purity
+
+Problem: editTree / editRhythm callers use impure before / after functions:
+
+The structure can be broken down like this:
+
+```js
+export function caller(tree: RhythmNode<string>) {
+  let state; // state in outside scope
+  return editTree(tree, (node) => {
+    // editRhythm is similar
+    state = mutate(state); // usage of state from outter scope
+    return edit(node, state);
+  });
+}
+```
+
+The point is: the callback depends on and modifies the state, which is defined outside the functions scope.
+This is a side effect, as the return value of the function may change for the same set of arguments.
+This makes it an impure function, which makes it less composable.
+If the function was pure, we would have less trouble when trying to combine multiple of them.
+
+### How to make it pure
+
+- the function needs access to the state
+  - the access can only happen through a param
+  - so, either we cram the state into the node itself (A)
+    - before({node,state}, index, siblings, {node,state})
+  - or we add an extra param for state (B)
+    - before(node, index, siblings, parent, state)
+- the function needs to modify the state
+  - the modified state needs to returned in some way
+  - so, either we return the state as part of the node (A)
+    - return { node, state }
+  - or we expect a specific return format (B)
+    - return [node,state] or { node, state }
+  - but, the before after functions expect the same output as input => maybe modify that
+
+### A
+
+```ts
+declare type RhythmState<T> = {
+  state: object;
+  node: RhythmNode<T>;
+};
+export function editRhythmState<T>(rhythm: RhythmState<T>) { // removed before, after params
+  let path = [];
+  return editTree<RhythmState<T>>(
+    ({ node, state }) => getRhythmChildren(node).map((child) => ({ node: child, state })), // + n
+    ({ node, state }, children) => ({
+      // merge child state to parent state
+      state = children.reduce((_state, { state: childState, node}) => ({ // + n
+        ..._state,
+        events: state.events.concat(childState.events)
+      }), state);
+      node: makeRhythmParent(
+        node,
+        children.map(({ node: childNode, state: childState }) => child.node) // + n
+      ),
+      state, // how to use childState here ?,
+    }),
+    ({ node, state }, i, c, { node: parent }) => {
+      // parent.state is equal to state (passed down in getChildren)
+      return {
+        node,
+        state: {
+          ...state,
+          path: path.concat([rhythmFraction(node, i, c, parent)]),
+        },
+      };
+    },
+    ({ node, state }, i, c, { node: parent }) => {
+      return {
+        node,
+        state: {
+          ...state,
+          events: state.events.concat([rhythmEvent(node,state.path)]) // concat event
+        }
+      };
+    },
+    rhythm
+  );
+}
+```
+
+- I wrote this code directly in mdx, just for conceptualizing => no type checking
+- may have forgotten something
+- generally, this grows into a monster pretty quickly. also, we need an extra of 3 rounds node iterations (+n)
+
+### B
+
+```ts
+export function editRhythm<T>(rhythm: RhythmNode<T>) {
+  // removed before, after params
+  let path = [];
+  return editTree<RhythmNode<T>>(
+    // here we pass parent state down to children (events should be empty..)
+    ([rhythm, state]) => getRhythmChildren(rhythm).map((child) => [child, state]), // + n
+    // here we pass reduce children states up to parent (just events)
+    ([parent, state], children) => [
+      makeRhythmParent(
+        parent,
+        children.map(([child]) => child) // + n
+      ),
+      { ...state, events: children.reduce((e, [c, s]) => [...e, s.events]) }, // + n
+    ],
+    // here we add the child fraction to the parent path
+    ([child, state], i, c, [parent, parentState]) => {
+      state = { ...parentState, path: parentState.path.concat(rhythmFraction(child, i, c, parent)) };
+      return [child, state]; // expected format
+    },
+    // here we add the child event to the child state (which is reduced in makeParent)
+    ([child, state], i, _, [parent, parentState]) => {
+      state = { ...parentState, events: [rhythmEvent(child, state.path), ...state.events] }; // state.events contains reduced child events
+      // no need to pop path => just don't pass path to parent
+      return [r, state];
+    },
+    rhythm
+  );
+}
+```
+
+- this turned out to be A, just with a more compact array format ...
+- this looks much better, as the array syntax is shorter and more readable than the object syntax
+- its still pretty mindfucky...
+- maybe, the second (makeParent) and fourth (after) can be combined...
+  - we could just add the already modified children as last argument to after
+  - then, we could check if it has children, and if yes, run makeRhythmParent
+
+```ts
+export function editRhythm<T>(rhythm: RhythmNode<T>) {
+  // removed before, after params
+  let path = [];
+  return editTreeSimpler<RhythmNode<T>>(
+    // here we pass parent state down to children (events should be empty..)
+    // could also concat path here... ?!
+    ([rhythm, state]) => getRhythmChildren(rhythm).map((child) => [child, state]), // +n
+    // here we add the child fraction to the parent path
+    ([child, state], i, c, [parent, parentState]) => {
+      state = { ...parentState, path: parentState.path.concat(rhythmFraction(child, i, c, parent)) };
+      return [child, state]; // expected format
+    },
+    // here we add the child event to the child state (which is reduced in makeParent)
+    ([node, state], i, _, [parent, parentState], children) => {
+      let childEvents = [];
+      if (children?.length) {
+        // could also collect nodes when reducing events
+        // [childNodes, childEvents] = children.reduce(blabla)
+        childEvents = children.reduce((e, [c, s]) => [...e, s.events]); // +n
+        const childNodes = children.map(([child]) => child); // +n
+        state = { ...state, events: childEvents };
+        node = makeRhythmParent(node, childNodes);
+      }
+      state = { ...parentState, events: [rhythmEvent(child, state.path), ...childEvents] };
+      return [node, state];
+    },
+    rhythm
+  );
+}
+```
+
+- this is somewhat more easy to understand in the third function
+- maybe it would help if there were functions for both data flow direction
+  - down: parent => child (getChildren and before)
+  - up: children => parent (after)
+- either wrap this around editTreeSimpler or write a new editTree that has the call signature with down, up
+
+## filter?
+
+filter tree nodes...
+
+## ideas
+
+- path down, event up
+
+## Bonux: Generating dependency graph
+
+```sh
+depcruise --exclude "node_modules" --output-type dot . | dot -T svg > dependencygraph3.svg
+```
+
+https://www.netlify.com/blog/2018/08/23/how-to-easily-visualize-a-projects-dependency-graph-with-dependency-cruiser/
 
 ## Bonus: Rhythmical > d3-hierarchy
 
@@ -609,4 +832,10 @@ export function r2d3<T>(rhythm: RhythmNode<T>, mapFn?) {
 - https://github.com/syntax-tree/unist
 - https://astexplorer.net/
 - https://github.com/vtrushin/json-to-ast => inspiration for rhythmical DSL
+
   - maybe add rhythmical DSL to astexplorer when done? ..
+
+- branch and bound
+- minimax
+- alpha beta pruning
+- anytime algorithm

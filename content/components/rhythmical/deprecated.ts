@@ -224,3 +224,36 @@ export function groupPlugins<S>(plugins: HierarchyReducerPlugin<S>[] = []): [Sta
 
 // plugins
 
+import { Chord, Note } from '@tonaljs/tonal';
+import { voicingsInRange } from './voicings/voicingsInRange';
+
+export const topNoteSort = (events) => {
+  const lastNote = events[events.length - 1].value; // last voiced note (top note)
+  // calculates the distance between the last note and the given voicings top note
+  const diff = (voicing) => Math.abs(Note.midi(lastNote) - Note.midi(voicing[voicing.length - 1]));
+  // sort voicings by lowest top note difference
+  return (a, b) => diff(a) - diff(b);
+}
+
+export const voicings = (dictionary, range, sorter = topNoteSort) => (events, event) => {
+  if (typeof event.value !== 'string') {
+    return events
+  }
+  let voicings = voicingsInRange(event.value, dictionary, range);
+  const { tonic, aliases } = Chord.get(event.value);
+  const symbol = Object.keys(dictionary).find(_symbol => aliases.includes(_symbol));
+  if (!symbol) {
+    console.log(`no voicings found for chord "${event.value}"`);
+    return events;
+  }
+  let notes;
+  const lastVoiced = events.filter(e => !!e.chord);
+  if (!lastVoiced.length) {
+    notes = voicings[Math.ceil(voicings.length / 2)];
+  } else {
+    // calculates the distance between the last note and the given voicings top note
+    // sort voicings with differ
+    notes = voicings.sort(sorter(lastVoiced))[0];
+  }
+  return events.concat(notes.map((note) => ({ ...event, value: note, chord: event.value })));
+}

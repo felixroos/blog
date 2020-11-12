@@ -19,6 +19,10 @@ export function rhythmEvents<T>(rhythm: RhythmNode<T>): RhythmEvent<T>[] {
   return events;
 }
 
+// TOTRY: actually use this function with player
+// problems: impure before / after
+// TOTRY: use editTree instead of visitTree and pull path, events and rhythm into one object that is modified
+
 // other function with similar purpose
 
 // - renderEvents of RhythmZipper

@@ -11,3 +11,7 @@ export function visitTree<T>(
   getChildren(tree)?.forEach((child, i, a) => visitTree(child, before, after, getChildren, i, a, tree));
   after(tree, index, siblings, parent)
 }
+
+// used by rhythmEvents
+// problems: read only
+// TOTRY: implement rhythmEvents with editTree, without editing anything

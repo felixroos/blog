@@ -1,6 +1,7 @@
 import { Chord, Note } from '@tonaljs/tonal';
+import { topNoteSort } from '../rhythmical/deprecated';
 import { ValueChild } from '../rhythmical/helpers/objects';
-import { voicingsInRange, topNoteSort } from '../rhythmical/dictionary/voicings';
+import { voicingsInRange } from '../rhythmical/voicings/voicingsInRange';
 
 export const lefthandBad = {
   "m7": ['3m 5P 7m 9M', '-2M 2M 3m 5P', '7m 9M 10m 12P'],

@@ -1,6 +1,6 @@
 import { curry } from 'ramda';
-import { editLeaf, walkRhythmLeafs } from '../RhythmZipper';
 import { Note } from '@tonaljs/tonal';
+import { editLeaf, walkRhythmLeafs } from '../tree/RhythmZipper';
 
 
 export const transpose = curry((interval, rhythm) => walkRhythmLeafs(

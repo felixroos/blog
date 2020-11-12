@@ -1,8 +1,8 @@
 import { Range, Note } from '@tonaljs/tonal';
-import { enharmonicEquivalent } from '../rhythmical/dictionary/voicings';
 import { flatObject } from '../rhythmical/helpers/objects';
 import { mean, sum } from 'd3-array';
 import { interpolateWarm, interpolateSinebow } from 'd3-scale-chromatic';
+import { enharmonicEquivalent } from '../rhythmical/voicings/enharmonicEquivalent';
 
 export function pitchPermutation(pitches, path = []) {
   if (!pitches.length) {

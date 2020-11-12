@@ -1,3 +1,4 @@
+import React from 'react';
 import Fab from '@material-ui/core/Fab';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import StopIcon from '@material-ui/icons/Stop';

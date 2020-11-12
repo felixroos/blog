@@ -1,0 +1,43 @@
+# Hello
+
+---
+
+## This is my deck
+
+to start, run
+
+```sh
+npx mdx-deck static/decks/test.mdx
+```
+
+---
+
+import Player from '../../content/components/rhythmical/components/Player.tsx';
+import tinypiano from '../../content/instruments/tinypiano.ts';
+import { renderRhythmObject } from '../../content/components/rhythmical/rhythmical.ts';
+import { tieReducer } from '../../content/components/rhythmical/reducers.ts';
+import { voicingReducer } from '../../content/components/voicing-permutation/old.ts';
+import { lefthand } from '../../content/components/rhythmical/voicings/dictionary.ts';
+
+## Component Test
+
+<Player
+  instruments={{ tinypiano }}
+  fold={false}
+  events={renderRhythmObject({
+    duration: 64,
+    sequential: [
+      ['Fm7', 'Bbm7', 'Eb7', 'Ab^7'],
+      ['Db^7', ['Dm7', 'G7'], 'C^7', '_'],
+      ['Cm7', 'Fm7', 'Bb7', 'Eb^7'],
+      ['Ab^7', ['Am7', 'D7'], 'G^7', '_'],
+      ['Am7', 'D7', 'G^7', '_'],
+      ['F#m7b5', 'B7b9', 'E^7', 'C7b13'],
+      ['Fm7', 'Bbm7', 'Eb7', 'Ab^7'],
+      ['Db^7', 'DbmM7', 'Cm7', 'Bo7'],
+      ['Bbm7', 'Eb7', 'Ab^7', ['Gm7b5', 'C7b9']],
+    ],
+  })
+    .reduce(tieReducer(), [])
+    .reduce(voicingReducer(lefthand, ['G3', 'G5']), [])}
+/>

@@ -12,10 +12,8 @@ import {
 import { tieReducer } from '../components/rhythmical/reducers.ts';
 import { renderRhythmObject } from '../components/rhythmical/rhythmical.ts';
 import { inheritProperty } from '../components/rhythmical/features/inherit.ts';
-import {
-  lefthand,
-  voicingsInRange
-} from '../components/rhythmical/dictionary/voicings.ts';
+import { voicingsInRange } from '../components/rhythmical/voicings/voicingsInRange.ts';
+import { lefthand } from '../components/rhythmical/voicings/dictionary.ts';
 import Player from '../components/rhythmical/components/Player.tsx';
 import tinypiano from '../instruments/tinypiano.ts';
 import { interpolateWarm } from 'd3-scale-chromatic';

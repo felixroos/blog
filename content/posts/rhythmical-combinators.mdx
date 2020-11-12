@@ -1,0 +1,15 @@
+---
+title: Rhythmical Mutations
+date: 2020-11-08
+---
+
+```js
+expect(combineLeft([1, 2, 3], [4, 5], (a, b) => a + b)).toEqual([5, [6, 7], 8]);
+expect(combineRight([1, 2, 3], [4, 5], (a, b) => a + b)).toEqual([
+  [{ value: 5, duration: 2 }, 6],
+  [7, { value: 8, duration: 2 }],
+]); // uses gKV = 6
+// https://github.com/yaxu/nime20/blob/master/pattern.pdf
+// https://slab.org/nime-algorithmic-pattern/
+expect(combineLeft([0, 1, 0, 1], ['C', 'G'], (a, b) => (a ? b : 'r'))).toEqual(['r', 'C', 'r', 'G']);
+```

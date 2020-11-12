@@ -1,3 +1,5 @@
+- https://bspaans.github.io/python-mingus/index.html (python)
+- https://github.com/nolanlawson/chord-magic (not many chords..)
 - https://www.musicprocessing.net/
 
 - https://www.hackster.io/Netcamprojects/arduino-powered-player-pianos-and-player-xylophones-d4e36d- https://under-construction.club/

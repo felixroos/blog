@@ -1,5 +1,5 @@
-import { voicingsInRange } from '../dictionary/voicings';
 import { Note } from '@tonaljs/tonal';
+import { voicingsInRange } from '../voicings/voicingsInRange';
 
 export const chords = ({ dictionary, range }) => ({ child, isLeaf, props, parent }) => {
   if (!isLeaf || parent.chord || child.plugin !== 'chords') { // prevent infinite loop

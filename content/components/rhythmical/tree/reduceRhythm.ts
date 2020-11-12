@@ -13,20 +13,15 @@ declare interface RhythmShovel<T> {
 
 declare type RhythmicalPlugin<T> = [
   StateDigger<RhythmShovel<T>>, // resolves children states
-  StateMutator<RhythmShovel<T>>, // runs on each state before accessing children
+  StateReducer<RhythmShovel<T>>, // runs on each state before accessing children
   StateReducer<RhythmShovel<T>>, // runs on each child state before going deeper
-  StateReducer<RhythmShovel<T>>,
 ]
 
 const rhythmicalBase: RhythmicalPlugin<string> = [
   function dig({ node, ...state }) {
     return getRhythmChildren(node)?.map(child => ({ ...state, node: child }));
   },
-  function mutate(state) {
-    // here we can modify the current state to e.g. generate children
-    return state;
-  },
-  function before(parentState, childState, index, childStates) {
+  function before(childState, parentState, brokeredState, index, childStates) {
     // this function runs before the child has been processed
     // => here we can pass data down to the children
     let { node: parent, events, path } = parentState;
@@ -40,7 +35,7 @@ const rhythmicalBase: RhythmicalPlugin<string> = [
       ])
     };
   },
-  function after(parentState, childState) {
+  function after(childState, parentState) {
     // this function runs after the child has been processed
     // => here the child already ran through "before" + "mutate"
     let { events, node, path } = childState;
@@ -54,14 +49,12 @@ const rhythmicalBase: RhythmicalPlugin<string> = [
   }
 ]
 
+// THIS IS CURRENTLY UNTESTED! JUST FIXED THE TYPINGS SO FAR
 
-
-export function digRhythm(tree: RhythmNode<string>, edit?: StateMutator<RhythmShovel<string>>) {
-  const [digger, mutate, before, after] = rhythmicalBase;
-
-  return reduceHierarchy<RhythmShovel<string>>(
+export function digRhythm(tree: RhythmNode<string>, edit?: any[]) {
+  const [digger, before, after] = rhythmicalBase;
+  const { events } = reduceHierarchy<RhythmShovel<string>>(
     digger,
-    edit || mutate,
     before,
     after,
     {
@@ -69,5 +62,6 @@ export function digRhythm(tree: RhythmNode<string>, edit?: StateMutator<RhythmSh
       events: [],
       path: [rhythmFraction(tree)] // start with root fraction = [0,duration,1]
     }
-  ).events
+  )
+  return events;
 }

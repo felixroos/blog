@@ -15,27 +15,27 @@ import {
   parseTransitions,
   includesTransitions,
   averageRegularity,
-  unique
+  unique,
 } from './analytics';
 import DynamicTable, { sortString } from '../common/DynamicTable';
 
 const songFields = [
   {
     property: 'title',
-    sort: sortString
+    sort: sortString,
   },
   {
     property: 'composer',
-    sort: sortString
+    sort: sortString,
   },
   {
     property: 'key',
-    sort: sortString
+    sort: sortString,
   },
   {
     property: 'style',
-    sort: sortString
-  }
+    sort: sortString,
+  },
 ];
 
 function scaleValue(value: number, start: number, end: number) {
@@ -49,7 +49,7 @@ const regularityField = (start?, end?) => ({
   property: 'regularity',
   display: (v) => `${Math.round(scaleValue(v, start, end) * 10000) / 100}%`,
   sort: (a, b) => b - a,
-  defaultOrder: 'desc'
+  defaultOrder: 'desc',
 });
 
 export function RealReader({ url }) {
@@ -151,7 +151,7 @@ export function RealPlaylist({ url, onChange }) {
             style={{ width: '100%' }}
             value={songIndex}
             SelectProps={{
-              native: true
+              native: true,
             }}
             onChange={(e) => setSongIndex(parseInt(e.currentTarget.value))}
           >
@@ -184,16 +184,11 @@ export function RealRanking(props) {
     setRanking(c);
   }
   const properties = ['composer', 'style', 'key'];
-  const filteredSongs = songs.filter(({ [property]: prop }) =>
-    selected.includes(prop)
-  );
+  const filteredSongs = songs.filter(({ [property]: prop }) => selected.includes(prop));
   return (
     <>
       <h3>top {property} ranking</h3>
-      <RealSongs
-        url={props.url}
-        onChange={(list) => handleChange(list.songs)}
-      />
+      <RealSongs url={props.url} onChange={(list) => handleChange(list.songs)} />
       <TextField
         variant="filled"
         select
@@ -201,7 +196,7 @@ export function RealRanking(props) {
         style={{ width: '100%' }}
         value={property}
         SelectProps={{
-          native: true
+          native: true,
         }}
         onChange={(e) => {
           handleChange(songs, e.currentTarget.value);
@@ -222,22 +217,12 @@ export function RealRanking(props) {
               id: value,
               selected: selected.includes(value),
               onClick: () =>
-                setSelected(
-                  selected.includes(value)
-                    ? selected.filter((s) => s !== value)
-                    : selected.concat([value])
-                )
-            }))
+                setSelected(selected.includes(value) ? selected.filter((s) => s !== value) : selected.concat([value])),
+            })),
           });
         }}
       />
-      {!!selected.length && (
-        <DynamicTable
-          orderedBy="title"
-          cols={songFields}
-          rows={filteredSongs}
-        />
-      )}
+      {!!selected.length && <DynamicTable orderedBy="title" cols={songFields} rows={filteredSongs} />}
     </>
   );
 }
@@ -249,23 +234,23 @@ export function RealChords(props) {
   const [normalize, setNormalize] = useState(true);
   const [selected, setSelected] = useState([]);
   useEffect(() => {
-    setChords(parseChords(songs, relative).slice(0, 45));
+    const _chords = parseChords(songs, relative);
+    console.log('chords', _chords);
+    setChords(_chords.slice(0, 45));
   }, [songs, relative]);
   let [start, end] = [Infinity, 0];
-  const filteredSongs = songs
-    .filter(includesChords(selected, relative))
-    .map((song) => {
-      const regularity = averageRegularity(
-        parseChords([song], relative).map((t) => t.value),
-        chords
-      );
-      start = start < regularity ? start : regularity;
-      end = end > regularity ? end : regularity;
-      return {
-        ...song,
-        regularity
-      };
-    });
+  const filteredSongs = songs.filter(includesChords(selected, relative)).map((song) => {
+    const regularity = averageRegularity(
+      parseChords([song], relative).map((t) => t.value),
+      chords
+    );
+    start = start < regularity ? start : regularity;
+    end = end > regularity ? end : regularity;
+    return {
+      ...song,
+      regularity,
+    };
+  });
   if (!normalize) {
     start = undefined;
     end = undefined;
@@ -283,30 +268,18 @@ export function RealChords(props) {
               id: value,
               selected: selected.includes(value),
               onClick: () =>
-                setSelected(
-                  selected.includes(value)
-                    ? selected.filter((s) => s !== value)
-                    : selected.concat([value])
-                )
-            }))
+                setSelected(selected.includes(value) ? selected.filter((s) => s !== value) : selected.concat([value])),
+            })),
           });
         }}
       />
       <div style={{ float: 'right' }}>
         <label>
-          <input
-            type="checkbox"
-            checked={normalize}
-            onChange={(e) => setNormalize(e.target.checked)}
-          />
+          <input type="checkbox" checked={normalize} onChange={(e) => setNormalize(e.target.checked)} />
           Normalize
         </label>
         <label>
-          <input
-            type="checkbox"
-            checked={relative}
-            onChange={(e) => setRelative(e.target.checked)}
-          />
+          <input type="checkbox" checked={relative} onChange={(e) => setRelative(e.target.checked)} />
           Relative
         </label>
       </div>
@@ -333,20 +306,18 @@ export function RealTransitions(props) {
     setTransitions(t);
   }, [songs, relative]);
   let [start, end] = [Infinity, 0];
-  const filteredSongs = songs
-    .filter(includesTransitions(selected, relative))
-    .map((song) => {
-      const regularity = averageRegularity(
-        parseTransitions([song], relative).map((t) => t.value),
-        transitions
-      );
-      start = start < regularity ? start : regularity;
-      end = end > regularity ? end : regularity;
-      return {
-        ...song,
-        regularity
-      };
-    });
+  const filteredSongs = songs.filter(includesTransitions(selected, relative)).map((song) => {
+    const regularity = averageRegularity(
+      parseTransitions([song], relative).map((t) => t.value),
+      transitions
+    );
+    start = start < regularity ? start : regularity;
+    end = end > regularity ? end : regularity;
+    return {
+      ...song,
+      regularity,
+    };
+  });
   if (!normalize) {
     start = undefined;
     end = undefined;
@@ -363,30 +334,18 @@ export function RealTransitions(props) {
               id: value,
               selected: selected.includes(value),
               onClick: () =>
-                setSelected(
-                  selected.includes(value)
-                    ? selected.filter((s) => s !== value)
-                    : selected.concat([value])
-                )
-            }))
+                setSelected(selected.includes(value) ? selected.filter((s) => s !== value) : selected.concat([value])),
+            })),
           });
         }}
       />
       <div style={{ float: 'right' }}>
         <label>
-          <input
-            type="checkbox"
-            checked={normalize}
-            onChange={(e) => setNormalize(e.target.checked)}
-          />
+          <input type="checkbox" checked={normalize} onChange={(e) => setNormalize(e.target.checked)} />
           Normalize
         </label>
         <label>
-          <input
-            type="checkbox"
-            checked={relative}
-            onChange={(e) => setRelative(e.target.checked)}
-          />
+          <input type="checkbox" checked={relative} onChange={(e) => setRelative(e.target.checked)} />
           Relative
         </label>
       </div>
@@ -415,14 +374,14 @@ export function RealDiversity(props) {
             {
               property: 'uniqueChords',
               sort: (a, b) => a - b,
-              defaultOrder: 'asc'
+              defaultOrder: 'asc',
             },
-            ...songFields
+            ...songFields,
           ]}
           rows={songs
             .map((song) => ({
               ...song,
-              uniqueChords: unique(song.music.measures.flat()).length
+              uniqueChords: unique(song.music.measures.flat()).length,
             }))
             .sort((a, b) => b.uniqueChords - a.uniqueChords)}
         />
