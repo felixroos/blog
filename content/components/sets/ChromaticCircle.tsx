@@ -1,0 +1,13 @@
+import React from 'react';
+import ConnectedCircle from '../common/ConnectedCircle';
+import getNodes from './getNodes';
+import { Range } from '@tonaljs/tonal';
+
+export default function ChromaticCircle({ pitches,tonic, ...props }) {
+  const notes = Range.chromatic(['C3', 'B3']);
+  return (
+    <div>
+      <ConnectedCircle nodes={getNodes(notes, pitches,tonic)} links={[]} r={120} {...props} />
+    </div>
+  );
+}

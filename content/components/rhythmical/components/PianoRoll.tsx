@@ -1,3 +1,5 @@
+// TODO: add scale fold like here https://youtu.be/A1yY_BXq7bQ?t=488
+
 import React from 'react';
 import { Note, Range } from '@tonaljs/tonal';
 import { scaleLinear } from 'd3-scale';

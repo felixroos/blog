@@ -7,7 +7,7 @@ import { Voicing } from '../../../content/drafts/voicing/Voicing';
 import Keyboard from '../../../content/components/Keyboard';
 const { PolySynth, Synth } = Tone;
 const isBrowser = typeof window !== 'undefined';
-const poly = isBrowser && new PolySynth(6, Synth, { volume: -12 }).toMaster();
+const poly = isBrowser && new PolySynth(32, Synth, { volume: -12 }).toMaster();
 import DynamicTable from '../../../content/components/common/DynamicTable';
 import { min, max } from 'd3-array';
 import Layout from '../Layout';

@@ -1,5 +1,247 @@
 # Key Detection
 
+## UPDATE
+
+RunJS:
+
+```js
+import { Chord, Scale, Collection, Note } from '@tonaljs/tonal';
+
+const chords = [
+  'Fm7',
+  'Bbm7',
+  'Eb7',
+  'Ab^7',
+  'Db^7',
+  'Dm7',
+  'G7',
+  'C^7',
+  'Cm7',
+  'Fm7',
+  'Bb7',
+  'Eb^7',
+  'Ab^7',
+  'Am7',
+  'D7',
+  'G^7',
+  'Am7',
+  'D7',
+  'G^7',
+  'F#m7b5',
+  'B7b9',
+  'E^7',
+  'C7b13',
+  'Fm7',
+  'Bbm7',
+  'Eb7',
+  'Ab^7',
+  'Db^7',
+  'DbmM7',
+  'Cm7',
+  'Bo7',
+  'Bbm7',
+  'Eb7',
+  'Ab^7',
+  'Gm7b5',
+  'C7b9',
+];
+
+const oneOfModes = (families) => (scale) =>
+  families.map((f) => Scale.get(f).normalized).includes(Scale.get(scale).normalized);
+
+const toDec = (binary) => parseInt(binary, 2);
+const scaleChroma = (root, scale) => Collection.rotate(-Note.chroma(root), Scale.get(scale).chroma.split('')).join('');
+const scaleDec = (root, scale) => toDec(scaleChroma(root, scale));
+
+function possibleChromas(chords, scaleFamilies) {
+  return chords.map(
+    (chord) =>
+      (Chord.chordScales(chord) || [])
+        .filter(oneOfModes(scaleFamilies))
+        .map((scale) => scaleDec(Chord.tokenize(chord)[0], scale))
+    //.map((scale) => `${Chord.tokenize(chord)[0]} ${scale}`) // for debugging, instead of scaleDec above
+  );
+}
+
+possibleChromas(chords, ['major']);
+```
+
+yields:
+
+```json
+[
+  [3434, 3418, 2906],
+  [1387, 3434, 3418],
+  [3418],
+  [2906, 3418],
+  [3418, 3434],
+  [2902, 2774, 2773],
+  [2773],
+  [2741, 2773],
+  [3418, 2906, 2902],
+  [3434, 3418, 2906],
+  [2906],
+  [2902, 2906],
+  [2906, 3418],
+  [2774, 2773, 2741],
+  [2741],
+  [1717, 2741],
+  [2774, 2773, 2741],
+  [2741],
+  [1717, 2741],
+  [2741],
+  [],
+  [1451, 1453],
+  [],
+  [3434, 3418, 2906],
+  [1387, 3434, 3418],
+  [3418],
+  [2906, 3418],
+  [3418, 3434],
+  [],
+  [3418, 2906, 2902],
+  [],
+  [1387, 3434, 3418],
+  [3418],
+  [2906, 3418],
+  [3418],
+  []
+]
+```
+
+which equals
+
+```json
+[
+  ["F phrygian", "F aeolian", "F dorian"],
+  ["Bb phrygian", "Bb aeolian", "Bb dorian"],
+  ["Eb mixolydian"],
+  ["Ab lydian", "Ab major"],
+  ["Db lydian", "Db major"],
+  ["D phrygian", "D aeolian", "D dorian"],
+  ["G mixolydian"],
+  ["C lydian", "C major"],
+  ["C phrygian", "C aeolian", "C dorian"],
+  ["F phrygian", "F aeolian", "F dorian"],
+  ["Bb mixolydian"],
+  ["Eb lydian", "Eb major"],
+  ["Ab lydian", "Ab major"],
+  ["A phrygian", "A aeolian", "A dorian"],
+  ["D mixolydian"],
+  ["G lydian", "G major"],
+  ["A phrygian", "A aeolian", "A dorian"],
+  ["D mixolydian"],
+  ["G lydian", "G major"],
+  ["F# locrian"],
+  [],
+  ["E lydian", "E major"],
+  [],
+  ["F phrygian", "F aeolian", "F dorian"],
+  ["Bb phrygian", "Bb aeolian", "Bb dorian"],
+  ["Eb mixolydian"],
+  ["Ab lydian", "Ab major"],
+  ["Db lydian", "Db major"],
+  [],
+  ["C phrygian", "C aeolian", "C dorian"],
+  [],
+  ["Bb phrygian", "Bb aeolian", "Bb dorian"],
+  ["Eb mixolydian"],
+  ["Ab lydian", "Ab major"],
+  ["G locrian"],
+  []
+]
+```
+
+- those scales are possible parent scales for each chord
+- the important question: which are most logical to the ear?
+- idea: scales that "stay the same" are more consonant
+- => traverse from start to finish in a tree like manner, where the number of different scaleDecs is the measurement of success
+
+### More Scales
+
+```js
+possibleChromas(chords, ['major', 'harmonic minor']);
+```
+
+yields:
+
+```json
+[
+  [2905, 2905, 3434, 3418, 2906],
+  [3290, 3290, 1387, 3434, 3418],
+  [1435, 3418],
+  [2906, 3418, 2905],
+  [3418, 3434, 3290],
+  [2765, 2765, 2902, 2774, 2773],
+  [2905, 2773],
+  [2741, 2773, 2485],
+  [2870, 2870, 3418, 2906, 2902],
+  [2905, 2905, 3434, 3418, 2906],
+  [875, 2906],
+  [2902, 2906, 2870],
+  [2906, 3418, 2905],
+  [2485, 2485, 2774, 2773, 2741],
+  [2870, 2741],
+  [1717, 2741, 1715],
+  [2485, 2485, 2774, 2773, 2741],
+  [2870, 2741],
+  [1717, 2741, 1715],
+  [2741, 2485, 3500, 3500],
+  [2485],
+  [1451, 1453, 1435],
+  [3290],
+  [2905, 2905, 3434, 3418, 2906],
+  [3290, 3290, 1387, 3434, 3418],
+  [1435, 3418],
+  [2906, 3418, 2905],
+  [3418, 3434, 3290],
+  [3500, 3290],
+  [2870, 2870, 3418, 2906, 2902],
+  [2905, 2765, 1645, 1645, 875],
+  [3290, 3290, 1387, 3434, 3418],
+  [1435, 3418],
+  [2906, 3418, 2905],
+  [3418, 3290, 1750, 1750],
+  [3290]
+]
+```
+
+## 251
+
+```js
+possibleChromas(['Dm7','G7','C^7'], ['major', 'harmonic minor']);
+/*[
+  [
+    'D romanian minor',
+    'D dorian #4',
+    'D phrygian',
+    'D aeolian',
+    'D dorian'
+  ],
+  [ 'G phrygian dominant', 'G mixolydian' ],
+  [ 'C lydian', 'C major', 'C lydian #9' ]
+]*/
+```
+
+## Possible Solutions
+
+```js
+possibleChromas(['Dm7', 'G7', 'C^7'], ['major', 'harmonic minor']).reduce(
+  (paths, scales) => paths * (scales.length || 1),
+  1
+);
+// 30
+```
+
+```js
+possibleChromas(chords, ['major', 'harmonic minor']).reduce((paths, scales) => paths * (scales.length || 1), 1);
+// 177147000000000000
+```
+
+as we see with all the things, 177147000000000000 is quite a number.. We have to cut some tree branches..
+
+## OLDER:
+
 import Player from '../../components/rhythmical/components/Player.tsx';
 import { renderRhythmObject } from '../../components/rhythmical/rhythmical.ts';
 import { tieReducer } from '../../components/rhythmical/reducers.ts';
@@ -20,8 +262,8 @@ Lets say we have chords
       ['F#m7b5', 'B7b9', 'E^7', 'C7b13'],
       ['Fm7', 'Bbm7', 'Eb7', 'Ab^7'],
       ['Db^7', 'DbmM7', 'Cm7', 'Bo7'],
-      ['Bbm7', 'Eb7', 'Ab^7', ['Gm7b5', 'C7b9']]
-    ]
+      ['Bbm7', 'Eb7', 'Ab^7', ['Gm7b5', 'C7b9']],
+    ],
   })
     .reduce(tieReducer(), [])
     .reduce(voicingReducer(lefthand, ['G3', 'G5']), [])}
@@ -39,8 +281,8 @@ renderRhythmObject({
     ['F#m7b5', 'B7b9', 'E^7', 'C7b13'],
     ['Fm7', 'Bbm7', 'Eb7', 'Ab^7'],
     ['Db^7', 'DbmM7', 'Cm7', 'Bo7'],
-    ['Bbm7', 'Eb7', 'Ab^7', ['Gm7b5', 'C7b9']]
-  ]
+    ['Bbm7', 'Eb7', 'Ab^7', ['Gm7b5', 'C7b9']],
+  ],
 });
 ```
 
@@ -59,14 +301,14 @@ the first 8 rendered events, before any reducers are applied, look like this:
         ['F#m7b5', 'B7b9', 'E^7', 'C7b13'],
         ['Fm7', 'Bbm7', 'Eb7', 'Ab^7'],
         ['Db^7', 'DbmM7', 'Cm7', 'Bo7'],
-        ['Bbm7', 'Eb7', 'Ab^7', ['Gm7b5', 'C7b9']]
-      ]
+        ['Bbm7', 'Eb7', 'Ab^7', ['Gm7b5', 'C7b9']],
+      ],
     })
       .map((e) =>
         Object.entries(e).reduce(
           (o, [key, value]) => ({
             ...o,
-            ...(key !== 'path' ? { [key]: value } : {})
+            ...(key !== 'path' ? { [key]: value } : {}),
           }),
           {}
         )
@@ -128,48 +370,48 @@ We could repeat this for each chord, creating a scale map:
     // Fm7 scales with reach (including Fm7 itself)
     ['Ab major', 0, 5], //Ab major last 5 chords, starting here (0)
     ['Db major', 0, 2],
-    ['Eb major', 0, 1]
+    ['Eb major', 0, 1],
   ],
   [
     // Bbm7 scales
     ['Ab major', 1, 5], //Ab major lasts 5 chords, started last chord (1)
     ['Db major', 1, 2],
-    ['Gb major', 0, 1]
+    ['Gb major', 0, 1],
   ],
   [
     // Eb7 scales
-    ['Ab major', 2, 5] //this is chord 3/5 for Ab major
+    ['Ab major', 2, 5], //this is chord 3/5 for Ab major
   ],
   [
     // Ab^7
     ['Ab major', 3, 5], //this is chord 4/5 for Ab major
-    ['Eb major', 0, 1]
+    ['Eb major', 0, 1],
   ],
   [
     // Db^7
     ['Ab major', 4, 5], //this is the last Ab major chord
-    ['Db major', 0, 1]
+    ['Db major', 0, 1],
   ],
   [
     // Dm7
     ['C major', 0, 4], // c major starts now
     ['Bb major', 0, 1],
-    ['F major', 0, 1]
+    ['F major', 0, 1],
   ],
   [
     // G7
-    ['C major', -1, 4]
+    ['C major', -1, 4],
   ],
   [
     // C^7
     ['C major', -2, 4],
-    ['G major', 0, 1]
+    ['G major', 0, 1],
   ],
   [
     // C^7 again
     ['C major', -2, 4],
-    ['G major', 0, 1]
-  ]
+    ['G major', 0, 1],
+  ],
 ];
 ```
 
@@ -217,9 +459,7 @@ const scales = chords.forEach((chordScales, i) => {
   // fill2D('yellow', 0, [['red','yellow'],['blue','yellow'],['blue','yellow']]) => [0,3]
   // fill2D('yellow', 2, [['red','yellow'],['blue','yellow'],['blue','yellow']]) => [0,3]
 
-  const reaches = chordScales
-    .map(fill2D(chordScale, i, chordScales))
-    .map(([start, size], i) => [chordScales[i], size]);
+  const reaches = chordScales.map(fill2D(chordScale, i, chordScales)).map(([start, size], i) => [chordScales[i], size]);
   return Object.sort(([i, a], [j, b]) => b - a)[0][0];
   // [['Ab major', 4], ['Eb major', 1], ['Db major', 0], ['C harmonic minor', 0]]
 });

@@ -38,21 +38,6 @@ export function circle(rotation = 0) {
   );
 }
 
-export function harmonicDegree(pitch, rotate = 0.55, flip = true) {
-  const chroma = Note.chroma(pitch);
-  const circleChromas = Array.from({ length: 12 }, (_, i) => (i * 5) % 12);
-  const deg = (circleChromas.indexOf(chroma) / 12 + rotate) % 1;
-  if (flip) {
-    return 1 - deg;
-  }
-  return deg;
-}
-
-export function averageDegree(pitches, rotate, flip) {
-  return pitches.map(pitch => harmonicDegree(pitch, rotate, flip))
-    .reduce((sum, degree) => sum + degree, 0) / pitches.length;
-}
-
 export function harmonicChroma(notes) {
   const chromas = notes.map(note => Note.chroma(note));
   // const circleChromas = circle().map(note => Note.chroma(note));

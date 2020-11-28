@@ -1,0 +1,16 @@
+import PitchSpectrum from '../components/tuning/PitchSpectrum.tsx';
+
+### Why fifths?
+
+The lesser fifths it takes to get from one pitch to another, the more consonant they sound together.
+The reason lies in the overtone series, as the fifth is the first interval that is not an octave, which leads to more common overtones than any other interval.
+
+<PitchSpectrum frequencies={Array.from({ length: 16 }, (_, i) => 440 * (i + 1))} min={440} max={440 * 16} />
+<br />
+<PitchSpectrum frequencies={Array.from({ length: 16 }, (_, i) => 660 * (i + 1))} min={440} max={440 * 16} />
+<br />
+<PitchSpectrum frequencies={Array.from({ length: 16 }, (_, i) => 990 * (i + 1))} min={440} max={440 * 16} />
+
+The three strips above represent the first 16 overtones of A (440Hz - 7040Hz) compared to the overtones of E (660Hz) and B (990Hz) in that range.
+Using this visualization, we can see which overtones line up and which don't.
+E has 5/16 common tones with A, while B only has 1. This shows that the common overtones decrease as we move away in fifths.

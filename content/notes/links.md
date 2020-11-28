@@ -1,3 +1,15 @@
+- https://github.com/yaxu/feedforward
+- https://music.stackexchange.com/questions/17571/how-to-determine-the-name-of-a-chord-from-knowing-the-notes-i-am-playing/17572#17572
+- https://www.npmjs.com/package/bb-chord-symbol !!!!!
+- https://github.com/no-chris/chord-symbol !!
+  - https://chord-symbol.netlify.app/
+- https://github.com/larsenwork/monomusic
+- https://github.com/jutunen/custom-piano-keys
+- https://sema.codes/
+- https://casfaculty.case.edu/ross-duffin/just-intonation-in-renaissance-theory-practice/introduction/
+
+- https://github.com/g-roma/freesound.js also part of gibber.cc (cool samples)
+- https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-s095-programming-for-the-puzzled-january-iap-2018/ (python)
 - https://bspaans.github.io/python-mingus/index.html (python)
 - https://github.com/nolanlawson/chord-magic (not many chords..)
 - https://www.musicprocessing.net/
