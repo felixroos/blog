@@ -31,6 +31,7 @@ export default function ConnectedCircle({
   links,
   sets,
   size,
+  margin,
   r,
   nodeRadius,
   onClick,
@@ -43,6 +44,7 @@ export default function ConnectedCircle({
   r: number;
   nodeRadius?: number;
   size?: number;
+  margin?: number;
   fontSize?: number;
   onClick?: (item: { link?: Link<any>; set?: Set; node?: Node }) => void;
   onHover?: (item: { link?: Link<any>; set?: Set; node?: Node }) => void;
@@ -52,8 +54,8 @@ export default function ConnectedCircle({
   const radius = r || 100;
   const maxDistance = max(nodes.map((n) => n.distance).concat([radius]));
   const maxRadius = max(nodes.map((n) => n.radius).concat([nodeRadius]));
-  size = size || maxDistance * 2 + maxRadius * 2;
-
+  margin = margin || 0;
+  size = size || maxDistance * 2 + maxRadius * 2 + margin * 2;
   function nodePosition(id: NodeIdentifier, r?: number): [number, number] {
     const node = nodes.find(({ id: _id }) => _id === id);
     if (!node) {
@@ -62,7 +64,7 @@ export default function ConnectedCircle({
     }
     const distance = r || node?.distance || radius;
     const value = typeof node.value !== 'undefined' ? node.value : nodes.indexOf(node) / nodes.length;
-    const [x, y] = circlePosition(value, distance);
+    const [x, y] = circlePosition(value, distance, margin);
     return [x + nodeRadius + maxDistance - distance, y + nodeRadius + maxDistance - distance];
   }
 
@@ -156,9 +158,9 @@ export default function ConnectedCircle({
   );
 }
 
-export function circlePosition(fraction, radius): [number, number] {
+export function circlePosition(fraction, radius, margin = 0): [number, number] {
   return [
-    /* Math.round( */ radius + Math.sin(fraction * Math.PI * 2) * radius /* ) */,
-    /* Math.round( */ radius - Math.cos(fraction * Math.PI * 2) * radius /* ) */,
+    /* Math.round( */ radius + Math.sin(fraction * Math.PI * 2) * radius + margin /* ) */,
+    /* Math.round( */ radius - Math.cos(fraction * Math.PI * 2) * radius + margin /* ) */,
   ];
 }

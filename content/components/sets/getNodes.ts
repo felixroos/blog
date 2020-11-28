@@ -3,7 +3,7 @@ import { interpolateRainbow } from 'd3-scale-chromatic';
 import { TinyColor } from '@ctrl/tinycolor';
 
 export default function getNodes(notes, pitches = [], tonic?) {
-  const stroke = 'red';
+  const stroke = 'steelblue';
   const strokeWidth = 3;
   const t = pitches.indexOf(pitches.find(n => Note.get(n).chroma === Note.get(tonic).chroma));
   const absoluteColor = (i, match) => new TinyColor(interpolateRainbow(((i + 3) % notes.length) / notes.length)).lighten(20).toHexString()

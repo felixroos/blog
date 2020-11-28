@@ -13,6 +13,7 @@ import { State } from 'react-powerplug';
 import rotateScale from '../components/sets/rotateScale.ts';
 import rotateTonic from '../components/sets/rotateTonic.ts';
 import transposeScale from '../components/sets/transposeScale.ts';
+import simplifyScale from '../components/sets/simplifyScale.ts';
 
 export const oneOfModes = (families) => (scale) =>
   families.map((f) => Scale.get(f).normalized).includes(Scale.get(scale).normalized);
@@ -34,49 +35,41 @@ There are (at least) two ways we can represent 12 notes in a circle:
     const set = scale.notes.concat([tonic]).map((pc) => Note.get(pc).chroma);
     const pcset = PcSet.get(scale.notes);
     const scales = scaleModes('major').sort(byCenter);
+    const setScale = (scale) => setState({ scale: simplifyScale(scale || state.scale) });
     return (
       <>
-        <Grid spacing={0} container style={{ width: '100%' }} alignItems="center">
-          <Grid item xs={6}>
-            <HarmonicCircle sets={[{ stroke: 'steelblue', set }]} pitches={scale.notes} tonic={scale.tonic} />
-            <p>
-              Circle of Fifths
-              <Button
-                color="primary"
-                onClick={() => setState({ scale: rotateScale(-4, state.scale, scales) || state.scale })}
-              >
+        <center>
+          <Grid spacing={0} container style={{ width: '100%' }} alignItems="center">
+            <Grid item xs={6}>
+              <h3>Circle of Fifths</h3>
+              <HarmonicCircle sets={[{ stroke: 'steelblue', set }]} pitches={scale.notes} tonic={scale.tonic} />
+              <Button color="primary" onClick={() => setScale(rotateScale(-4, state.scale, scales))}>
                 rotate scale
               </Button>
-              <Button color="primary" onClick={() => setState({ scale: rotateTonic(4, state.scale, scales) || state.scale })}>
+              <Button color="primary" onClick={() => setScale(rotateTonic(4, state.scale, scales))}>
                 rotate tonic
               </Button>
-              <Button color="primary" onClick={() => setState({ scale: transposeScale(5, state.scale) || state.scale })}>
+              <Button color="primary" onClick={() => setScale(transposeScale(5, state.scale))}>
                 transpose
               </Button>
-            </p>
-          </Grid>
-          <Grid item xs={6}>
-            <ChromaticCircle sets={[{ stroke: 'steelblue', set }]} pitches={scale.notes} tonic={scale.tonic} />
-            <p>
-              Chromatic Circle
-              <Button
-                color="primary"
-                onClick={() => setState({ scale: rotateScale(1, state.scale, scales) || state.scale })}
-              >
+            </Grid>
+            <Grid item xs={6}>
+              <h3>Chromatic Circle</h3>
+              <ChromaticCircle sets={[{ stroke: 'steelblue', set }]} pitches={scale.notes} tonic={scale.tonic} />
+              <Button color="primary" onClick={() => setScale(rotateScale(1, state.scale, scales))}>
                 rotate scale
               </Button>
-              <Button color="primary" onClick={() => setState({ scale: transposeScale(-1, state.scale) || state.scale })}>
+              <Button color="primary" onClick={() => setScale(transposeScale(-1, state.scale))}>
                 transpose
               </Button>
-              <Button color="primary" onClick={() => setState({ scale: rotateTonic(1, state.scale, scales) || state.scale })}>
+              <Button color="primary" onClick={() => setScale(rotateTonic(1, state.scale, scales))}>
                 rotate tonic
               </Button>
-            </p>
+            </Grid>
           </Grid>
-        </Grid>
-        <ScalePicker scale={state.scale} onChange={(scale) => setState({ scale })} scales={scales} /> Chroma: {
-          pcset.chroma
-        } = {pcset.setNum} {/*pcset.normalized*/}
+          <ScalePicker scale={state.scale} onChange={(scale) => setState({ scale })} scales={scales} />
+          <br /> Chroma: {pcset.chroma} = {pcset.setNum} {/*pcset.normalized*/}
+        </center>
       </>
     );
   }}
