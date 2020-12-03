@@ -83,7 +83,7 @@ export default function ConnectedCircle({
         cy={maxDistance + nodeRadius}
         r={radius}
         stroke="gray"
-        strokeWidth={2}
+        strokeWidth={3}
         fill="none"
       />
       {links &&

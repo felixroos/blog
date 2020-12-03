@@ -1,12 +1,11 @@
 import { Collection, Note, Scale } from '@tonaljs/tonal';
+import chromaScale from './chromaScale';
 import rotateChroma from './rotateChroma';
-import scaleChroma from './scaleChroma';
 
-export default (amount, scale, scaleTypes = Scale.names()) => {
+// keep root and scale shape, rotate around root
+export default (n, scale, scaleTypes = Scale.names()) => {
   const { tonic, chroma } = Scale.get(scale);
-  //const rotated = rotateChroma(amount, scaleChroma(scale));
-  const rotatedChroma = rotateChroma(amount, chroma);
+  const rotatedChroma = rotateChroma(n, chroma);
   const rotated = Collection.rotate(12 - Note.get(tonic).chroma, rotatedChroma.split('')).join('');
-  const type = scaleTypes.find((type) => scaleChroma(`${tonic} ${type}`) === rotated);
-  return type ? `${tonic} ${type}` : '';
+  return chromaScale(rotated, tonic, scaleTypes);
 };

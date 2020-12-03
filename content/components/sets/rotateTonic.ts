@@ -1,4 +1,5 @@
 import { Note, Scale } from '@tonaljs/tonal';
+import chromaScale from './chromaScale';
 import scaleChroma from './scaleChroma';
 
 export default (amount, scale, scaleTypes = Scale.names()) => {
@@ -6,6 +7,5 @@ export default (amount, scale, scaleTypes = Scale.names()) => {
   const chroma = scaleChroma(scale);
   const t = notes.indexOf(notes.find(n => Note.get(n).pc === Note.get(tonic).pc));
   const newTonic = notes[(t + amount + notes.length) % notes.length];
-  const type = scaleTypes.find(type => scaleChroma(`${newTonic} ${type}`) === chroma);
-  return `${newTonic} ${type}`;
+  return chromaScale(chroma, newTonic, scaleTypes);
 }

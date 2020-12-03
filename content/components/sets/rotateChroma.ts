@@ -1,8 +1,9 @@
 import { Collection } from '@tonaljs/tonal';
 
-export default function rotateChroma(amount, chroma) {
+// rotate ones so that the nth one is at the start
+export default function rotateChroma(n, chroma) {
   const digits = chroma.split('');
   const ones = digits.reduce((indices, digit, index) => indices.concat(digit === '1' ? [index] : []), []);
-  const rotation = ones[(amount + ones.length) % ones.length];
+  const rotation = ones[(n + ones.length) % ones.length];
   return Collection.rotate(rotation, digits).join('');
 };

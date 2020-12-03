@@ -34,7 +34,7 @@ There are (at least) two ways we can represent 12 notes in a circle:
     const scale = Scale.get(state.scale);
     const set = scale.notes.concat([tonic]).map((pc) => Note.get(pc).chroma);
     const pcset = PcSet.get(scale.notes);
-    const scales = scaleModes('major').sort(byCenter);
+    const scales = scaleModes('major','harmonic minor','melodic minor').sort(byCenter);
     const setScale = (scale) => setState({ scale: simplifyScale(scale || state.scale) });
     return (
       <>
@@ -77,6 +77,21 @@ There are (at least) two ways we can represent 12 notes in a circle:
 
 The blue line connects all pitches that are part of the selected scale. Using those representations, we can build a geometric intuition for musical phenomena.
 In a nutshell, the circle of fifth helps to understand harmonic relationships, while the chromatic circle works better for melodic content.
+
+todo: 
+
+- fix order of rotation (wrong for non diatonic scales)
+- add relative switch => show intervals instead of pitch class names
+- coherent coloring: pitch classes should always have the same color (across both circles)
+- different scale sortings: byScaleNum, byCenter, alphatbetically.
+- two level scale sorting: sort first after number of notes, only if same number after the above
+- show scale properties: chroma, scaleNum, accidentals, related scales, supersets, subsets
+- show nearby scales: 1 altered note (1 added note, 1 removed note => already shown sub/supersets)
+- handle unnamed scales: allow rotation into scales that do not have a name
+- also allow chords + maybe intervals
+- curved lines
+- animation??
+- add hotkeys 1-9 to play steps
 
 ## Chromas & Set Numbers
 

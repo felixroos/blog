@@ -1,4 +1,3 @@
-import { Collection } from '@tonaljs/tonal';
 import rotateChroma from './rotateChroma'
 import scaleChroma from './scaleChroma';
 
