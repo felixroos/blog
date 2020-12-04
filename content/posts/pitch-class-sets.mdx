@@ -8,10 +8,12 @@ import ChromaticCircle from '../components/sets/ChromaticCircle.tsx';
 import HarmonicCircle from '../components/sets/HarmonicCircle.tsx';
 import ScalePicker from '../components/sets/ScalePicker.tsx';
 import Grid from '@material-ui/core/Grid';
+import Switch from '@material-ui/core/Switch';
 import { Scale, Note, Range, PcSet, Chord } from '@tonaljs/tonal';
 import { State } from 'react-powerplug';
-import rotateScale from '../components/sets/rotateScale.ts';
 import rotateTonic from '../components/sets/rotateTonic.ts';
+import rotateMode from '../components/sets/rotateMode';
+import rotateScale from '../components/sets/rotateScale';
 import transposeScale from '../components/sets/transposeScale.ts';
 import simplifyScale from '../components/sets/simplifyScale.ts';
 
@@ -28,13 +30,13 @@ Let's explore the world of pitch class sets.
 
 There are (at least) two ways we can represent 12 notes in a circle:
 
-<State initial={{ scale: 'C major' }}>
+<State initial={{ scale: 'C major', relative: false }}>
   {({ state, setState }) => {
     const tonic = state.scale.split(' ')[0];
     const scale = Scale.get(state.scale);
     const set = scale.notes.concat([tonic]).map((pc) => Note.get(pc).chroma);
     const pcset = PcSet.get(scale.notes);
-    const scales = scaleModes('major','harmonic minor','melodic minor').sort(byCenter);
+    const scales = scaleModes('major').sort(byCenter);
     const setScale = (scale) => setState({ scale: simplifyScale(scale || state.scale) });
     return (
       <>
@@ -42,12 +44,17 @@ There are (at least) two ways we can represent 12 notes in a circle:
           <Grid spacing={0} container style={{ width: '100%' }} alignItems="center">
             <Grid item xs={6}>
               <h3>Circle of Fifths</h3>
-              <HarmonicCircle sets={[{ stroke: 'steelblue', set }]} pitches={scale.notes} tonic={scale.tonic} />
-              <Button color="primary" onClick={() => setScale(rotateScale(-4, state.scale, scales))}>
+              <HarmonicCircle
+                sets={[{ stroke: 'steelblue', set }]}
+                pitches={scale.notes}
+                tonic={scale.tonic}
+                relative={state.relative}
+              />
+              <Button color="primary" onClick={() => setScale(rotateScale(state.scale, 5, scales))}>
                 rotate scale
               </Button>
-              <Button color="primary" onClick={() => setScale(rotateTonic(4, state.scale, scales))}>
-                rotate tonic
+              <Button color="primary" onClick={() => setScale(rotateMode(state.scale, 5, scales))}>
+                rotate mode
               </Button>
               <Button color="primary" onClick={() => setScale(transposeScale(5, state.scale))}>
                 transpose
@@ -55,19 +62,34 @@ There are (at least) two ways we can represent 12 notes in a circle:
             </Grid>
             <Grid item xs={6}>
               <h3>Chromatic Circle</h3>
-              <ChromaticCircle sets={[{ stroke: 'steelblue', set }]} pitches={scale.notes} tonic={scale.tonic} />
-              <Button color="primary" onClick={() => setScale(rotateScale(1, state.scale, scales))}>
+              <ChromaticCircle
+                sets={[{ stroke: 'steelblue', set }]}
+                pitches={scale.notes}
+                tonic={scale.tonic}
+                relative={state.relative}
+              />
+              <Button color="primary" onClick={() => setScale(rotateScale(state.scale, 1, scales))}>
                 rotate scale
+              </Button>
+              <Button color="primary" onClick={() => setScale(rotateMode(state.scale, 1, scales))}>
+                rotate mode
               </Button>
               <Button color="primary" onClick={() => setScale(transposeScale(-1, state.scale))}>
                 transpose
               </Button>
-              <Button color="primary" onClick={() => setScale(rotateTonic(1, state.scale, scales))}>
-                rotate tonic
-              </Button>
             </Grid>
           </Grid>
           <ScalePicker scale={state.scale} onChange={(scale) => setState({ scale })} scales={scales} />
+          <br />
+          <label>
+            absolute
+            <Switch
+              checked={state.relative}
+              color="primary"
+              onChange={(e) => setState({ relative: e.target.checked })}
+            />
+            relative
+          </label>
           <br /> Chroma: {pcset.chroma} = {pcset.setNum} {/*pcset.normalized*/}
         </center>
       </>
@@ -78,11 +100,11 @@ There are (at least) two ways we can represent 12 notes in a circle:
 The blue line connects all pitches that are part of the selected scale. Using those representations, we can build a geometric intuition for musical phenomena.
 In a nutshell, the circle of fifth helps to understand harmonic relationships, while the chromatic circle works better for melodic content.
 
-todo: 
+todo:
 
-- fix order of rotation (wrong for non diatonic scales)
-- add relative switch => show intervals instead of pitch class names
-- coherent coloring: pitch classes should always have the same color (across both circles)
+- [x] fix order of rotation (wrong for non diatonic scales)
+- [x] add relative switch => show intervals instead of pitch class names
+- [x] coherent coloring: pitch classes should always have the same color (across both circles)
 - different scale sortings: byScaleNum, byCenter, alphatbetically.
 - two level scale sorting: sort first after number of notes, only if same number after the above
 - show scale properties: chroma, scaleNum, accidentals, related scales, supersets, subsets
