@@ -82,7 +82,7 @@ import { State, Toggle } from 'react-powerplug';
           noteColor(note, state.rotation)
             .desaturate(100 - state.saturation)
             .lighten(noteLightness(note, state.offset, 1 / state.width))
-            .toHex()
+            .toHexString()
         }
       />
       <p>sinebow</p>
@@ -92,7 +92,7 @@ import { State, Toggle } from 'react-powerplug';
           rainbow(note, state.rotation)
             .desaturate(100 - state.saturation)
             .lighten(noteLightness(note, state.offset, 1 / state.width))
-            .toHex()
+            .toHexString()
         }
       />
       <p>less angry rainbow</p>
@@ -102,7 +102,7 @@ import { State, Toggle } from 'react-powerplug';
           sinebow(note, state.rotation)
             .desaturate(100 - state.saturation)
             .lighten(noteLightness(note, state.offset, 1 / state.width))
-            .toHex()
+            .toHexString()
         }
       />
     </>

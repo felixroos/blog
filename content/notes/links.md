@@ -1,3 +1,9 @@
+- https://github.com/Ableton/link/issues/49
+  - https://github.com/Deep-Symmetry/afterglow#afterglow
+  - https://github.com/2bbb/node-abletonlink
+
+- https://vdmx.vidvox.net/tutorials/midi-oscquery-helper-ableton-live
+
 nice changes:
 C^7 F^7#11 B^7 G7
 

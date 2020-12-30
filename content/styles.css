@@ -1,4 +1,4 @@
-header>div, header+div>div {
+#gatsby-focus-wrapper>div>header>div, #gatsby-focus-wrapper>div>header+div>div {
   max-width: 672px;
 }
 
