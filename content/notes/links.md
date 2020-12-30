@@ -1,3 +1,70 @@
+nice changes:
+C^7 F^7#11 B^7 G7
+
+midi python
+- https://pypi.org/project/mido/
+- https://github.com/aiobofh/midi-utils
+
+
+launchpad
+
+- https://github.com/Granjow/launchpad-mini
+- https://github.com/dvhdr/launchpad-pro
+- https://github.com/rocketryjs/rocketry
+- see launchpad-programmers-reference in ☁/Dill/Documents/Manuals
+
+- https://llllllll.co/
+
+
+[d3-render !!!](https://observablehq.com/@unkleho/introducing-d3-render-truly-declarative-and-reusable-d3?collection=@observablehq/top-10-liked-notebooks-created-by-the-community-in-2020)
+
+- [Music and Euclid's algorithm](https://plus.maths.org/content/os/issue40/features/wardhaugh/index)
+
+- [quaverseries](https://www.youtube.com/watch?v=1Oirap9_xMg&list=PLQ9S5oqvpyWlo6DeiV43DFBMUWb1X22dV&index=5) 
+  - https://ohmlang.github.io/
+  - https://github.com/chaosprint/QuaverSeries
+- http://makker.hu/makkeroni/
+
+- https://www.flipcode.com/archives/The_Art_of_Demomaking-Issue_01_Prologue.shtml
+- https://github.com/jariseon/yoshimi !!!
+- https://github.com/Ableton/push-interface/blob/master/doc/AbletonPush2MIDIDisplayInterface.asc
+- https://github.com/ffont/pysha
+- https://github.com/garrensmith/abletonpush
+- https://4jo8t.csb.app/
+
+- http://patchstorage.com/
+
+https://twitter.com/brutallo
+  https://fr0stbyter.github.io/webaudio-patcher/
+https://twitter.com/lildata/status/1250158507367817216
+http://blipnoise.herokuapp.com/
+
+zynthian
+
+- cannot replace first in layer => need to remove then add new...
+  - should be able to change engine => imagine having many effects on a layer, wanting to change the instrument
+- replace should scroll to current selected
+- encoder jittery when scrolling
+- snapshot bug (doubled layer)
+- audio effects should have a bypass switch by default
+- audio routing is clunky.. when deleting an audio effect, silence..
+- cannot easily mix synth layers => have to route to gain fx => cumbersome
+  - how about showing a control view in alsa mixer for each layer that goes to system out?
+  - there, volume, panning and mute / solo could be set up
+- layer mixer or quick way to create composite layers
+- layer snapshots?! =
+  1. create layer with any content (e.g. gain node + zyn)
+  2. go to layer options > save as snapshot
+  3. can create same layer again with
+- more zyn options? what about filter envelope?
+- control screen bold select should show which parameters are on the page..
+- control screen could enable adding fx to current layer (last in list: add Audio FX / add MIDI FX)
+
+- https://monome.org/docs/norns/shield/
+- https://brilliant.org/courses/puzzle-science/?auto_login_key=gAJNUt7aS1OCgmG3LtLktN5QTIGTGwunFu8YOQxHUM&utm_source=brilliant&utm_medium=email&utm_content=buttonLink&utm_campaign=november_2020_monthly_newsletter
+- https://support.roli.com/support/solutions/articles/36000037202-compatible-synths-daws-and-instruments
+- https://lvtk.org/doc/
+  - https://x42-plugins.com/x42/x42-midifilter#midichord
 - http://freepats.zenvoid.org/Piano/acoustic-grand-piano.html
 - https://github.com/yaxu/feedforward
 - https://music.stackexchange.com/questions/17571/how-to-determine-the-name-of-a-chord-from-knowing-the-notes-i-am-playing/17572#17572

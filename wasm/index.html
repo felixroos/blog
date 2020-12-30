@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>WASM instantiateStreaming() test</title>
+  </head>
+
+  <body>
+    <script>
+      fetch('build/untouched.wasm')
+        .then((response) => {
+          return response.arrayBuffer();
+        })
+        .then((buffer) => {
+          console.log('buffer',buffer);
+          return WebAssembly.instantiateStreaming(buffer, {});
+        })
+        .then((obj) => console.log(obj.instance.exports.add(1, 2)));
+    </script>
+  </body>
+</html>
