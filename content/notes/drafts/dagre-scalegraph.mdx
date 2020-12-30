@@ -1,0 +1,97 @@
+import DagreGraph from '../../components/graphs/DagreGraph.tsx';
+
+export const getGraph = (chords, allowedScales = scaleModes('major')) => {
+  const scales = chords
+    .map((chord) => chordScales(chord, allowedScales))
+    .map((choices) => (choices.length > 0 ? choices : ['chromatic']));
+  let nodes = [];
+  let links = [];
+  scales.forEach((choices, i) => {
+    choices
+      .map((choice) => `${Chord.tokenize(chords[i])[0]} ${choice}`)
+      .sort(bySetNum)
+      .forEach((choice, j) => {
+        if (i > 0) {
+          const prev = scales[i - 1];
+          prev.forEach((sourceScale, k) => {
+            links.push({ source: nodes.length - j - prev.length + k, target: nodes.length });
+          });
+        }
+        nodes.push({ label: choice });
+      });
+  });
+  nodes = nodes.map((node, id) => ({ ...node, id, config: { style: `fill: ${scaleColor(node.label)}` } }));
+  return { nodes, links };
+};
+
+<DagreGraph
+  {...getGraph(['Dm7', 'G7', 'C^7'])}
+  config={{
+    rankdir: 'TB',
+    ranker: 'tight-tree',
+    ranksep: 100,
+  }}
+  width="500"
+  height="500"
+  shape="rect"
+  fitBoundaries
+/>
+
+<div style={{ maxHeight: 500, width: 500, border: '1px solid black', borderRadius: 10, overflow: 'auto' }}>
+  <DagreGraph
+    {...getGraph(
+      [
+        'Fm7',
+        'Bbm7',
+        'Eb7',
+        'Ab^7',
+        'Db^7',
+        'Dm7',
+        'G7',
+        'C^7',
+        'C^7',
+        'Cm7',
+        'Fm7',
+        'Bb7',
+        'Eb^7',
+        'Ab^7',
+        'Am7',
+        'D7',
+        'G^7',
+        'G^7',
+        'Am7',
+        'D7',
+        'G^7',
+        'G^7',
+        'F#h7',
+        'B7b9',
+        'E^7',
+        'C7b13',
+        'Fm7',
+        'Bbm7',
+        'Eb7',
+        'Ab^7',
+        'Db^7',
+        'Db-^7',
+        'Cm7',
+        'Bo7',
+        'Bbm7',
+        'Eb7',
+        'Ab^7',
+        'Gh7',
+        'C7b9',
+      ],
+      ['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6']
+      // 'locrian 6', 'phrygian dominant','major pentatonic', 'minor pentatonic'
+    )}
+    config={{
+      rankdir: 'TB',
+      ranker: 'tight-tree',
+      ranksep: 50,
+    }}
+    width="500"
+    height="2200"
+    shape="rect"
+    fitBoundaries
+  />
+</div>

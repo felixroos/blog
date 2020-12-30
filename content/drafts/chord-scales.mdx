@@ -1,0 +1,291 @@
+---
+title: Chord Scales
+date: 2020-11-26
+---
+
+import { Chord } from '@tonaljs/tonal';
+import Tree from '../components/rhythmical/components/Tree.tsx';
+import GraphvizJSON from '../components/graphs/GraphvizJSON.tsx';
+import PathBuilder from '../components/graphs/PathBuilder.tsx';
+import '../styles.css';
+import scaleChroma from '../components/sets/scaleChroma';
+import chromaDifference from '../components/sets/chromaDifference';
+import reorderChroma from '../components/sets/reorderChroma';
+import scaleModes from '../components/sets/scaleModes';
+import chordScales from '../components/sets/chordScales';
+import bySetNum from '../components/sets/bySetNum';
+import chordScaleGraph from '../components/graphs/chordScaleGraph';
+import scaleColor from '../components/sets/scaleColor';
+import { Graphviz } from 'graphviz-react';
+
+To build a hackable backing track player, we now got rhythm and harmony. What's missing: Melodies.
+Even if we just want a backing track player, playing melodies is required for basslines, or any kind of melodic fill in.
+
+So far, we were generating voicings from chord symbols. The problem: melodies will eventually use notes that are not a chord notes.
+Therefore, we need a way to find scales that fit to chord changes.
+
+## Hello 251
+
+Let's start with the "Hello World" of jazz:
+
+```js
+const chords = ['Dm7', 'G7', 'C^7'];
+chords.map((chord) => chordScales(chord, scaleModes('major')));
+/*
+[
+  [ 'phrygian', 'aeolian', 'dorian' ],
+  [ 'mixolydian' ],
+  [ 'lydian', 'major' ]
+]
+*/
+```
+
+Here, we have 3 choices for Dm7, 1 choice for G7 and 2 choices for C^7.
+
+The smoothest scale choice would be D dorian - G mixolydian - C major, because those scales share the exact same pitch classes.
+How could an algorithm find this choice? And could the same chord progression potentially have multiple scale choices that fit?
+
+### Scale Graph
+
+We can visualize the transitions between the possible scales in a graph like this:
+
+<!--<GraphvizJSON
+  options={{ height: 800 }}
+  json={{
+    graph: {
+      directed: true,
+      ...chordScaleGraph(
+        [
+          'C^7',
+          'F^7',
+          'Bb^7',
+          'Eb^7',
+          'Ab^7',
+          'Db^7',
+          'Gb^7',
+          'B^7',
+          'E^7',
+          'A^7',
+          'D^7',
+          'G^7',
+          'C^7',
+          'F^7',
+          'Bb^7',
+          'Eb^7',
+        ],
+        ['major']
+      ),
+    },
+  }}
+/>-->
+
+<GraphvizJSON
+  options={{ height: 300 }}
+  json={{
+    graph: {
+      directed: true,
+      ...chordScaleGraph(['Dm7', 'G7', 'C^7']),
+    },
+  }}
+/>
+
+The numbers are the difference of bits in the chroma of the scale.
+We can use them to evaluate how smooth the scale transition will be.
+
+### Choice Tree
+
+Navigating the graph above, we can follow one of 6 possible paths:
+
+export const treeNodes = [
+  { label: 'start' },
+  { label: 'D dorian' },
+  { label: 'G mixolydian' },
+  { label: 'C major' },
+  { label: 'C lydian' },
+  { label: 'D aeolian' },
+  { label: 'G mixolydian' },
+  { label: 'C major' },
+  { label: 'C lydian' },
+  { label: 'D phrygian' },
+  { label: 'G mixolydian' },
+  { label: 'C major' },
+  { label: 'C lydian' },
+].map((node, id) => ({ ...node, id, fillcolor: id !== 0 ? scaleColor(node.label) : 'white', style: 'filled' }));
+
+export const edgeWithLabel = (edge) => ({
+  ...edge,
+  label:
+    edge.source === 0
+      ? ''
+      : chromaDifference(scaleChroma(treeNodes[edge.source].label), scaleChroma(treeNodes[edge.target].label)),
+});
+
+<GraphvizJSON
+  options={{ height: 300 }}
+  json={{
+    graph: {
+      directed: true,
+      nodes: treeNodes,
+      edges: [
+        { source: 0, target: 1 },
+        { source: 0, target: 5 },
+        { source: 0, target: 9 },
+        { source: 1, target: 2 },
+        { source: 2, target: 3 },
+        { source: 2, target: 4 },
+        { source: 5, target: 6 },
+        { source: 6, target: 7 },
+        { source: 6, target: 8 },
+        { source: 9, target: 10 },
+        { source: 10, target: 11 },
+        { source: 10, target: 12 },
+      ].map(edgeWithLabel),
+    },
+  }}
+/>
+
+Here, the leftmost path is the best, as its sum of values is 0. The worst path has a value of 6.
+
+## Complex Example
+
+The scale graph of "All the Things you Are" looks like this:
+
+<div style={{ maxHeight: 500, width: 600, border: '1px solid black', borderRadius: 10, overflow: 'auto' }}>
+  <GraphvizJSON
+    options={{ fit: true, height: 3000, width: 600 }}
+    json={{
+      graph: {
+        directed: true,
+        ...chordScaleGraph(
+          [
+            'Fm7',
+            'Bbm7',
+            'Eb7',
+            'Ab^7',
+            'Db^7',
+            'Dm7',
+            'G7',
+            'C^7',
+            'C^7',
+            'Cm7',
+            'Fm7',
+            'Bb7',
+            'Eb^7',
+            'Ab^7',
+            'Am7',
+            'D7',
+            'G^7',
+            'G^7',
+            'Am7',
+            'D7',
+            'G^7',
+            'G^7',
+            'F#h7',
+            'B7b9',
+            'E^7',
+            'C7b13',
+            'Fm7',
+            'Bbm7',
+            'Eb7',
+            'Ab^7',
+            'Db^7',
+            'Db-^7',
+            'Cm7',
+            'Bo7',
+            'Bbm7',
+            'Eb7',
+            'Ab^7',
+            'Gh7',
+            'C7b9',
+          ],
+          ['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6']
+        ),
+      },
+    }}
+  />
+</div>
+<br />
+
+<PathBuilder
+  chords={[
+    'Fm7',
+    'Bbm7',
+    'Eb7',
+    'Ab^7',
+    'Db^7',
+    'Dm7',
+    'G7',
+    'C^7',
+    'C^7',
+    'Cm7',
+    'Fm7',
+    'Bb7',
+    'Eb^7',
+    'Ab^7',
+    'Am7',
+    'D7',
+    'G^7',
+    'G^7',
+    'Am7',
+    'D7',
+    'G^7',
+    'G^7',
+    'F#h7',
+    'B7b9',
+    'E^7',
+    'C7b13',
+    'Fm7',
+    'Bbm7',
+    'Eb7',
+    'Ab^7',
+    'Db^7',
+    'Db-^7',
+    'Cm7',
+    'Bo7',
+    'Bbm7',
+    'Eb7',
+    'Ab^7',
+    'Gh7',
+    'C7b9',
+  ]}
+  scales={['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6']}
+/>
+
+[...scaleModes('major'),...scaleModes('harmonic minor')]
+
+,...scaleModes('melodic minor')
+
+<PathBuilder
+  chords={['Dm7', 'G7', 'C^7', 'Cm7', 'F7', 'Bb^7', 'C#m7', 'F#7', 'B^7']}
+  scales={['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6']}
+/>
+
+<PathBuilder
+  chords={['C', 'F', 'G', 'C']}
+  scales={['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6']}
+/>
+
+To have a scale for each chord, we allow the following scales:
+
+```js
+['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6'];
+```
+
+I won't render the choice tree here, as it would blow up everything..
+
+### Chroma Difference
+
+We can get the chroma difference like this:
+
+```js
+export const chromaDifference(a, b) => {
+  let diff = 0;
+  for (let i = 0; i < 12; ++i) {
+    diff += a[i] === b[i] ? 0 : 1
+  }
+  return diff;
+}
+```
+
+- [wasm graphviz](https://github.com/hpcc-systems/hpcc-js-wasm#graphviz) (used by d3-graphviz)
+- [jgf-dot](https://github.com/jsongraph/jgf-dot)

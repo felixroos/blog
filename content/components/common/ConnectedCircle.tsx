@@ -37,6 +37,7 @@ export default function ConnectedCircle({
   onClick,
   onHover,
   fontSize,
+  label,
 }: {
   nodes: Node[];
   links?: Link<any>[];
@@ -48,6 +49,7 @@ export default function ConnectedCircle({
   fontSize?: number;
   onClick?: (item: { link?: Link<any>; set?: Set; node?: Node }) => void;
   onHover?: (item: { link?: Link<any>; set?: Set; node?: Node }) => void;
+  label?: string;
 }) {
   nodeRadius = nodeRadius || 20;
   fontSize = fontSize || (nodeRadius / 3) * 2;
@@ -117,7 +119,11 @@ export default function ConnectedCircle({
             />
           );
         })}
-
+      {label && (
+        <text x={size / 2} y={size / 2} textAnchor="middle">
+          {label}
+        </text>
+      )}
       {nodes.map((node, i, a) => {
         const { id, label, fill, radius: _radius, style } = node;
         const [x, y] = nodePosition(id);

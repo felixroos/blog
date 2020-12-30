@@ -2,7 +2,7 @@ import canUseDOM from '../components/canUseDOM'
 import { rack } from '../components/rhythmical/instruments/rack';
 
 export default {
-  load: (onload) => {
+  load: async () => {
     const samples = {
       bd: "../samples/tidal/bd/BT0A0D0.wav",
       sn: "../samples/tidal/sn/ST0T0S3.wav",
@@ -12,6 +12,6 @@ export default {
       ht: "../samples/tidal/ht/HT0D3.wav",
       lt: "../samples/tidal/lt/LT0D3.wav",
     }
-    return canUseDOM() && rack(samples, { onload }).toMaster();
+    return canUseDOM() && (await rack(samples, { volume: -20 })()).toMaster();
   }
 }
