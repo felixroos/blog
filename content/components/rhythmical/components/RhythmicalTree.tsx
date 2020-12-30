@@ -68,14 +68,14 @@ export default function RhythmicalTree(props) {
 
 // could be obsolete
 export function tree(rhythm, width = 600) {
-  console.log('rh', rhythmicalHierarchy(rhythm));
+  //console.log('rh', rhythmicalHierarchy(rhythm));
   const root: any = hierarchy(
     rhythmicalHierarchy(rhythm)
   ); /* .sort(
     (a, b) =>
       descending(a.height, b.height) || ascending(a.data.name, b.data.name)
   ); */
-  console.log('hkhgfj', rhythmicalHierarchy(rhythm));
+  //console.log('hkhgfj', rhythmicalHierarchy(rhythm));
   root.dx = 10;
   root.dy = width / (root.height + 1);
   return cluster().nodeSize([root.dx, root.dy])(root);

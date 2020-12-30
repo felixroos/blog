@@ -3,6 +3,45 @@ title: Rhythmical Reimplementation
 date: 2020-08-25
 ---
 
+import { Chord } from '@tonaljs/tonal';
+import { piano } from '../instruments/piano.ts';
+import { MK2md2 } from '../instruments/rhodes.ts';
+import swimming from '../components/rhythmical/tunes/swimming.ts';
+import tetris from '../components/rhythmical/tunes/tetris.ts';
+import tetrisQuiet from '../components/rhythmical/tunes/tetrisQuiet.ts';
+import { marblemachine } from '../components/rhythmical/tunes/marblemachine.ts';
+import { rhythmEvents } from '../components/rhythmical/tree/hierarchy.ts';
+import { renderRhythm, flatRhythm } from '../components/rhythmical/rhythmical.ts';
+import { renderEvents } from '../components/rhythmical/RhythmZipper.ts';
+import { digRhythm } from '../components/rhythmical/tree/digRhythm.ts';
+import { transpose, transposeEvents, transposeEvent } from '../components/rhythmical/features/transpose.ts';
+import { tieEvents } from '../components/rhythmical/reducers.ts';
+import { inheritProp, inherit } from '../components/rhythmical/features/inherit.ts';
+import tinypiano from '../instruments/tinypiano.ts';
+import Player, { click } from '../components/rhythmical/components/Player.tsx';
+import compose from 'ramda/src/compose';
+import pipe from 'ramda/src/pipe';
+import map from 'ramda/src/map';
+import RhythmicalTree from '../components/rhythmical/components/RhythmicalTree.tsx';
+import Tree, { colorizePath } from '../components/rhythmical/components/Tree.tsx';
+import { TreeAnalyzer } from '../components/rhythmical/components/TreeAnalyzer.tsx';
+import { rhythmicalScore } from '../components/score/score.ts';
+import { Score } from '../components/score/Score.tsx';
+import { Color } from '../components/common/Color.tsx';
+import TreeVisitor from '../components/common/TreeVisitor.tsx';
+import { useGenerator } from '../components/common/useGenerator.ts';
+import { schemeTableau10 } from 'd3-scale-chromatic';
+import { InlineMath, BlockMath } from 'react-katex';
+import { toRhythmObject, getRhythmChildren, pathString, haveSameIndices } from '../components/rhythmical/util';
+import { r2d3 } from '../components/rhythmical/r2d3';
+import { colorize } from '../components/rhythmical/tree/colorize';
+import { editRhythm } from '../components/rhythmical/editRhythm';
+import { State } from 'react-powerplug';
+import Fraction from 'fraction.js';
+import Switch from '@material-ui/core/Switch';
+import { bolero, conventionalLabels, absoluteLabels, relativeLabels } from '../components/rhythmical/tunes/bolero';
+import * as treeify from 'treeify';
+
 ## TBD
 
 <Player fold={true} instruments={{ MK2md2 }} events={digRhythm(swimming)} />
