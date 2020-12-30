@@ -2,7 +2,7 @@ import canUseDOM from '../components/canUseDOM'
 import { sampler } from '../components/rhythmical/instruments/sampler';
 
 export const piano = {
-  load: (onload) => {
+  load: async () => {
     const samples = {
       C1: "../samples/piano/C1.mp3",
       Db1: "../samples/piano/Db1.mp3",
@@ -89,6 +89,6 @@ export const piano = {
       Bb7: "../samples/piano/Bb7.mp3",
       B7: "../samples/piano/B7.mp3"
     }
-    return canUseDOM() && sampler(samples, { onload }).toMaster();
+    return canUseDOM() && (await sampler(samples, { volume: -20 })()).toMaster();
   }
 }

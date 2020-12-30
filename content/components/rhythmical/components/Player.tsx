@@ -36,7 +36,9 @@ export function playEvents(
   const playableEvents = events.filter(
     (e) => ['string', 'number'].includes(typeof e.value) // && e.value !== 'r'
   );
+  // console.log('events', playableEvents);
   let { loop = true, instruments = { synth }, duration = max(playableEvents.map((e) => e.time + e.duration)) } = config;
+  // Tone.setContext(new Tone.Context({ latencyHint: 'interactive' }));
   const part = new Tone.Part((time, event) => {
     if (event.value === 'r' || !['string', 'number'].includes(typeof event.value)) {
       return;
@@ -57,7 +59,7 @@ export function playEvents(
 function pickInstrument(instrumentKey, instruments) {
   const availableInstruments = Object.keys(instruments);
   if (!availableInstruments.length) {
-    console.warn('no instruments set!');
+    //console.warn('no instruments set!');
   }
   instrumentKey = instrumentKey || availableInstruments[0];
   let instrument;
@@ -66,7 +68,7 @@ function pickInstrument(instrumentKey, instruments) {
     instrument = instruments[match];
   } else {
     const fallback = availableInstruments[0];
-    console.warn('instrument ' + instrumentKey + ' was not added to player. using ' + fallback + ' as fallback');
+    //console.warn('instrument ' + instrumentKey + ' was not added to player. using ' + fallback + ' as fallback');
     instrument = instruments[fallback] || synth;
   }
   return instrument;
@@ -82,6 +84,7 @@ export function drawCallback(callback, grain = 1 / 30) {
 
 export default function Player(props) {
   const [time, setTime] = useState(0);
+  // TBD with more complex tunes (swimming), calling setTime each frame will lead to hiccups after a certain time
   return (
     <>
       <PianoRoll {...props} time={time} />

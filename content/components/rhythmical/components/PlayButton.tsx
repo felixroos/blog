@@ -25,7 +25,7 @@ export default function PlayButton({ events, instruments, draw, loop }) {
     Tone.Transport.stop();
     setPart(false);
   }
-  async function loadInstruments() {
+  /* async function loadInstruments() {
     return await Promise.all(
       Object.keys(instruments || {}).map(async (key) => {
         if (typeof instruments[key].load === 'function') {
@@ -36,6 +36,21 @@ export default function PlayButton({ events, instruments, draw, loop }) {
         return Promise.resolve();
       })
     );
+  } */
+  async function preloadInstruments() {
+    const keys = Object.keys(instruments || {});
+    const loaded = await Promise.all(
+      keys.map((key) => {
+        if (typeof instruments[key] === 'function') {
+          return instruments[key]();
+        }
+        if (typeof instruments[key]?.load === 'function') {
+          return instruments[key].load();
+        }
+        return instruments[key];
+      })
+    );
+    return loaded.reduce((o, instrument, i) => ({ ...o, [keys[i]]: instrument }), {});
   }
   async function start() {
     if (pending) {
@@ -43,11 +58,13 @@ export default function PlayButton({ events, instruments, draw, loop }) {
       return;
     }
     setPending(true);
-    await loadInstruments();
+    const loadedInstruments = await preloadInstruments();
+    // console.log('loaded instruments', loadedInstruments);
+    // await loadInstruments();
     setPart(
       playEvents(events, {
-        instruments: instruments || { synth, drums },
-        loop
+        instruments: loadedInstruments || { synth, drums },
+        loop,
       })
     );
     drawLoop.current = drawCallback(draw);
@@ -55,15 +72,7 @@ export default function PlayButton({ events, instruments, draw, loop }) {
   }
   return (
     <Fab color="primary" onClick={() => (part ? stop() : start())}>
-      {!part ? (
-        pending ? (
-          <CircularProgress />
-        ) : (
-          <PlayArrowIcon />
-        )
-      ) : (
-        <StopIcon />
-      )}
+      {!part ? pending ? <CircularProgress /> : <PlayArrowIcon /> : <StopIcon />}
     </Fab>
   );
 }

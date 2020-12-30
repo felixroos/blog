@@ -1,5 +1,3 @@
-import { digRhythm } from '../digRhythm';
-
 const d = (e) => { // duration short notation
   const [value, duration] = e.split('*');
   if (duration) {
