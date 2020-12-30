@@ -36,9 +36,7 @@ export function playEvents(
   const playableEvents = events.filter(
     (e) => ['string', 'number'].includes(typeof e.value) // && e.value !== 'r'
   );
-  // console.log('events', playableEvents);
   let { loop = true, instruments = { synth }, duration = max(playableEvents.map((e) => e.time + e.duration)) } = config;
-  // Tone.setContext(new Tone.Context({ latencyHint: 'interactive' }));
   const part = new Tone.Part((time, event) => {
     if (event.value === 'r' || !['string', 'number'].includes(typeof event.value)) {
       return;

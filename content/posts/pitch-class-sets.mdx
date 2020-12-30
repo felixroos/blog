@@ -13,15 +13,17 @@ import { Scale, Note, Range, PcSet, Chord } from '@tonaljs/tonal';
 import { State } from 'react-powerplug';
 import rotateTonic from '../components/sets/rotateTonic.ts';
 import rotateMode from '../components/sets/rotateMode';
+import scaleChroma from '../components/sets/scaleChroma';
 import rotateScale from '../components/sets/rotateScale';
 import transposeScale from '../components/sets/transposeScale.ts';
 import simplifyScale from '../components/sets/simplifyScale.ts';
+import bySetNum from '../components/sets/bySetNum.ts';
+import { groupBy } from 'lodash';
 
 export const oneOfModes = (families) => (scale) =>
   families.map((f) => Scale.get(f).normalized).includes(Scale.get(scale).normalized);
 export const scaleModes = (...families) => Scale.names().filter(oneOfModes(families));
 export const byCenter = (a, b) => Scale.get(a).setNum - Scale.get(b).setNum;
-export const scaleChroma = (scale) => PcSet.get(Scale.get(scale).notes).chroma;
 export const roots = ['C', 'C#', 'Db', 'D', 'D#', 'Eb', 'E', 'F', 'F#', 'Gb', 'G', 'G#', 'Ab', 'A', 'A#', 'Bb', 'B'];
 
 Let's explore the world of pitch class sets.
@@ -36,7 +38,7 @@ There are (at least) two ways we can represent 12 notes in a circle:
     const scale = Scale.get(state.scale);
     const set = scale.notes.concat([tonic]).map((pc) => Note.get(pc).chroma);
     const pcset = PcSet.get(scale.notes);
-    const scales = scaleModes('major').sort(byCenter);
+    const scales = scaleModes('major', 'melodic minor').sort(byCenter);
     const setScale = (scale) => setState({ scale: simplifyScale(scale || state.scale) });
     return (
       <>
@@ -100,44 +102,19 @@ There are (at least) two ways we can represent 12 notes in a circle:
 The blue line connects all pitches that are part of the selected scale. Using those representations, we can build a geometric intuition for musical phenomena.
 In a nutshell, the circle of fifth helps to understand harmonic relationships, while the chromatic circle works better for melodic content.
 
-todo:
-
-- [x] fix order of rotation (wrong for non diatonic scales)
-- [x] add relative switch => show intervals instead of pitch class names
-- [x] coherent coloring: pitch classes should always have the same color (across both circles)
-- different scale sortings: byScaleNum, byCenter, alphatbetically.
-- two level scale sorting: sort first after number of notes, only if same number after the above
-- show scale properties: chroma, scaleNum, accidentals, related scales, supersets, subsets
-- show nearby scales: 1 altered note (1 added note, 1 removed note => already shown sub/supersets)
-- handle unnamed scales: allow rotation into scales that do not have a name
-- also allow chords + maybe intervals
-- curved lines
-- animation??
-- add hotkeys 1-9 to play steps
-
 ## Chromas & Set Numbers
 
-A chroma is a format to represent a set of notes. For example, the chroma of a C major scale is `101011010101`.
+In the circles above, a so called chroma is displayed for each scale. A chroma is a format to represent a set of notes.
+For example, the chroma of a C major scale is `101011010101`.
 
 The idea: each digit stands for 1 of 12 possible pitches, where the first digit is C, then going chromatically up.
 A 1 means that the pitch that is represented by the digit is in the set, a 0 means it is not.
 
-A set number is just the decimal representation of a chroma, which is `2773` for C major:
-
-```js
-parseInt(101011010101, 2); // 2773
-PcSet.get(101011010101).setNum; // 2773
-```
-
-To find more about scale representations, be sure to check out [The Exciting Universe of Music Theory](https://ianring.com/musictheory/scales/#representing).
-Unfortunately, the chromas and set numbers are reversed, which does not seem right to me..
-
-### Scales
+A set number is just the decimal representation of a chroma:
 
 <State initial={{ scale: 'major', root: 'C' }}>
   {({ state, setState }) => (
     <>
-      The chroma of
       <select value={state.root} onChange={(e) => setState({ root: e.target.value })}>
         {Note.names().map((note, index) => (
           <option key={index}>{note}</option>
@@ -147,9 +124,7 @@ Unfortunately, the chromas and set numbers are reversed, which does not seem rig
         {['major', 'minor', 'dorian', 'mixolydian', 'harmonic minor', 'melodic minor'].map((scale, index) => (
           <option key={index}>{scale}</option>
         ))}
-      </select>{' '}
-      is
-      <pre>
+      </select> <pre>
         {Range.chromatic(['C3', 'B3'])
           .map((n) => Note.get(n))
           .map(({ pc, alt }) => (alt ? ' ' : pc))
@@ -158,19 +133,32 @@ Unfortunately, the chromas and set numbers are reversed, which does not seem rig
         <br />
         {PcSet.get(Scale.get(state.root + ' ' + state.scale).notes).chroma} ={' '}
         {PcSet.get(Scale.get(state.root + ' ' + state.scale).notes).setNum}
+        <br />
+        {Array.from({ length: Note.chroma(state.root) + 1 }).join(' ')}^
       </pre>
-      <ChromaticCircle scale={`${state.root} ${state.scale}`} allNotes={true} />
     </>
   )}
 </State>
 
-To get a chroma with tonal, we can use PcSet + Scale:
+To find more about scale representations, be sure to check out [The Exciting Universe of Music Theory](https://ianring.com/musictheory/scales/#representing).
+Unfortunately, the chromas and set numbers are reversed, which does not seem right to me. Read [these comments](https://www.youtube.com/watch?v=4MIVQqSOJU4&lc=Ugzl97yE7jsVWS9JLmd4AaABAg) to find out more.
+
+### Chroma from Scale
+
+To get the chroma for a given scale, we can do this:
 
 ```js
-const scaleChroma = (scale) => PcSet.get(Scale.get(scale).notes).chroma;
-scaleChroma('G major');
-// '101011010101'
+PcSet.get(Scale.get('D dorian')).chroma; // 101011010101
 ```
+
+<!-- You might wonder why we do not use this:
+
+```js
+Scale.get('D dorian').chroma; // 101101010110
+```
+
+If you take a closer look at the chroma, you will notice that it represents C dorian, practially ignoring the "D", which is impractical for our purpose.
+-->
 
 <details>
   <summary>Why not Scale.get().chroma ?</summary>
@@ -192,14 +180,30 @@ PcSet.get(scaleProps.notes).chroma;
 <br/>
 
 
-### Chords
+### Scale from Chroma
+
+As the opposite of the above, we might also want the scale for a given chroma:
+
+```js
+const chromaScale = (chroma, tonic, scaleTypes = Scale.names()) => {
+  const type = scaleTypes.find((type) => scaleChroma(`${tonic} ${type}`) === chroma);
+  if (type) {
+    return `${tonic} ${type}`;
+  }
+  return '';
+};
+expect(chromaScale('101011010101', 'C')).toBe('C major');
+expect(chromaScale('101011010101', 'D')).toBe('D dorian');
+expect(chromaScale('101011010101', 'E')).toBe('E phrygian');
+expect(chromaScale('101011010101', 'Eb')).toBe('');
+```
+### Chroma from Chord
 
 Of course, we can also represent a chord as a chroma:
 
 <State initial={{ chord: 'M', root: 'C' }}>
   {({ state, setState }) => (
     <>
-      The chroma of
       <select value={state.root} onChange={(e) => setState({ root: e.target.value })}>
         {Note.names().map((note, index) => (
           <option key={index}>{note}</option>
@@ -209,9 +213,7 @@ Of course, we can also represent a chord as a chroma:
         {['M', 'm', '7', '^7', 'm7'].map((chord, index) => (
           <option key={index}>{chord}</option>
         ))}
-      </select>{' '}
-      is
-      <pre>
+      </select> <pre>
         {Range.chromatic(['C3', 'B3'])
           .map((n) => Note.get(n))
           .map(({ pc, alt }) => (alt ? ' ' : pc))
@@ -220,12 +222,14 @@ Of course, we can also represent a chord as a chroma:
         <br />
         {PcSet.get(Chord.get(state.root + ' ' + state.chord).notes).chroma} ={' '}
         {PcSet.get(Chord.get(state.root + ' ' + state.chord).notes).setNum}
+        <br />
+        {Array.from({ length: Note.chroma(state.root) + 1 }).join(' ')}^
       </pre>
     </>
   )}
 </State>
 
-### Subsets and Supersets
+## Subsets and Supersets
 
 Sets can be related by being sub or supersets. For example, a C major chord is a subset of the C major scale. Also, the C major scale is a superset of a C major chord.
 So, a superset contains all notes of its subset + some more, while a subset contains some of its superset (and no others!).
@@ -307,6 +311,46 @@ PcSet.modes(Scale.get('C major').chroma);
 */
 ```
 
+## Scales
+
+Let's explore all scales, grouped by note number and shape:
+
+<div>
+  {Object.entries(groupBy(Scale.names(), (scale) => Scale.get(scale).intervals.length)).map(([l, scales], i) => (
+    <React.Fragment key={i}>
+      <h3>{l} notes</h3>
+      <ul>
+        {Object.entries(groupBy(scales.sort(bySetNum), (scale) => Scale.get(scale).normalized))
+          .sort(([a], [b]) => b - a)
+          .map(([setNum, scales], j) => (
+            <li key={j}>
+              <b>{parseInt(setNum, 2)}</b> {scales.join(', ')}
+            </li>
+          ))}
+      </ul>
+    </React.Fragment>
+  ))}
+</div>
+
+```js
+<div>
+  {Object.entries(groupBy(Scale.names(), (scale) => Scale.get(scale).intervals.length)).map(([l, scales], i) => (
+    <React.Fragment key={i}>
+      <h3>{l} notes</h3>
+      <ul>
+        {Object.entries(groupBy(scales.sort(bySetNum), (scale) => Scale.get(scale).normalized)).map(
+          ([setNum, scales], j) => (
+            <li key={j}>
+              <b>{parseInt(setNum, 2)}</b> {scales.join(', ')}
+            </li>
+          )
+        )}
+      </ul>
+    </React.Fragment>
+  ))}
+</div>
+```
+
 ## Chord Scales
 
 Now, if we want to know which scales we can play over a certain chord, we just have to look for supersets of the chords chroma. Luckily, there is already a method in tonal:
@@ -346,8 +390,6 @@ function getChordScales(chord) {
 getChordScales('^7');
 ```
 
-### Subsets with Rotation
-
 ### Filtering Choices
 
 The above scale choices are pretty overwhelming. We could limit the checked scales like that:
@@ -383,24 +425,20 @@ getChordScales('^7', scaleModes('major', 'harmonic minor', 'melodic minor'));
 // [ 'lydian', 'major', 'lydian #9' ]
 ```
 
-## Scales for Chord Progressions
+<!--
 
-So far, we are able to find out possible scales over single chords.
-In reality, a sequence of chords will mostly be used to outline a certain sound or scale.
-So if we want to know which scales fit in a tune, we cannot just look at single chords.
+## todo
 
-Let's start with the "Hello World" of jazz:
-
-```js
-const chords = ['Dm7', 'G7', 'C^7'];
-chords.map((chord) => getChordScales(chord, scaleModes('major')));
-/*
-[
-  [ 'phrygian', 'aeolian', 'dorian' ],
-  [ 'mixolydian' ],
-  [ 'lydian', 'major' ]
-]
-*/
-```
-
-Here, we have 3 choices for Dm7, 1 choice for G7 and 2 choices for C^7.
+- [x] fix order of rotation (wrong for non diatonic scales)
+- [x] add relative switch => show intervals instead of pitch class names
+- [x] coherent coloring: pitch classes should always have the same color (across both circles)
+- [x] two level scale sorting: sort first after number of notes, only if same number after the above
+- [ ] different scale sortings: byScaleNum, byCenter, alphatbetically.
+- show scale properties: chroma, scaleNum, accidentals, related scales, supersets, subsets
+- show nearby scales: 1 altered note (1 added note, 1 removed note => already shown sub/supersets)
+- handle unnamed scales: allow rotation into scales that do not have a name
+- also allow chords + maybe intervals
+- curved lines
+- animation??
+- add hotkeys 1-9 to play steps
+-->
