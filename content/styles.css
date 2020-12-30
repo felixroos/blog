@@ -1,0 +1,18 @@
+header>div, header+div>div {
+  max-width: 672px;
+}
+
+svg.dagre-d3-react .nodes {
+  fill: darkgray;
+}
+
+svg.dagre-d3-react .nodes text {
+  fill: black;
+  font-size: 12;
+}
+
+svg.dagre-d3-react path {
+  stroke: black;
+  fill: black;
+  stroke-width: 1.5px;
+}
