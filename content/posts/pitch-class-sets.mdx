@@ -14,7 +14,10 @@ import { State } from 'react-powerplug';
 import rotateTonic from '../components/sets/rotateTonic.ts';
 import rotateMode from '../components/sets/rotateMode';
 import scaleChroma from '../components/sets/scaleChroma';
+import chromaScale from '../components/sets/chromaScale';
 import rotateScale from '../components/sets/rotateScale';
+import chromaReflection from '../components/sets/chromaReflection';
+import scaleReflection from '../components/sets/scaleReflection';
 import transposeScale from '../components/sets/transposeScale.ts';
 import simplifyScale from '../components/sets/simplifyScale.ts';
 import bySetNum from '../components/sets/bySetNum.ts';
@@ -309,8 +312,9 @@ export const relectedCircle = (scale, interval) => {
   };
 };
 
-
-<p>reflect {scaleChroma('C major')} > {scaleChroma('Ab major')}</p>
+<p>
+  reflect {scaleChroma('C major')} > {scaleChroma('Ab major')}
+</p>
 
 <ChromaticCircle {...relectedCircle('C major', 'C 4A')} />
 <ChromaticCircle {...relectedCircle('Ab major', 'C 4A')} />
@@ -325,7 +329,7 @@ Above, we are continuously reflecting around the root to get coltrane changes..
 Flipping around the fifth gives us whole tone steps down:
 
 <ChromaticCircle {...relectedCircle('C major', 'G 4A')} />
-<ChromaticCircle {...relectedCircle('Bb major', 'G 4A')} />
+<ChromaticCircle {...relectedCircle(scaleReflection('C major', 7, 'Bb'), 'G 4A')} />
 <br />
 <ChromaticCircle {...relectedCircle('Bb major', 'F 4A')} />
 <ChromaticCircle {...relectedCircle('Ab major', 'F 4A')} />
@@ -340,7 +344,7 @@ Reflection by 4th:
 <ChromaticCircle {...relectedCircle('C major', 'F 4A')} />
 <ChromaticCircle {...relectedCircle('Gb major', 'F 4A')} />
 
-TBD: 
+TBD:
 
 - get reflection programmatically
 - findSymbols(chroma) => ({scales,intervals,chords,pitches})
