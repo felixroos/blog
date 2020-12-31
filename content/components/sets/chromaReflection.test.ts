@@ -1,4 +1,5 @@
 import { Note } from '@tonaljs/tonal';
+import chordChroma from './chordChroma';
 import chromaReflection from './chromaReflection'
 import scaleChroma from './scaleChroma';
 
@@ -18,5 +19,8 @@ test('chromaReflection', () => {
 
 test('chromaReflection axisBefore', () => {
   expect(chromaReflection(scaleChroma('C major'), 4,true)).toBe(scaleChroma('C minor'));
+  expect(chromaReflection(chordChroma('C'), 4, true)).toBe(chordChroma('Cm'));
+  expect(chromaReflection(chordChroma('G7'), 4, true)).toBe(chordChroma('Dm7b5'));
+  expect(chromaReflection(chordChroma('Dm7'), 4, true)).toBe(chordChroma('C'));
 
 })

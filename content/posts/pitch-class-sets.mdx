@@ -329,7 +329,7 @@ Above, we are continuously reflecting around the root to get coltrane changes..
 Flipping around the fifth gives us whole tone steps down:
 
 <ChromaticCircle {...relectedCircle('C major', 'G 4A')} />
-<ChromaticCircle {...relectedCircle(scaleReflection('C major', 7, 'Bb'), 'G 4A')} />
+<ChromaticCircle {...relectedCircle(scaleReflection('C major', 7, false, 'Bb'), 'G 4A')} />
 <br />
 <ChromaticCircle {...relectedCircle('Bb major', 'F 4A')} />
 <ChromaticCircle {...relectedCircle('Ab major', 'F 4A')} />
@@ -344,10 +344,13 @@ Reflection by 4th:
 <ChromaticCircle {...relectedCircle('C major', 'F 4A')} />
 <ChromaticCircle {...relectedCircle('Gb major', 'F 4A')} />
 
-TBD:
+Negative Harmony:
 
-- get reflection programmatically
-- findSymbols(chroma) => ({scales,intervals,chords,pitches})
+<ChromaticCircle {...scaleCircle('C major')} />
+<ChromaticCircle {...scaleCircle(scaleReflection('C major', 4, true))} />
+
+- [x] get reflection programmatically
+- [ ] findSymbols(chroma) => ({scales,intervals,chords,pitches})
 
 ## How many sets are there?
 
