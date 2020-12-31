@@ -233,9 +233,9 @@ Of course, we can also represent a chord as a chroma:
   )}
 </State>
 
-## Set Types
+## Set Concepts
 
-Let's look at some common ways to understand sets:
+Let's look at different concepts around pitch class sets.
 
 export const smallCircle = { r: 80, nodeRadius: 16 };
 
@@ -312,45 +312,51 @@ export const relectedCircle = (scale, interval) => {
   };
 };
 
-<p>
-  reflect {scaleChroma('C major')} > {scaleChroma('Ab major')}
-</p>
+Flipping around the 1 / b5 will drop a major third down:
 
 <ChromaticCircle {...relectedCircle('C major', 'C 4A')} />
-<ChromaticCircle {...relectedCircle('Ab major', 'C 4A')} />
-<br />
-<ChromaticCircle {...relectedCircle('Ab major', 'Ab 4A')} />
-<ChromaticCircle {...relectedCircle('E major', 'Ab 4A')} />
-<br />
-<ChromaticCircle {...relectedCircle('E major', 'E 4A')} />
-<ChromaticCircle {...relectedCircle('C major', 'E 4A')} />
+<ChromaticCircle {...relectedCircle(scaleReflection('C major', 0, false, 'Ab'), 'C 4A')} />
 
-Above, we are continuously reflecting around the root to get coltrane changes..
-Flipping around the fifth gives us whole tone steps down:
+Flipping around the 5th / b2 gives us whole tone steps down:
 
 <ChromaticCircle {...relectedCircle('C major', 'G 4A')} />
-<ChromaticCircle {...relectedCircle(scaleReflection('C major', 7, false, 'Bb'), 'G 4A')} />
-<br />
-<ChromaticCircle {...relectedCircle('Bb major', 'F 4A')} />
-<ChromaticCircle {...relectedCircle('Ab major', 'F 4A')} />
+<ChromaticCircle {...relectedCircle(scaleReflection('C major', 1, false, 'Bb'), 'G 4A')} />
 
-Some reflections will even yield the same set:
+Flipping around at the 2nd / b13 degree returns the same set:
 
 <ChromaticCircle {...relectedCircle('C major', 'D 4A')} />
-<ChromaticCircle {...relectedCircle('C major', 'D 4A')} />
+<ChromaticCircle {...relectedCircle(scaleReflection('C major', 2, false, 'C'), 'D 4A')} />
 
-Reflection by 4th:
+Flipping around at the 6th / b3:
+
+<ChromaticCircle {...relectedCircle('C major', 'Eb 4A')} />
+<ChromaticCircle {...relectedCircle(scaleReflection('C major', 3, false, 'D'), 'Eb 4A')} />
+
+Flipping around at the 3rd / b7:
+
+<ChromaticCircle {...relectedCircle('C major', 'E 4A')} />
+<ChromaticCircle {...relectedCircle(scaleReflection('C major', 4, false, 'E'), 'E 4A')} />
+
+Flipping around at 4th / 7:
 
 <ChromaticCircle {...relectedCircle('C major', 'F 4A')} />
-<ChromaticCircle {...relectedCircle('Gb major', 'F 4A')} />
+<ChromaticCircle {...relectedCircle(scaleReflection('C major', 5, false, 'Gb'), 'F 4A')} />
 
-Negative Harmony:
+### Negative Harmony Reflections
+
+If we move the axis between the notes, we can get the "negative harmony":
 
 <ChromaticCircle {...scaleCircle('C major')} />
 <ChromaticCircle {...scaleCircle(scaleReflection('C major', 4, true))} />
 
+Here, the C major scale is flipped around the axis between Eb/E and A/Bb.
+
+### TBD
+
+- [ ] be able to draw lines between nodes in connected circle (for negative harmony axis)
 - [x] get reflection programmatically
-- [ ] findSymbols(chroma) => ({scales,intervals,chords,pitches})
+- [ ] chromaSymbols(chroma) => ({ scales, chords, intervals})
+- [ ] show some chord reflections
 
 ## How many sets are there?
 

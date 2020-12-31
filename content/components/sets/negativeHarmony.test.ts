@@ -5,7 +5,7 @@ import scaleChroma from './scaleChroma';
 test('negativeHarmony', () => {
   expect(negativeHarmony(scaleChroma('C major'), 'C')).toBe(scaleChroma('C minor'));
   expect(negativeHarmony(chordChroma('C'), 'C')).toBe(chordChroma('Cm'));
-  expect(negativeHarmony(chordChroma('Eb'), 'C')).toBe(chordChroma('Am'));
+  expect(negativeHarmony(chordChroma('Eb'), 'C')).toBe(chordChroma('Am')); // https://www.youtube.com/watch?v=x6zypc_LhnM
   expect(negativeHarmony(chordChroma('C^7'), 'C')).toBe(chordChroma('Ab^7'));
   expect(negativeHarmony(chordChroma('F^7'), 'C')).toBe(chordChroma('Eb^7'));
   expect(negativeHarmony(chordChroma('F'), 'C')).toBe(chordChroma('Gm'));
