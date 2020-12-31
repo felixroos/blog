@@ -14,5 +14,9 @@ test('chromaReflection', () => {
   expect(chromaReflection(scaleChroma('F# major'), Note.chroma('C#'))).toBe(scaleChroma('E major'));
   expect(chromaReflection(scaleChroma('E major'), Note.chroma('B'))).toBe(scaleChroma('D major'));
   expect(chromaReflection(scaleChroma('D major'), Note.chroma('A'))).toBe(scaleChroma('C major'));
+})
+
+test('chromaReflection axisBefore', () => {
+  expect(chromaReflection(scaleChroma('C major'), 4,true)).toBe(scaleChroma('C minor'));
 
 })
