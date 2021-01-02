@@ -1,0 +1,343 @@
+---
+title: Coloring Scales
+date: 2020-06-13
+---
+
+import { Fragment } from 'react';
+import { Score } from '../components/score/Score.tsx';
+import { rhythmicalScore } from '../components/score/score.ts';
+import { Scale, Chord, ChordType, Note, PcSet, Collection } from '@tonaljs/tonal';
+import { Rhythm } from 'rhythmical';
+import Grid from '@material-ui/core/Grid';
+import { chromaDarkness, chromaDiff, circle, harmonicChroma } from '../components/coloring-pitches/noteColor.ts';
+import { harmonicDegree } from '../components/common/harmonicDegree.ts';
+import { playEvents } from '../components/rhythmical/components/Player.tsx';
+import PlayButton from '../components/rhythmical/components/PlayButton.tsx';
+import { renderRhythmObject } from '../components/rhythmical/rhythmical.ts';
+import { interpolateWarm, interpolateSinebow } from 'd3-scale-chromatic';
+import ConnectedCircle from '../components/common/ConnectedCircle';
+import { frequencyColor } from '../components/tuning/tuning.ts';
+import { mean } from 'd3-array';
+import chromaColor from '../components/sets/chromaColor.ts';
+import HarmonicCircle from '../components/sets/HarmonicCircle.tsx';
+import chromaAverage from '../components/sets/chromaAverage.ts';
+
+After we found a basic way of coloring pitches, let's now look at ways to color scales and chords.
+
+## Chroma Average
+
+export const chromaticCircle = Array.from({ length: 12 }, (_, i) => Note.get(Note.fromMidi(i)).pc);
+
+This is the C major scale in a chromatic circle, indexed from 0 to 11:
+
+export const mirrorAxis = (scale) => {
+  const avg = chromaAverage(scaleChroma(scale));
+  return {
+    source: avg * 2,
+    target: (avg + 6) * 2,
+  };
+};
+
+export const numberedCircle = (scale) => (
+  <ConnectedCircle
+    margin={3}
+    nodes={Array.from({ length: 24 }, (_, id) => ({
+      id,
+      value: Math.floor(id / 2) / 12,
+      ...(id % 2 === 0
+        ? {
+            stroke: 'black',
+            fill: 'white',
+            color: 'black',
+            label: id / 2,
+            distance: 120,
+          }
+        : {
+            fill: Scale.get(scale).notes.includes(chromaticCircle[(id - 1) / 2]) ? 'steelblue' : 'gray',
+            color: 'white',
+            label: chromaticCircle[(id - 1) / 2],
+            distance: 80,
+          }),
+    }))}
+    links={[mirrorAxis(scale)]}
+    r={80}
+    nodeRadius={16}
+  />
+);
+
+<div>{numberedCircle('C major')}</div>
+
+If we now add all indices of active notes inside modulo 12, we get:
+
+```
+(0 + 1 + 2 + 3 + 4 + 5 + 11) % 12 = 2
+```
+
+... which is the index of D. This is no surprise, as D is the only place we can put a mirroring axis that won't change the notes after reflection.
+We can calculate this center (which can also be seen as the average) for any chroma like this:
+
+```js
+export default function chromaAverage(chroma) {
+  const digits = chroma.split('');
+  const ones = digits.map((d, i) => (d === '1' ? i : -1)).filter((i) => i !== -1);
+  const avg = ones.reduce((sum, i) => i + sum, 0) % 12;
+  return avg;
+}
+```
+
+Here, we are summing all indices that contain "1" inside mod 12.
+
+## Scale Colors
+
+Now, we can use the chroma average for [cyclical color interpolation](https://github.com/d3/d3-scale-chromatic#cyclical):
+
+```js
+import { interpolateSinebow } from 'd3-scale-chromatic';
+import chromaAverage from './chromaAverage';
+
+export default function chromaColor(chroma) {
+  return interpolateSinebow(chromaAverage(chroma) / 12);
+}
+```
+
+... and run it on all diatonic scales:
+
+export const circleOfFifths = Array.from({ length: 12 }, (_, i) => Note.get(Note.fromMidi(60 + ((i * 7) % 12))).pc);
+export const scaleColor = (scale) => chromaColor(scaleChroma(scale));
+export const familyScales = (family) => (
+  <ul style={{ margin: 0 }}>
+    {circleOfFifths.map((tonic) => (
+      <li style={{ marginBottom: 2, listStyle: 'none', display: 'flex' }} key={tonic}>
+        {Scale.modeNames(`${tonic} ${family}`).map(([root, scale], i) => (
+          <span style={{ backgroundColor: scaleColor(`${root} ${scale}`), marginRight: 2, padding: 2 }} key={i}>
+            {root} {scale}
+          </span>
+        ))}
+      </li>
+    ))}
+  </ul>
+);
+
+<div>{familyScales('major')}</div>
+
+Here, we can see that scales that contain the same notes have the same color.
+
+<details>
+  <summary>Show Source</summary>
+
+
+```js
+export const circleOfFifths = Array.from({ length: 12 }, (_, i) => Note.get(Note.fromMidi(60 + ((i * 7) % 12))).pc);
+export const scaleColor = (scale) => chromaColor(scaleChroma(scale));
+export const familyScales = (family) => (
+  <ul style={{ margin: 0 }}>
+    {circleOfFifths.map((tonic) => (
+      <li style={{ marginBottom: 2, listStyle: 'none', display: 'flex' }} key={tonic}>
+        {Scale.modeNames(`${tonic} ${family}`).map(([root, scale], i) => (
+          <span style={{ backgroundColor: scaleColor(`${root} ${scale}`), marginRight: 2, padding: 2 }} key={i}>
+            {root} {scale}
+          </span>
+        ))}
+      </li>
+    ))}
+  </ul>
+);
+
+<div>{familyScales('major')}</div>;
+```
+
+</details>
+<br/>
+
+
+### More Scales
+
+Modes of Harmonic Minor:
+
+<div>{familyScales('harmonic minor')}</div>
+
+Modes of Melodic Minor:
+
+<div>{familyScales('melodic minor')}</div>
+<br />
+
+### Issue: Same Color for Different Scales
+
+While the coloring inside one scale family works, we can see that some scales across families have the same color, for example C melodic minor and C mixoldian.
+
+This is because the center is the same for both:
+
+<div>
+  {numberedCircle('C melodic minor')}
+  {numberedCircle('C mixolydian')}
+</div>
+
+```
+(0 + 2 + 3 + 5 + 7 + 9 + 11) % 12 = 1
+(0 + 2 + 4 + 5 + 7 + 9 + 10) % 12 = 1
+```
+
+Still, this way of coloring chromas is very helpful to differentiate different tonal centers inside the same scale family.
+
+## Light vs Dark Scales
+
+In music school, I learned about the lightness of the modes, from light to dark:
+
+<div>
+  {['lydian', 'ionian', 'mixolydian', 'dorian', 'aeolian', 'phrygian', 'locrian'].map((scale, index, scales) => (
+    <React.Fragment key={scale}>
+      <Grid spacing={0} container style={{ width: '100%' }} alignItems="center">
+        <Grid item xs={10}>
+          <Score
+            width={500}
+            height={100}
+            staves={rhythmicalScore(Rhythm.group(Scale.get(`C4 ${scale}`).notes.concat(['C5']), 4))}
+          />
+        </Grid>
+        <Grid item xs={2}>
+          {scale}
+          <br />
+          {Scale.get(`C4 ${scale}`).chroma}
+          <br />= {parseInt(Scale.get(`C4 ${scale}`).chroma, 2)}
+        </Grid>
+      </Grid>
+    </React.Fragment>
+  ))}
+</div>
+
+<details>
+<summary>show source</summary>
+
+
+```ts
+<div>
+  {['lydian', 'ionian', 'mixolydian', 'dorian', 'aeolian', 'phrygian', 'locrian'].map((scale, index, scales) => (
+    <React.Fragment key={scale}>
+      <Grid spacing={0} container style={{ width: '100%' }} alignItems="center">
+        <Grid item xs={10}>
+          <Score
+            width={500}
+            height={100}
+            staves={rhythmicalScore(Rhythm.group(Scale.get(`C4 ${scale}`).notes.concat(['C5']), 4))}
+          />
+        </Grid>
+        <Grid item xs={2}>
+          {scale}
+          <br />
+          {Scale.get(`C4 ${scale}`).chroma}
+        </Grid>
+      </Grid>
+    </React.Fragment>
+  ))}
+</div>
+```
+
+</details>
+
+
+- In general, a scale gets darker with more flats
+- The binary number describes which chromatic notes are in the scale (ones) and which not (zeroes). This binary number is called chroma.
+- As the flats increase, more and more ones gravitate to the left
+- So the scale darkness will be reflected directly by the chroma value
+
+## Light and Dark Chords
+
+If we transfer the same concept to chords, we can also calculate a darkness:
+
+<div>
+  {['M7', '7', 'mM7', 'm7', 'm6', 'm7b5', 'o7'].map((chord, index, chords) => (
+    <React.Fragment key={chord}>
+      <Grid spacing={0} container style={{ width: '100%' }} alignItems="center">
+        <Grid item xs={10}>
+          <Score width={500} height={100} staves={rhythmicalScore([Chord.getChord(chord, 'C4').notes])} />
+        </Grid>
+        <Grid item xs={2}>
+          {chord}
+          <br />
+          {Chord.getChord(chord, 'C4').chroma}
+          <br />= {parseInt(Chord.getChord(chord, 'C4').chroma, 2)}
+        </Grid>
+      </Grid>
+    </React.Fragment>
+  ))}
+</div>
+
+<details>
+<summary>show source</summary>
+
+
+```ts
+<div>
+  {['M7', '7', 'mM7', 'm7', 'm6', 'm7b5', 'o7'].map((chord, index, chords) => (
+    <React.Fragment key={chord}>
+      <Grid spacing={0} container style={{ width: '100%' }} alignItems="center">
+        <Grid item xs={10}>
+          <Score width={500} height={100} staves={rhythmicalScore([Chord.getChord(chord, 'C4').notes])} />
+        </Grid>
+        <Grid item xs={2}>
+          {chord}
+          <br />
+          {Chord.getChord(chord, 'C4').chroma}
+          <br />= {parseInt(Chord.getChord(chord, 'C4').chroma, 2)}
+        </Grid>
+      </Grid>
+    </React.Fragment>
+  ))}
+</div>
+```
+
+</details>
+
+
+One could now argue that for example a mM7 chord is darker than a m6 chord, but let's just use this as a guiding number and not an absolute truth
+
+### Relative Darkness
+
+If we compare the scales to the chords, we see that scales all have higher numbers, which is natural due to more notes which leads to more ones and thus a higher number.
+If we just divide the chroma by the number of notes, we can get a more independent value:
+
+```ts
+// divide chroma decimal by number of ones to get relative darkness
+export function chromaDarkness(chroma) {
+  return (
+    parseInt(chroma, 2) /
+    chroma
+      .split('')
+      .filter((d) => d === '1')
+      .join('').length
+  );
+}
+```
+
+<div style={{ overflow: 'auto', maxHeight: '300px' }}>
+  <ul>
+    {Scale.names()
+      .map((scale) => ({
+        name: scale,
+        type: 'scale',
+        notes: Scale.get(`C4 ${scale}`).notes,
+        darkness: chromaDarkness(Scale.get(`C4 ${scale}`).chroma),
+      }))
+      .concat(
+        ChordType.names().map((chord) => ({
+          name: chord,
+          type: 'chord',
+          notes: Chord.getChord(chord, 'C4').notes,
+          darkness: chromaDarkness(Chord.getChord(chord, 'C4').chroma),
+        }))
+      )
+      .sort((a, b) => a.darkness - b.darkness)
+      .map(({ name, darkness, notes }, index) => (
+        <li key={index}>
+          <PlayButton
+            events={renderRhythmObject({
+              sequential: notes,
+              duration: notes.length / 4,
+            })}
+            loop={false}
+          />
+          {Math.round(darkness * 100) / 100}: {name}
+        </li>
+      ))}
+  </ul>
+</div>

@@ -125,7 +125,7 @@ export default function ConnectedCircle({
         </text>
       )}
       {nodes.map((node, i, a) => {
-        const { id, label, fill, radius: _radius, style } = node;
+        const { id, label, fill, radius: _radius, style, color } = node;
         const [x, y] = nodePosition(id);
         // tick position
         const [tx, ty] = nodePosition(id, radius);
@@ -152,7 +152,7 @@ export default function ConnectedCircle({
               style={{ userSelect: 'none', pointerEvents: 'none', fontSize }}
               x={x}
               y={y + nodeRadius / 4}
-              fill="black"
+              fill={color || 'black'}
               textAnchor="middle"
             >
               {typeof label !== 'undefined' ? label : id}
