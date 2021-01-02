@@ -29,6 +29,13 @@ export const scaleModes = (...families) => Scale.names().filter(oneOfModes(famil
 export const byCenter = (a, b) => Scale.get(a).setNum - Scale.get(b).setNum;
 export const roots = ['C', 'C#', 'Db', 'D', 'D#', 'Eb', 'E', 'F', 'F#', 'Gb', 'G', 'G#', 'Ab', 'A', 'A#', 'Bb', 'B'];
 
+export const intervalCircle = (tonicAndinterval) => {
+  const [tonic, interval] = tonicAndinterval.split(' ');
+  const pitches = [tonic, Note.transpose(tonic, interval)];
+  const set = pitches.map((pc) => Note.get(pc).chroma);
+  return { tonic, pitches, sets: [{ stroke: 'steelblue', set }], label: tonicAndinterval, ...smallCircle };
+};
+
 Let's explore the world of pitch class sets.
 
 ## Harmonic & Chromatic Circles
@@ -357,97 +364,6 @@ Here, the C major scale is flipped around the axis between Eb/E and A/Bb.
 - [x] get reflection programmatically
 - [ ] chromaSymbols(chroma) => ({ scales, chords, intervals})
 - [ ] show some chord reflections
-
-## How many sets are there?
-
-In a binary number with 12 digits, we have 2^12 = 4096 different possibilities. As is this quite a lot, let's group similar sets to simplify things.
-
-export const pitchCircle = (pitches) => {
-  const tonic = pitches[0];
-  const set = pitches.concat([pitches[0]]).map((pc) => Note.get(pc).chroma);
-  return { tonic, pitches, sets: [{ stroke: 'steelblue', set }], label: pitches.join(' '), ...smallCircle };
-};
-
-### Single Pitch
-
-With just one pitch, there is just one unique set:
-
-<ChromaticCircle {...pitchCircle(['C'])} />
-
-### Intervals
-
-export const intervalCircle = (tonicAndinterval) => {
-  const [tonic, interval] = tonicAndinterval.split(' ');
-  const pitches = [tonic, Note.transpose(tonic, interval)];
-  const set = pitches.map((pc) => Note.get(pc).chroma);
-  return { tonic, pitches, sets: [{ stroke: 'steelblue', set }], label: tonicAndinterval, ...smallCircle };
-};
-
-Sets with 2 pitches represent intervals, with 6 unique ones:
-
-<ChromaticCircle {...intervalCircle('C 2m')} />
-<ChromaticCircle {...intervalCircle('C 2M')} />
-<ChromaticCircle {...intervalCircle('C 3m')} />
-<ChromaticCircle {...intervalCircle('C 3M')} />
-<ChromaticCircle {...intervalCircle('C 4P')} />
-<ChromaticCircle {...intervalCircle('C 4A')} />
-
-- intervals >= perfect fifth are just the 2nd mode of the intervals inversion
-- example: "C 5P" is the 2nd mode of "G 4P"
-
-<!--
-<ChromaticCircle {...intervalCircle('C 5P')} />
-<ChromaticCircle {...intervalCircle('C 6m')} />
-<ChromaticCircle {...intervalCircle('C 6M')} />
-<ChromaticCircle {...intervalCircle('C 7m')} />
-<ChromaticCircle {...intervalCircle('C 7M')} />
--->
-
-### Triads
-
-export const triadCircle = (triadName) => {
-  const chord = Chord.get(triadName);
-  const pitches = chord.notes;
-  const set = pitches.concat([chord.tonic]).map((pc) => Note.get(pc).chroma);
-  const r = 80;
-  const nodeRadius = 16;
-  return {
-    tonic: chord.tonic,
-    pitches,
-    sets: [{ stroke: 'steelblue', set }],
-    label: triadName,
-    r,
-    nodeRadius,
-  };
-};
-
-Three pitches can represent triads:
-
-<ChromaticCircle {...triadCircle('C')} />
-<ChromaticCircle {...triadCircle('Cm')} />
-<ChromaticCircle {...triadCircle('Co')} />
-<ChromaticCircle {...triadCircle('Caug')} />
-
-...and more:
-
-<ChromaticCircle {...pitchCircle(['C', 'Db', 'D'])} />
-<ChromaticCircle {...pitchCircle(['C', 'Db', 'Eb'])} />
-<ChromaticCircle {...pitchCircle(['C', 'D', 'Eb'])} />
-<ChromaticCircle {...pitchCircle(['C', 'Db', 'E'])} />
-<ChromaticCircle {...pitchCircle(['C', 'D', 'E'])} />
-<ChromaticCircle {...pitchCircle(['C', 'Eb', 'E'])} />
-<ChromaticCircle {...pitchCircle(['C', 'Db', 'F'])} />
-<ChromaticCircle {...pitchCircle(['C', 'D', 'F'])} />
-<ChromaticCircle {...pitchCircle(['C', 'Eb', 'F'])} />
-<ChromaticCircle {...pitchCircle(['C', 'E', 'F'])} />
-<ChromaticCircle {...pitchCircle(['C', 'Db', 'Gb'])} />
-<ChromaticCircle {...pitchCircle(['C', 'D', 'Gb'])} />
-<ChromaticCircle {...pitchCircle(['C', 'Eb', 'Gb'])} />
-<ChromaticCircle {...pitchCircle(['C', 'E', 'Gb'])} />
-<ChromaticCircle {...pitchCircle(['C', 'F', 'Gb'])} />
-<ChromaticCircle {...pitchCircle(['C', 'F', 'Gb'])} />
-<ChromaticCircle {...pitchCircle(['C', 'Db', 'G'])} />
-<ChromaticCircle {...pitchCircle(['C', 'D', 'G'])} />
 
 ## Subsets and Supersets
 
