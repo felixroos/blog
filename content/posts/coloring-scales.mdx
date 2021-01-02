@@ -7,18 +7,19 @@ import { Scale, Chord, ChordType, Note, PcSet, Collection } from '@tonaljs/tonal
 import { interpolateSinebow } from 'd3-scale-chromatic';
 import ConnectedCircle from '../components/common/ConnectedCircle';
 import chromaColor from '../components/sets/chromaColor.ts';
-import chromaAverage from '../components/sets/chromaAverage.ts';
+import scaleChroma from '../components/sets/scaleChroma.ts';
+import chromaCenter from '../components/sets/chromaCenter.ts';
 
-After we found a basic way of coloring pitches, let's now look at ways to color scales.
+After we found a basic way of [coloring pitches](../coloring-pitches), let's now look at a way to color scales.
 
-## Chroma Average
+## Chroma Center
 
 export const chromaticCircle = Array.from({ length: 12 }, (_, i) => Note.get(Note.fromMidi(i)).pc);
 
 This is the C major scale in a chromatic circle, indexed from 0 to 11:
 
 export const mirrorAxis = (scale) => {
-  const avg = chromaAverage(scaleChroma(scale));
+  const avg = chromaCenter(scaleChroma(scale));
   return {
     source: avg * 2,
     target: (avg + 6) * 2,
@@ -57,14 +58,14 @@ export const numberedCircle = (scale) => (
 If we now add all indices of active notes inside modulo 12, we get:
 
 ```
-(0 + 1 + 2 + 3 + 4 + 5 + 11) % 12 = 2
+(0 + 2 + 4 + 5 + 7 + 9 + 11) % 12 = 2
 ```
 
-... which is the index of D. This is no surprise, as D is the only place we can put a mirroring axis that won't change the notes after reflection.
-We can calculate this center (which can also be seen as the average) for any chroma like this:
+... which is the index of D. Interestingly, D is the only place we can put a mirroring axis that won't change the notes after reflection.
+Let's call this the chroma center. We can calculate it for any chroma like this:
 
 ```js
-export default function chromaAverage(chroma) {
+export default function chromaCenter(chroma) {
   const digits = chroma.split('');
   const ones = digits.map((d, i) => (d === '1' ? i : -1)).filter((i) => i !== -1);
   const avg = ones.reduce((sum, i) => i + sum, 0) % 12;
@@ -72,18 +73,36 @@ export default function chromaAverage(chroma) {
 }
 ```
 
-Here, we are summing all indices that contain "1" inside mod 12. The given chroma is a 12 character string that contains a combination of 1s and 0s. The 12 characters represent all chromatic notes going from C to B. For example, the chroma of C major is 101011010101.
+Here, we are summing all indices that contain "1" inside mod 12.
+
+<details>
+  <summary>What is a chroma?</summary>
+
+
+A chroma is a string with 12 characters that represent a set of pitches with a combination of 1s and 0s.
+A 1 means that the note is in the set, a zero means not.
+The 12 characters represent all chromatic notes going from C to B.
+For example, the chroma of C major is 101011010101:
+
+<pre>
+  {`101011010101 
+C D EF G A B`}
+</pre>
+
+</details>
+<br/>
+
 
 ## Scale Colors
 
-Now, we can use the chroma average for [cyclical color interpolation](https://github.com/d3/d3-scale-chromatic#cyclical):
+Now, we can use the chroma center for [cyclical color interpolation](https://github.com/d3/d3-scale-chromatic#cyclical):
 
 ```js
 import { interpolateSinebow } from 'd3-scale-chromatic';
-import chromaAverage from './chromaAverage';
+import chromaCenter from './chromaCenter';
 
 export default function chromaColor(chroma) {
-  return interpolateSinebow(chromaAverage(chroma) / 12);
+  return interpolateSinebow(chromaCenter(chroma) / 12);
 }
 ```
 
@@ -106,7 +125,7 @@ export const familyScales = (family) => (
 );
 
 <div>{familyScales('major')}</div>
-
+<br />
 Here, we can see that scales that contain the same notes have the same color.
 
 <details>
@@ -154,14 +173,24 @@ While the coloring inside one scale family works, we can see that some scales ac
 
 This is because the center is the same for both:
 
-<div>
-  {numberedCircle('C melodic minor')}
-  {numberedCircle('C mixolydian')}
+<div style={{ display: 'flex' }}>
+  <div>
+    <center>C melodic minor</center>
+    {numberedCircle('C melodic minor')}
+  </div>
+  <div>
+    <center>C mixolydian</center>
+    {numberedCircle('C mixolydian')}
+  </div>
 </div>
 
+We can also double check this by calculating the chroma center:
+
 ```
-(0 + 2 + 3 + 5 + 7 + 9 + 11) % 12 = 1
-(0 + 2 + 4 + 5 + 7 + 9 + 10) % 12 = 1
+(0 + 2 + 3 + 5 + 7 + 9 + 11) % 12 = 1 // C melodic minor
+(0 + 2 + 4 + 5 + 7 + 9 + 10) % 12 = 1 // C mixolydian
 ```
 
 Still, this way of coloring chromas is very helpful to differentiate different tonal centers inside the same scale family.
+
+That's it for today, the next color post will be about scale light and darkness to diversify the colors.
