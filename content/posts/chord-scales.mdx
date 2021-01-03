@@ -127,7 +127,7 @@ export const edgeWithLabel = (edge) => ({
   label:
     edge.source === 0
       ? ''
-      : chromaDifference(scaleChroma(treeNodes[edge.source].label), scaleChroma(treeNodes[edge.target].label)),
+      : chromaDifference(scaleChroma(treeNodes[edge.source].label), scaleChroma(treeNodes[edge.target].label)) / 2,
 });
 
 <GraphvizJSON
@@ -154,7 +154,7 @@ export const edgeWithLabel = (edge) => ({
   }}
 />
 
-Here, the leftmost path is the best, as its sum of values is 0. The worst path has a value of 6.
+Here, the leftmost path is the best, as its sum of values is 0. The worst path has a value of 3.
 
 ### Naive Approach
 
