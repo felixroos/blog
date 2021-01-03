@@ -6,7 +6,7 @@ import scaleColor from '../sets/scaleColor';
 import chromaDifference from '../sets/chromaDifference';
 import scaleChroma from '../sets/scaleChroma';
 
-export default (chords, allowedScales = scaleModes('major')) => {
+export default (chords, allowedScales = scaleModes('major'), halfDifference = false) => {
   const scales = chords
     .map((chord) => chordScales(chord, allowedScales))
     .map((choices) => (choices.length > 0 ? choices : ['chromatic']));
@@ -22,7 +22,10 @@ export default (chords, allowedScales = scaleModes('major')) => {
           prev.forEach((sourceScale, k) => {
             const source = nodes.length - j - prev.length + k;
             const target = nodes.length;
-            const label = chromaDifference(scaleChroma(nodes[source].label), scaleChroma(choice));
+            let label = chromaDifference(scaleChroma(nodes[source].label), scaleChroma(choice));
+            if (halfDifference) {
+              label /= 2;
+            }
             links.push({ source, target, label });
           });
         }
