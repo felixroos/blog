@@ -1,5 +1,5 @@
 ---
-title: Coloring Scales
+title: Coloring Musical Scales
 date: 2021-01-02
 ---
 
@@ -19,10 +19,10 @@ export const chromaticCircle = Array.from({ length: 12 }, (_, i) => Note.get(Not
 This is the C major scale in a chromatic circle, indexed from 0 to 11:
 
 export const mirrorAxis = (scale) => {
-  const avg = chromaCenter(scaleChroma(scale));
+  const center = chromaCenter(scaleChroma(scale));
   return {
-    source: avg * 2,
-    target: (avg + 6) * 2,
+    source: center * 2,
+    target: (center + 6) * 2,
   };
 };
 
@@ -65,11 +65,10 @@ If we now add all indices of active notes inside modulo 12, we get:
 Let's call this the chroma center. We can calculate it for any chroma like this:
 
 ```js
-export default function chromaCenter(chroma) {
+export default function chromaCenter(chroma: string) {
   const digits = chroma.split('');
-  const ones = digits.map((d, i) => (d === '1' ? i : -1)).filter((i) => i !== -1);
-  const avg = ones.reduce((sum, i) => i + sum, 0) % 12;
-  return avg;
+  const ones = digits.map((d, i) => d === '1' ? i : -1).filter(i => i !== -1);
+  return ones.reduce((sum, i) => i + sum, 0) % 12;
 }
 ```
 

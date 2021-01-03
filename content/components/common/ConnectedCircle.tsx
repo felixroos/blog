@@ -24,6 +24,7 @@ export declare type Link<T> = {
 export declare type Set = {
   set: NodeIdentifier[];
   stroke?: string;
+  offset?:number;
 };
 
 export default function ConnectedCircle({
@@ -58,7 +59,7 @@ export default function ConnectedCircle({
   const maxRadius = max(nodes.map((n) => n.radius).concat([nodeRadius]));
   margin = margin || 0;
   size = size || maxDistance * 2 + maxRadius * 2 + margin * 2;
-  function nodePosition(id: NodeIdentifier, r?: number): [number, number] {
+  function nodePosition(id: NodeIdentifier, r?: number, offset = 0): [number, number] {
     const node = nodes.find(({ id: _id }) => _id === id);
     if (!node) {
       console.error(`node ${id} not found`);
@@ -66,12 +67,12 @@ export default function ConnectedCircle({
     }
     const distance = r || node?.distance || radius;
     const value = typeof node.value !== 'undefined' ? node.value : nodes.indexOf(node) / nodes.length;
-    const [x, y] = circlePosition(value, distance, margin);
+    const [x, y] = circlePosition(value + offset, distance, margin);
     return [x + nodeRadius + maxDistance - distance, y + nodeRadius + maxDistance - distance];
   }
 
-  function nodePoints(set) {
-    return set.map((id) => nodePosition(id)).filter((point) => !!point);
+  function nodePoints(set, radius?, offset?) {
+    return set.map((id) => nodePosition(id, radius, offset)).filter((point) => !!point);
   }
 
   const hover = useHover(({ args: [item], active }) => {
@@ -106,7 +107,7 @@ export default function ConnectedCircle({
 
       {sets &&
         sets.map((_set, i) => {
-          const { set, stroke } = _set;
+          const { set, stroke, offset } = _set;
           return (
             <path
               onClick={() => onClick && onClick({ set: _set })}
@@ -115,7 +116,7 @@ export default function ConnectedCircle({
               stroke={stroke || 'gray'}
               strokeWidth={4}
               fill="none"
-              d={line()(nodePoints(set))}
+              d={line()(nodePoints(set, undefined, offset))}
             />
           );
         })}
