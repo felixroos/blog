@@ -61,7 +61,8 @@ module.exports = {
         //jsxPragma: `jsx`, // defaults to "React"
         allExtensions: true // defaults to false
       }
-    }
+    },
+    { resolve: 'gatsby-theme-material-ui' }
   ],
   // Customize your site metadata:
   siteMetadata: {
