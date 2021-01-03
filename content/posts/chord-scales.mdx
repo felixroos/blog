@@ -503,15 +503,14 @@ export const scaleDiff = (source, target) =>
 />
 
 Note that the "Next Step" button turns into "Done", when the algorithm has found the optimal path.
-In this case, we have a match before we even had to check "D phrygian" and "D aeolian" in the second 251.
-This works because:
+In this case, we have a match before we even had to check all transitions. This works because:
 
 - At each step, the path with the lowest value is extended
 - The algorithm finishes if a the path with the lowest value reaches the end.
 - If no transition is negative (which cannot be), the shortest path is found
 
-In this case, we can ignore the first "C lydian" as well as the second time "D phrygian" and "D aeolian", because they are not as promising.
-This saves calculation time, which might seem small in this case, but it will be a life saver for bigger graphs.
+We could savely ignore the first "C lydian" as well as the second time "D phrygian" and "D aeolian", because they were not as promising.
+This saves calculation time, which might seem marginal in this instance, but it will be a life saver for bigger graphs.
 
 ## All The Things You Are
 
@@ -580,70 +579,13 @@ The scale graph of "All the Things you Are" looks like this:
 <br />
 
 
-<details>
-<summary>show source</summary>
-
-
-```js
-<GraphvizJSON
-  options={{ fit: true, height: 3000, width: 620 }}
-  json={{
-    graph: {
-      directed: true,
-      ...chordScaleGraph(
-        [
-          'Fm7',
-          'Bbm7',
-          'Eb7',
-          'Ab^7',
-          'Db^7',
-          'Dm7',
-          'G7',
-          'C^7',
-          'C^7',
-          'Cm7',
-          'Fm7',
-          'Bb7',
-          'Eb^7',
-          'Ab^7',
-          'Am7',
-          'D7',
-          'G^7',
-          'G^7',
-          'Am7',
-          'D7',
-          'G^7',
-          'G^7',
-          'F#h7',
-          'B7b9',
-          'E^7',
-          'C7b13',
-          'Fm7',
-          'Bbm7',
-          'Eb7',
-          'Ab^7',
-          'Db^7',
-          'Db-^7',
-          'Cm7',
-          'Bo7',
-          'Bbm7',
-          'Eb7',
-          'Ab^7',
-          'Gh7',
-          'C7b9',
-        ],
-        ['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6']
-      ),
-    },
-  }}
-/>
-```
-
-</details>
-<br/>
-
+Let's run the same path finding algorithm on these scales and see what happens:
 
 <PathBuilder
+  height={600}
+  maxHeight={2000}
+  keepLongerPaths={false}
+  scales={['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6']}
   chords={[
     'Fm7',
     'Bbm7',
@@ -685,105 +627,13 @@ The scale graph of "All the Things you Are" looks like this:
     'Gh7',
     'C7b9',
   ]}
-  scales={['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6']}
 />
+<br />
 
-[...scaleModes('major'),...scaleModes('harmonic minor')]
-
-,...scaleModes('melodic minor')
-
-<PathBuilder
-  chords={['Dm7', 'G7', 'C^7', 'Cm7', 'F7', 'Bb^7', 'C#m7', 'F#7', 'B^7']}
-  scales={['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6']}
-/>
-
-<PathBuilder
-  chords={['C', 'F', 'G', 'C']}
-  scales={['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6']}
-/>
-
-To have a scale for each chord, we allow the following scales:
-
-```js
-['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6'];
-```
-
-I won't render the choice tree here, as it would blow up everything..
-
-- [wasm graphviz](https://github.com/hpcc-systems/hpcc-js-wasm#graphviz) (used by d3-graphviz)
-- [jgf-dot](https://github.com/jsongraph/jgf-dot)
-
-### Rotations and Modes
-
-Chromas can also be rotations of one another. Is mucial terms, we would call those modes:
-
-```js
-Scale.modeNames('C major').map(([root, scale]) => `${root} ${scale}`);
-/*
-[
-  'C major',
-  'D dorian',
-  'E phrygian',
-  'F lydian',
-  'G mixolydian',
-  'A aeolian',
-  'B locrian'
-]
-*/
-PcSet.modes(Scale.get('C major').chroma);
-/*
-[
-  '101011010101',
-  '101101010110',
-  '110101011010',
-  '101010110101',
-  '101011010110',
-  '101101011010',
-  '110101101010'
-]
-*/
-```
-
-## Scales
-
-Let's explore all scales, grouped by note number and shape:
-
-<div>
-  {Object.entries(groupBy(Scale.names(), (scale) => Scale.get(scale).intervals.length)).map(([l, scales], i) => (
-    <React.Fragment key={i}>
-      <h3>{l} notes</h3>
-      <ul>
-        {Object.entries(groupBy(scales.sort(bySetNum), (scale) => Scale.get(scale).normalized))
-          .sort(([a], [b]) => b - a)
-          .map(([setNum, scales], j) => (
-            <li key={j}>
-              <b>{parseInt(setNum, 2)}</b> {scales.join(', ')}
-            </li>
-          ))}
-      </ul>
-    </React.Fragment>
-  ))}
-</div>
-
-```js
-<div>
-  {Object.entries(groupBy(Scale.names(), (scale) => Scale.get(scale).intervals.length)).map(([l, scales], i) => (
-    <React.Fragment key={i}>
-      <h3>{l} notes</h3>
-      <ul>
-        {Object.entries(groupBy(scales.sort(bySetNum), (scale) => Scale.get(scale).normalized)).map(
-          ([setNum, scales], j) => (
-            <li key={j}>
-              <b>{parseInt(setNum, 2)}</b> {scales.join(', ')}
-            </li>
-          )
-        )}
-      </ul>
-    </React.Fragment>
-  ))}
-</div>
-```
+TBD: calculate svg height based on longest path with "heightPerLevel" to adjust the height as needed
+TBD: colorize shortest path
+TBD: autoscroll to shortest leaf
 
 ## Links
 
-- https://www.youtube.com/watch?v=gGQ-vAmdAOI
+- [Search: Optimal, Branch and Bound, Astar @MIT](https://www.youtube.com/watch?v=gGQ-vAmdAOI)

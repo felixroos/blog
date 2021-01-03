@@ -1,0 +1,92 @@
+import { BlockMath, InlineMath } from 'react-katex';
+import { Chord } from '@tonaljs/tonal';
+import Tree from '../components/rhythmical/components/Tree.tsx';
+import GraphvizJSON from '../components/graphs/GraphvizJSON.tsx';
+import PathBuilder from '../components/graphs/PathBuilder.tsx';
+import '../styles.css';
+import scaleChroma from '../components/sets/scaleChroma';
+import chromaDifference from '../components/sets/chromaDifference';
+import reorderChroma from '../components/sets/reorderChroma';
+import scaleModes from '../components/sets/scaleModes';
+import chordScales from '../components/sets/chordScales';
+import bySetNum from '../components/sets/bySetNum';
+import chordScaleGraph from '../components/graphs/chordScaleGraph';
+import scaleColor from '../components/sets/scaleColor';
+import { Graphviz } from 'graphviz-react';
+import { groupBy } from 'lodash';
+import { Scale, Note } from '@tonaljs/tonal';
+import ChromaticCircle from '../components/sets/ChromaticCircle.tsx';
+import HarmonicCircle from '../components/sets/HarmonicCircle.tsx';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+
+### Rotations and Modes
+
+Chromas can also be rotations of one another. Is mucial terms, we would call those modes:
+
+```js
+Scale.modeNames('C major').map(([root, scale]) => `${root} ${scale}`);
+/*
+[
+  'C major',
+  'D dorian',
+  'E phrygian',
+  'F lydian',
+  'G mixolydian',
+  'A aeolian',
+  'B locrian'
+]
+*/
+PcSet.modes(Scale.get('C major').chroma);
+/*
+[
+  '101011010101',
+  '101101010110',
+  '110101011010',
+  '101010110101',
+  '101011010110',
+  '101101011010',
+  '110101101010'
+]
+*/
+```
+
+## Scales
+
+Let's explore all scales, grouped by note number and shape:
+
+<div>
+  {Object.entries(groupBy(Scale.names(), (scale) => Scale.get(scale).intervals.length)).map(([l, scales], i) => (
+    <React.Fragment key={i}>
+      <h3>{l} notes</h3>
+      <ul>
+        {Object.entries(groupBy(scales.sort(bySetNum), (scale) => Scale.get(scale).normalized))
+          .sort(([a], [b]) => b - a)
+          .map(([setNum, scales], j) => (
+            <li key={j}>
+              <b>{parseInt(setNum, 2)}</b> {scales.join(', ')}
+            </li>
+          ))}
+      </ul>
+    </React.Fragment>
+  ))}
+</div>
+
+```js
+<div>
+  {Object.entries(groupBy(Scale.names(), (scale) => Scale.get(scale).intervals.length)).map(([l, scales], i) => (
+    <React.Fragment key={i}>
+      <h3>{l} notes</h3>
+      <ul>
+        {Object.entries(groupBy(scales.sort(bySetNum), (scale) => Scale.get(scale).normalized)).map(
+          ([setNum, scales], j) => (
+            <li key={j}>
+              <b>{parseInt(setNum, 2)}</b> {scales.join(', ')}
+            </li>
+          )
+        )}
+      </ul>
+    </React.Fragment>
+  ))}
+</div>
+```

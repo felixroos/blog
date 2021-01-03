@@ -83,7 +83,7 @@ function* buildTree(candidates, getValue, keepLongerPaths = false) {
   return paths;
 }
 
-export default ({ chords, scales, height, noScroll, getValue , keepLongerPaths}) => {
+export default ({ chords, scales, height, maxHeight, noScroll, getValue , keepLongerPaths}:any) => {
   const candidates = useMemo(
     () =>
       chords.map((chord) => {
@@ -145,7 +145,7 @@ export default ({ chords, scales, height, noScroll, getValue , keepLongerPaths})
       {/* <div style={{ display: 'flex' }}> */}
       <Card elevation={3}>
         <CardContent style={{ height: height || 800, overflow: 'auto' }}>
-          <PathTree paths={paths?.value} height={height || 800} getValue={getDiff} />
+          <PathTree paths={paths?.value} height={maxHeight || 800} getValue={getDiff} />
         </CardContent>
       </Card>
       {/* <ul>
