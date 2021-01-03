@@ -1,3 +1,7 @@
+- https://github.com/public-apis/public-apis !!!
+- http://stoney.sb.org/eno/oblique.html
+
+
 - https://github.com/unkleho/d3-render !!
 
 - https://github.com/rakannimer/react-orchestra

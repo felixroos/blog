@@ -1,6 +1,6 @@
 ---
 title: Chord Scales
-date: 2020-11-26
+date: 2021-01-04
 ---
 
 import { Chord } from '@tonaljs/tonal';
@@ -17,19 +17,26 @@ import bySetNum from '../components/sets/bySetNum';
 import chordScaleGraph from '../components/graphs/chordScaleGraph';
 import scaleColor from '../components/sets/scaleColor';
 import { Graphviz } from 'graphviz-react';
+import { groupBy } from 'lodash';
 
-To build a hackable backing track player, we now got rhythm and harmony. What's missing: Melodies.
+To build a hackable backing track player, we already laid the foundation of [rhythm](../rhythmical-objects/) and [harmony](../rhythmical-chords/).
+What's missing: Melodies.
 Even if we just want a backing track player, playing melodies is required for basslines, or any kind of melodic fill in.
 
-So far, we were generating voicings from chord symbols. The problem: melodies will eventually use notes that are not a chord notes.
+So far, we were generating voicings from chord symbols. The problem: melodies will eventually use notes that are not a chord note.
 Therefore, we need a way to find scales that fit to chord changes.
 
+TBD: show three circles with Dminor7 chord inside aeolian, dorian and phrygian
+
 ## Subsets and Supersets
+
+To be able to find out which scales contain a chord, we need to understand the concept of subsets and supersets.
+To fully understand this, I recommend you to read my [pitch class sets post](../pitch-class-sets/) first.
 
 Sets can be related by being sub or supersets. For example, a C major chord is a subset of the C major scale. Also, the C major scale is a superset of a C major chord.
 So, a superset contains all notes of its subset + some more, while a subset contains some of its superset (and no others!).
 
-In tonal, we can check if chromas are subsets or supersets:
+In tonal, we can check if [chromas](../pitch-class-sets/#chromas--set-numbers) are subsets or supersets:
 
 ```js
 const isSupersetOfChord = (chord) => PcSet.isSupersetOf(Chord.get(chord).chroma);
@@ -73,77 +80,6 @@ function isSubset(subset, superset) {
 }
 isSubset(Chord.get('M').chroma, Scale.get('major').chroma); // true
 isSubset(Chord.get('m').chroma, Scale.get('major').chroma); // false
-```
-
-### Rotations and Modes
-
-Chromas can also be rotations of one another. Is mucial terms, we would call those modes:
-
-```js
-Scale.modeNames('C major').map(([root, scale]) => `${root} ${scale}`);
-/*
-[
-  'C major',
-  'D dorian',
-  'E phrygian',
-  'F lydian',
-  'G mixolydian',
-  'A aeolian',
-  'B locrian'
-]
-*/
-PcSet.modes(Scale.get('C major').chroma);
-/*
-[
-  '101011010101',
-  '101101010110',
-  '110101011010',
-  '101010110101',
-  '101011010110',
-  '101101011010',
-  '110101101010'
-]
-*/
-```
-
-## Scales
-
-Let's explore all scales, grouped by note number and shape:
-
-<div>
-  {Object.entries(groupBy(Scale.names(), (scale) => Scale.get(scale).intervals.length)).map(([l, scales], i) => (
-    <React.Fragment key={i}>
-      <h3>{l} notes</h3>
-      <ul>
-        {Object.entries(groupBy(scales.sort(bySetNum), (scale) => Scale.get(scale).normalized))
-          .sort(([a], [b]) => b - a)
-          .map(([setNum, scales], j) => (
-            <li key={j}>
-              <b>{parseInt(setNum, 2)}</b> {scales.join(', ')}
-            </li>
-          ))}
-      </ul>
-    </React.Fragment>
-  ))}
-</div>
-
-```js
-<div>
-  {Object.entries(groupBy(Scale.names(), (scale) => Scale.get(scale).intervals.length)).map(([l, scales], i) => (
-    <React.Fragment key={i}>
-      <h3>{l} notes</h3>
-      <ul>
-        {Object.entries(groupBy(scales.sort(bySetNum), (scale) => Scale.get(scale).normalized)).map(
-          ([setNum, scales], j) => (
-            <li key={j}>
-              <b>{parseInt(setNum, 2)}</b> {scales.join(', ')}
-            </li>
-          )
-        )}
-      </ul>
-    </React.Fragment>
-  ))}
-</div>
 ```
 
 ## Chord Scales
@@ -221,7 +157,6 @@ getChordScales('^7', scaleModes('major', 'harmonic minor', 'melodic minor'));
 ```
 
 We will look more closely at chord scales in a future post
-
 
 ## Hello 251
 
@@ -488,3 +423,74 @@ export const chromaDifference(a, b) => {
 
 - [wasm graphviz](https://github.com/hpcc-systems/hpcc-js-wasm#graphviz) (used by d3-graphviz)
 - [jgf-dot](https://github.com/jsongraph/jgf-dot)
+
+### Rotations and Modes
+
+Chromas can also be rotations of one another. Is mucial terms, we would call those modes:
+
+```js
+Scale.modeNames('C major').map(([root, scale]) => `${root} ${scale}`);
+/*
+[
+  'C major',
+  'D dorian',
+  'E phrygian',
+  'F lydian',
+  'G mixolydian',
+  'A aeolian',
+  'B locrian'
+]
+*/
+PcSet.modes(Scale.get('C major').chroma);
+/*
+[
+  '101011010101',
+  '101101010110',
+  '110101011010',
+  '101010110101',
+  '101011010110',
+  '101101011010',
+  '110101101010'
+]
+*/
+```
+
+## Scales
+
+Let's explore all scales, grouped by note number and shape:
+
+<div>
+  {Object.entries(groupBy(Scale.names(), (scale) => Scale.get(scale).intervals.length)).map(([l, scales], i) => (
+    <React.Fragment key={i}>
+      <h3>{l} notes</h3>
+      <ul>
+        {Object.entries(groupBy(scales.sort(bySetNum), (scale) => Scale.get(scale).normalized))
+          .sort(([a], [b]) => b - a)
+          .map(([setNum, scales], j) => (
+            <li key={j}>
+              <b>{parseInt(setNum, 2)}</b> {scales.join(', ')}
+            </li>
+          ))}
+      </ul>
+    </React.Fragment>
+  ))}
+</div>
+
+```js
+<div>
+  {Object.entries(groupBy(Scale.names(), (scale) => Scale.get(scale).intervals.length)).map(([l, scales], i) => (
+    <React.Fragment key={i}>
+      <h3>{l} notes</h3>
+      <ul>
+        {Object.entries(groupBy(scales.sort(bySetNum), (scale) => Scale.get(scale).normalized)).map(
+          ([setNum, scales], j) => (
+            <li key={j}>
+              <b>{parseInt(setNum, 2)}</b> {scales.join(', ')}
+            </li>
+          )
+        )}
+      </ul>
+    </React.Fragment>
+  ))}
+</div>
+```

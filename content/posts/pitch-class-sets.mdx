@@ -11,17 +11,11 @@ import Grid from '@material-ui/core/Grid';
 import Switch from '@material-ui/core/Switch';
 import { Scale, Note, Range, PcSet, Chord } from '@tonaljs/tonal';
 import { State } from 'react-powerplug';
-import rotateTonic from '../components/sets/rotateTonic.ts';
 import rotateMode from '../components/sets/rotateMode';
-import scaleChroma from '../components/sets/scaleChroma';
-import chromaScale from '../components/sets/chromaScale';
 import rotateScale from '../components/sets/rotateScale';
-import chromaReflection from '../components/sets/chromaReflection';
 import scaleReflection from '../components/sets/scaleReflection';
 import transposeScale from '../components/sets/transposeScale.ts';
 import simplifyScale from '../components/sets/simplifyScale.ts';
-import bySetNum from '../components/sets/bySetNum.ts';
-import { groupBy } from 'lodash';
 
 export const oneOfModes = (families) => (scale) =>
   families.map((f) => Scale.get(f).normalized).includes(Scale.get(scale).normalized);
