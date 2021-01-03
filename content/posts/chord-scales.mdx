@@ -197,7 +197,7 @@ As a first step, we need to find all possible scales for a chord progression. Wh
 
 ```js
 const chords = ['Dm7', 'G7', 'C^7'];
-chords.map((chord) => getChordScales(chord, scaleModes('major')));
+chords.map((chord) => chordScales(chord, scaleModes('major')));
 /*
 [
   [ 'phrygian', 'aeolian', 'dorian' ],
@@ -304,11 +304,11 @@ Chord.chordScales('^7');
 To understand how it works + to have more control over the output, let's reimplent it:
 
 ```js
-function getChordScales(chord) {
+function chordScales(chord) {
   const isSuperSet = PcSet.isSupersetOf(Chord.get(chord).chroma);
   return Scale.names().filter((scale) => isSuperSet(Scale.get(scale).chroma));
 }
-getChordScales('^7');
+chordScales('^7');
 ```
 
 ### Filtering Choices
@@ -316,11 +316,11 @@ getChordScales('^7');
 The above scale choices are pretty overwhelming. We could limit the checked scales like that:
 
 ```js
-function getChordScales(chord, scales = Scale.names()) {
+function chordScales(chord, scales = Scale.names()) {
   const isSuperSet = PcSet.isSupersetOf(Chord.get(chord).chroma);
   return scales.filter((scale) => isSuperSet(Scale.get(scale).chroma));
 }
-getChordScales('^7', ['major', 'minor', 'lydian']);
+chordScales('^7', ['major', 'minor', 'lydian']);
 // ['lydian', 'major']
 ```
 
@@ -342,7 +342,7 @@ scaleModes('major');
   'major'
 ]
 */
-getChordScales('^7', scaleModes('major', 'harmonic minor', 'melodic minor'));
+chordScales('^7', scaleModes('major', 'harmonic minor', 'melodic minor'));
 // [ 'lydian', 'major', 'lydian #9' ]
 ```
 
@@ -479,23 +479,50 @@ Finally, this is what we get:
   json={{
     graph: {
       directed: true,
-      ...chordScaleGraph(['Dm7', 'G7', 'C^7'], scaleModes('major')),
+      ...chordScaleGraph(['Dm7', 'G7', 'C^7'], scaleModes('major'), true),
     },
   }}
 />
 
-Note that we are now using chroma differences without dividing by 2.
+## Simple Path Finding
+
+Now let's get down to the nitty gritty.
+Before talking code, let's look at how the graph is built up, step by step.
+To be able to see some interesting results, we will use a doubled 251 progression `Dm7 G7 C^7 Dm7 G7 C^7`:
+
+export const scaleDiff = (source, target) =>
+  source && target ? chromaDifference(scaleChroma(source), scaleChroma(target)) / 2 : 0;
+
+<PathBuilder
+  chords={['Dm7', 'G7', 'C^7', 'Dm7', 'G7', 'C^7']}
+  scales={scaleModes('major')}
+  getValue={scaleDiff}
+  height={400}
+  noScroll={true}
+  keepLongerPaths={true}
+/>
+
+Note that the "Next Step" button turns into "Done", when the algorithm has found the optimal path.
+In this case, we have a match before we even had to check "D phrygian" and "D aeolian" in the second 251.
+This works because:
+
+- At each step, the path with the lowest value is extended
+- The algorithm finishes if a the path with the lowest value reaches the end.
+- If no transition is negative (which cannot be), the shortest path is found
+
+In this case, we can ignore the first "C lydian" as well as the second time "D phrygian" and "D aeolian", because they are not as promising.
+This saves calculation time, which might seem small in this case, but it will be a life saver for bigger graphs.
 
 ## All The Things You Are
 
-Now that we can generate graphs of any complexity, let's step up our game and visualize a more complex tune.
+Let's step up our game and use a more complex tune.
 
 The scale graph of "All the Things you Are" looks like this:
 
 <Card elevation={3} >
 <CardContent style={{ maxHeight: 500, overflow: 'auto'}}>
   <GraphvizJSON
-    options={{ fit: true, height: 3000, width: 600 }}
+    options={{ fit: true, height: 3000, width: 620 }}
     json={{
       graph: {
         directed: true,
@@ -559,7 +586,7 @@ The scale graph of "All the Things you Are" looks like this:
 
 ```js
 <GraphvizJSON
-  options={{ fit: true, height: 3000, width: 600 }}
+  options={{ fit: true, height: 3000, width: 620 }}
   json={{
     graph: {
       directed: true,
@@ -613,8 +640,7 @@ The scale graph of "All the Things you Are" looks like this:
 ```
 
 </details>
-
-## Path Finding Generator
+<br/>
 
 
 <PathBuilder

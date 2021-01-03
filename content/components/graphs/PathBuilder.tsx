@@ -6,11 +6,15 @@ import chromaDifference from '../sets/chromaDifference';
 import scaleChroma from '../sets/scaleChroma';
 import scaleColor from '../sets/scaleColor';
 import GraphvizJSON from './GraphvizJSON';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import Button from '@material-ui/core/Button';
 
-function* buildTree(candidates, getValue) {
+function* buildTree(candidates, getValue, keepLongerPaths = false) {
   let paths = [];
   let source = { path: [], value: 0, values: [] };
   let isFinished = false;
+  let minIndex = 0;
   while (!isFinished) {
     const level = source.path.length;
     const sourceCandidate = source.path.length > 0 ? source.path.slice(-1)[0] : undefined;
@@ -24,7 +28,7 @@ function* buildTree(candidates, getValue) {
       const lvl = source.path.length;
       // check if already have shorter path to target => ignore
       const shorter = findShorterPath(target, lvl, value);
-      if (!!shorter) {
+      if (!!shorter && !keepLongerPaths) {
         // console.log('already have a shorter path..');
         return next;
       }
@@ -48,8 +52,9 @@ function* buildTree(candidates, getValue) {
       });
       return next;
     }, []);
-    paths = paths.concat(nextPaths);
-    let minIndex, minValue, longest, longestIndex;
+    paths.splice(minIndex, 0, ...nextPaths); // to keep order
+    //paths = paths.concat(nextPaths);
+    let /* minIndex,  */ minValue, longest, longestIndex;
     paths.forEach((current, index) => {
       const { value, path } = current;
       if (longest === undefined || path.length > longest.path.length) {
@@ -57,14 +62,14 @@ function* buildTree(candidates, getValue) {
         longestIndex = index;
       }
       // only use non finished paths for next
-      if (path.length < candidates.length && (minValue === undefined || value < minValue)) {
+      if (minValue === undefined || value < minValue) {
         minValue = value;
         minIndex = index;
       }
     });
     source = paths[minIndex];
-    if (longest?.path.length === candidates.length && longest.value === minValue) {
-      paths = [longest];
+    if (paths[minIndex].path.length === candidates.length) {
+      //paths = [paths[minIndex]];
       isFinished = true;
     }
     if (!source) {
@@ -78,7 +83,7 @@ function* buildTree(candidates, getValue) {
   return paths;
 }
 
-export default ({ chords, scales }) => {
+export default ({ chords, scales, height, noScroll, getValue , keepLongerPaths}) => {
   const candidates = useMemo(
     () =>
       chords.map((chord) => {
@@ -95,52 +100,74 @@ export default ({ chords, scales }) => {
   const combinedDiff = (source, target) => {
     return colorDiff(source, target) + scaleDiff(source, target);
   };
-  const [paths, next] = useGenerator(
+  const getDiff = getValue || combinedDiff;
+  const [paths, next, reset] = useGenerator(
     () => {
-      return buildTree(candidates, combinedDiff);
+      return buildTree(candidates, getDiff, keepLongerPaths);
     },
     true,
     false
   );
 
-  useEffect(() => {
+  /* useEffect(() => {
     setInterval(() => {
       if (paths && !paths.done) {
         next();
       }
     }, 200);
-    /* let p = buildTree(candidates, scaleDiff);
-    let r = p.next();
-    while (!r.done) {
-      r = p.next();
-    } */
-  }, []);
+  }, []); */
+  /* let p = buildTree(candidates, scaleDiff);
+  let r = p.next();
+  while (!r.done) {
+    r = p.next();
+  } */
+  const controls = (
+    <>
+      <Button color="primary" onClick={() => !paths?.done && next()}>
+        {paths?.done ? 'DONE' : 'Next Step'}
+      </Button>
+      <Button color="primary" onClick={() => reset()}>
+        RESET
+      </Button>
+    </>
+  );
+  if (noScroll) {
+    return (
+      <div style={{ height: height + 30 }}>
+        {controls}
+        <PathTree paths={paths?.value} height={height || 800} getValue={getDiff} />
+      </div>
+    );
+  }
   return (
     <div>
-      <button onClick={() => !paths.done && next()}>next {paths?.done ? 'DONE' : 'NOT DONE'}</button>
-      <div style={{ display: 'flex' }}>
-        <div style={{ width: 600, maxHeight: 700, border: '1px solid black', borderRadius: 10, overflow: 'auto' }}>
-          <PathTree paths={paths?.value} />
-        </div>
-        <ul>
+      {controls}
+      {/* <div style={{ display: 'flex' }}> */}
+      <Card elevation={3}>
+        <CardContent style={{ height: height || 800, overflow: 'auto' }}>
+          <PathTree paths={paths?.value} height={height || 800} getValue={getDiff} />
+        </CardContent>
+      </Card>
+      {/* <ul>
           {paths?.value?.map(({ path, value }, index) => (
             <li key={index}>
               #{index}: {path.length} ({value})
             </li>
           ))}
         </ul>
-      </div>
+      </div> */}
     </div>
   );
 };
 
-function PathTree({ paths }) {
+function PathTree({ paths, height, getValue }) {
   if (!paths) {
     return null;
   }
   let nodes: any[] = [{ label: 'start', id: '0' }];
   let edges = [];
   const nodeId = (i, j) => `${i}.${j}`;
+  // TODO: color edges of smallest path
   paths.forEach(({ path, value }, i) => {
     path.forEach((label, j) => {
       const target = nodeId(label, j);
@@ -152,7 +179,8 @@ function PathTree({ paths }) {
         edges.push({ source: '0', target, label: '0' });
       } else {
         const source = nodeId(path[j - 1], j - 1);
-        const diff = chromaDifference(scaleChroma(path[j - 1]), scaleChroma(label));
+        //const diff = chromaDifference(scaleChroma(path[j - 1]), scaleChroma(label));
+        const diff = getValue(path[j - 1], label);
         const isDuplicate = edges.find(({ source: s, target: t }) => source === s && target === t);
 
         if (j === path.length - 1) {
@@ -160,16 +188,16 @@ function PathTree({ paths }) {
             source,
             target,
             label: `+${diff}=${value}`,
-            fillcolor: isDuplicate ? 'yellow' : 'red',
-            style: 'filled',
+            //fillcolor: isDuplicate ? 'yellow' : 'green',
+            //style: 'filled',
           });
         } else if (!isDuplicate) {
           edges.push({
             source,
             target,
             label: `+${diff}`,
-            fillcolor: isDuplicate ? 'yellow' : 'green',
-            style: 'filled',
+            //fillcolor: isDuplicate ? 'yellow' : 'green',
+            //style: 'filled',
           });
         }
       }
@@ -178,7 +206,7 @@ function PathTree({ paths }) {
 
   return (
     <GraphvizJSON
-      options={{ width: 600, height: 800 }}
+      options={{ width: 600, height: height || 800 }}
       json={{
         graph: {
           directed: true,

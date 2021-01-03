@@ -18,5 +18,8 @@ export function useGenerator(init, autostart = true, loop = true) {
     setState(_state);
     return _state;
   }
-  return [state, next];
+  function reset() {
+    setState(undefined);
+  }
+  return [state, next, reset];
 }
