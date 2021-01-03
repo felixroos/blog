@@ -22,6 +22,8 @@ import { groupBy } from 'lodash';
 import { Scale, Note } from '@tonaljs/tonal';
 import ChromaticCircle from '../components/sets/ChromaticCircle.tsx';
 import HarmonicCircle from '../components/sets/HarmonicCircle.tsx';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
 
 To build a hackable backing track player, we already laid the foundation of [rhythm](../rhythmical-objects/) and [harmony](../rhythmical-chords/).
 What's missing: Melodies.
@@ -100,7 +102,7 @@ We can visualize the transitions between the possible scales in a graph like thi
 - The numbers indicate the number of accidentals that change between scales. We can use them to evaluate how smooth the scale transition will be.
 - The colorization is used like described in [this post](coloring-scales/).
 
-Using this representation, we can turn this into a path finding problem.
+Using this representation, we can turn it into a path finding problem.
 
 ### Choice Tree
 
@@ -205,7 +207,16 @@ chords.map((chord) => getChordScales(chord, scaleModes('major')));
 */
 ```
 
-We can reach this goal by using:
+Instead of just using [Chord.chordScales](https://github.com/tonaljs/tonal/tree/master/packages/chord#chordchordscaleschordname-string--string), I am using a custom implementation that allows to filter the scales.
+As this is not really the topic of this post, I put the details in a yellow box:
+
+<Card elevation={3} >
+<CardContent style={{backgroundColor:'#E9E850'}}>
+
+
+<details>
+  <summary>Show Implementation Details</summary>
+
 
 ### Subsets and Supersets
 
@@ -335,15 +346,154 @@ getChordScales('^7', scaleModes('major', 'harmonic minor', 'melodic minor'));
 // [ 'lydian', 'major', 'lydian #9' ]
 ```
 
-### Bing
+</details>
 
--....
 
-## Complex Example
+</CardContent>
+</Card>
+<br/>
+
+
+### Scale Transitions
+
+To know which scale transition are the smoothest, we need a way to assess change.
+An easy way is using the chroma difference:
+
+```js
+export const chromaDifference(a, b) => {
+  let diff = 0;
+  for (let i = 0; i < 12; ++i) {
+    diff += a[i] === b[i] ? 0 : 1
+  }
+  return diff;
+}
+```
+
+This function will count how much characters of two chromas are different. Example:
+
+```
+101011010101 = C major
+101011010110 = F major
+          ^^ = 2 different bits
+```
+
+If we divide the different bits by 2, we get the difference in accidentals:
+
+```js
+const fromCtoG = chromaDifference(scaleChroma('C major'), scaleChroma('F major')); // 2
+const diff = fromCtoG / 2; // 1
+```
+
+In the final algorithm, we won't divide by 2, as it does not bring anything new to the table.
+
+## Generating Scale Graphs
+
+To be visualize the algorithm for development, we will use [graphviz-react](https://github.com/DomParfitt/graphviz-react).
+
+As this is also just an extra implementation, I'll put the details in a green box.
+
+<Card elevation={3} >
+<CardContent style={{backgroundColor:'#C1E585'}}>
+
+
+<details>
+  <summary>Show Implementation Details</summary>
+
+
+To be able to use JSON instead of DOT, we will use [jgf-dot](https://github.com/jsongraph/jgf-dot):
+
+```js
+import { Graphviz } from 'graphviz-react';
+import toDot from 'jgf-dot';
+
+export default function GraphvizJSON({ json, options }) {
+  if (!json) {
+    return;
+  }
+  const dot = toDot(json);
+  // console.log('dot',dot);
+  return <Graphviz dot={dot} options={options} />;
+}
+```
+
+We can use it like that:
+
+```js
+<GraphvizJSON
+  options={{ height: 300 }}
+  json={{
+    graph: {
+      directed: true,
+      ...chordScaleGraph(['Dm7', 'G7', 'C^7'], scaleModes('major')),
+    },
+  }}
+/>
+```
+
+Finally, the chordScaleGraph function will output a json-graph that represents the scales of the given chords:
+
+```js
+export default (chords, allowedScales = scaleModes('major'), halfDifference = false) => {
+  const scales = chords
+    .map((chord) => chordScales(chord, allowedScales))
+    .map((choices) => (choices.length > 0 ? choices : ['chromatic']));
+  let nodes = [];
+  let links = [];
+  scales.forEach((choices, i) => {
+    choices
+      .map((choice) => `${Chord.tokenize(chords[i])[0]} ${choice}`)
+      .sort(bySetNum)
+      .forEach((choice, j) => {
+        if (i > 0) {
+          const prev = scales[i - 1];
+          prev.forEach((sourceScale, k) => {
+            const source = nodes.length - j - prev.length + k;
+            const target = nodes.length;
+            let label = chromaDifference(scaleChroma(nodes[source].label), scaleChroma(choice));
+            if (halfDifference) {
+              label /= 2;
+            }
+            links.push({ source, target, label });
+          });
+        }
+        nodes.push({ label: choice, fillcolor: scaleColor(choice), style: 'filled' });
+      });
+  });
+  nodes = nodes.map((node, id) => ({ ...node, id }));
+  return { nodes, edges: links };
+};
+```
+
+</details>
+
+
+</CardContent>
+</Card>
+<br/>
+
+
+Finally, this is what we get:
+
+<GraphvizJSON
+  options={{ height: 300 }}
+  json={{
+    graph: {
+      directed: true,
+      ...chordScaleGraph(['Dm7', 'G7', 'C^7'], scaleModes('major')),
+    },
+  }}
+/>
+
+Note that we are now using chroma differences without dividing by 2.
+
+## All The Things You Are
+
+Now that we can generate graphs of any complexity, let's step up our game and visualize a more complex tune.
 
 The scale graph of "All the Things you Are" looks like this:
 
-<div style={{ maxHeight: 500, width: 600, border: '1px solid black', borderRadius: 10, overflow: 'auto' }}>
+<Card elevation={3} >
+<CardContent style={{ maxHeight: 500, overflow: 'auto'}}>
   <GraphvizJSON
     options={{ fit: true, height: 3000, width: 600 }}
     json={{
@@ -396,8 +546,76 @@ The scale graph of "All the Things you Are" looks like this:
       },
     }}
   />
-</div>
+
+
+</CardContent>
+</Card>
 <br />
+
+
+<details>
+<summary>show source</summary>
+
+
+```js
+<GraphvizJSON
+  options={{ fit: true, height: 3000, width: 600 }}
+  json={{
+    graph: {
+      directed: true,
+      ...chordScaleGraph(
+        [
+          'Fm7',
+          'Bbm7',
+          'Eb7',
+          'Ab^7',
+          'Db^7',
+          'Dm7',
+          'G7',
+          'C^7',
+          'C^7',
+          'Cm7',
+          'Fm7',
+          'Bb7',
+          'Eb^7',
+          'Ab^7',
+          'Am7',
+          'D7',
+          'G^7',
+          'G^7',
+          'Am7',
+          'D7',
+          'G^7',
+          'G^7',
+          'F#h7',
+          'B7b9',
+          'E^7',
+          'C7b13',
+          'Fm7',
+          'Bbm7',
+          'Eb7',
+          'Ab^7',
+          'Db^7',
+          'Db-^7',
+          'Cm7',
+          'Bo7',
+          'Bbm7',
+          'Eb7',
+          'Ab^7',
+          'Gh7',
+          'C7b9',
+        ],
+        ['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6']
+      ),
+    },
+  }}
+/>
+```
+
+</details>
+
+## Path Finding Generator
+
 
 <PathBuilder
   chords={[
@@ -465,20 +683,6 @@ To have a scale for each chord, we allow the following scales:
 ```
 
 I won't render the choice tree here, as it would blow up everything..
-
-### Chroma Difference
-
-We can get the chroma difference like this:
-
-```js
-export const chromaDifference(a, b) => {
-  let diff = 0;
-  for (let i = 0; i < 12; ++i) {
-    diff += a[i] === b[i] ? 0 : 1
-  }
-  return diff;
-}
-```
 
 - [wasm graphviz](https://github.com/hpcc-systems/hpcc-js-wasm#graphviz) (used by d3-graphviz)
 - [jgf-dot](https://github.com/jsongraph/jgf-dot)
@@ -553,3 +757,7 @@ Let's explore all scales, grouped by note number and shape:
   ))}
 </div>
 ```
+
+## Links
+
+- https://www.youtube.com/watch?v=gGQ-vAmdAOI
