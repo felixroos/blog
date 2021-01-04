@@ -8,16 +8,21 @@ declare type Path = {
 
 declare type ValueFn = (path: Path, target: string,) => number;
 
-export default function extendBestPath(paths: Path[], candidates: string[][], getValue: ValueFn) {
+export default function extendBestPath(paths: Path[], graph: string[][], getValue: ValueFn): Path[] | false {
   if (!paths.length) {
-    return candidates[0].map(candidate => ({ value: 0, values: [0], path: [candidate] }))
+    // if no paths are given, return initial paths
+    return graph[0].map(candidate => ({ value: 0, values: [0], path: [candidate] }))
   }
+  // find index with lowest value
   const bestIndex = minIndex(paths, (path) => path.value);
   const best = paths[bestIndex];
-  if (best.path.length >= candidates.length) {
-    throw new Error('cannot extendBestPath: graph end reached')
+  if (best.path.length >= graph.length) {
+    // throw error if the best path is already at the end => cannot extend any further
+    // throw new Error('cannot extendBestPath: graph end reached');
+    return false;
   }
-  const nextCandidates: Path[] = candidates[best.path.length].map(candidate => {
+  // generate next possible steps by splitting up the best path for all possible next candidates
+  const nextSteps: Path[] = graph[best.path.length].map(candidate => {
     const value = getValue(best, candidate);
     return {
       value: best.value + value,
@@ -25,5 +30,8 @@ export default function extendBestPath(paths: Path[], candidates: string[][], ge
       path: best.path.concat(candidate)
     }
   });
-  return [...paths.slice(0, bestIndex), ...nextCandidates, ...paths.slice(bestIndex + 1)]
+  // replace best path with nextSteps
+  return paths.slice(0, bestIndex).concat(nextSteps, paths.slice(bestIndex + 1));
+  // now using concat for performance boost
+  // return [...paths.slice(0, bestIndex), ...nextSteps, ...paths.slice(bestIndex + 1)]
 }
