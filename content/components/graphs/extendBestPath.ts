@@ -1,12 +1,12 @@
 import { minIndex } from 'd3-array';
 
-declare type Path = {
-  values: number[],
+export declare type Path = {
+  values?: number[],
   value: number,
   path: string[]
 }
 
-declare type ValueFn = (path: Path, target: string,) => number;
+export declare type ValueFn = (source: string, target: string, path: Path) => number;
 
 export default function extendBestPath(paths: Path[], graph: string[][], getValue: ValueFn): Path[] | false {
   if (!paths.length) {
@@ -16,18 +16,19 @@ export default function extendBestPath(paths: Path[], graph: string[][], getValu
   // find index with lowest value
   const bestIndex = minIndex(paths, (path) => path.value);
   const best = paths[bestIndex];
-  if (best.path.length >= graph.length) {
+  const { path, value, values } = best;
+  if (path.length >= graph.length) {
     // throw error if the best path is already at the end => cannot extend any further
     // throw new Error('cannot extendBestPath: graph end reached');
     return false;
   }
   // generate next possible steps by splitting up the best path for all possible next candidates
-  const nextSteps: Path[] = graph[best.path.length].map(candidate => {
-    const value = getValue(best, candidate);
+  const nextSteps: Path[] = graph[path.length].map(candidate => {
+    const nextValue = getValue(path[path.length - 1], candidate, best);
     return {
-      value: best.value + value,
-      values: best.values.concat([value]),
-      path: best.path.concat(candidate)
+      value: value + nextValue,
+      values: values.concat([nextValue]),
+      path: path.concat(candidate)
     }
   });
   // replace best path with nextSteps

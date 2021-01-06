@@ -5,3 +5,5 @@ export default (a, b) => {
   }
   return diff;
 }
+
+// export const chromaDifference = (a, b) => ((parseInt(a, 2) ^ parseInt(b, 2)) >>> 0).toString(2).split('1').length - 1;

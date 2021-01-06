@@ -4,8 +4,8 @@ import extendBestPath from './extendBestPath'
 
 test('extendBestPath', () => {
   const candidates = [['D aeolian', 'D dorian'], ['G mixolydian'], ['C major', 'C lydian']];
-  const getValue = ({ path }, candidate) => {
-    return chromaDifference(scaleChroma(path[path.length - 1]), scaleChroma(candidate))
+  const getValue = (source, target) => {
+    return chromaDifference(scaleChroma(source), scaleChroma(target))
   };
   const step1 = [
     {
@@ -48,7 +48,5 @@ test('extendBestPath', () => {
       values: [0, 0, 2],
     }]
   expect(extendBestPath(step3, candidates, getValue)).toEqual(step4);
-  expect(() => extendBestPath(step4, candidates, getValue)).toThrowError();
+  expect(extendBestPath(step4, candidates, getValue)).toBe(false);
 })
-
-// TODO: use this function in a loop

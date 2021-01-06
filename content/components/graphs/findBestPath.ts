@@ -1,13 +1,14 @@
 import { minIndex } from 'd3-array';
-import extendBestPath from './extendBestPath';
+import extendBestPath, { ValueFn, Path } from './extendBestPath';
 
-export default function findBestPath(graph, getValue) {
-  let paths = [];
+
+export default function findBestPath(graph: string[][], getValue: ValueFn): string[] {
+  let paths: Path[] = [];
   let isFinished = false;
   while (!isFinished) {
     const extended = extendBestPath(paths, graph, getValue);
     if (!extended) {
-      isFinished = true
+      isFinished = true;
     } else {
       paths = extended;
     }
