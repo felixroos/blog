@@ -527,6 +527,7 @@ export const scaleDiff = (source, target) =>
   scales={scaleModes('major')}
   getValue={scaleDiff}
   height={400}
+  width={600}
   noScroll={true}
   keepLongerPaths={true}
   view="tree"
@@ -805,11 +806,161 @@ That's the basic trick! But we might run into some unforseen problems when throw
 Like a diligent gardener, we might need some branch pruning to get better results..
 To illustrate the problem, let's the chord progression `TODO`
 
+## Solar
+
+<PathBuilder
+  height={600}
+  maxHeight={2000}
+  noScroll={false}
+  keepLongerPaths={false}
+  view={'graph'}
+  scales={['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6', 'harmonic minor']}
+  chords={['CmM7', 'Gm7', 'C7', 'F^7', 'Fm7', 'Bb7', 'Eb^7', 'Ebm7', 'Ab7', 'Db^7', 'Dm7b5', 'G7b9']}
+/>
+
+<details>
+  <summary>show full graph</summary>
+
+
+TODO: get rid of chordScaleGraph, use PathGraph instead
+
+<Card elevation={3} >
+<CardContent style={{ maxHeight: 500, overflow: 'auto'}}>
+  <GraphvizJSON
+    options={{ fit: true, height: 1800, width: 620 }}
+    json={{
+      graph: {
+        directed: true,
+        ...chordScaleGraph(
+          [
+            'CmM7',
+            'Gm7',
+            'C7',
+            'F^7',
+            'Fm7',
+            'Bb7',
+            'Eb^7',
+            'Ebm7',
+            'Ab7',
+            'Db^7',
+            'Dm7b5',
+            'G7b9'
+          ],
+          ['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6','harmonic minor']
+        ),
+      },
+    }}
+  />
+
+
+</CardContent>
+</Card>
+</details>
+<br />
+
+
+## How High The Moon
+
+export const hhtm = ['G^7', 'Gm7', 'C7', 'F^7', 'Fm7', 'Bb7', 'Eb^7', 'Am7b5', 'D7b9', 'Gm7', 'Am7b5', 'D7b9'];
+
+<PathBuilder
+  height={600}
+  maxHeight={2000}
+  noScroll={false}
+  keepLongerPaths={false}
+  view={'graph'}
+  scales={['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6']}
+  chords={hhtm}
+/>
+
+<details>
+  <summary>show full graph</summary>
+  <Card elevation={3}>
+    <CardContent style={{ maxHeight: 500, overflow: 'auto' }}>
+      <GraphvizJSON
+        options={{ fit: true, height: 3000, width: 620 }}
+        json={{
+          graph: {
+            directed: true,
+            ...chordScaleGraph(hhtm, [
+              'major',
+              'dorian',
+              'lydian',
+              'mixolydian',
+              'aeolian',
+              'phrygian dominant',
+              'locrian 6',
+            ]),
+          },
+        }}
+      />
+    </CardContent>
+  </Card>
+</details>
+<br />
+
 ## All The Things You Are
 
-Let's step up our game and use a more complex tune.
+<!-- interval={500}  -->
 
-The scale graph of "All the Things you Are" looks like this:
+<!--export const attyaScales = ['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6'];-->
+
+export const attyaScales = scaleModes('major', 'melodic minor', 'harmonic minor');
+export const attyaChords = [
+  'Fm7',
+  'Bbm7',
+  'Eb7',
+  'Ab^7',
+  'Db^7',
+  'Dm7',
+  'G7',
+  'C^7',
+  'C^7',
+  'Cm7',
+  'Fm7',
+  'Bb7',
+  'Eb^7',
+  'Ab^7',
+  'Am7',
+  'D7',
+  'G^7',
+  'G^7',
+  'Am7',
+  'D7',
+  'G^7',
+  'G^7',
+  'F#h7',
+  'B7b9',
+  'E^7',
+  'C7b13',
+  'Fm7',
+  'Bbm7',
+  'Eb7',
+  'Ab^7',
+  'Db^7',
+  'Db-^7',
+  'Cm7',
+  'Bo7',
+  'Bbm7',
+  'Eb7',
+  'Ab^7',
+  'Gh7',
+  'C7b9',
+];
+
+<PathBuilder
+  height={600}
+  maxHeight={2000}
+  noScroll={false}
+  keepLongerPaths={false}
+  view={'graph'}
+  scales={attyaScales}
+  chords={attyaChords}
+/>
+  
+<details>
+  <summary>show full graph</summary>
+
 
 <Card elevation={3} >
 <CardContent style={{ maxHeight: 500, overflow: 'auto'}}>
@@ -819,48 +970,8 @@ The scale graph of "All the Things you Are" looks like this:
       graph: {
         directed: true,
         ...chordScaleGraph(
-          [
-            'Fm7',
-            'Bbm7',
-            'Eb7',
-            'Ab^7',
-            'Db^7',
-            'Dm7',
-            'G7',
-            'C^7',
-            'C^7',
-            'Cm7',
-            'Fm7',
-            'Bb7',
-            'Eb^7',
-            'Ab^7',
-            'Am7',
-            'D7',
-            'G^7',
-            'G^7',
-            'Am7',
-            'D7',
-            'G^7',
-            'G^7',
-            'F#h7',
-            'B7b9',
-            'E^7',
-            'C7b13',
-            'Fm7',
-            'Bbm7',
-            'Eb7',
-            'Ab^7',
-            'Db^7',
-            'Db-^7',
-            'Cm7',
-            'Bo7',
-            'Bbm7',
-            'Eb7',
-            'Ab^7',
-            'Gh7',
-            'C7b9',
-          ],
-          ['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6']
+          attyaChords,
+          attyaScales
         ),
       },
     }}
@@ -869,65 +980,13 @@ The scale graph of "All the Things you Are" looks like this:
 
 </CardContent>
 </Card>
+</details>
 <br />
 
 
-Let's run the same path finding algorithm on these scales and see what happens:
-
-<PathBuilder
-  height={600}
-  maxHeight={2000}
-  noScroll={false}
-  keepLongerPaths={false}
-  view={'graph'}
-  scales={['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6']}
-  chords={[
-    'Fm7',
-    'Bbm7',
-    'Eb7',
-    'Ab^7',
-    'Db^7',
-    'Dm7',
-    'G7',
-    'C^7',
-    'C^7',
-    'Cm7',
-    'Fm7',
-    'Bb7',
-    'Eb^7',
-    'Ab^7',
-    'Am7',
-    'D7',
-    'G^7',
-    'G^7',
-    'Am7',
-    'D7',
-    'G^7',
-    'G^7',
-    'F#h7',
-    'B7b9',
-    'E^7',
-    'C7b13',
-    'Fm7',
-    'Bbm7',
-    'Eb7',
-    'Ab^7',
-    'Db^7',
-    'Db-^7',
-    'Cm7',
-    'Bo7',
-    'Bbm7',
-    'Eb7',
-    'Ab^7',
-    'Gh7',
-    'C7b9',
-  ]}
-/>
-<br />
-
-TBD: calculate svg height based on longest path with "heightPerLevel" to adjust the height as needed
-TBD: colorize shortest path
-TBD: autoscroll to shortest leaf
+- TBD: calculate svg height based on longest path with "heightPerLevel" to adjust the height as needed
+- TBD: colorize shortest path
+- TBD: autoscroll to shortest leaf
 
 ## Links
 

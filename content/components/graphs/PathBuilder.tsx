@@ -3,7 +3,7 @@ import Card from '@material-ui/core/Card';
 import Switch from '@material-ui/core/Switch';
 import CardContent from '@material-ui/core/CardContent';
 import { Chord } from '@tonaljs/tonal';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useGenerator } from '../common/useGenerator';
 import chordScales from '../sets/chordScales';
 import chromaDifference from '../sets/chromaDifference';
@@ -19,9 +19,23 @@ import Grid from '@material-ui/core/Grid';
 // TODO: add json view
 // TODO: button group to change view to tree | graph | json
 // TODO: add undo button
+// TODO: find out why width sometimes is too big
 
-export default ({ chords, scales, height, maxHeight, noScroll, getValue, keepLongerPaths, view: initialView }: any) => {
+export default ({
+  chords,
+  scales,
+  width,
+  height,
+  maxHeight,
+  noScroll,
+  getValue,
+  keepLongerPaths,
+  view: initialView,
+  interval,
+}: any) => {
   const [view, setView] = useState(initialView);
+  const [tolerance, setTolerance] = useState(0);
+  const [nextInterval, setNextInterval] = useState<any>();
   height = height || 800;
   maxHeight = maxHeight || 800;
   const candidates = useMemo(
@@ -37,41 +51,81 @@ export default ({ chords, scales, height, maxHeight, noScroll, getValue, keepLon
   const colorDiff = (source, target) => {
     return source && scaleChroma(source) !== scaleChroma(target) ? 1 : 0;
   };
-  const combinedDiff = (source, target) => {
-    return colorDiff(source, target) + scaleDiff(source, target);
+  const distance = (source, target, { path }) => {
+    // this seems to not always find the best path...
+    return chords.length - path.length; // adds distance to goal => checks nearer paths first
   };
-  //const getDiff = getValue || combinedDiff;
-  const getDiff = getValue || scaleDiff;
-  const [paths, next, reset] = useGenerator(
+  const combinedDiff = (source, target, path) => {
+    return colorDiff(source, target) + scaleDiff(source, target) /* + distance(source, target, path) */;
+  };
+  const getDiff = getValue || combinedDiff;
+  // const getDiff = getValue || scaleDiff;
+  const [started, setStarted] = useState(false);
+  const [paths, nextValue, resetGenerator] = useGenerator(
     () => {
-      return bestPath(candidates, getDiff, keepLongerPaths);
+      return bestPath(candidates, getDiff, { keepLongerPaths, tolerance });
     },
     true,
     false
   );
-  /* useEffect(() => {
-    setInterval(() => {
-      if (paths && !paths.done) {
-        next();
-      }
-    }, 200);
-  }, []); */
-  /* let p = bestPath(candidates, scaleDiff);
-  let r = p.next();
-  while (!r.done) {
-    r = p.next();
-  } */
+  useEffect(() => {
+    if (interval && !nextInterval && started) {
+      console.log('bing', interval);
+      const timeout = setTimeout(() => {
+        console.log('done', paths?.value?.length);
+        if (!paths?.done) {
+          nextValue();
+        }
+      }, interval);
+      setNextInterval(timeout);
+    }
+  }, [started, paths?.value?.length]);
+  function reset() {
+    resetGenerator();
+    setStarted(false);
+    clearInterval(nextInterval);
+    setNextInterval(undefined);
+  }
+  function next() {
+    setStarted(true);
+    nextValue();
+  }
+  function finish() {
+    let p = paths;
+    let count = 0;
+    while (!p.done) {
+      p = nextValue();
+      ++count;
+    }
+    console.log('took', count, 'steps');
+  }
   const controls = (
     <Grid container>
-      <Grid item xs={6}>
+      <Grid item xs={4}>
         <Button color="primary" onClick={() => !paths?.done && next()}>
-          {paths?.done ? 'DONE' : 'Next Step'}
+          {paths?.done ? 'done' : 'step'}
         </Button>
         <Button color="primary" onClick={() => reset()}>
-          RESET
+          reset
+        </Button>
+        <Button color="primary" onClick={() => finish()}>
+          finish
         </Button>
       </Grid>
-      <Grid item xs={6}>
+      <Grid item xs={4}>
+        <label>
+          tol.:{' '}
+          <input
+            min="-6"
+            max="6"
+            value={tolerance}
+            disabled={started}
+            type="number"
+            onChange={(e) => setTolerance(parseInt(e.target.value))}
+          />
+        </label>
+      </Grid>
+      <Grid item xs={4}>
         <label>
           tree
           <Switch
@@ -91,6 +145,7 @@ export default ({ chords, scales, height, maxHeight, noScroll, getValue, keepLon
         <PathGraph
           paths={paths?.value}
           height={height}
+          width={width}
           getColor={(scale) => scaleColor(scale)}
           includeStartNode={true}
           showCalculation={true}
@@ -100,31 +155,30 @@ export default ({ chords, scales, height, maxHeight, noScroll, getValue, keepLon
     </>
   );
   const levelHeight = 80;
-  const dynamicHeight = max(paths?.value || [], (p: Path) => p.path.length + 1) * levelHeight;
+  const dynamicHeight = (max(paths?.value || [], (p: Path) => p.path.length + 1) || 1) * levelHeight;
   if (noScroll) {
     return (
       <>
         {controls}
         <Card elevation={3}>
           <CardContent style={{ width: '100%', overflow: 'auto', textAlign: 'center' }}>
-            <Content height={height} />
+            <Content height={dynamicHeight} />
           </CardContent>
         </Card>
         {dynamicHeight > 500 ? controls : <></>}
-        {/* TODO: scroll to bottom when pressing bottom controls */}
       </>
     );
   }
+  const h = height ? Math.min(dynamicHeight + 40, height) : dynamicHeight;
   return (
     <>
       {controls}
-      {/* <div style={{ display: 'flex' }}> */}
       <Card elevation={3}>
-        <CardContent style={{ height: Math.min(dynamicHeight + 40, height), textAlign: 'center', overflow: 'auto' }}>
+        <CardContent style={{ height: h, textAlign: 'center', overflow: 'auto' }}>
           <Content height={Math.min(maxHeight, dynamicHeight)} />
         </CardContent>
       </Card>
-      {controls}
+      {dynamicHeight > 500 ? controls : <></>}
       {/* <ul>
           {paths?.value?.map(({ path, value }, index) => (
             <li key={index}>

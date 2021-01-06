@@ -1,4 +1,5 @@
-export default function* bestPath(candidates, getValue, keepLongerPaths = false) {
+export default function* bestPath(candidates, getValue, options = {}) {
+  const { keepLongerPaths, tolerance } = { tolerance: 0, keepLongerPaths: false, ...options };
   let paths = [];
   let source = { path: [], value: 0, values: [], acc: [] };
   let isFinished = false;
@@ -6,20 +7,20 @@ export default function* bestPath(candidates, getValue, keepLongerPaths = false)
   while (!isFinished) {
     const level = source.path.length;
     const sourceCandidate = source.path.length > 0 ? source.path.slice(-1)[0] : undefined;
-    const findShorterPath = (target, lvl, minValue) =>
-      paths.find(({ path, acc }) => path.length > lvl && path[lvl] === target && acc[lvl] < minValue);
+    const findBetterPath = (target, lvl, minValue) =>
+      paths.find(({ path, acc }) => path.length > lvl && path[lvl] === target && acc[lvl] < minValue - tolerance);
     const nextCandidates = candidates[level];
     const nextPaths = nextCandidates.reduce((next, target) => {
-      const nextValue = getValue(sourceCandidate, target);
+      const nextValue = getValue(sourceCandidate, target, source);
       const values = source.values.concat([nextValue]);
       const value = source.value + nextValue;
       const acc = source.acc.concat([value]);
       const targetPath = [...source.path, target];
       const lvl = source.path.length;
       // check if already have shorter path to target => ignore
-      const shorter = findShorterPath(target, lvl, value);
+      const shorter = findBetterPath(target, lvl, value);
       if (!!shorter && !keepLongerPaths) {
-        // console.log('found shorter path..', shorter, target, value, values, lvl);
+        // console.log('found better path..', shorter, target, value, values, lvl);
         return next;
       }
       next.push({
@@ -32,7 +33,7 @@ export default function* bestPath(candidates, getValue, keepLongerPaths = false)
       paths = paths.map((p) => {
         const { path } = p;
         if (path.length === lvl + 1 && path[lvl] === sourceCandidate) {
-          console.log('update similar path..'); // must be of equal value to be
+          // console.log('update similar path..'); // must be of equal value to be
           return {
             path: path.concat([target]),
             value: p.value + nextValue,
@@ -53,8 +54,10 @@ export default function* bestPath(candidates, getValue, keepLongerPaths = false)
         longest = current;
         longestIndex = index;
       }
+      //const stepsLeft = candidates.length - path.length;
       // only use non finished paths for next
-      if (minValue === undefined || value < minValue) {
+      const worst = false;
+      if (minValue === undefined || (!worst && value < minValue) || (worst && value > minValue)) {
         minValue = value;
         minIndex = index;
       }
@@ -62,6 +65,7 @@ export default function* bestPath(candidates, getValue, keepLongerPaths = false)
     source = paths[minIndex];
     if (paths[minIndex].path.length === candidates.length) {
       //paths = [paths[minIndex]];
+      //paths = paths.filter(({ path }) => path.length === candidates.length);
       isFinished = true;
     }
     if (!source) {
