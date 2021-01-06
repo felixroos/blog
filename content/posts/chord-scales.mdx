@@ -20,6 +20,7 @@ import chordScales from '../components/sets/chordScales';
 import bySetNum from '../components/sets/bySetNum';
 import chordScaleGraph from '../components/graphs/chordScaleGraph';
 import extendBestPath from '../components/graphs/extendBestPath';
+import decoratePathValues from '../components/graphs/decoratePathValues';
 import scaleColor from '../components/sets/scaleColor';
 import { Graphviz } from 'graphviz-react';
 import { groupBy } from 'lodash';
@@ -120,9 +121,9 @@ Navigating the graph above, we can follow one of 6 possible paths:
     { path: ['D aeolian', 'G mixolydian', 'C lydian'] },
     { path: ['D phrygian', 'G mixolydian', 'C major'] },
     { path: ['D phrygian', 'G mixolydian', 'C lydian'] },
-  ]}
+  ].map(decoratePathValues((a, b) => scaleDifference(a, b) / 2))}
   width={600}
-  getValue={(a, b) => scaleDifference(a, b) / 2}
+  height={300}
   getColor={(scale) => scaleColor(scale)}
 />
 

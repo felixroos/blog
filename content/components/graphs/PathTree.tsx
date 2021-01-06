@@ -2,8 +2,8 @@ import React from 'react';
 import buildTree from './buildTree';
 import GraphvizJSON from './GraphvizJSON';
 
-export default function PathTree({ paths, getValue, getColor, width, height }: any) {
-  const { nodes, edges } = buildTree(paths, getColor, getValue);
+export default function PathTree({ paths, getColor, width, height }: any) {
+  const { nodes, edges } = buildTree(paths, getColor);
   return (
     <GraphvizJSON
       options={{ height: height, width: width }}

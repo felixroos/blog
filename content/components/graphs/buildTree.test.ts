@@ -1,5 +1,3 @@
-import chromaDifference from '../sets/chromaDifference';
-import scaleChroma from '../sets/scaleChroma';
 import buildTree from './buildTree'
 
 test('buildTree', () => {
