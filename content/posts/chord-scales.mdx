@@ -613,9 +613,9 @@ export const step1 = extendBestPath([], graph, getValue);
 
 As a first step, we start with 2 paths leading to the 2 scale choices for the first chord:
 
-<!--<PathGraph height={300} paths={step1} />-->
-
-<PathTree height={300} paths={step1} getColor={(scale) => scaleColor(scale)} />
+<center>
+  <PathTree paths={step1} getColor={(scale) => scaleColor(scale)} />
+</center>
 
 So we can formulate our first expectation:
 
@@ -644,7 +644,9 @@ In the second step, we extend the (first found) best path:
 
 <!--<PathGraph height={300} paths={step2} getValue={getValue} />-->
 
-<PathTree height={300} paths={step2} getColor={(scale) => scaleColor(scale)} />
+<center>
+  <PathTree paths={step2} getColor={(scale) => scaleColor(scale)} />
+</center>
 
 ```js
 const step2 = extendBestPath(step1, graph, getValue);
@@ -666,7 +668,9 @@ Next, the second root branch seems more tempting, as it is still zero:
 
 <!--<PathGraph height={300} paths={step3} getValue={getValue} />-->
 
-<PathTree height={300} paths={step3} getColor={(scale) => scaleColor(scale)} />
+<center>
+  <PathTree paths={step3} getColor={(scale) => scaleColor(scale)} />
+</center>
 
 ```js
 const step3 = extendBestPath(step2, graph, getValue);
@@ -686,9 +690,11 @@ export const step4 = extendBestPath(step3, graph, getValue);
 
 Now, we continue extending the right branch, as it is still zero (compared to 2):
 
-<!--<PathGraph height={300} paths={step4} getValue={getValue} />-->
+<!-- TODO: add PathView with tree + graph + json modes and maybe a minimap -->
 
-<PathTree height={300} paths={step4} getColor={(scale) => scaleColor(scale)} />
+<center>
+  <PathTree paths={step4} getColor={(scale) => scaleColor(scale)} />
+</center>
 
 ```js
 const step4 = extendBestPath(step3, graph, getValue);

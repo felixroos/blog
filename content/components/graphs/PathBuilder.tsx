@@ -80,6 +80,8 @@ export default ({ chords, scales, height, maxHeight, noScroll, getValue, keepLon
             {view === 'graph' && <PathGraph paths={paths?.value} height={height} getValue={getDiff} />}
           </CardContent>
         </Card>
+        {dynamicHeight > 500 ? controls : <></>}
+        {/* TODO: scroll to bottom when pressing bottom controls */}
       </>
     );
   }
