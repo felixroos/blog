@@ -1,30 +1,32 @@
 export default function* buildGraph(candidates, getValue, keepLongerPaths = false) {
   let paths = [];
-  let source = { path: [], value: 0, values: [] };
+  let source = { path: [], value: 0, values: [], acc: [] };
   let isFinished = false;
   let minIndex = 0;
   while (!isFinished) {
     const level = source.path.length;
     const sourceCandidate = source.path.length > 0 ? source.path.slice(-1)[0] : undefined;
     const findShorterPath = (target, lvl, minValue) =>
-      paths.find(({ path, values }) => path.length > lvl && path[lvl] === target && values[lvl] < minValue);
+      paths.find(({ path, acc }) => path.length > lvl && path[lvl] === target && acc[lvl] < minValue);
     const nextCandidates = candidates[level];
     const nextPaths = nextCandidates.reduce((next, target) => {
       const nextValue = getValue(sourceCandidate, target);
       const values = source.values.concat([nextValue]);
       const value = source.value + nextValue;
+      const acc = source.acc.concat([value]);
       const targetPath = [...source.path, target];
       const lvl = source.path.length;
       // check if already have shorter path to target => ignore
       const shorter = findShorterPath(target, lvl, value);
       if (!!shorter && !keepLongerPaths) {
-        // console.log('already have a shorter path..');
+        // console.log('found shorter path..', shorter, target, value, values, lvl);
         return next;
       }
       next.push({
         path: targetPath,
         value,
         values,
+        acc
       });
       // the following is maybe not really needed with combinedDiff.. it's too expensive this way...
       paths = paths.map((p) => {

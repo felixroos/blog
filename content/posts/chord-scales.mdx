@@ -114,27 +114,6 @@ Navigating the graph above, we can follow one of 6 possible paths:
 
 <PathTree
   paths={[
-    {
-      path: ['D aeolian', 'G mixolydian'],
-      value: 2,
-    },
-    {
-      path: ['D dorian', 'G mixolydian', 'C major'],
-      value: 0,
-    },
-    {
-      path: ['D dorian', 'G mixolydian', 'C lydian'],
-      value: 2,
-    },
-  ]}
-  getValue={(a, b) => scaleDifference(a, b)}
-  getColor={(scale) => scaleColor(scale)}
-/>
-
-...
-
-<PathTree
-  paths={[
     { path: ['D dorian', 'G mixolydian', 'C major'] },
     { path: ['D dorian', 'G mixolydian', 'C lydian'] },
     { path: ['D aeolian', 'G mixolydian', 'C major'] },
@@ -142,6 +121,7 @@ Navigating the graph above, we can follow one of 6 possible paths:
     { path: ['D phrygian', 'G mixolydian', 'C major'] },
     { path: ['D phrygian', 'G mixolydian', 'C lydian'] },
   ]}
+  width={600}
   getValue={(a, b) => scaleDifference(a, b) / 2}
   getColor={(scale) => scaleColor(scale)}
 />
@@ -512,6 +492,7 @@ export const scaleDiff = (source, target) =>
   height={400}
   noScroll={true}
   keepLongerPaths={true}
+  view="tree"
 />
 <br />
 
@@ -706,6 +687,7 @@ export const step4 = extendBestPath(step3, graph, getValue);
 Now, we continue extending the right branch, as it is still zero (compared to 2):
 
 <!--<PathGraph height={300} paths={step4} getValue={getValue} />-->
+
 <PathTree height={300} paths={step4} getColor={(scale) => scaleColor(scale)} />
 
 ```js

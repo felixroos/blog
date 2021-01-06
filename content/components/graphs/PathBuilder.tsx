@@ -14,7 +14,12 @@ import PathTree from './PathTree';
 import { max } from 'd3-array';
 import { Path } from './extendBestPath';
 
-export default ({ chords, scales, height, maxHeight, noScroll, getValue, keepLongerPaths }: any) => {
+// TODO: add json view
+// TODO: button group to change view to tree | graph | json
+// TODO: add undo button
+
+export default ({ chords, scales, height, maxHeight, noScroll, getValue, keepLongerPaths, view }: any) => {
+  view = view || 'tree';
   height = height || 800;
   maxHeight = maxHeight || 800;
   const candidates = useMemo(
@@ -71,8 +76,8 @@ export default ({ chords, scales, height, maxHeight, noScroll, getValue, keepLon
         {controls}
         <Card elevation={3}>
           <CardContent style={{ width: '100%', overflow: 'auto', textAlign: 'center' }}>
-            <PathTree paths={paths?.value} getColor={(scale) => scaleColor(scale)} />
-            {/* <PathGraph paths={paths?.value} height={height} getValue={getDiff} /> */}
+            {view === 'tree' && <PathTree paths={paths?.value} getColor={(scale) => scaleColor(scale)} />}
+            {view === 'graph' && <PathGraph paths={paths?.value} height={height} getValue={getDiff} />}
           </CardContent>
         </Card>
       </>
@@ -84,8 +89,10 @@ export default ({ chords, scales, height, maxHeight, noScroll, getValue, keepLon
       {/* <div style={{ display: 'flex' }}> */}
       <Card elevation={3}>
         <CardContent style={{ height: height, overflow: 'auto' }}>
-          <PathTree height={maxHeight} paths={paths?.value} getColor={(scale) => scaleColor(scale)} />
-          {/* <PathGraph paths={paths?.value} height={maxHeight} getValue={getDiff} /> */}
+          {view === 'tree' && (
+            <PathTree height={maxHeight} paths={paths?.value} getColor={(scale) => scaleColor(scale)} />
+          )}
+          {view === 'graph' && <PathGraph paths={paths?.value} height={maxHeight} getValue={getDiff} />}
         </CardContent>
       </Card>
       {/* <ul>
