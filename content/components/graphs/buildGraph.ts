@@ -1,75 +1,60 @@
-export default function* buildGraph(candidates, getValue, keepLongerPaths = false) {
-  let paths = [];
-  let source = { path: [], value: 0, values: [], acc: [] };
-  let isFinished = false;
-  let minIndex = 0;
-  while (!isFinished) {
-    const level = source.path.length;
-    const sourceCandidate = source.path.length > 0 ? source.path.slice(-1)[0] : undefined;
-    const findShorterPath = (target, lvl, minValue) =>
-      paths.find(({ path, acc }) => path.length > lvl && path[lvl] === target && acc[lvl] < minValue);
-    const nextCandidates = candidates[level];
-    const nextPaths = nextCandidates.reduce((next, target) => {
-      const nextValue = getValue(sourceCandidate, target);
-      const values = source.values.concat([nextValue]);
-      const value = source.value + nextValue;
-      const acc = source.acc.concat([value]);
-      const targetPath = [...source.path, target];
-      const lvl = source.path.length;
-      // check if already have shorter path to target => ignore
-      const shorter = findShorterPath(target, lvl, value);
-      if (!!shorter && !keepLongerPaths) {
-        // console.log('found shorter path..', shorter, target, value, values, lvl);
-        return next;
+import { Path } from './extendBestPath';
+
+export declare type GraphOptions = {
+  getColor?: (string) => string,
+  includeStartNode?: boolean,
+  showDuplicates?: boolean,
+  showCalculation?: boolean
+};
+
+export default function buildGraph(paths: Path[], { getColor, includeStartNode, showDuplicates, showCalculation }: GraphOptions) {
+  const nodes: any[] = includeStartNode ? [{ label: 'start', id: '0' }] : [];
+  const edges = [];
+  const getId = (i, j) => `${i}.${j}`;
+  paths?.forEach(({ path, value, values }, i) => {
+    path.forEach((choice, j) => {
+      const target = getId(choice, j);
+      const color = getColor ? { fillcolor: getColor(choice), style: 'filled' } : {};
+      const match = nodes.find(({ id }) => id === target);
+      const isLeaf = j === path.length - 1;
+      const isFirst = j === 0;
+      if (!match /* || (isLeaf && includeDuplicateLeaves) */) {
+        // wont work as id is the same => übereinander
+        /* if ((isLeaf && includeDuplicateLeaves)) {
+          console.log('add duplicate leaf', label);
+        } */
+        nodes.push({ label: choice, id: target, level: j, ...color });
       }
-      next.push({
-        path: targetPath,
-        value,
-        values,
-        acc
+      if (isFirst) {
+        // is first in path
+        includeStartNode && edges.push({ source: '0', target, label: '0' });
+        return;
+      }
+      const source = getId(path[j - 1], j - 1);
+      const diff = values[j];
+
+      const duplicates = edges.filter(({ source: s, target: t }) => source === s && target === t);
+      const isDuplicate = duplicates.length > 0;
+
+      let label;
+      if (showCalculation) {
+        label = isLeaf && !isDuplicate ? `+${diff}=${value}` : `+${diff}`;
+      } else {
+        label = diff;
+      }
+
+      if (showDuplicates) {
+        const count = isDuplicate ? ` (${duplicates.length + 1})` : ''
+        label = `${label}${count}`
+      }
+      // sadly, multiple edges between same nodes is not supported by graphviz
+      // https://github.com/shevek/graphviz4j/issues/1
+      edges.push({
+        source,
+        target,
+        label
       });
-      // the following is maybe not really needed with combinedDiff.. it's too expensive this way...
-      paths = paths.map((p) => {
-        const { path } = p;
-        if (path.length === lvl + 1 && path[lvl] === sourceCandidate) {
-          console.log('update similar path..'); // must be of equal value to be
-          return {
-            path: path.concat([target]),
-            value: p.value + nextValue,
-            values: p.values.concat([value]),
-          };
-        }
-        return p;
-      });
-      return next;
-    }, []);
-    paths.splice(minIndex, 0, ...nextPaths); // to keep order
-    //paths = paths.concat(nextPaths);
-    let /* minIndex,  */ minValue, longest, longestIndex;
-    paths.forEach((current, index) => {
-      const { value, path } = current;
-      if (longest === undefined || path.length > longest.path.length) {
-        longest = current;
-        longestIndex = index;
-      }
-      // only use non finished paths for next
-      if (minValue === undefined || value < minValue) {
-        minValue = value;
-        minIndex = index;
-      }
     });
-    source = paths[minIndex];
-    if (paths[minIndex].path.length === candidates.length) {
-      //paths = [paths[minIndex]];
-      isFinished = true;
-    }
-    if (!source) {
-      isFinished = true;
-    }
-    if (!isFinished) {
-      yield paths;
-      paths.splice(minIndex, 1); // remove old path
-    }
-  }
-  return paths;
+  });
+  return { nodes, edges }
 }

@@ -1,4 +1,4 @@
-import { Path, ValueFn } from './extendBestPath';
+import { Path } from './extendBestPath';
 
 export default function buildTree(paths: Path[], getColor?: (string) => string) {
   const nodes: object[] = [{ label: 'start', id: '0' }];
@@ -6,7 +6,7 @@ export default function buildTree(paths: Path[], getColor?: (string) => string) 
   const getId = (x, y, label) => `${x}.${y}:${label}`;
   paths?.forEach((current, p) => {
     const { path, values, value } = current;
-    let ids = [];
+    const ids = [];
     path.forEach((choice, c) => {
       const pathString = (p, n) => p.slice(0, n).join('.');
       const match = paths.slice(0, p).find(({ path: p }) => pathString(p, c + 1) === pathString([...path, choice], c + 1));
@@ -19,11 +19,9 @@ export default function buildTree(paths: Path[], getColor?: (string) => string) 
         ids.unshift(getId(x, c, choice))
       }
       if (!c) {
-        //edges.push({ target: '0', source: ids[0], label: '0' })
         edges.push({ source: '0', target: ids[0], label: '0' })
       } else {
         const label = values?.[c] !== undefined ? `+${values?.[c]}` + (c === path.length - 1 ? `=${value}` : '') : '';
-        // edges.push({ target: ids[1], source: ids[0], label })
         edges.push({ source: ids[1], target: ids[0], label })
       }
     });

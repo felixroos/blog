@@ -93,7 +93,24 @@ There are 2 scales that could be played over a the C major 7 chord:
 
 We can visualize the transitions between the possible scales in a graph like this:
 
-<GraphvizJSON
+<center>
+  <PathGraph
+    paths={[
+      { path: ['D dorian', 'G mixolydian', 'C major'] },
+      { path: ['D dorian', 'G mixolydian', 'C lydian'] },
+      { path: ['D aeolian', 'G mixolydian', 'C major'] },
+      { path: ['D aeolian', 'G mixolydian', 'C lydian'] },
+      { path: ['D phrygian', 'G mixolydian', 'C major'] },
+      { path: ['D phrygian', 'G mixolydian', 'C lydian'] },
+    ].map(decoratePathValues((a, b) => scaleDifference(a, b) / 2))}
+    getColor={(scale) => scaleColor(scale)}
+    includeStartNode={false}
+    showCalculation={false}
+    showDuplicates={false}
+  />
+</center>
+
+<!--<GraphvizJSON
   options={{ height: 300 }}
   json={{
     graph: {
@@ -101,7 +118,7 @@ We can visualize the transitions between the possible scales in a graph like thi
       ...chordScaleGraph(['Dm7', 'G7', 'C^7'], scaleModes('major'), true),
     },
   }}
-/>
+/>-->
 
 - Each column shows the possible scales for one chord, with the arrows representing transitions between scales.
 - The numbers indicate the number of accidentals that change between scales. We can use them to evaluate how smooth the scale transition will be.
@@ -113,19 +130,21 @@ Using this representation, we can turn it into a path finding problem.
 
 Navigating the graph above, we can follow one of 6 possible paths:
 
-<PathTree
-  paths={[
-    { path: ['D dorian', 'G mixolydian', 'C major'] },
-    { path: ['D dorian', 'G mixolydian', 'C lydian'] },
-    { path: ['D aeolian', 'G mixolydian', 'C major'] },
-    { path: ['D aeolian', 'G mixolydian', 'C lydian'] },
-    { path: ['D phrygian', 'G mixolydian', 'C major'] },
-    { path: ['D phrygian', 'G mixolydian', 'C lydian'] },
-  ].map(decoratePathValues((a, b) => scaleDifference(a, b) / 2))}
-  width={600}
-  height={300}
-  getColor={(scale) => scaleColor(scale)}
-/>
+<center>
+  <PathTree
+    paths={[
+      { path: ['D dorian', 'G mixolydian', 'C major'] },
+      { path: ['D dorian', 'G mixolydian', 'C lydian'] },
+      { path: ['D aeolian', 'G mixolydian', 'C major'] },
+      { path: ['D aeolian', 'G mixolydian', 'C lydian'] },
+      { path: ['D phrygian', 'G mixolydian', 'C major'] },
+      { path: ['D phrygian', 'G mixolydian', 'C lydian'] },
+    ].map(decoratePathValues((a, b) => scaleDifference(a, b) / 2))}
+    width={600}
+    height={300}
+    getColor={(scale) => scaleColor(scale)}
+  />
+</center>
 
 Here, the leftmost path is the best, as its sum of values is 0. The worst path has a value of 3.
 
@@ -137,8 +156,6 @@ A naive approach for the algorithm would be to
 2. calculate all possible transition values (accidental changes)
 3. walk all possible paths and sum transition values
 4. the path with the lowest transition value sum is the smoothest
-
-This is similar to [Dijkstra's Algorithm](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm) for finding shortest paths.
 
 ### Complexity
 
@@ -155,7 +172,7 @@ paths, which is quite a lot.
 
 ### Smart Approach
 
-A much more clever approach for path finding is the [A\* algorithm](https://en.wikipedia.org/wiki/A*_search_algorithm).
+A much more clever approach for path finding is something like the [A\* algorithm](https://en.wikipedia.org/wiki/A*_search_algorithm).
 I won't go into detail here, but generally a heuristic is applied that favors certain more promising paths before less promising ones.
 
 ## Implementation
@@ -382,11 +399,11 @@ In the final algorithm, we won't divide by 2, as it does not bring anything new 
 
 To be visualize the algorithm for development, we will use [graphviz-react](https://github.com/DomParfitt/graphviz-react).
 
+<!--
 As this is also just an extra implementation, I'll put the details in a green box.
 
 <Card elevation={3} >
 <CardContent style={{backgroundColor:'#C1E585'}}>
-
 
 <details>
   <summary>Show Implementation Details</summary>
@@ -461,20 +478,39 @@ export default (chords, allowedScales = scaleModes('major'), halfDifference = fa
 
 </CardContent>
 </Card>
-<br/>
-
+<br/>-->
 
 Finally, this is what we get:
 
-<GraphvizJSON
-  options={{ height: 300 }}
-  json={{
-    graph: {
-      directed: true,
-      ...chordScaleGraph(['Dm7', 'G7', 'C^7'], scaleModes('major'), true),
-    },
-  }}
-/>
+<center>
+  <PathGraph
+    paths={[
+      { path: ['D dorian', 'G mixolydian', 'C major'] },
+      { path: ['D dorian', 'G mixolydian', 'C lydian'] },
+      { path: ['D aeolian', 'G mixolydian', 'C major'] },
+      { path: ['D aeolian', 'G mixolydian', 'C lydian'] },
+      { path: ['D phrygian', 'G mixolydian', 'C major'] },
+      { path: ['D phrygian', 'G mixolydian', 'C lydian'] },
+    ].map(decoratePathValues((a, b) => scaleDifference(a, b) / 2))}
+    getColor={(scale) => scaleColor(scale)}
+    includeStartNode={false}
+    showCalculation={true}
+    showDuplicates={true}
+  />
+</center>
+
+<!--<center>
+  <GraphvizJSON
+    options={{ height: 300 }}
+    json={{
+      graph: {
+        directed: true,
+        ...chordScaleGraph(['Dm7', 'G7', 'C^7'], scaleModes('major'), true),
+      },
+    }}
+  />
+</center>-->
+
 <br />
 
 ## Path Finding
@@ -643,7 +679,7 @@ export const step2 = extendBestPath(step1, graph, getValue);
 
 In the second step, we extend the (first found) best path:
 
-<!--<PathGraph height={300} paths={step2} getValue={getValue} />-->
+<!--<PathGraph height={300} paths={step2} getColor={(scale) => scaleColor(scale)} />-->
 
 <center>
   <PathTree paths={step2} getColor={(scale) => scaleColor(scale)} />
@@ -667,7 +703,7 @@ export const step3 = extendBestPath(step2, graph, getValue);
 
 Next, the second root branch seems more tempting, as it is still zero:
 
-<!--<PathGraph height={300} paths={step3} getValue={getValue} />-->
+<!--<PathGraph height={300} paths={step3} getColor={(scale) => scaleColor(scale)} />-->
 
 <center>
   <PathTree paths={step3} getColor={(scale) => scaleColor(scale)} />
@@ -839,10 +875,11 @@ The scale graph of "All the Things you Are" looks like this:
 Let's run the same path finding algorithm on these scales and see what happens:
 
 <PathBuilder
-  height={1000}
+  height={600}
   maxHeight={2000}
-  noScroll={true}
+  noScroll={false}
   keepLongerPaths={false}
+  view={'graph'}
   scales={['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6']}
   chords={[
     'Fm7',
