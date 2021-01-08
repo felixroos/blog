@@ -1,13 +1,14 @@
 import { Path } from './extendBestPath';
 
 export declare type GraphOptions = {
-  getColor?: (string) => string,
+  getColor?: (a: string) => string,
+  getValue?: (a: string, b: string) => number,
   includeStartNode?: boolean,
   showDuplicates?: boolean,
   showCalculation?: boolean
 };
 
-export default function buildGraph(paths: Path[], { getColor, includeStartNode, showDuplicates, showCalculation }: GraphOptions) {
+export default function buildGraph(paths: Path[], { getColor, getValue, includeStartNode, showDuplicates, showCalculation }: GraphOptions) {
   const nodes: any[] = includeStartNode ? [{ label: 'start', id: '0' }] : [];
   const edges = [];
   const getId = (i, j) => `${i}.${j}`;
@@ -31,7 +32,7 @@ export default function buildGraph(paths: Path[], { getColor, includeStartNode, 
         return;
       }
       const source = getId(path[j - 1], j - 1);
-      const diff = values[j];
+      const diff = values?.[j] ?? getValue?.(path[j - 1], choice) ?? '';
 
       const duplicates = edges.filter(({ source: s, target: t }) => source === s && target === t);
       const isDuplicate = duplicates.length > 0;

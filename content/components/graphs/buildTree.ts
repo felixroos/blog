@@ -1,6 +1,6 @@
 import { Path } from './extendBestPath';
 
-export default function buildTree(paths: Path[], getColor?: (string) => string) {
+export default function buildTree(paths: Path[], getColor?: (string) => string, getValue?) {
   const nodes: object[] = [{ label: 'start', id: '0' }];
   const edges = [];
   const getId = (x, y, label) => `${x}.${y}:${label}`;
@@ -21,7 +21,8 @@ export default function buildTree(paths: Path[], getColor?: (string) => string) 
       if (!c) {
         edges.push({ source: '0', target: ids[0], label: '0' })
       } else {
-        const label = values?.[c] !== undefined ? `+${values?.[c]}` + (c === path.length - 1 ? `=${value}` : '') : '';
+        const diff = values?.[c] ?? getValue?.(path[c - 1], choice) ?? '';
+        const label = diff !== undefined ? `+${diff}` + (c === path.length - 1 ? `=${value}` : '') : '';
         edges.push({ source: ids[1], target: ids[0], label })
       }
     });

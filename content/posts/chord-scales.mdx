@@ -399,11 +399,11 @@ In the final algorithm, we won't divide by 2, as it does not bring anything new 
 
 To be visualize the algorithm for development, we will use [graphviz-react](https://github.com/DomParfitt/graphviz-react).
 
-<!--
 As this is also just an extra implementation, I'll put the details in a green box.
 
 <Card elevation={3} >
 <CardContent style={{backgroundColor:'#C1E585'}}>
+
 
 <details>
   <summary>Show Implementation Details</summary>
@@ -478,7 +478,8 @@ export default (chords, allowedScales = scaleModes('major'), halfDifference = fa
 
 </CardContent>
 </Card>
-<br/>-->
+<br/>
+
 
 Finally, this is what we get:
 
@@ -494,8 +495,8 @@ Finally, this is what we get:
     ].map(decoratePathValues((a, b) => scaleDifference(a, b) / 2))}
     getColor={(scale) => scaleColor(scale)}
     includeStartNode={false}
-    showCalculation={true}
-    showDuplicates={true}
+    showCalculation={false}
+    showDuplicates={false}
   />
 </center>
 
@@ -806,16 +807,38 @@ That's the basic trick! But we might run into some unforseen problems when throw
 Like a diligent gardener, we might need some branch pruning to get better results..
 To illustrate the problem, let's the chord progression `TODO`
 
+export const pentatonicScales = Scale.names().filter((scale) => Scale.get(`C ${scale}`).notes.length === 5);
+
 ## Solar
+
+export const solarChords = [
+  'CmM7',
+  'Gm7',
+  'C7',
+  'F^7',
+  'Fm7',
+  'Bb7',
+  'Eb^7',
+  'Ebm7',
+  'Ab7',
+  'Db^7',
+  'Dm7b5',
+  'G7b9',
+  'CmM7',
+];
+export const solarScales = scaleModes('major', 'melodic minor', 'harmonic minor');
+//export const solarScales = pentatonicScales;
+//export const solarScales = ['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6', 'harmonic minor'];
 
 <PathBuilder
   height={600}
   maxHeight={2000}
   noScroll={false}
   keepLongerPaths={false}
+  onlyKeepWinner={true}
   view={'graph'}
-  scales={['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6', 'harmonic minor']}
-  chords={['CmM7', 'Gm7', 'C7', 'F^7', 'Fm7', 'Bb7', 'Eb^7', 'Ebm7', 'Ab7', 'Db^7', 'Dm7b5', 'G7b9']}
+  scales={solarScales}
+  chords={solarChords}
 />
 
 <details>
@@ -832,21 +855,8 @@ TODO: get rid of chordScaleGraph, use PathGraph instead
       graph: {
         directed: true,
         ...chordScaleGraph(
-          [
-            'CmM7',
-            'Gm7',
-            'C7',
-            'F^7',
-            'Fm7',
-            'Bb7',
-            'Eb^7',
-            'Ebm7',
-            'Ab7',
-            'Db^7',
-            'Dm7b5',
-            'G7b9'
-          ],
-          ['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6','harmonic minor']
+          solarChords,
+          solarScales
         ),
       },
     }}
@@ -862,14 +872,17 @@ TODO: get rid of chordScaleGraph, use PathGraph instead
 ## How High The Moon
 
 export const hhtm = ['G^7', 'Gm7', 'C7', 'F^7', 'Fm7', 'Bb7', 'Eb^7', 'Am7b5', 'D7b9', 'Gm7', 'Am7b5', 'D7b9'];
+export const hhtmScales = scaleModes('major', 'melodic minor', 'harmonic minor');
+//export const hhtmScales = ['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6'];
 
 <PathBuilder
   height={600}
   maxHeight={2000}
   noScroll={false}
   keepLongerPaths={false}
+  onlyKeepWinner={true}
   view={'graph'}
-  scales={['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6']}
+  scales={hhtmScales}
   chords={hhtm}
 />
 
@@ -882,15 +895,7 @@ export const hhtm = ['G^7', 'Gm7', 'C7', 'F^7', 'Fm7', 'Bb7', 'Eb^7', 'Am7b5', '
         json={{
           graph: {
             directed: true,
-            ...chordScaleGraph(hhtm, [
-              'major',
-              'dorian',
-              'lydian',
-              'mixolydian',
-              'aeolian',
-              'phrygian dominant',
-              'locrian 6',
-            ]),
+            ...chordScaleGraph(hhtm, hhtmScales),
           },
         }}
       />
@@ -903,9 +908,10 @@ export const hhtm = ['G^7', 'Gm7', 'C7', 'F^7', 'Fm7', 'Bb7', 'Eb^7', 'Am7b5', '
 
 <!-- interval={500}  -->
 
-<!--export const attyaScales = ['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6'];-->
+<!-- export const attyaScales = ['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6']; -->
 
 export const attyaScales = scaleModes('major', 'melodic minor', 'harmonic minor');
+
 export const attyaChords = [
   'Fm7',
   'Bbm7',
@@ -953,6 +959,7 @@ export const attyaChords = [
   maxHeight={2000}
   noScroll={false}
   keepLongerPaths={false}
+  onlyKeepWinner={true}
   view={'graph'}
   scales={attyaScales}
   chords={attyaChords}

@@ -9,7 +9,7 @@ import chordScales from '../sets/chordScales';
 import chromaDifference from '../sets/chromaDifference';
 import scaleChroma from '../sets/scaleChroma';
 import scaleColor from '../sets/scaleColor';
-import bestPath from './bestPath';
+import bestPath from './generateBestPath';
 import PathGraph from './PathGraph';
 import PathTree from './PathTree';
 import { max } from 'd3-array';
@@ -30,6 +30,7 @@ export default ({
   noScroll,
   getValue,
   keepLongerPaths,
+  onlyKeepWinner,
   view: initialView,
   interval,
 }: any) => {
@@ -63,7 +64,7 @@ export default ({
   const [started, setStarted] = useState(false);
   const [paths, nextValue, resetGenerator] = useGenerator(
     () => {
-      return bestPath(candidates, getDiff, { keepLongerPaths, tolerance });
+      return bestPath(candidates, getDiff, { keepLongerPaths, tolerance, onlyKeepWinner });
     },
     true,
     false
@@ -140,13 +141,21 @@ export default ({
   );
   const Content = ({ height }) => (
     <>
-      {view === 'tree' && <PathTree height={height} paths={paths?.value} getColor={(scale) => scaleColor(scale)} />}
+      {view === 'tree' && (
+        <PathTree
+          height={height}
+          paths={paths?.value}
+          getColor={(scale) => scaleColor(scale)}
+          getValue={(a, b) => getDiff(a, b)}
+        />
+      )}
       {view === 'graph' && (
         <PathGraph
           paths={paths?.value}
           height={height}
           width={width}
           getColor={(scale) => scaleColor(scale)}
+          getValue={(a, b) => getDiff(a, b)}
           includeStartNode={true}
           showCalculation={true}
           showDuplicates={true}

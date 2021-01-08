@@ -1,5 +1,3 @@
-import { minIndex } from 'd3-array';
-
 export declare type Path = {
   values?: number[],
   value: number,
@@ -8,15 +6,39 @@ export declare type Path = {
 
 export declare type ValueFn = (source: string, target: string, path: Path) => number;
 
-export default function extendBestPath(paths: Path[], graph: string[][], getValue: ValueFn): Path[] | false {
-  if (!paths.length) {
+export default function extendBestPath(paths: Path[], graph: string[][], getValue: ValueFn, extended?: any[]): Path[] | false {
+  if (!paths?.length) {
     // if no paths are given, return initial paths
-    return graph[0].map(candidate => ({ value: 0, values: [0], path: [candidate] }))
+    return graph[0].map(candidate => ({ value: 0, /* values: [0], */ path: [candidate] }))
   }
   // find index with lowest value
-  const bestIndex = minIndex(paths, (path) => path.value);
-  const best = paths[bestIndex];
-  const { path, value, values } = best;
+  let best;
+  // if true, alternative paths with the same value will also be expanded
+  const keepAlternatives = false;
+  paths = paths?.filter((current) => {
+    // >= takes leftmost min, > takes rightmost min
+    if (best !== undefined && current.value >= best.value) {
+      return true;
+    }
+    const alreadyExtended = extended?.find(
+      ([level, candidate, value]) => current.path[level] === candidate && current.path.length === level + 1 && (!keepAlternatives || value < current.value))
+    if (alreadyExtended) {
+      // prune path, as it has already been expanded
+      return false;
+    }
+    best = current;
+    return true;
+  });
+  if (best === undefined) {
+    return paths;
+  }
+  // const bestIndex = minIndex(paths, (path) => path.value);
+  const level = best.path.length;
+  const extension = [level - 1, best.path[level - 1], best.value];
+  // console.log('extension', extension);
+  extended?.push(extension);
+  // console.log('extensions', extensions);
+  const { path, value/* , values */ } = best;
   if (path.length >= graph.length) {
     // throw error if the best path is already at the end => cannot extend any further
     // throw new Error('cannot extendBestPath: graph end reached');
@@ -27,11 +49,12 @@ export default function extendBestPath(paths: Path[], graph: string[][], getValu
     const nextValue = getValue(path[path.length - 1], candidate, best);
     return {
       value: value + nextValue,
-      values: values.concat([nextValue]),
+      /* values: values.concat([nextValue]), */
       path: path.concat(candidate)
     }
   });
   // replace best path with nextSteps
+  const bestIndex = paths.indexOf(best);
   return paths.slice(0, bestIndex).concat(nextSteps, paths.slice(bestIndex + 1));
   // now using concat for performance boost
   // return [...paths.slice(0, bestIndex), ...nextSteps, ...paths.slice(bestIndex + 1)]
