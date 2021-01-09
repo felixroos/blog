@@ -6,7 +6,7 @@ export declare type Path = {
 
 export declare type ValueFn = (source: string, target: string, path: Path) => number;
 
-export default function extendBestPath(paths: Path[], graph: string[][], getValue: ValueFn, extended?: any[]): Path[] | false {
+export default function extendBestPath(paths: Path[], graph: string[][], getValue: ValueFn, extended?: any[], keepLongerPaths = false): Path[] | false {
   if (!paths?.length) {
     // if no paths are given, return initial paths
     return graph[0].map(candidate => ({ value: 0, /* values: [0], */ path: [candidate] }))
@@ -22,7 +22,7 @@ export default function extendBestPath(paths: Path[], graph: string[][], getValu
     }
     const alreadyExtended = extended?.find(
       ([level, candidate, value]) => current.path[level] === candidate && current.path.length === level + 1 && (!keepAlternatives || value < current.value))
-    if (alreadyExtended) {
+    if (alreadyExtended && !keepLongerPaths) {
       // prune path, as it has already been expanded
       return false;
     }

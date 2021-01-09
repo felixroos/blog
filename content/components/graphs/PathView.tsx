@@ -24,7 +24,7 @@ export default ({ paths, width, height, maxHeight, noScroll, getValue, getColor,
           width={width}
           height={height}
           paths={paths}
-          getColor={(a) => getColor(atob)}
+          getColor={(a) => getColor(a)}
           getValue={(a, b) => getValue(a, b)}
         />
       )}
@@ -42,20 +42,22 @@ export default ({ paths, width, height, maxHeight, noScroll, getValue, getColor,
       )}
     </>
   );
+  const controls = (
+    <label>
+      tree
+      <Switch
+        checked={view === 'graph'}
+        color="primary"
+        onChange={(e) => setView(e.target.checked ? 'graph' : 'tree')}
+      />
+      graph
+    </label>
+  );
   const levelHeight = 80;
   const dynamicHeight = (max(paths || [], (p: Path) => p.path.length + 1) || 1) * levelHeight;
   if (noScroll) {
     return (
       <>
-        <label>
-          tree
-          <Switch
-            checked={view === 'graph'}
-            color="primary"
-            onChange={(e) => setView(e.target.checked ? 'graph' : 'tree')}
-          />
-          graph
-        </label>
         <Card elevation={3}>
           <CardContent style={{ width: '100%', overflow: 'auto', textAlign: 'center' }}>
             <Content height={dynamicHeight} />

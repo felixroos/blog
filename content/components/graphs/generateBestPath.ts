@@ -2,15 +2,15 @@ import { minIndex } from 'd3-array';
 import extendBestPath, { ValueFn, Path } from './extendBestPath';
 
 export default function* generateBestPath(graph: string[][], getValue: ValueFn, options = {}) {
-  const { onlyKeepWinner } = {
-    onlyKeepWinner: false, ...options
+  const { onlyKeepWinner, keepLongerPaths } = {
+    keepLongerPaths: false, onlyKeepWinner: false, ...options
   };
   let paths: Path[] = [];
   let isFinished = false;
   let extensions = [];
 
   while (!isFinished) {
-    const extended = extendBestPath(paths, graph, getValue, extensions);
+    const extended = extendBestPath(paths, graph, getValue, extensions, keepLongerPaths);
     if (!extended) {
       isFinished = true;
     } else {
