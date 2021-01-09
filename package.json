@@ -20,6 +20,7 @@
     "@tonaljs/chord-type": "^3.6.1",
     "@tonaljs/tonal": "^4.2.1",
     "@types/d3": "^6.2.0",
+    "@types/d3-graphviz": "^2.6.6",
     "@types/jest": "^26.0.9",
     "@types/node": "^13.9.8",
     "@types/ramda": "^0.27.17",

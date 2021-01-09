@@ -22,5 +22,4 @@ export default function* generateBestPath(graph: string[][], getValue: ValueFn, 
     return [paths[minIndex(paths, (path) => path.value)]];
   }
   return paths;
-
 }

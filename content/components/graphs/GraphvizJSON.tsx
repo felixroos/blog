@@ -7,7 +7,18 @@ export default function GraphvizJSON({ json, options }) {
   }
   const dot = toDot(json);
   const { width, height } = options || {};
-  options = { ...(height ? { height } : {}), ...(width ? { width } : {}) };
+  options = {
+    ...(height ? { height } : {}),
+    ...(width ? { width } : {}),
+    fit: true,
+    zoom: false,
+    scale: 1,
+    fade: false,
+    zoomScaleExtent: [1, 2],
+    keyMode: 'id',
+    growEnteringEdges: true,
+    useWorker: false,
+  };
   // TODO: find out how to "inject" rankdir
   // https://github.com/jsongraph/json-graph-specification
   // https://github.com/jsongraph/jgf-dot
