@@ -19,7 +19,8 @@ test('astar', () => {
     }
     return graph[level + 1].map((target): Target => [
       getNodeID(level + 1, target),
-      scaleDifference(source, target) + colorDiff(source, target)
+      scaleDifference(source, target) + colorDiff(source, target) /* + 1 ,
+      graph.length - level - 1 */
     ])
   }
   expect(getNodeID(0, 'D dorian')).toBe('0.D dorian');

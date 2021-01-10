@@ -16,12 +16,12 @@ export default function astar(
   let count = 0;
   while (!winner) {
     count++;
-    const bestIndex = minIndex(open, (o) => o[2]);
+    const getValue = (o) => o[2]; // + (o[3] || 0);
+    const bestIndex = minIndex(open, getValue);
     const best = open[bestIndex];
     closed.push(best);
     winner = closed.find((c) => endNodes.includes(c[1]));
     if (winner) {
-      /* console.log('count', count); */
       return traceWinner();
     }
     const [_, newSource, distance] = best;
@@ -31,7 +31,7 @@ export default function astar(
       ...open.slice(0, bestIndex),
       ...connections,
       ...open.slice(bestIndex + 1)
-    ].filter(c => !closed.find(([_, target, v]) => target === c[1] && c[2] >= v))
+    ].filter(c => !closed.find(([_, target, v]) => target === c[1] && getValue(c) >= v))
   }
   function traceWinner() {
     const path = winner.slice(0, 2);
@@ -45,21 +45,3 @@ export default function astar(
     return path;
   }
 }
-
-
-
-/*
-// attempt to unify min + pruning into one loop:
-    /* let best, bestIndex;
-    open = open.filter((c, i) => {
-      if (best !== undefined && c[2] >= best[2]) {
-        return true; // not min
-      }
-      // const obsolete = closed.find(([_, target, v]) => target === c[1] && c[2] >= v);
-      // if (obsolete) {
-      //   return false;
-      // }
-      best = c;
-      bestIndex = i;
-      return true;
-    }) */
