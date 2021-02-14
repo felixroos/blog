@@ -21,21 +21,21 @@ The little green pcb holds a microcontroller, which controls the keybed:
 
 ![control pcb](./img/maudio49/control-pcb.png)
 
-Looking from the side, we can see plastic fins that push down a buttons when keys are pressed:
+Looking from the side, we can see plastic fins that push down buttons when keys are pressed:
 
 ![switch](./img/maudio49/switch.jpeg)
 
-To get a better view, I removed the pcb from the keybed and looked at the switches:
+To get a better view, I removed the pcb from the keybed and took a closer look at the buttons:
 
 ![switch inside](./img/maudio49/switch-inside.jpeg)
 
-Inside each button, there are two circles with conductive ink above a snakelike pattern of conductive ink on the pcb.
-If the buttons are pressed, the circles touch the snakes, acting as switches.
+Inside each button, there are two circles with conductive ink above a conductive ink pad that is interrupted by a snake shaped gap.
+If the buttons are pressed, the circles bridge the gap, connecting the left and right inputs. Long story short, these are switches.
 
 ### Why are there two switches per key?
 
 There are two switches per key to be able to measure the velocity of the keystroke.
-As one circle is slightly more elevated, it will make a connection a little before the less elevated one.
+As one circle is slightly more elevated, it will make a connection a little earlier, before the less elevated one.
 The time between the connections can be used to tell the velocity (smaller time = higher velocity).
 
 ## 2. Analyzing the PCB
@@ -47,7 +47,7 @@ Taking a closer look, we can see many diodes on the plastic side:
 
 ![diodes](./img/maudio49/diodes.png)
 
-I took pictures of the other (more interesting) side of the pcb, sewed them together and then redrew the copper lines above the photo:
+I took pictures of the other (more interesting) side of the pcb, stitched them together and then redrew the copper lines above the photo:
 
 <div style="display:flex;height:500px;width:600px;overflow:auto">
   <div style="width:300px;height:1000px">
