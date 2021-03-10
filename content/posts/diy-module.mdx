@@ -1,0 +1,152 @@
+---
+title: DIY Potentiometer Module
+date: 2021-03-10
+---
+
+Let's talk about building synth modules..
+I am still a noob in the area of eurorack and modular synthesis, but I try to learn how to build
+modules, as I want to sharpen my electronics skills and save some money.
+
+This "module" is my first attempt at finding out how to create a module from scratch.
+At the end of this post, this will not be a finished, usable product, but merely walk
+with tiny baby steps into the direction of DIY module building.
+
+![module](./img/diy-module/module.png)
+
+Here you see the finished control module. From bottom to top, you can see:
+
+- Potentiometers knobs
+- Wood Panel
+- Potentiometers
+- PCB for Potentiometers
+- Hex Connectors
+- PCB for module (not there yet)
+
+As you might notice, this module only contains potentiometers and no jacks + no actual module electronics or power supply.
+I will add this stuff later, this will only be a study in the frontend of things..
+
+## BOM
+
+Here is a list of parts I used:
+
+- 4 [100k Alpha Potentiometers](https://syntaxis.com.pl/en/potentiometers/91-potentiometer-b100k.html) á 1,94€ = 7,76€
+- 4 [Knobs with washers](https://syntaxis.com.pl/en/knobs/101-knob-k88-gry.html) á 0,38€ = 1,52€
+- 4 [Knob Caps](https://syntaxis.com.pl/en/knobs/102-cap-k85-red.html) á 0,32€ = 1,28€
+- scrap wood panel piece for a few cents
+- 1 [50x100mm stripboard](https://www.amazon.de/Rademacher-Streifenrasterplatine-Hartpapier-Rasterma%C3%9F-Leiterbahnen/dp/B085WJ7535/) á 0,84€
+- 2 [Brass Standoff Spacers + screws](https://www.amazon.de/gp/product/B07RP6CRD5) ~0,20€
+- [JST-XH plug and socket](https://www.amazon.de/YIXISI-Stecker-Weiblich-Adapter-M%C3%A4nnlich/dp/B082ZLYRRN/) á ~0,20€
+  - you also need a [crimping tool](https://www.amazon.de/Crimpzange-Dupont-Stecker-Steckverbinder-Crimpkontakten/dp/B07QX51F3B/ref=sr_1_4?__mk_de_DE=%C3%85M%C3%85%C5%BD%C3%95%C3%91&dchild=1&keywords=JST-XH&qid=1615388011&s=diy&sr=1-4)
+- [wire](https://www.amazon.de/gp/product/B07V3C686H/) (could also use strand)
+
+All in all, the price for those components is at about 12€.
+
+## Cuttin the Wood Panel
+
+![panel cut](./img/diy-module/IMG_0649.jpeg)
+
+From a larger wood piece, I cut a row of 3U (133.4mm). Then I mark where the rails are, so nothing will be in the way later.
+Then I can cut smaller pieces if I want to build a module. The piece on the right is approximately 6HP which is ~30mm.
+
+## Drilling Holes
+
+To get the holes in the right spot, I stick the pots into a pcb at a desirable distance and lay them to the wood piece:
+
+![pot drilling](./img/diy-module/IMG_0661.jpeg)
+
+I also drew a (pretty inaccurate) centerline to help me drill.
+
+## Preparing Pots
+
+Now the pots must be prepared. First, I remove the little metal knubsi:
+
+![metal knubsi](./img/diy-module/IMG_0666.jpeg)
+
+Then, I straighten the side pins:
+
+![metal knubsi](./img/diy-module/IMG_0667.jpeg)
+
+On the right, you can see how it should look like.
+
+## Preparing the first PCB
+
+Now, after screwing the pots to the panel, we can gently push the pcb ontop:
+
+![pcb test](./img/diy-module/IMG_0669.jpeg)
+
+Here, I aligned one end of the pcb the end of the wood panel. To align the other side, I mark it:
+
+![marked pcb](./img/diy-module/IMG_0671.jpeg)
+
+... cut it
+
+![cut pcb](./img/diy-module/IMG_0672.jpeg)
+
+... and break it on a table end
+
+![broken pcb](./img/diy-module/IMG_0673.jpeg)
+
+After some sanding, the pcb should fit the panel:
+
+![fitting pcb](./img/diy-module/IMG_0675.jpeg)
+
+## Preparing the second PCB
+
+As I am using single sided stripboard, I need a second pcb to have more space for components later.
+If I were using double sided pcb, I could just connect another pcb using male pins and female sockets.
+But because single sided stripboard is much much cheaper, and [available in 5cmx10cm](https://www.amazon.de/Rademacher-Streifenrasterplatine-Hartpapier-Rasterma%C3%9F-Leiterbahnen/dp/B085WJ7535/), I will just use a second layer and connect it hex screws.
+For this module, I needed only one pcb for both layers, which costs around 84 cents.
+
+To know where to screw without screwing up, I marked where the component footprints are on the other pcb:
+
+![component footprint](./img/diy-module/IMG_0683.jpeg)
+
+After screwing 2 holes in each board, they can be screwed together using hex spaces + M3 screws:
+
+![spacers](./img/diy-module/IMG_0685.jpeg)
+
+## Preparing the connector
+
+To connect the boards, I will manually crimp a JST-XH plug with 6 wires (+, - and 4 pot values). I will need these parts:
+
+![connector parts](./img/diy-module/IMG_0690.jpeg)
+
+... after crimping the cable ends
+
+![spacers](./img/diy-module/IMG_0691.jpeg)
+
+Now the crimped contacts can be plugged into the plug:
+
+![plug](./img/diy-module/IMG_0692.jpeg)
+
+## Soldering
+
+After the preparation, the pots can be soldered onto the first board:
+
+![soldered pots](./img/diy-module/IMG_0694.jpeg)
+
+Then, the one side of the pot pins must be connected to voltage (red) and the other to ground (black).
+After connecting all pins on the first board, we can connect the plug wires.
+The middle pot pins can be soldered directly to the plug (yellow wires).
+The last step is to solder on the jack on the second board and connect it:
+
+![soldered plug](./img/diy-module/IMG_0695.jpeg)
+
+## Done?
+
+So far, the controls are connected and can be easily accessed on the second board.
+Now we can screw it on rails:
+
+![in case](./img/diy-module/IMG_0699.jpeg)
+
+## Future goal: Making it functional
+
+This could be made into a finished ADSR module by adding the [uADSR-3310-A](https://syntaxis.com.pl/en/micromodules/80-uadsr-3310-a.html) (20,24€).
+So a finished module could be made for ~35€.
+
+To add the uModule, I need to add a [female socket](https://www.amazon.de/gp/product/B07Q1XBGFB/) for the module.
+To power the module, I can either connect eurorack power plugs using [male pins](https://youtu.be/tok3l28D55k?t=677) or using a [standard box header](https://eu.mouser.com/ProductDetail/Wurth-Elektronik/61201021621?qs=%2Fha2pyFadujEIp2%2FjsKWLXg%252Bb4e8v61jj1J6zp6AkGGUW5Lrb6Z%2Fiw==&utm_source=octopart&utm_medium=aggregator&utm_campaign=710-61201021621&utm_content=Wurth+Elektronik).
+
+The module can either be patched at the backend using more female sockets and dupont cables or by cramping some [3.5mm jack sockets](https://www.thonk.co.uk/shop/thonkiconn/) in as well.
+For this build, I will go with dupont cables in the back, but in the future, I want to build modules with eurorack compatible jacks as well.
+Having 4 pots and 2 jacks (input + output) in 6U might be a little bit fiddly though..
