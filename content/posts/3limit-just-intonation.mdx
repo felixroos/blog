@@ -259,6 +259,7 @@ Now we can generate a whole tuning system, by picking a range of ratios. We can 
           Sort
         </label> */}
         <table>
+          <tbody>
           <tr>
             <th>position</th>
             <th>powers</th>
@@ -271,7 +272,7 @@ Now we can generate a whole tuning system, by picking a range of ratios. We can 
             const [top, bottom] = new Fraction(ratio).toFraction().split("/")
             const exp = Math.ceil(Math.log(1 / factor) / Math.log(2))
             return (
-              <tr>
+              <tr key={i}>
                 <td>{i}</td>
                 <td>
                   <InlineMath key={i}>{`3^{${power}} * 2^{${exp}}`}</InlineMath>
@@ -292,6 +293,7 @@ Now we can generate a whole tuning system, by picking a range of ratios. We can 
               </tr>
             )
           })}
+          </tbody>
         </table>
       </div>
     )

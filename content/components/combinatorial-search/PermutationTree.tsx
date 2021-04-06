@@ -60,18 +60,14 @@ export default function PermutationTree(props) {
           .selectAll('text')
           .data(root.descendants())
           .join('text')
-          .on('click', (d) => {
+          .on('click', (e, d) => {
             onClick && onClick(d);
           })
           .attr('x', (d: any) => d.y)
           .attr('y', (d: any) => d.x)
           .attr('dy', '0.31em')
           .attr('dx', (d: any) => (d.children ? -6 : 6))
-          .text((d: any) =>
-            d.children
-              ? d.data.name
-              : d.data.name + ' ➡ ' + d.data.path.join(' ')
-          )
+          .text((d: any) => (d.children ? d.data.name : d.data.name + ' ➡ ' + d.data.path.join(' ')))
           .filter((d: any) => d.children)
           .attr('text-anchor', 'end')
           .clone(true)

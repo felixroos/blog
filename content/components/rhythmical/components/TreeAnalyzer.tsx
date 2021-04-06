@@ -23,6 +23,7 @@ export function TreeAnalyzer(props) {
     default: '#DFDFDF',
   };
   const { data, hideJson, hideChips } = props;
+  const [node, setNode] = useState<any>(hierarchy(data));
   const isActive = (type) =>
     ({
       parent: !!node.parent?.data?.name,
@@ -39,19 +40,10 @@ export function TreeAnalyzer(props) {
     };
   };
   const columns = props.columns || [8, 4];
-  const [node, setNode] = useState<any>(hierarchy(data));
   return (
     <Grid container>
       <Grid item xs={columns[0]}>
-        <Tree
-          data={data}
-          onClick={(d) => {
-            setNode(d);
-          }}
-          theme={theme}
-          selected={node}
-          {...props}
-        />
+        <Tree data={data} onClick={(event, d) => setNode(d)} theme={theme} selected={node} {...props} />
       </Grid>
       {node && !hideChips && (
         <Grid item xs={columns[1]}>

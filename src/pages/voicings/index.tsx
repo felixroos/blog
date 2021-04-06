@@ -332,7 +332,7 @@ export default function Voicings() {
               },
               {
                 property: 'structure',
-                resolve: (keys: string[]) => {
+                resolve: (keys: any) => {
                   const { steps, intervals } = Voicing.analyze(
                     keys,
                     state.tonic

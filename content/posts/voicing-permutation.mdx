@@ -155,7 +155,7 @@ export default function PermutationTree(props) {
           .selectAll('text')
           .data(root.descendants())
           .join('text')
-          .on('click', (d) => {
+          .on('click', (e, d) => {
             onClick && onClick(d);
           })
           .attr('x', (d: any) => d.y)

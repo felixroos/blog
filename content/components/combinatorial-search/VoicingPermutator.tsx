@@ -25,7 +25,7 @@ export default function VoicingPermutator({
   const piano = useMemo(() => tinypiano.load(), []);
   const playNode = (hasOctaves = false) => ({ data: { path, isLeaf } }) => {
     const notes = hasOctaves ? path : renderUp(path, 3);
-    notes.forEach((note) => piano.triggerAttackRelease(note, 4));
+    notes.forEach(async (note) => (await piano).triggerAttackRelease(note, 4));
   };
   const tree = permutate(options);
   let chords = flatTree(tree);
