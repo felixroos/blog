@@ -33,7 +33,7 @@ export default function treeMap(container, data) {
     .attr('height', function (d) { return d.y1 - d.y0; })
     .style("stroke", "black")
     .style("fill", (d) => d.data.selected ? 'darksalmon' : 'steelblue')
-    .on("click", (d) => {
+    .on("click", (event, d) => { // d3 v6
       d.data.onClick && d.data.onClick(d.data);
     })
   // and to add the text labels

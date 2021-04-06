@@ -1,5 +1,4 @@
 import { stack, clamp, nearestPitch, maxFractionSize, powers, limitN, equivalence, generate } from './tuning';
-// import * as Combinatorics from 'js-combinatorics';
 
 test('generate', () => {
   expect(generate(3, 7, 12, 2)).toEqual([
