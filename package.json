@@ -8,7 +8,8 @@
     "start": "gatsby develop --host=0.0.0.0 -p 8000",
     "build": "gatsby build --prefix-paths",
     "clean": "gatsby clean",
-    "deploy": "gatsby clean && npm run build && gh-pages -d public -b gh-pages"
+    "deploy": "gatsby clean && npm run build && gh-pages -d public -b gh-pages",
+    "depcruise": "cd ./content/components/sets && dependency-cruise -x \"^(../../../node_modules|test)\" --output-type dot . | dot -T svg > deps-sets.svg && mv ./deps-sets.svg ../../../static/deps-sets.svg"
   },
   "dependencies": {
     "@ctrl/tinycolor": "^3.1.5",
@@ -83,6 +84,7 @@
     "babel-jest": "^26.2.2",
     "babel-preset-gatsby": "^0.5.5",
     "cheerio": "^1.0.0-rc.3",
+    "dependency-cruiser": "^9.25.0",
     "gatsby-plugin-goatcounter": "^0.3.1",
     "html-pdf": "^2.2.0",
     "identity-obj-proxy": "^3.0.0",

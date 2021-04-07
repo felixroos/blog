@@ -4,7 +4,7 @@ import { ChordType, Interval, Scale } from '@tonaljs/tonal'
 import chromaChords from './chromaChords'
 import chromaScales from './chromaScales'
 
-export default function chromaSymbol(chroma, tonic, symbols) {
+export default function chromaSymbols(chroma, tonic, symbols) {
   symbols = {
     scales: symbols.scales || Scale.names(),
     chords: symbols.chords || ChordType.names(),

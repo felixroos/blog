@@ -1,4 +1,4 @@
-import simplifyScale from './simplifyScale';
+import simplifyScale from '../simplifyScale';
 
 test('simplifyScale', () => {
   expect(simplifyScale('C dorian')).toBe('C dorian');

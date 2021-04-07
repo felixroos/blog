@@ -1,5 +1,5 @@
-import chromaDifference from './chromaDifference'
-import scaleChroma from './scaleChroma'
+import chromaDifference from '../chromaDifference'
+import scaleChroma from '../scaleChroma'
 
 test('chromaDifference', () => {
   expect(chromaDifference(scaleChroma('C major'), scaleChroma('F major'))).toBe(2)

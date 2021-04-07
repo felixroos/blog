@@ -1,5 +1,5 @@
-import rotateChroma from './rotateChroma'
-import scaleChroma from './scaleChroma';
+import rotateChroma from '../rotateChroma'
+import scaleChroma from '../scaleChroma';
 
 test('rotateChroma', () => {
 

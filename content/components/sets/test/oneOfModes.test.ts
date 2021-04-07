@@ -1,5 +1,5 @@
 import { Scale } from '@tonaljs/tonal'
-import oneOfModes from './oneOfModes'
+import oneOfModes from '../oneOfModes'
 
 test('oneOfModes', () => {
   expect(Scale.names().filter(oneOfModes(['major']))).toEqual([

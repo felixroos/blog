@@ -1,7 +1,7 @@
 import { Scale } from '@tonaljs/tonal'
-import allPitches from './allPitches'
-import rotateTonic from './rotateTonic'
-import scaleModes from './scaleModes'
+import allPitches from '../allPitches'
+import rotateTonic from '../rotateTonic'
+import scaleModes from '../scaleModes'
 
 test('rotateTonic diatonic', () => {
   /* expect(rotateTonic(0, 'C major', scaleModes('major'))).toBe('C major')

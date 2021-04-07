@@ -1,6 +1,6 @@
-import chordChroma from './chordChroma';
-import negativeHarmony from './negativeHarmony';
-import scaleChroma from './scaleChroma';
+import chordChroma from '../chordChroma';
+import negativeHarmony from '../negativeHarmony';
+import scaleChroma from '../scaleChroma';
 
 test('negativeHarmony', () => {
   expect(negativeHarmony(scaleChroma('C major'), 'C')).toBe(scaleChroma('C minor'));

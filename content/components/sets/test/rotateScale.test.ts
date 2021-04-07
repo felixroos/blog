@@ -1,5 +1,5 @@
-import rotateScale from './rotateScale';
-import scaleModes from './scaleModes'
+import rotateScale from '../rotateScale';
+import scaleModes from '../scaleModes'
 
 test('rotateScale', () => {
   expect(rotateScale('C major', 1, scaleModes('major'))).toBe('C dorian');

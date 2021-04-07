@@ -1,5 +1,5 @@
-import chromaScale from './chromaScale'
-import scaleChroma from './scaleChroma';
+import chromaScale from '../chromaScale'
+import scaleChroma from '../scaleChroma';
 
 test('chromaScale', () => {
   expect(chromaScale('101011010101', 'C')).toBe('C major');

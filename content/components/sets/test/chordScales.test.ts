@@ -1,5 +1,5 @@
-import chordScales from './chordScales'
-import scaleModes from './scaleModes'
+import chordScales from '../chordScales'
+import scaleModes from '../scaleModes'
 
 test('chordScales', () => {
   expect(chordScales('m7', scaleModes('major'))).toEqual(['phrygian', 'aeolian', 'dorian'])

@@ -1,4 +1,4 @@
-import allPitches from './allPitches'
+import allPitches from '../allPitches'
 
 test('allPitches', () => {
   expect(allPitches).toEqual([

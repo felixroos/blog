@@ -1,5 +1,5 @@
-import bySetNum from './bySetNum'
-import scaleModes from './scaleModes'
+import bySetNum from '../bySetNum'
+import scaleModes from '../scaleModes'
 
 test('bySetNum', () => {
   expect(scaleModes('major').sort(bySetNum)).toEqual([

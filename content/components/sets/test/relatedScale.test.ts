@@ -1,4 +1,4 @@
-import relatedScale from './relatedScale';
+import relatedScale from '../relatedScale';
 
 test('relatedScale', () => {
   expect(relatedScale('C major', 'D')).toBe('D dorian');

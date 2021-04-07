@@ -1,4 +1,4 @@
-import findCircularIndex from './findCircularIndex'
+import findCircularIndex from '../findCircularIndex'
 
 test('findCircularIndex', () => {
   const chroma = '101011010101'.split(''); // c major
@@ -10,4 +10,4 @@ test('findCircularIndex', () => {
   expect(findCircularIndex(chroma, isOne, 6)).toBe(7)
   expect(findCircularIndex(chroma, isOne, 8)).toBe(9)
   expect(findCircularIndex(chroma, isOne, 10)).toBe(11)
-})
+});

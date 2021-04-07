@@ -1,5 +1,5 @@
-import chromaColor from './chromaColor'
-import scaleChroma from './scaleChroma'
+import chromaColor from '../chromaColor'
+import scaleChroma from '../scaleChroma'
 
 test('chromaColor', () => {
   expect(chromaColor(scaleChroma('C dorian'))).toBe('rgb(255, 64, 64)')

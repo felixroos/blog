@@ -1,4 +1,4 @@
-import rotateMode from './rotateMode'
+import rotateMode from '../rotateMode'
 
 test('rotateMode', () => {
   expect(rotateMode('A locrian #2', 7)).toBe('B altered')
@@ -6,7 +6,3 @@ test('rotateMode', () => {
   expect(rotateMode('A major', 1)).toBe('B dorian')
   expect(rotateMode('A major', 7)).toBe('E mixolydian')
 })
-
-
-  // TODO: use this in pitch-class-sets for rotate tonic
-  // TODO: find similar solution for rotate scale

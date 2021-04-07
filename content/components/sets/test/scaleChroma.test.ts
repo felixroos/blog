@@ -1,4 +1,4 @@
-import scaleChroma from './scaleChroma'
+import scaleChroma from '../scaleChroma'
 
 test('scaleChroma', () => {
   expect(scaleChroma('C major')).toBe('101011010101')

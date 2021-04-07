@@ -1,4 +1,4 @@
-import scaleColor from './scaleColor'
+import scaleColor from '../scaleColor'
 
 test('scaleColor', () => {
   /* expect(scaleColor('C dorian')).toBe('rgb(255, 64, 64)')

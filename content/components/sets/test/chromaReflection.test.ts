@@ -1,7 +1,7 @@
 import { Note } from '@tonaljs/tonal';
-import chordChroma from './chordChroma';
-import chromaReflection from './chromaReflection'
-import scaleChroma from './scaleChroma';
+import chordChroma from '../chordChroma';
+import chromaReflection from '../chromaReflection'
+import scaleChroma from '../scaleChroma';
 
 test('chromaReflection', () => {
   expect(chromaReflection(scaleChroma('C major'))).toBe(scaleChroma('Ab major'));

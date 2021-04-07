@@ -1,4 +1,4 @@
-import scaleModes from './scaleModes'
+import scaleModes from '../scaleModes'
 
 test('scaleModes', () => {
   expect(scaleModes('major')).toEqual([

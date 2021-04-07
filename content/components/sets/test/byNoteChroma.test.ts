@@ -1,4 +1,4 @@
-import byNoteChroma from './byNoteChroma'
+import byNoteChroma from '../byNoteChroma'
 
 test('byNoteChroma', () => {
   expect(['D', 'Dbb', 'C', 'C#'].sort(byNoteChroma)).toEqual([

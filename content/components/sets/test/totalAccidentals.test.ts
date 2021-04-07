@@ -1,4 +1,4 @@
-import totalAccidentals from './totalAccidentals';
+import totalAccidentals from '../totalAccidentals';
 
 test('totalAccidentals', () => {
   expect(totalAccidentals(['C', 'D', 'E'])).toBe(0);

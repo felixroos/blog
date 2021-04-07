@@ -1,4 +1,4 @@
-import nextRoot from './nextRoot';
+import nextRoot from '../nextRoot';
 
 test('nextRoot', () => {
   expect(nextRoot('C major', 1)).toBe('D');

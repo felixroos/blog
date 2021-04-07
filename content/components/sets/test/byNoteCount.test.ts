@@ -1,5 +1,5 @@
 import { Scale } from '@tonaljs/tonal'
-import byNoteCount from './byNoteCount'
+import byNoteCount from '../byNoteCount'
 
 test('byNoteCount', () => {
   expect(Scale.get('dorian').intervals.length).toEqual(7);

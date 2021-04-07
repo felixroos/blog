@@ -1,7 +1,7 @@
 import { Note } from '@tonaljs/tonal';
-import chromaCenter from './chromaCenter';
-import reorderChroma from './reorderChroma';
-import scaleChroma from './scaleChroma';
+import chromaCenter from '../chromaCenter';
+import reorderChroma from '../reorderChroma';
+import scaleChroma from '../scaleChroma';
 
 test('chromaCenter', () => {
   // tested with dorian, as it is the harmonic "equilibrium" (see circle)

@@ -1,4 +1,4 @@
-import reorderChroma from './reorderChroma'
+import reorderChroma from '../reorderChroma'
 
 test('reorderChroma', () => {
   expect(reorderChroma('101011010101', 7)).toBe('111111000001') // chromatic to fifths c major
