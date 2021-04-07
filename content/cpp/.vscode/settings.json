@@ -1,0 +1,10 @@
+{
+  "files.associations": {
+    "*.tidal": "haskell",
+    "*.html": "html",
+    "*.njk": "nunjucks",
+    "sdl.h": "c",
+    "sdl_audio.h": "c",
+    "sdl_video.h": "c"
+  }
+}
