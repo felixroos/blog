@@ -5,8 +5,13 @@ import scaleModes from '../../components/sets/scaleModes';
 # Graphviz
 
 Using [@hpcc-js/wasm](https://www.npmjs.com/package/@hpcc-js/wasm).
-Currently pretty hacky, as the script is loaded from jsdeliver.. did not find a way to bundle the module.
-But this lib is the only one i found that could handle large graphs without looking like shit.
+
+<strike>
+  Currently pretty hacky, as the script is loaded from jsdeliver.. did not find a way to bundle the module. But this lib
+  is the only one i found that could handle large graphs without looking like shit.
+</strike>
+
+Update: Now using @hpcc-js/wasm + graphvizlib.wasm file as static asset, see [this comment](https://github.com/magjac/d3-graphviz/issues/152#issuecomment-625710638).
 
 The json is converted to dot via [jgf-dot](https://github.com/jsongraph/jgf-dot#jgf-dot).
 

@@ -1,18 +1,19 @@
 import * as React from 'react';
 import toDot from 'jgf-dot';
-import canUseDOM from '../../components/canUseDOM';
 
-canUseDOM() && document.write('<script src="https://cdn.jsdelivr.net/npm/@hpcc-js/wasm/dist/index.min.js"><' + '/script>');
+import { graphviz } from '@hpcc-js/wasm';
+
+// to make this work, make sure to copy graphvizlib.wasm to static with:
+// cp ./node_modules/@hpcc-js/wasm/dist/graphvizlib.wasm ./static
 
 export function Graph({ json, editable }: any) {
   const [el, setEl] = React.useState<HTMLDivElement>();
   const [value, setValue] = React.useState<string>(JSON.stringify(json, null, 2));
   const renderGraph = async (jsonString) => {
-    if (!window?.['@hpcc-js/wasm'] || !el) {
+    if (!el) {
       return;
     }
     try {
-      const { graphviz } = window['@hpcc-js/wasm'];
       const dot = toDot(JSON.parse(jsonString));
       const svg = await graphviz.layout(dot, 'svg', 'dot');
       el.innerHTML = svg;
@@ -22,7 +23,7 @@ export function Graph({ json, editable }: any) {
   };
   React.useEffect(() => {
     renderGraph(value);
-  }, [window['@hpcc-js/wasm'], el, value]);
+  }, [el, value]);
   return (
     <>
       <div ref={(e) => setEl(e)}></div>
