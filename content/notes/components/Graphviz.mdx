@@ -1,0 +1,125 @@
+import { Graph } from '../../components/graphs/Graphviz.tsx';
+import chordScaleGraph from '../../components/graphs/chordScaleGraph';
+import scaleModes from '../../components/sets/scaleModes';
+
+# Graphviz
+
+Using [@hpcc-js/wasm](https://www.npmjs.com/package/@hpcc-js/wasm).
+Currently pretty hacky, as the script is loaded from jsdeliver.. did not find a way to bundle the module.
+But this lib is the only one i found that could handle large graphs without looking like shit.
+
+The json is converted to dot via [jgf-dot](https://github.com/jsongraph/jgf-dot#jgf-dot).
+
+## Simple Example
+
+<Graph
+  editable={true}
+  json={{
+    graph: {
+      directed: true,
+      nodes: [
+        {
+          label: 'A',
+          fillcolor: 'steelblue',
+          style: 'filled',
+          id: 0,
+        },
+        {
+          label: 'B',
+          fillcolor: 'salmon',
+          style: 'filled',
+          id: 1,
+        },
+      ],
+      edges: [
+        {
+          source: 0,
+          target: 1,
+          label: 'link',
+        },
+      ],
+    },
+  }}
+/>
+
+## Moderate Example: Chord Scales of a 251
+
+<Graph
+  editable={true}
+  json={{
+    graph: {
+      directed: true,
+      ...chordScaleGraph(['Dm7', 'G7', 'C^7'], scaleModes('major')),
+    },
+  }}
+/>
+
+## Complex Example: Chord Scales of "Solar"
+
+<Graph
+  editable={true}
+  json={{
+    graph: {
+      directed: true,
+      ...chordScaleGraph(
+        ['CmM7', 'Gm7', 'C7', 'F^7', 'Fm7', 'Bb7', 'Eb^7', 'Ebm7', 'Ab7', 'Db^7', 'Dm7b5', 'G7b9', 'CmM7'],
+        scaleModes('major', 'melodic minor', 'harmonic minor')
+      ),
+    },
+  }}
+/>
+
+## Very Complex Example: Chord Scales of "All The Things You Are"
+
+<Graph
+  editable={true}
+  json={{
+    graph: {
+      directed: true,
+      ...chordScaleGraph(
+        [
+          'Fm7',
+          'Bbm7',
+          'Eb7',
+          'Ab^7',
+          'Db^7',
+          'Dm7',
+          'G7',
+          'C^7',
+          'C^7',
+          'Cm7',
+          'Fm7',
+          'Bb7',
+          'Eb^7',
+          'Ab^7',
+          'Am7',
+          'D7',
+          'G^7',
+          'G^7',
+          'Am7',
+          'D7',
+          'G^7',
+          'G^7',
+          'F#h7',
+          'B7b9',
+          'E^7',
+          'C7b13',
+          'Fm7',
+          'Bbm7',
+          'Eb7',
+          'Ab^7',
+          'Db^7',
+          'Db-^7',
+          'Cm7',
+          'Bo7',
+          'Bbm7',
+          'Eb7',
+          'Ab^7',
+          'Gh7',
+          'C7b9',
+        ],
+        scaleModes('major', 'melodic minor', 'harmonic minor')
+      ),
+    },
+  }}
+/>
