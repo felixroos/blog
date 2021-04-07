@@ -1,0 +1,128 @@
+# Common Components
+
+## AnimationFrame
+
+See [AnimationFrame](../AnimationFrame).
+
+## AsciiTree
+
+Vizualize a tree structure with text. Currently not in use
+
+import { AsciiTree } from '../../components/common/AsciiTree';
+
+<AsciiTree
+  node={{
+    oranges: { mandarin: { clementine: null, tangerine: 'so cheap and juicy' } },
+    apples: { gala: null, 'pink lady': null },
+  }}
+/>
+
+```js
+<AsciiTree
+  node={{
+    oranges: { mandarin: { clementine: null, tangerine: 'so cheap and juicy' } },
+    apples: { gala: null, 'pink lady': null },
+  }}
+/>
+```
+
+## AsciiTreeDiff
+
+Diff 2 AsciiTrees. Currently not in use
+
+import { AsciiTreeDiff } from '../../components/common/AsciiTreeDiff';
+
+<AsciiTreeDiff
+  before={{
+    oranges: { mandarin: { clementine: null, tangerine: 'so cheap and juicy' } },
+    apples: { gala: null, 'pink lady': null },
+  }}
+  after={{
+    oranges: { mandarin: { clementine: null, tangerine: 'so cheap and juicy!!!!' } },
+    apples: { gala: null },
+  }}
+/>
+<br />
+
+```js
+<AsciiTreeDiff
+  before={{
+    oranges: { mandarin: { clementine: null, tangerine: 'so cheap and juicy' } },
+    apples: { gala: null, 'pink lady': null },
+  }}
+  after={{
+    oranges: { mandarin: { clementine: null, tangerine: 'so cheap and juicy!!!!' } },
+    apples: { gala: null },
+  }}
+/>
+```
+
+## barChart
+
+import barChart from '../../components/common/barChart';
+import DShell from '../../components/common/D3Shell';
+
+<DShell
+  render={(container) =>
+    barChart({
+      width: 500,
+      height: 300,
+      container,
+      data: [
+        { value: 'A', count: 3 },
+        { value: 'B', count: 5 },
+        { value: 'C', count: 2 },
+      ],
+    })
+  }
+/>
+<br />
+
+```js
+<DShell
+  render={(container) =>
+    barChart({
+      width: 500,
+      height: 300,
+      container,
+      data: [
+        { value: 'A', count: 3 },
+        { value: 'B', count: 5 },
+        { value: 'C', count: 2 },
+      ],
+    })
+  }
+/>
+```
+
+## Circle
+
+svg subcomponent to quickly create a circle. Currently only used in NoteCircle which is not in use...
+
+import Circle from '../../components/common/Circle';
+
+<svg width={42} height={42}>
+  <Circle fill={'steelblue'} radius={20}>
+    <text x={16} y={25}>
+      X
+    </text>
+  </Circle>
+</svg>
+
+```js
+<svg width={42} height={42}>
+  <Circle fill={'steelblue'} radius={20}>
+    <text x={16} y={25}>
+      X
+    </text>
+  </Circle>
+</svg>
+```
+
+TBD: kill?
+
+## Color
+
+import { Color } from '../../components/common/Color';
+
+<Color color={'steelblue'} />

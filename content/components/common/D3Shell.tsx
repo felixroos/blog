@@ -14,7 +14,10 @@ export default function D3Shell({ render }) {
     <div
       style={{ width: '100%', overflow: 'auto' }}
       ref={(el) => {
-        render && render(select(el));
+        if (el) {
+          el.innerHTML = '';
+          render && render(select(el));
+        }
       }}
     />
   );

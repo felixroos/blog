@@ -9,7 +9,7 @@
     "build": "gatsby build --prefix-paths",
     "clean": "gatsby clean",
     "deploy": "gatsby clean && npm run build && gh-pages -d public -b gh-pages",
-    "depcruise": "cd ./content/components/sets && dependency-cruise -x \"^(../../../node_modules|test)\" --output-type dot . | dot -T svg > deps-sets.svg && mv ./deps-sets.svg ../../../static/deps-sets.svg"
+    "depcruise-sets": "cd ./content/components/sets && dependency-cruise -x \"^(../../../node_modules|test)\" --output-type dot . | dot -T svg > deps-sets.svg && mv ./deps-sets.svg ../../../static/deps-sets.svg"
   },
   "dependencies": {
     "@ctrl/tinycolor": "^3.1.5",

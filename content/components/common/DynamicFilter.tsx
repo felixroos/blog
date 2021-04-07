@@ -22,13 +22,13 @@ set = normalizeProperty('count', set);
 );
 const normalized = regularities.map(normalize(regularities)).map(toString); */
 
-const data = set.sort((a, b) => b.count - a.count).slice(0, 10);
+const data: any = set.sort((a, b) => b.count - a.count).slice(0, 10);
 
 export default function DynamicFilter({ values }) {
   return (
     <>
       <JSONViewer src={set} />
-      <D3Shell render={(container) => barChart({ container, data })} />
+      <D3Shell render={(container) => barChart({ container, data } as any)} />
     </>
   );
 }

@@ -1,15 +1,16 @@
 import * as d3 from 'd3';
 import { Selection, BaseType } from 'd3-selection';
 
-export default function barChart({ container, data }: {
+export default function barChart({ container, data, width: widthProp, height: heightProp }: {
   container: Selection<BaseType, any, null, undefined>,
-  data: { count: number, value: string, [key: string]: any }[]
+  data: { count: number, value: string, [key: string]: any }[],
+  width: number, height: number
 }) {
 
   // set the dimensions and margins of the graph
   var margin = { top: 20, right: 20, bottom: 30, left: 40 },
-    width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+    width = (widthProp || 960) - margin.left - margin.right,
+    height = (heightProp || 500) - margin.top - margin.bottom;
 
   // set the ranges
   var x = d3.scaleBand().range([0, width]).padding(0.1);

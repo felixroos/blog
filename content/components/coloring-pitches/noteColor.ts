@@ -2,6 +2,8 @@ import { TinyColor } from "@ctrl/tinycolor"
 import { Note, Collection } from "@tonaljs/tonal"
 import { interpolateRainbow, interpolateSinebow, interpolateWarm } from 'd3-scale-chromatic'
 
+// used in Keyboard.mdx + coloring-pitches.mdx + 2 drafts
+
 export function noteColor(note: string, rotate = 0): TinyColor {
   return new TinyColor({
     h: Math.floor((rotate + (Note.chroma(note) / 12) * 360) % 360),
