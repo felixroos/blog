@@ -24,6 +24,7 @@
     "@types/react": "^16.14.5",
     "@types/react-dom": "^16.9.12",
     "@types/vexflow": "^1.2.35",
+    "bb-chord-symbol": "^1.0.10",
     "clsx": "^1.1.1",
     "d3": "^6.6.2",
     "d3-array": "^2.12.1",

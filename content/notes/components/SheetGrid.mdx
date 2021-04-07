@@ -1,0 +1,185 @@
+# SheetGrid
+
+import { renderChordSymbols } from '../../components/score/ChordSymbol';
+import { mapHierarchy } from '../../components/rhythmical/tree/mapHierarchy';
+import NestedGrid from '../../components/graphs/NestedGrid';
+
+Using [NestedGrid](./NestedGrid) + [ChordSymbol](./ChordSymbol), we can generate beautiful sheets!
+
+## Without ChordSymbol
+
+With plain text, the sheet looks like that:
+
+<NestedGrid
+  rows={[1]}
+  innerBorders={true}
+  cells={[
+    ['F^7', ['Gm7', 'C7'], 'F^7', ['Bbm7', 'Eb7']],
+    [['Am7', 'Ab7'], ['Gm7', 'C7'], 'F^7', ['Abm7', 'Db7']],
+    ['Gb^7', ['Abm7', 'Db7'], 'Gb^7', ['Bm7', 'E7']],
+    [['Bbm7', 'A7'], ['Abm7', 'Db7'], 'Gb^7', ['Am7', 'D7']],
+    ['G^7', ['Gm7', 'C7'], 'F^7', ['Fm7', 'Bb7']],
+    ['Eb^7', ['Abm7', 'Db7'], 'Gb^7', ['Gm7', 'C7']],
+    ['F^7', ['Gm7', 'C7'], 'F^7', ['Bbm7', 'Eb7']],
+    [['Am7', 'Ab7'], ['Gm7', 'C7'], 'F^7', ['Gm7', 'C7']],
+  ]}
+/>
+<br />
+
+```js
+<NestedGrid
+  rows={[1]}
+  innerBorders={true}
+  cells={[
+    ['F^7', ['Gm7', 'C7'], 'F^7', ['Bbm7', 'Eb7']],
+    [['Am7', 'Ab7'], ['Gm7', 'C7'], 'F^7', ['Abm7', 'Db7']],
+    ['Gb^7', ['Abm7', 'Db7'], 'Gb^7', ['Bm7', 'E7']],
+    [['Bbm7', 'A7'], ['Abm7', 'Db7'], 'Gb^7', ['Am7', 'D7']],
+    ['G^7', ['Gm7', 'C7'], 'F^7', ['Fm7', 'Bb7']],
+    ['Eb^7', ['Abm7', 'Db7'], 'Gb^7', ['Gm7', 'C7']],
+    ['F^7', ['Gm7', 'C7'], 'F^7', ['Bbm7', 'Eb7']],
+    [['Am7', 'Ab7'], ['Gm7', 'C7'], 'F^7', ['Gm7', 'C7']],
+  ]}
+/>
+```
+
+## renderChordSymbols helper
+
+To be able to render nested string arrays as ChordSymbol elements, we need a helper:
+
+```ts
+export function renderChordSymbols(chords: NestedArray<string>, options?) {
+  return mapNestedArray(chords, (node) => {
+    if (!Array.isArray(node)) {
+      return <ChordSymbol chord={node} {...options} />;
+    }
+    return node;
+  });
+}
+```
+
+## With ChordSymbols
+
+Now we can do this:
+
+<NestedGrid
+  rows={[1]}
+  innerBorders={true}
+  outerBorders={false}
+  cells={renderChordSymbols([
+    ['F^7', ['Gm7', 'C7'], 'F^7', ['Bbm7', 'Eb7']],
+    [['Am7', 'Ab7'], ['Gm7', 'C7'], 'F^7', ['Abm7', 'Db7']],
+    ['Gb^7', ['Abm7', 'Db7'], 'Gb^7', ['Bm7', 'E7']],
+    [['Bbm7', 'A7'], ['Abm7', 'Db7'], 'Gb^7', ['Am7', 'D7']],
+    ['G^7', ['Gm7', 'C7'], 'F^7', ['Fm7', 'Bb7']],
+    ['Eb^7', ['Abm7', 'Db7'], 'Gb^7', ['Gm7', 'C7']],
+    ['F^7', ['Gm7', 'C7'], 'F^7', ['Bbm7', 'Eb7']],
+    [['Am7', 'Ab7'], ['Gm7', 'C7'], 'F^7', ['Gm7', 'C7']],
+  ])}
+/>
+<br />
+
+```js
+<NestedGrid
+  rows={[1]}
+  innerBorders={true}
+  outerBorders={false}
+  cells={renderChordSymbols([
+    ['F^7', ['Gm7', 'C7'], 'F^7', ['Bbm7', 'Eb7']],
+    [['Am7', 'Ab7'], ['Gm7', 'C7'], 'F^7', ['Abm7', 'Db7']],
+    ['Gb^7', ['Abm7', 'Db7'], 'Gb^7', ['Bm7', 'E7']],
+    [['Bbm7', 'A7'], ['Abm7', 'Db7'], 'Gb^7', ['Am7', 'D7']],
+    ['G^7', ['Gm7', 'C7'], 'F^7', ['Fm7', 'Bb7']],
+    ['Eb^7', ['Abm7', 'Db7'], 'Gb^7', ['Gm7', 'C7']],
+    ['F^7', ['Gm7', 'C7'], 'F^7', ['Bbm7', 'Eb7']],
+    [['Am7', 'Ab7'], ['Gm7', 'C7'], 'F^7', ['Gm7', 'C7']],
+  ])}
+/>
+```
+
+## Custom Font
+
+The second argument of renderChordSymbols is passed to the ChordSymbol element props, so we can change the font:
+
+<NestedGrid
+  rows={[1]}
+  innerBorders={true}
+  outerBorders={false}
+  cells={renderChordSymbols(
+    [
+      ['F^7', ['Gm7', 'C7'], 'F^7', ['Bbm7', 'Eb7']],
+      [['Am7', 'Ab7'], ['Gm7', 'C7'], 'F^7', ['Abm7', 'Db7']],
+      ['Gb^7', ['Abm7', 'Db7'], 'Gb^7', ['Bm7', 'E7']],
+      [['Bbm7', 'A7'], ['Abm7', 'Db7'], 'Gb^7', ['Am7', 'D7']],
+      ['G^7', ['Gm7', 'C7'], 'F^7', ['Fm7', 'Bb7']],
+      ['Eb^7', ['Abm7', 'Db7'], 'Gb^7', ['Gm7', 'C7']],
+      ['F^7', ['Gm7', 'C7'], 'F^7', ['Bbm7', 'Eb7']],
+      [['Am7', 'Ab7'], ['Gm7', 'C7'], 'F^7', ['Gm7', 'C7']],
+    ],
+    { fontFamily: 'monospace', fontSize: '20px' }
+  )}
+/>
+<br />
+
+```js
+<NestedGrid
+  rows={[1]}
+  innerBorders={true}
+  outerBorders={false}
+  cells={renderChordSymbols(
+    [
+      ['F^7', ['Gm7', 'C7'], 'F^7', ['Bbm7', 'Eb7']],
+      [['Am7', 'Ab7'], ['Gm7', 'C7'], 'F^7', ['Abm7', 'Db7']],
+      ['Gb^7', ['Abm7', 'Db7'], 'Gb^7', ['Bm7', 'E7']],
+      [['Bbm7', 'A7'], ['Abm7', 'Db7'], 'Gb^7', ['Am7', 'D7']],
+      ['G^7', ['Gm7', 'C7'], 'F^7', ['Fm7', 'Bb7']],
+      ['Eb^7', ['Abm7', 'Db7'], 'Gb^7', ['Gm7', 'C7']],
+      ['F^7', ['Gm7', 'C7'], 'F^7', ['Bbm7', 'Eb7']],
+      [['Am7', 'Ab7'], ['Gm7', 'C7'], 'F^7', ['Gm7', 'C7']],
+    ],
+    { fontFamily: 'monospace', fontSize: '20px' }
+  )}
+/>
+```
+
+### Next Steps:
+
+- Colorize cells according to chord scale
+- find way to show major chords with triangles
+- add textarea editor
+- add player
+- add piano
+- [x] add fancy chord symbols
+  - [x] use https://www.npmjs.com/package/bb-chord-symbol
+
+## Rhythm Example
+
+This is the bolero:
+
+<NestedGrid
+  rows={[1]}
+  innerBorders={true}
+  cells={[
+    [
+      ['sn', ['sn', 'sn', 'sn']],
+      ['sn', ['sn', 'sn', 'sn']],
+      ['sn', 'sn'],
+    ],
+    [
+      ['sn', ['sn', 'sn', 'sn']],
+      ['sn', ['sn', 'sn', 'sn']],
+      [
+        ['sn', 'sn', 'sn'],
+        ['sn', 'sn', 'sn'],
+      ],
+    ],
+  ]}
+/>
+<br />
+
+### Next Steps
+
+- allow objects as cells to specify rows for each array
+  - this can be used to support durations
+- try rendering notes with the pitch mapped to one dimension, scrolling into the other dimension
+  - the outermost grid must not overflow

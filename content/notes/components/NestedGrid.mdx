@@ -1,0 +1,284 @@
+# Nested CSS Grid
+
+Let's play around with CSS Grid + React.
+
+## Automatic Cell Styles
+
+export const gridStyle = (cells, gridGap = '1px') => ({
+  display: 'grid',
+  gridTemplateColumns: cells.map((n) => `${n}fr`).join(' '),
+  gridGap,
+});
+export const boxStyle = { border: '1px solid #444', padding: '1px' };
+
+The grid styles are generated like this (inspired by [Grid by Example](https://gridbyexample.com/examples/)):
+
+```js
+export const gridStyle = (cells, gridGap = '1px') => ({
+  display: 'grid',
+  gridTemplateColumns: cells.map((n) => `${n}fr`).join(' '),
+  gridGap,
+});
+export const boxStyle = { border: '1px solid #444', padding: '1px' };
+```
+
+This grid has 4 equal cells:
+
+<div style={gridStyle([1, 1, 1, 1])}>
+  <div style={{ ...boxStyle }}>A</div>
+  <div style={{ ...boxStyle }}>B</div>
+  <div style={{ ...boxStyle }}>C</div>
+  <div style={{ ...boxStyle }}>D</div>
+</div>
+<br />
+
+```js
+<div style={gridStyle([1, 1, 1, 1])}>
+  <div style={{ ...boxStyle }}>A</div>
+  <div style={{ ...boxStyle }}>B</div>
+  <div style={{ ...boxStyle }}>C</div>
+  <div style={{ ...boxStyle }}>D</div>
+</div>
+```
+
+This grid has a bigger first cell:
+
+<div style={gridStyle([2, 1, 1])}>
+  <div style={{ ...boxStyle }}>A</div>
+  <div style={{ ...boxStyle }}>B</div>
+  <div style={{ ...boxStyle }}>C</div>
+</div>
+<br />
+
+```js
+<div style={gridStyle([2, 1, 1])}>
+  <div style={{ ...boxStyle }}>A</div>
+  <div style={{ ...boxStyle }}>B</div>
+  <div style={{ ...boxStyle }}>C</div>
+</div>
+```
+
+This grid has 2 equal cells with a nested grid inside the second cell:
+
+<div style={gridStyle([1, 1])}>
+  <div style={{ ...boxStyle }}>A</div>
+  <div style={{ ...boxStyle, ...gridStyle([1, 1]) }}>
+    <div style={{ ...boxStyle }}>B</div>
+    <div style={{ ...boxStyle }}>C</div>
+  </div>
+</div>
+<br />
+
+```js
+<div style={gridStyle([1, 1])}>
+  <div style={{ ...boxStyle }}>A</div>
+  <div style={{ ...boxStyle, ...gridStyle([1, 1]) }}>
+    <div style={{ ...boxStyle }}>B</div>
+    <div style={{ ...boxStyle }}>C</div>
+  </div>
+</div>
+```
+
+This grid is the same as above, but the second cell has no border:
+
+<div style={gridStyle([1, 1])}>
+  <div style={{ ...boxStyle }}>A</div>
+  <div style={{ ...gridStyle([1, 1]) }}>
+    <div style={{ ...boxStyle }}>B</div>
+    <div style={{ ...boxStyle }}>C</div>
+  </div>
+</div>
+<br />
+
+```js
+<div style={gridStyle([1, 1])}>
+  <div style={{ ...boxStyle }}>A</div>
+  <div style={{ ...gridStyle([1, 1]) }}>
+    <div style={{ ...boxStyle }}>B</div>
+    <div style={{ ...boxStyle }}>C</div>
+  </div>
+</div>
+```
+
+This grid has more than one line:
+
+<div style={gridStyle([1, 1, 1, 1])}>
+  <div style={{ ...boxStyle }}>A</div>
+  <div style={{ ...boxStyle }}>B</div>
+  <div style={{ ...boxStyle }}>C</div>
+  <div style={{ ...boxStyle }}>D</div>
+  <div style={{ ...boxStyle }}>E</div>
+  <div style={{ ...boxStyle, ...gridStyle([1, 1]) }}>
+    <div style={{ ...boxStyle }}>F</div>
+    <div style={{ ...boxStyle }}>G</div>
+  </div>
+  <div style={{ ...boxStyle }}>H</div>
+  <div style={{ ...boxStyle }}>I</div>
+</div>
+<br />
+
+```js
+<div style={gridStyle([1, 1, 1, 1])}>
+  <div style={{ ...boxStyle }}>A</div>
+  <div style={{ ...boxStyle }}>B</div>
+  <div style={{ ...boxStyle }}>C</div>
+  <div style={{ ...boxStyle }}>D</div>
+  <div style={{ ...boxStyle }}>E</div>
+  <div style={{ ...boxStyle, ...gridStyle([1, 1]) }}>
+    <div style={{ ...boxStyle }}>F</div>
+    <div style={{ ...boxStyle }}>G</div>
+  </div>
+  <div style={{ ...boxStyle }}>H</div>
+  <div style={{ ...boxStyle }}>I</div>
+</div>
+```
+
+## Nested Array to Grid
+
+It would be nice to be able to turn nested arrays to grids:
+
+```js
+<NestedGrid cells={['A', ['B', 'C']]} />
+```
+
+to
+
+<div style={gridStyle([1, 1])}>
+  <div style={{ ...boxStyle }}>A</div>
+  <div style={{ ...boxStyle, ...gridStyle([1, 1]) }}>
+    <div style={{ ...boxStyle }}>B</div>
+    <div style={{ ...boxStyle }}>C</div>
+  </div>
+</div>
+<br />
+
+```js
+<div style={gridStyle([1, 1])}>
+  <div style={{ ...boxStyle }}>A</div>
+  <div style={{ ...boxStyle, ...gridStyle([1, 1]) }}>
+    <div style={{ ...boxStyle }}>B</div>
+    <div style={{ ...boxStyle }}>C</div>
+  </div>
+</div>
+```
+
+This can be solved with a recursive react component:
+
+```js
+export default function NestedGrid(props: any) {
+  const { cells, outerBorders, innerBorders, rows } = props;
+  if (!Array.isArray(cells)) {
+    return <div style={innerBorders ? boxStyle : {}}>{cells}</div>;
+  }
+  return (
+    <div style={{ ...(outerBorders ? boxStyle : {}), ...gridStyle(rows || cells.map(() => 1)) }}>
+      {cells?.map((content, i) => (
+        <NestedGrid key={i} {...props} cells={content} rows={undefined} />
+      ))}
+    </div>
+  );
+}
+```
+
+import NestedGrid from '../../components/graphs/NestedGrid';
+
+No Borders:
+
+<NestedGrid cells={['A', ['B', 'C']]} />
+<br />
+
+```js
+<NestedGrid cells={['A', ['B', 'C']]} />
+```
+
+Inner + Outer Borders:
+
+<NestedGrid cells={['A', ['B', 'C']]} innerBorders={true} outerBorders={true} />
+<br />
+
+```js
+<NestedGrid cells={['A', ['B', 'C']]} innerBorders={true} outerBorders={true} />
+```
+
+Only Outer Borders:
+
+<NestedGrid cells={['A', ['B', 'C']]} outerBorders={true} />
+<br />
+
+```js
+<NestedGrid cells={['A', ['B', 'C']]} outerBorders={true} />
+```
+
+Only Inner Borders:
+
+<NestedGrid cells={['A', ['B', 'C']]} innerBorders={true} />
+<br />
+
+```js
+<NestedGrid cells={['A', ['B', 'C']]} innerBorders={true} />
+```
+
+The cool thing: it also works with elements:
+
+export const box = (label, backgroundColor) => <div style={{ backgroundColor }}>{label}</div>;
+
+<NestedGrid cells={[box('A', 'steelblue'), [box('B', 'salmon'), box('C', 'gray')]]} />
+<br />
+
+```js
+export const box = (label, backgroundColor) => <div style={{ backgroundColor }}>{label}</div>
+
+<NestedGrid cells={[box('A', 'steelblue'), [box('B', 'salmon'), box('C', 'gray')]]} />
+```
+
+Overflowing rows:
+
+<NestedGrid
+  rows={[1, 1]}
+  cells={[
+    box('A', 'steelblue'),
+    [box('B', 'salmon'), box('C', 'gray')],
+    box('D', 'steelblue'),
+    [box('E', 'salmon'), box('F', 'gray')],
+  ]}
+/>
+<br />
+
+```js
+<NestedGrid
+  rows={[1, 1]}
+  cells={[
+    box('A', 'steelblue'),
+    [box('B', 'salmon'), box('C', 'gray')],
+    box('D', 'steelblue'),
+    [box('E', 'salmon'), box('F', 'gray')],
+  ]}
+/>
+```
+
+Different row sizes:
+
+<NestedGrid
+  rows={[1, 2]}
+  cells={[
+    box('A', 'steelblue'),
+    [box('B', 'salmon'), box('C', 'gray')],
+    box('D', 'steelblue'),
+    [box('E', 'salmon'), box('F', 'gray')],
+  ]}
+/>
+<br />
+
+```js
+<NestedGrid
+  rows={[1, 2]}
+  cells={[
+    box('A', 'steelblue'),
+    [box('B', 'salmon'), box('C', 'gray')],
+    box('D', 'steelblue'),
+    [box('E', 'salmon'), box('F', 'gray')],
+  ]}
+/>
+```
+
+See [SheetGrid](./SheetGrid) for more practical examples!
