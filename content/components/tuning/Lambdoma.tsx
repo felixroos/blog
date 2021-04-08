@@ -88,7 +88,6 @@ export function Lambdoma({
             if (typeof max === "number" && value > max) {
               return false
             }
-            /* (isPrime(col) || isPrime(row)) && */
             if (typeof filter === "function" && !filter([value, top, bottom])) {
               return false
             }

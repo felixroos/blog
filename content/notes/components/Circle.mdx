@@ -1,25 +1,17 @@
-import {
-  clamp,
-  ratios,
-  frequencyColor,
-  cents,
-} from "../../components/tuning/tuning.ts"
-import IntervalSet, {
-  getLinks,
-  getNodes,
-} from "../../components/tuning/IntervalSet.tsx"
-import TuningCircle from "../../components/tuning/TuningCircle.tsx"
-import NoteCircle from "../../components/tuning/NoteCircle"
-import FractionCircle from "../../components/common/FractionCircle.tsx"
-import Circle, { circlePosition } from "../../components/common/Circle.tsx"
-import { State } from "react-powerplug"
-import { Note, Scale, Range } from "@tonaljs/tonal"
-import { Switch } from "@material-ui/core"
-import { line } from "d3-shape"
-import ConnectedCircle from "../../components/common/ConnectedCircle"
-import AnimationFrame from "../../components/common/AnimationFrame.tsx"
-import Fraction from "fraction.js"
-import Slider from "@material-ui/core/Slider"
+import { clamp, ratios, frequencyColor, cents } from '../../components/tuning/tuning.ts';
+import IntervalSet, { getLinks, getNodes } from '../../components/tuning/IntervalSet.tsx';
+import TuningCircle from '../../components/tuning/TuningCircle.tsx';
+import NoteCircle from '../../components/tuning/NoteCircle';
+import FractionCircle from '../../components/common/FractionCircle.tsx';
+import Circle, { circlePosition } from '../../components/common/Circle.tsx';
+import { State } from 'react-powerplug';
+import { Note, Scale, Range } from '@tonaljs/tonal';
+import { Switch } from '@material-ui/core';
+import { line } from 'd3-shape';
+import ConnectedCircle from '../../components/common/ConnectedCircle';
+import AnimationFrame from '../../components/common/AnimationFrame.tsx';
+import Fraction from 'fraction.js';
+import Slider from '@material-ui/core/Slider';
 
 ## Just Tuning (Limit 5)
 
@@ -43,20 +35,7 @@ import Slider from "@material-ui/core/Slider"
     toggle: false,
     interval: 1,
     focus: undefined,
-    ratios: [
-      1,
-      16 / 15,
-      9 / 8,
-      6 / 5,
-      5 / 4,
-      4 / 3,
-      45 / 32,
-      3 / 2,
-      8 / 5,
-      5 / 3,
-      16 / 9,
-      15 / 8,
-    ],
+    ratios: [1, 16 / 15, 9 / 8, 6 / 5, 5 / 4, 4 / 3, 45 / 32, 3 / 2, 8 / 5, 5 / 3, 16 / 9, 15 / 8],
   }}
 >
   {({ state, setState }) => <TuningCircle state={state} setState={setState} />}
@@ -72,7 +51,7 @@ import Slider from "@material-ui/core/Slider"
       ratio,
       cents: cents(ratio),
       value: cents(ratio) / 1200,
-      frequency: ratio * Note.freq("A4"),
+      frequency: ratio * Note.freq('A4'),
     }))
     .reduce(
       (nodes, { value, ratio, frequency, cents }, i, notes) =>
@@ -106,7 +85,7 @@ import Slider from "@material-ui/core/Slider"
 To get the frequencies for equal temperament we can use:
 
 ```js
-const equal = Array.from({ length: 12 }, (_, i) => Math.pow(2, i / 12))
+const equal = Array.from({ length: 12 }, (_, i) => Math.pow(2, i / 12));
 ```
 
 This will result in equidistant frequencies:
@@ -118,7 +97,7 @@ This will result in equidistant frequencies:
     .map((ratio, i, notes) => ({
       ratio,
       value: cents(ratio) / 1200,
-      frequency: ratio * Note.freq("A4"),
+      frequency: ratio * Note.freq('A4'),
     }))
     .map(({ value, ratio, frequency }, i, notes) => ({
       id: i,
@@ -185,14 +164,12 @@ This will result in equidistant frequencies:
 
 ## Scale Circle
 
-<State initial={{ tonic: "C", scale: "major", allNotes: false }}>
+<State initial={{ tonic: 'C', scale: 'major', allNotes: false }}>
   {({ state, setState }) => {
-    const scale = Scale.get(`${state.tonic} ${state.scale}`)
+    const scale = Scale.get(`${state.tonic} ${state.scale}`);
     const notes = state.allNotes
-      ? Range.chromatic(["C3", "B3"])
-      : scale.intervals.map((interval) =>
-          Note.transpose(state.tonic + "3", interval)
-        )
+      ? Range.chromatic(['C3', 'B3'])
+      : scale.intervals.map((interval) => Note.transpose(state.tonic + '3', interval));
     return (
       <div>
         <ConnectedCircle
@@ -206,24 +183,18 @@ This will result in equidistant frequencies:
           sets={[
             {
               set: scale.notes.concat([state.tonic]).map((n) => Note.chroma(n)),
-              stroke: "steelblue",
+              stroke: 'steelblue',
             },
           ]}
           r={120}
         />
         <br />
-        <select
-          value={state.tonic}
-          onChange={(e) => setState({ tonic: e.target.value })}
-        >
-          {Range.chromatic(["C3", "B3"]).map((note, index) => (
+        <select value={state.tonic} onChange={(e) => setState({ tonic: e.target.value })}>
+          {Range.chromatic(['C3', 'B3']).map((note, index) => (
             <option key={index}>{Note.get(note).pc}</option>
           ))}
         </select>
-        <select
-          value={state.scale}
-          onChange={(e) => setState({ scale: e.target.value })}
-        >
+        <select value={state.scale} onChange={(e) => setState({ scale: e.target.value })}>
           {Scale.names()
             .sort()
             .map((_scale, index) => (
@@ -232,14 +203,10 @@ This will result in equidistant frequencies:
         </select>
         <label>
           allNotes
-          <Switch
-            checked={state.allNotes}
-            color="primary"
-            onChange={(e) => setState({ allNotes: e.target.checked })}
-          />
+          <Switch checked={state.allNotes} color="primary" onChange={(e) => setState({ allNotes: e.target.checked })} />
         </label>
       </div>
-    )
+    );
   }}
 </State>
 
@@ -248,29 +215,6 @@ This will result in equidistant frequencies:
 - show correct accidentals when allNotes true
 - show subsets (chords & scales that fit inside)
 - group scales by number of notes + darkness
-
-# Other Circles
-
-## FractionCircle
-
-As frequency ratio:
-
-<svg width={42} height={42}>
-  <FractionCircle top={2} bottom={3} radius={20} cx={20} cy={20} />
-</svg>
-
-As length ration (uses invert):
-
-<svg width={42} height={42}>
-  <FractionCircle
-    top={2}
-    bottom={3}
-    radius={20}
-    cx={20}
-    cy={20}
-    invert={true}
-  />
-</svg>
 
 ## Note Circle
 
