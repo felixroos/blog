@@ -4,7 +4,7 @@ import canUseDOM from '../canUseDOM';
 let Tree;
 
 if (canUseDOM()) {
-  const ReactD3Tree = require('react-d3-tree');
+  const ReactD3Tree = require('react-d3-tree'); // TODO: replace with Graphviz
   Tree = ReactD3Tree.default;
 }
 

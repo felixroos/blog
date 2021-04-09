@@ -6,7 +6,7 @@ date: 2021-01-04
 import { BlockMath, InlineMath } from 'react-katex';
 import { Chord } from '@tonaljs/tonal';
 import Tree from '../components/rhythmical/components/Tree.tsx';
-import GraphvizJSON from '../components/graphs/GraphvizJSON.tsx';
+import GraphvizJSON from '../components/graphs/Graphviz.tsx';
 import PathBuilder from '../components/graphs/PathBuilder.tsx';
 import PathGraph from '../components/graphs/PathGraph.tsx';
 import PathTree from '../components/graphs/PathTree.tsx';
@@ -22,7 +22,6 @@ import chordScaleGraph from '../components/graphs/chordScaleGraph';
 import extendBestPath from '../components/graphs/extendBestPath';
 import decoratePathValues from '../components/graphs/decoratePathValues';
 import scaleColor from '../components/sets/scaleColor';
-import { Graphviz } from 'graphviz-react';
 import { groupBy } from 'lodash';
 import { Scale, Note } from '@tonaljs/tonal';
 import ChromaticCircle from '../components/sets/ChromaticCircle.tsx';
@@ -40,14 +39,71 @@ Therefore, we need a way to find scales that fit to chord changes.
 ## Problem: Chord Scale Ambiguity
 
 The main problem when searching for chord scales: most of the time, there are serveral scales that could be played over a single chord.
-And it depends on the surrounding chords which scale choices are better than others. 
+And it depends on the surrounding chords which scale choices are better than others.
 Here is a video where Barry Harris talks about chords vs keys:
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/3V2eNh8qWVo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe
+  width="560"
+  height="315"
+  src="https://www.youtube.com/embed/3V2eNh8qWVo"
+  title="YouTube video player"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowfullscreen
+></iframe>
+
+import NestedGrid from '../components/graphs/NestedGrid';
+import { renderChordSymbols } from '../components/score/ChordSymbol';
+import { mapNestedArray } from '../components/rhythmical/tree/mapNestedArray';
+
+This is the chord they are talking about:
+
+<NestedGrid
+  rows={[1]}
+  innerBorders={true}
+  outerBorders={false}
+  cells={mapNestedArray(
+    [
+      ['Fm7', 'Bbm7', 'Eb7', 'Ab^7'],
+      ['Db^7', ['Dm7', 'G7'], 'C^7', '%'],
+      ['Cm7', 'Fm7', 'Bb7', 'Eb^7'],
+      ['Ab^7', ['Am7', 'D7'], 'G^7', '%'],
+      ['Am7', 'D7', 'G^7', '%'],
+      ['F#m7b5', 'B7b9', 'E^7', 'C7b13'],
+      ['Fm7', 'Bbm7', 'Eb7', 'Ab^7'],
+      ['Db^7', 'DbmM7', 'Cm7', 'Bo7'],
+      ['Bbm7', 'Eb7', 'Ab^7', ['Gm7b5', 'C7b9']],
+    ],
+    (e, i, a) => {
+      if (e === 'Cm7' && i === 2) {
+        return <div style={{ backgroundColor: 'steelblue', color: 'white' }}>{e}</div>;
+      }
+      return e;
+    }
+  )}
+/>
+<br />
+
+He says: "When you see a C minor in the key of Ab, it's not necessarily the C minor 7 that's in the key of Bb,
+so I cannot put a D natural in it. It's the Ab major scale."
+
+In other words: As the Cm7 appears as in the context of Ab major, it can be seen as the 3rd step chord,
+which is based on the phrygian mode, which has a b9.
+So you would prefer phrygian over aeolian or dorian if you want to stay in Ab major.
+
+### A Little Sidenote
+
+There are some people (including Barry Harris), that do not like the chord / scale approach.
+One reason is that the original jazz artists most certainly did not think that way.
+I still like having scale names as a means to express note material that exceeds 4 notes.
+If you would want to express more than 4 notes as chord symbols, it gets ugly.
+
+Don't take the sentence "scale X can be played over chord Y" too seriously.. It does not mean
+you should be playing the scale up and down, it just means those 7 notes fit over the chord.
 
 ### Hello 251
 
-Let's start with the "Hello World" of jazz chord progressions, the 251 in C major: `Dm7 G7 C^7`.
+Let's dial back a little bit, and start with the "Hello World" of jazz chord progressions, the 251 in C major: `Dm7 G7 C^7`.
 
 When only using the 7 modes of the major scale (diatonic scales), there are 3 scales that could be played over the D minor 7 chord:
 
@@ -75,7 +131,7 @@ export const chordScale = (chord, scale) => {
   );
 };
 
-<div style={{ display: 'flex' }}>
+<div style={{ display: 'flex', justifyContent: 'center' }}>
   {chordScale('Dm7', 'D dorian')}
   {chordScale('Dm7', 'D aeolian')}
   {chordScale('Dm7', 'D phrygian')}
@@ -83,14 +139,17 @@ export const chordScale = (chord, scale) => {
 
 There is only one (diatonic) scale that can be played over a the G7 chord:
 
-<div>{chordScale('G7', 'G mixolydian')}</div>
+<center>
+  <div>{chordScale('G7', 'G mixolydian')}</div>
+</center>
 
 There are 2 scales that could be played over a the C major 7 chord:
 
-<div style={{ display: 'flex' }}>
+<div style={{ display: 'flex', justifyContent: 'center' }}>
   {chordScale('C^7', 'C lydian')}
   {chordScale('C^7', 'C major')}
 </div>
+<br />
 
 ### Scale Graph
 
@@ -112,16 +171,7 @@ We can visualize the transitions between the possible scales in a graph like thi
     showDuplicates={false}
   />
 </center>
-
-<!--<GraphvizJSON
-  options={{ height: 300 }}
-  json={{
-    graph: {
-      directed: true,
-      ...chordScaleGraph(['Dm7', 'G7', 'C^7'], scaleModes('major'), true),
-    },
-  }}
-/>-->
+<br />
 
 - Each column shows the possible scales for one chord, with the arrows representing transitions between scales.
 - The numbers indicate the number of accidentals that change between scales. We can use them to evaluate how smooth the scale transition will be.
@@ -135,6 +185,7 @@ Navigating the graph above, we can follow one of 6 possible paths:
 
 <center>
   <PathTree
+    containerStyle={{}}
     paths={[
       { path: ['D dorian', 'G mixolydian', 'C major'] },
       { path: ['D dorian', 'G mixolydian', 'C lydian'] },
@@ -143,40 +194,12 @@ Navigating the graph above, we can follow one of 6 possible paths:
       { path: ['D phrygian', 'G mixolydian', 'C major'] },
       { path: ['D phrygian', 'G mixolydian', 'C lydian'] },
     ].map(decoratePathValues((a, b) => scaleDifference(a, b) / 2))}
-    width={600}
-    height={300}
     getColor={(scale) => scaleColor(scale)}
   />
 </center>
+<br />
 
 Here, the leftmost path is the best, as its sum of values is 0. The worst path has a value of 3.
-
-### Naive Approach
-
-A naive approach for the algorithm would be to
-
-1. find all possible chord scales for the given progression
-2. calculate all possible transition values (accidental changes)
-3. walk all possible paths and sum transition values
-4. the path with the lowest transition value sum is the smoothest
-
-### Complexity
-
-Before implementing the algorithm above, let's think about its complexity.
-To find out the total number of paths, we can multiply the number of scale choices for each chord:
-
-<BlockMath>{`3 * 1 * 2 = 6`}</BlockMath>
-
-In a common tune, there might be 32 bars of chords (and more). Event if each bar only has one chord with only 2 possible scales, we get:
-
-<BlockMath>{`2^{32} = 4294967296`}</BlockMath>
-
-paths, which is quite a lot.
-
-### Smart Approach
-
-A much more clever approach for path finding is something like the [A\* algorithm](https://en.wikipedia.org/wiki/A*_search_algorithm).
-I won't go into detail here, but generally a heuristic is applied that favors certain more promising paths before less promising ones.
 
 ## Implementation
 
@@ -204,10 +227,8 @@ As this is not really the topic of this post, I put the details in a yellow box:
 <Card elevation={3} >
 <CardContent style={{backgroundColor:'#E9E850'}}>
 
-
 <details>
   <summary>Show Implementation Details</summary>
-
 
 ### Subsets and Supersets
 
@@ -339,11 +360,9 @@ chordScales('^7', scaleModes('major', 'harmonic minor', 'melodic minor'));
 
 </details>
 
-
 </CardContent>
 </Card>
 <br/>
-
 
 ### Scale Transitions
 
@@ -359,25 +378,6 @@ export const chromaDifference(a, b) => {
   return diff;
 }
 ```
-
-After checking my artificial limb (stackoverflow), I found out we can achieve the same goal [using bit operations](https://stackoverflow.com/questions/50479322/how-to-find-bit-difference-between-two-numbers-in-javascript):
-
-```js
-export const chromaDifference = (a, b) => {
-  const bitStr = ((parseInt(a, 2) ^ parseInt(b, 2)) >>> 0).toString(2);
-  return bitStr.split('1').length - 1;
-};
-```
-
-using popcount(a^b), more ideas can be found [here](https://stackoverflow.com/questions/43122082/efficiently-count-the-number-of-bits-in-an-integer-in-javascript):
-
-```js
-// const popcount = (x) => (!x ? 0 : (x & 1) + popcount((x >>= 1)));
-const popcount = (n) => n.toString(2).replace(/0/g, '').length;
-const chromaDiff = (a, b) => popcount(parseInt(a, 2) ^ parseInt(b, 2));
-```
-
-TODO: test which one is faster..
 
 This function will count how much characters of two chromas are different. Example:
 
@@ -400,17 +400,15 @@ In the final algorithm, we won't divide by 2, as it does not bring anything new 
 
 ## Generating Scale Graphs
 
-To be visualize the algorithm for development, we will use [graphviz-react](https://github.com/DomParfitt/graphviz-react).
+To be visualize the algorithm for development, we will use [graphviz](https://graphviz.org/).
 
 As this is also just an extra implementation, I'll put the details in a green box.
 
 <Card elevation={3} >
 <CardContent style={{backgroundColor:'#C1E585'}}>
 
-
 <details>
   <summary>Show Implementation Details</summary>
-
 
 To be able to use JSON instead of DOT, we will use [jgf-dot](https://github.com/jsongraph/jgf-dot):
 
@@ -445,7 +443,7 @@ We can use it like that:
 Finally, the chordScaleGraph function will output a json-graph that represents the scales of the given chords:
 
 ```js
-export default (chords, allowedScales = scaleModes('major'), halfDifference = false) => {
+export default function PathGraph(chords, allowedScales = scaleModes('major'), halfDifference = false) {
   const scales = chords
     .map((chord) => chordScales(chord, allowedScales))
     .map((choices) => (choices.length > 0 ? choices : ['chromatic']));
@@ -473,16 +471,17 @@ export default (chords, allowedScales = scaleModes('major'), halfDifference = fa
   });
   nodes = nodes.map((node, id) => ({ ...node, id }));
   return { nodes, edges: links };
-};
+}
 ```
 
-</details>
+UPDATE: replaced graphviz-react by [@hpcc-js/wasm](https://github.com/hpcc-systems/hpcc-js-wasm),
+which is internatlly used by d3-graphviz, which is a dependency of graphviz-react.
 
+</details>
 
 </CardContent>
 </Card>
 <br/>
-
 
 Finally, this is what we get:
 
@@ -503,23 +502,42 @@ Finally, this is what we get:
   />
 </center>
 
-<!--<center>
-  <GraphvizJSON
-    options={{ height: 300 }}
-    json={{
-      graph: {
-        directed: true,
-        ...chordScaleGraph(['Dm7', 'G7', 'C^7'], scaleModes('major'), true),
-      },
-    }}
-  />
-</center>-->
-
 <br />
 
 ## Path Finding
 
-Now let's get down to the nitty gritty.
+As we now have all the tools we need, let's talk about how path finding works.
+
+### Naive Approach
+
+A naive approach for a the algorithm would be to
+
+1. find all possible chord scales for the given progression
+2. calculate all possible transition values (accidental changes)
+3. walk all possible paths and sum transition values
+4. the path with the lowest transition value sum is the smoothest
+
+### Complexity
+
+Before implementing the algorithm above, let's think about its complexity.
+To find out the total number of paths, we can multiply the number of scale choices for each chord. In the 251 example, this is:
+
+<BlockMath>{`3 * 1 * 2 = 6`}</BlockMath>
+
+In a common tune, there might be 32 bars of chords (and more). Event if each bar only has one chord with only 2 possible scales, we get:
+
+<BlockMath>{`2^{32} = 4294967296`}</BlockMath>
+
+paths, which is quite a lot.
+
+### Smart Approach
+
+A much more clever approach for path finding is something like [Dijkstra's algorithm](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm) or the [A\* algorithm](https://en.wikipedia.org/wiki/A*_search_algorithm).
+The general trick is to only calculate the transitions needed, by always following the most promising path first.
+We will find out what that means below..
+
+### Step by Step Path Exploration
+
 Before talking code, let's look at how the graph is building up, step by step.
 To be able to see some interesting results, we will use a doubled 251 progression `Dm7 G7 C^7 Dm7 G7 C^7`:
 
@@ -847,12 +865,11 @@ export const solarScales = scaleModes('major', 'melodic minor', 'harmonic minor'
 <details>
   <summary>show full graph</summary>
 
-
 TODO: get rid of chordScaleGraph, use PathGraph instead
 
 <Card elevation={3} >
 <CardContent style={{ maxHeight: 500, overflow: 'auto'}}>
-  <GraphvizJSON
+  {/* <GraphvizJSON
     options={{ fit: true, height: 1800, width: 620 }}
     json={{
       graph: {
@@ -863,14 +880,12 @@ TODO: get rid of chordScaleGraph, use PathGraph instead
         ),
       },
     }}
-  />
-
+  /> */}
 
 </CardContent>
 </Card>
 </details>
 <br />
-
 
 ## How High The Moon
 
@@ -893,7 +908,7 @@ export const hhtmScales = scaleModes('major', 'melodic minor', 'harmonic minor')
   <summary>show full graph</summary>
   <Card elevation={3}>
     <CardContent style={{ maxHeight: 500, overflow: 'auto' }}>
-      <GraphvizJSON
+      {/* <GraphvizJSON
         options={{ fit: true, height: 3000, width: 620 }}
         json={{
           graph: {
@@ -901,17 +916,13 @@ export const hhtmScales = scaleModes('major', 'melodic minor', 'harmonic minor')
             ...chordScaleGraph(hhtm, hhtmScales),
           },
         }}
-      />
+      /> */}
     </CardContent>
   </Card>
 </details>
 <br />
 
 ## All The Things You Are
-
-<!-- interval={500}  -->
-
-<!-- export const attyaScales = ['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6']; -->
 
 export const attyaScales = scaleModes('major', 'melodic minor', 'harmonic minor');
 
@@ -947,7 +958,7 @@ export const attyaChords = [
   'Eb7',
   'Ab^7',
   'Db^7',
-  'Db-^7',
+  'DbmM7',
   'Cm7',
   'Bo7',
   'Bbm7',
@@ -972,10 +983,9 @@ export const attyaChords = [
 <details>
   <summary>show full graph</summary>
 
-
 <Card elevation={3} >
 <CardContent style={{ maxHeight: 500, overflow: 'auto'}}>
-  <GraphvizJSON
+{/*   <GraphvizJSON
     options={{ fit: true, height: 3000, width: 620 }}
     json={{
       graph: {
@@ -986,14 +996,12 @@ export const attyaChords = [
         ),
       },
     }}
-  />
-
+  /> */}
 
 </CardContent>
 </Card>
 </details>
 <br />
-
 
 - TBD: calculate svg height based on longest path with "heightPerLevel" to adjust the height as needed
 - TBD: colorize shortest path
@@ -1002,6 +1010,7 @@ export const attyaChords = [
 ## Links
 
 - [Search: Optimal, Branch and Bound, Astar @MIT](https://www.youtube.com/watch?v=gGQ-vAmdAOI)
+- https://github.com/dagrejs/graphlib/wiki/API-Reference
 
 ## TODO
 

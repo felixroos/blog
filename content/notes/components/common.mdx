@@ -130,10 +130,13 @@ import { Color } from '../../components/common/Color';
 ## ConnectedCircle
 
 import ConnectedCircle from '../../components/common/ConnectedCircle';
+import ComponentDoc from '../../components/common/ComponentDoc';
+import ConnectedCircleDoc from '../../components/common/ConnectedCircle.doc.json';
 
 <ConnectedCircle
   nodeRadius={25}
   r={120}
+  size={10}
   nodes={Array(10)
     .fill()
     .map((_, i) => ({
@@ -173,6 +176,8 @@ import ConnectedCircle from '../../components/common/ConnectedCircle';
   ].map(([source, target, stroke, strokeWidth]) => ({ source, target, stroke, strokeWidth }))}
 />
 ```
+
+<ComponentDoc json={ConnectedCircleDoc} />
 
 See [Pitch Class Sets](../../pitch-class-sets/), [Tuning Circle](../../3limit-just-intonation/#tuning-circle)
 

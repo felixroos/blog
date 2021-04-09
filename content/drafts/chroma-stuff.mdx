@@ -1,7 +1,7 @@
 import { BlockMath, InlineMath } from 'react-katex';
 import { Chord } from '@tonaljs/tonal';
 import Tree from '../components/rhythmical/components/Tree.tsx';
-import GraphvizJSON from '../components/graphs/GraphvizJSON.tsx';
+import GraphvizJSON from '../components/graphs/Graphviz.tsx';
 import PathBuilder from '../components/graphs/PathBuilder.tsx';
 import '../styles.css';
 import scaleChroma from '../components/sets/scaleChroma';
@@ -12,7 +12,6 @@ import chordScales from '../components/sets/chordScales';
 import bySetNum from '../components/sets/bySetNum';
 import chordScaleGraph from '../components/graphs/chordScaleGraph';
 import scaleColor from '../components/sets/scaleColor';
-import { Graphviz } from 'graphviz-react';
 import { groupBy } from 'lodash';
 import { Scale, Note } from '@tonaljs/tonal';
 import ChromaticCircle from '../components/sets/ChromaticCircle.tsx';

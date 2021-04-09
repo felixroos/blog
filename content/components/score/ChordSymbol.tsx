@@ -47,7 +47,7 @@ export default function ChordSymbol({ chord, margin, fontSize, fontFamily }: any
     draw(context);
   }, [chord, canvasRef.current]);
 
-  return <canvas ref={(c) => (canvasRef.current = c)} />;
+  return <canvas width="1px" height="1px" ref={(c) => (canvasRef.current = c)} />;
 }
 
 export function renderChordSymbols(chords: NestedArray<string>, options?) {

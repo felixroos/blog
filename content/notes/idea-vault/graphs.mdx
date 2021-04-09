@@ -1,0 +1,93 @@
+# Graphs
+
+## Graphviz
+
+Graphviz json renderer Using [@hpcc-js/wasm](https://www.npmjs.com/package/@hpcc-js/wasm) + [jgf-dot](https://github.com/jsongraph/jgf-dot#jgf-dot).
+
+More info, see [Graphviz](../components/Graphviz).
+
+import { Graph } from '../../components/graphs/Graphviz.tsx';
+
+<Graph
+  editable={false}
+  json={{
+    graph: {
+      directed: true,
+      nodes: [
+        {
+          label: 'A',
+          fillcolor: 'steelblue',
+          style: 'filled',
+          id: 0,
+        },
+        {
+          label: 'B',
+          fillcolor: 'salmon',
+          style: 'filled',
+          id: 1,
+        },
+      ],
+      edges: [
+        {
+          source: 0,
+          target: 1,
+          label: 'link',
+        },
+      ],
+    },
+  }}
+/>
+
+## GraphvizJSON
+
+import GraphvizJSON from '../../components/graphs/GraphvizJSON';
+
+Same as Graphviz component, but using [graphviz-react](https://www.npmjs.com/package/graphviz-react) (no commit since 9 month), which uses an old version [d3-graphviz](https://www.npmjs.com/package/d3-graphviz), which uses an older version of [@hpcc-js/wasm](https://www.npmjs.com/package/@hpcc-js/wasm).
+
+TBD: migrate components to using new Graphviz component, which has less dependencies and uses the new version of graphviz.
+
+this has been removed, use Graphviz instead
+
+## NestedGrid
+
+import NestedGrid from '../../components/graphs/NestedGrid';
+
+<NestedGrid cells={['A', ['B', 'C']]} innerBorders={true} />
+
+See [NestedGrid](../components/NestedGrid).
+
+## PathBuilder
+
+Builds up a chord-scale path, using PathView. See chord-scales.
+
+TBD: rename e.g. ScalePathBuilder + move to chord-scales folder?
+
+## PathGraph
+
+Constructs a graph from given paths. Used in PathView
+
+## PathTree
+
+Constructs a tree from given paths.
+
+## PathView
+
+Uses PathGraph and PathTree
+
+## astar
+
+## bestPath
+
+## buildGraph
+
+## buildTree
+
+## chordScaleGraph
+
+## countPathExtensions
+
+## decoratePathValues
+
+## extendBestPath
+
+## generateBestPath

@@ -24,7 +24,7 @@ export declare type Link<T> = {
 export declare type Set = {
   set: NodeIdentifier[];
   stroke?: string;
-  offset?:number;
+  offset?: number;
 };
 
 export default function ConnectedCircle({
@@ -40,11 +40,17 @@ export default function ConnectedCircle({
   fontSize,
   label,
 }: {
+  /** elements with values between 0 and 1 for circular position.  */
   nodes: Node[];
+  /** lines between two nodes */
   links?: Link<any>[];
+  /** lines between multiple nodes */
   sets?: Set[];
+  /** radius of the circle */
   r: number;
+  /** radius of each node */
   nodeRadius?: number;
+  /** sizzz */
   size?: number;
   margin?: number;
   fontSize?: number;
