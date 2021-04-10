@@ -2,7 +2,7 @@ import chordScales from '../sets/chordScales';
 import scaleChroma from '../sets/scaleChroma';
 import scaleDifference from '../sets/scaleDifference';
 import scaleModes from '../sets/scaleModes';
-import astar, { Target } from './astar';
+import astar, { generateAstar, openNext, Target } from './astar';
 
 test('astar', () => {
 
@@ -89,5 +89,104 @@ test('astar', () => {
       "C phrygian dominant",
     ]
   );
+
+
+
+})
+
+
+test('openNext', () => {
+  const getNodeID = (level, scale) => `${level}.${scale}`;
+  const graph = [['D aeolian', 'D dorian'], ['G mixolydian'], ['C lydian', 'C major']];
+  const start = graph[0].map(scale => getNodeID(0, scale));
+  const lastLvl = graph.length - 1;
+  const end = graph[lastLvl].map(scale => getNodeID(lastLvl, scale));
+  const colorDiff = (source, target) => {
+    return source && scaleChroma(source) !== scaleChroma(target) ? 1 : 0;
+  };
+  const scaleTargets = (graph) => (nodeID) => {
+    const [lvl, source] = nodeID.split('.');
+    const level = parseInt(lvl);
+    if (level >= graph.length - 1) {
+      return [];
+    }
+    return graph[level + 1].map((target): Target => [
+      getNodeID(level + 1, target),
+      scaleDifference(source, target) + colorDiff(source, target) /* + 1 ,
+      graph.length - level - 1 */
+    ])
+  }
+
+  let next = openNext(start, end, scaleTargets(graph));
+  expect(next.winner).toEqual(false);
+  expect(next.closed).toEqual([[null, "0.D aeolian", 0]]);
+  expect(next.open).toEqual([["0.D aeolian", "1.G mixolydian", 3], [null, "0.D dorian", 0]]);
+
+  next = openNext(start, end, scaleTargets(graph), next);
+  expect(next.winner).toEqual(false);
+  expect(next.closed).toEqual([[null, "0.D aeolian", 0], [null, "0.D dorian", 0]]);
+  expect(next.open).toEqual([["0.D aeolian", "1.G mixolydian", 3], ["0.D dorian", "1.G mixolydian", 0]]);
+
+  next = openNext(start, end, scaleTargets(graph), next);
+  expect(next.winner).toEqual(false);
+  expect(next.closed).toEqual([[null, "0.D aeolian", 0], [null, "0.D dorian", 0], ["0.D dorian", "1.G mixolydian", 0]]);
+  expect(next.open).toEqual([["1.G mixolydian", "2.C lydian", 3], ["1.G mixolydian", "2.C major", 0]]);
+
+  next = openNext(start, end, scaleTargets(graph), next);
+  expect(next.winner).toEqual(['0.D dorian', '1.G mixolydian', '2.C major']);
+  expect(next.closed).toEqual([[null, "0.D aeolian", 0], [null, "0.D dorian", 0], ["0.D dorian", "1.G mixolydian", 0]]);
+  expect(next.open).toEqual([["1.G mixolydian", "2.C lydian", 3], ["1.G mixolydian", "2.C major", 0]]);
+
+})
+
+test('generateAstar', () => {
+  const getNodeID = (level, scale) => `${level}.${scale}`;
+  const graph = [['D aeolian', 'D dorian'], ['G mixolydian'], ['C lydian', 'C major']];
+  const start = graph[0].map(scale => getNodeID(0, scale));
+  const lastLvl = graph.length - 1;
+  const end = graph[lastLvl].map(scale => getNodeID(lastLvl, scale));
+  const colorDiff = (source, target) => {
+    return source && scaleChroma(source) !== scaleChroma(target) ? 1 : 0;
+  };
+  const scaleTargets = (graph) => (nodeID) => {
+    const [lvl, source] = nodeID.split('.');
+    const level = parseInt(lvl);
+    if (level >= graph.length - 1) {
+      return [];
+    }
+    return graph[level + 1].map((target): Target => [
+      getNodeID(level + 1, target),
+      scaleDifference(source, target) + colorDiff(source, target) /* + 1 ,
+      graph.length - level - 1 */
+    ])
+  }
+
+  const gen = generateAstar(start, end, scaleTargets(graph));
+
+  let next = gen.next().value;
+  expect(next.winner).toEqual(false);
+  expect(next.closed).toEqual([]);
+  expect(next.open).toEqual([[null, "0.D aeolian", 0], [null, "0.D dorian", 0]]);
+
+  next = gen.next().value;
+  expect(next.winner).toEqual(false);
+  expect(next.closed).toEqual([[null, "0.D aeolian", 0]]);
+  expect(next.open).toEqual([["0.D aeolian", "1.G mixolydian", 3], [null, "0.D dorian", 0]]);
+
+  next = gen.next().value;
+  expect(next.winner).toEqual(false);
+  expect(next.closed).toEqual([[null, "0.D aeolian", 0], [null, "0.D dorian", 0]]);
+  expect(next.open).toEqual([["0.D aeolian", "1.G mixolydian", 3], ["0.D dorian", "1.G mixolydian", 0]]);
+
+  next = gen.next().value;
+  expect(next.winner).toEqual(false);
+  expect(next.closed).toEqual([[null, "0.D aeolian", 0], [null, "0.D dorian", 0], ["0.D dorian", "1.G mixolydian", 0]]);
+  expect(next.open).toEqual([["1.G mixolydian", "2.C lydian", 3], ["1.G mixolydian", "2.C major", 0]]);
+
+  next = gen.next().value;
+  expect(next.winner).toEqual(['0.D dorian', '1.G mixolydian', '2.C major']);
+  expect(next.closed).toEqual([[null, "0.D aeolian", 0], [null, "0.D dorian", 0], ["0.D dorian", "1.G mixolydian", 0]]);
+  expect(next.open).toEqual([["1.G mixolydian", "2.C lydian", 3], ["1.G mixolydian", "2.C major", 0]]);
+
 
 })

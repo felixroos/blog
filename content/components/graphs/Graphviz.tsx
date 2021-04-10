@@ -28,6 +28,9 @@ export function Graph({ json, editable, options, containerStyle }: any) {
   React.useEffect(() => {
     renderGraph(value);
   }, [el, value]);
+  React.useEffect(() => {
+    setValue(JSON.stringify(json, null, 2));
+  }, [json]);
   return (
     <>
       <style>{`.graphviz-container > svg \{ width: 100%; height: 100% \}`}</style>

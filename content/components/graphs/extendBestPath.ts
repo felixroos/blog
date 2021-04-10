@@ -4,6 +4,9 @@ export declare type Path = {
   path: string[]
 }
 
+// this implementation is not optimal, as it remembers the whole path
+// it is much more clever to just remember the connections
+
 export declare type ValueFn = (source: string, target: string, path: Path) => number;
 
 export default function extendBestPath(paths: Path[], graph: string[][], getValue: ValueFn, extended?: any[], keepLongerPaths = false): Path[] | false {

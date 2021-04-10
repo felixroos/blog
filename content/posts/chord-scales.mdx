@@ -6,23 +6,13 @@ date: 2021-01-04
 import { BlockMath, InlineMath } from 'react-katex';
 import { Chord } from '@tonaljs/tonal';
 import { Graph } from '../components/graphs/Graphviz.tsx';
-import PathBuilder from '../components/graphs/PathBuilder.tsx';
+import AstarChordScaleFinder from '../components/graphs/AstarChordScaleFinder.tsx';
 import '../styles.css';
-import scaleChroma from '../components/sets/scaleChroma';
-import chromaDifference from '../components/sets/chromaDifference';
-import scaleDifference from '../components/sets/scaleDifference';
-import reorderChroma from '../components/sets/reorderChroma';
 import scaleModes from '../components/sets/scaleModes';
-import chordScales from '../components/sets/chordScales';
-import bySetNum from '../components/sets/bySetNum';
 import chordScaleGraph from '../components/graphs/chordScaleGraph';
-import extendBestPath from '../components/graphs/extendBestPath';
-import decoratePathValues from '../components/graphs/decoratePathValues';
 import scaleColor from '../components/sets/scaleColor';
-import { groupBy } from 'lodash';
 import { Scale, Note } from '@tonaljs/tonal';
 import ChromaticCircle from '../components/sets/ChromaticCircle.tsx';
-import HarmonicCircle from '../components/sets/HarmonicCircle.tsx';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 
@@ -692,19 +682,8 @@ We will find out what that means below..
 Before talking code, let's look at how the algorithm should behave, step by step.
 To be able to see some interesting results, we will use a doubled 251 progression `Dm7 G7 C^7 Dm7 G7 C^7`:
 
-export const scaleDiff = (source, target) =>
-  source && target ? chromaDifference(scaleChroma(source), scaleChroma(target)) / 2 : 0;
+<AstarChordScaleFinder chords={['Dm7', 'G7', 'C^7', 'Dm7', 'G7', 'C^7']} scales={scaleModes('major')} />
 
-<PathBuilder
-  chords={['Dm7', 'G7', 'C^7', 'Dm7', 'G7', 'C^7']}
-  scales={scaleModes('major')}
-  getValue={scaleDiff}
-  height={400}
-  width={600}
-  noScroll={true}
-  keepLongerPaths={true}
-  view="tree"
-/>
 <br />
 
 After pressing "Next Step" 7 times, it turns into "Done", and the algorithm has found the optimal path.
@@ -1366,16 +1345,7 @@ export const solarScales = scaleModes('major', 'melodic minor', 'harmonic minor'
 //export const solarScales = pentatonicScales;
 //export const solarScales = ['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6', 'harmonic minor'];
 
-<PathBuilder
-  height={600}
-  maxHeight={2000}
-  noScroll={false}
-  keepLongerPaths={false}
-  onlyKeepWinner={true}
-  view={'graph'}
-  scales={solarScales}
-  chords={solarChords}
-/>
+<AstarChordScaleFinder chords={solarChords} scales={solarScales} />
 
 <details>
   <summary>show full graph</summary>
@@ -1405,16 +1375,7 @@ export const hhtm = ['G^7', 'Gm7', 'C7', 'F^7', 'Fm7', 'Bb7', 'Eb^7', 'Am7b5', '
 export const hhtmScales = scaleModes('major', 'melodic minor', 'harmonic minor');
 //export const hhtmScales = ['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6'];
 
-<PathBuilder
-  height={600}
-  maxHeight={2000}
-  noScroll={false}
-  keepLongerPaths={false}
-  onlyKeepWinner={true}
-  view={'graph'}
-  scales={hhtmScales}
-  chords={hhtm}
-/>
+<AstarChordScaleFinder chords={hhtm} scales={hhtmScales} />
 
 <details>
   <summary>show full graph</summary>
@@ -1480,18 +1441,8 @@ export const attyaChords = [
   'C7b9',
 ];
 
-<PathBuilder
-  height={500}
-  width={600}
-  maxHeight={2000}
-  noScroll={false}
-  keepLongerPaths={false}
-  onlyKeepWinner={true}
-  view={'graph'}
-  scales={attyaScales}
-  chords={attyaChords}
-/>
-  
+<AstarChordScaleFinder chords={attyaChords} scales={attyaScales} />
+
 <details>
   <summary>show full graph</summary>
 

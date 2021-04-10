@@ -1,6 +1,9 @@
 import { minIndex } from 'd3-array';
 import extendBestPath, { ValueFn, Path } from './extendBestPath';
 
+// this implementation is not optimal, as it remembers the whole path
+// it is much more clever to just remember the connections
+
 export default function* generateBestPath(graph: string[][], getValue: ValueFn, options = {}) {
   const { onlyKeepWinner, keepLongerPaths } = {
     keepLongerPaths: false, onlyKeepWinner: false, ...options

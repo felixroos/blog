@@ -1,4 +1,4 @@
-## scale graph 
+## scale graph
 
 <center>
   <PathGraph
@@ -112,7 +112,6 @@ export default function findBestPath(graph: string[][], getValue: ValueFn): stri
 ```
 
 I guess that does not look that complicated. But of course, this is just a skeleton, with the real meat hiding in the extendBestPath function.
-
 
 ### Extending the Best Path
 
@@ -298,3 +297,58 @@ Like a diligent gardener, we might need some branch pruning to get better result
 To illustrate the problem, let's the chord progression `TODO`
 
 export const pentatonicScales = Scale.names().filter((scale) => Scale.get(`C ${scale}`).notes.length === 5);
+
+## step by step exploration
+
+<PathBuilder
+  chords={['Dm7', 'G7', 'C^7', 'Dm7', 'G7', 'C^7']}
+  scales={scaleModes('major')}
+  getValue={scaleDiff}
+  height={400}
+  width={600}
+  noScroll={true}
+  keepLongerPaths={true}
+  view="tree"
+/>
+
+## solar
+
+<PathBuilder
+  height={600}
+  maxHeight={2000}
+  noScroll={false}
+  keepLongerPaths={false}
+  onlyKeepWinner={true}
+  view={'graph'}
+  scales={solarScales}
+  chords={solarChords}
+/>
+
+## hhtm
+
+<PathBuilder
+  height={600}
+  maxHeight={2000}
+  noScroll={false}
+  keepLongerPaths={false}
+  onlyKeepWinner={true}
+  view={'graph'}
+  scales={hhtmScales}
+  chords={hhtm}
+/>
+
+## attya
+
+
+
+<PathBuilder
+  height={500}
+  width={600}
+  maxHeight={2000}
+  noScroll={false}
+  keepLongerPaths={false}
+  onlyKeepWinner={true}
+  view={'graph'}
+  scales={attyaScales}
+  chords={attyaChords}
+/>
