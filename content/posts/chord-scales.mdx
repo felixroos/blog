@@ -980,6 +980,125 @@ If we compare the finished graph above with a graph that includes every possible
 </Card>
 <br />
 
+Using the result of the algorithm, here is a colored version of the sheet:
+
+<NestedGrid
+  rows={[1]}
+  innerBorders={true}
+  cells={(() => {
+    let i = 0;
+    const colors = [
+      //['#E4AEAD', 0, 5],
+      ['#D8B282', 0, 5],
+      ['#CD7FAF', 6, 8],
+      ['#A57FE2', 9, 11],
+      ['#E4AEAD', 12, 14],
+    ];
+    return mapNestedArray(
+      [
+        ['CmM7', '%', 'Gm7', 'C7'],
+        ['F^7', '%', 'Fm7', 'Bb7'],
+        ['Eb^7', ['Ebm7', 'Ab7'], 'Db^7', ['Dm7b5', 'G7b9']],
+      ],
+      (chord) => {
+        if (typeof chord === 'string') {
+          const [backgroundColor] = colors.find(([color, min, max]) => i >= min && i <= max);
+          ++i;
+          return <div style={{ backgroundColor }}>{chord}</div>;
+        }
+        return chord;
+      }
+    );
+  })()}
+/>
+<br />
+
+Problem: A set of changes is mostly played in a loop, but the result has a break between the end and the beginning.
+Instead of C melodic minor, we could play harmonic minor at the beginning to better fit the ending.
+
+Possible Solution: We could put the sheet 3 times in sequence:
+
+<NestedGrid
+  rows={[1]}
+  innerBorders={true}
+  cells={(() => {
+    let i = 0;
+    const colors = [
+      ['#D8B282', 0, 5],
+      ['#CD7FAF', 6, 8],
+      ['#A57FE2', 9, 11],
+      ['#E4AEAD', 12, 13],
+      ['#E4AEAD', 14, 15],
+      ['#D8B282', 16, 19],
+      ['#CD7FAF', 19, 22],
+      ['#A57FE2', 23, 25],
+      ['#E4AEAD', 26, 27],
+      ['#E4AEAD', 14 + 14, 15 + 14],
+      ['#D8B282', 16 + 14, 19 + 14],
+      ['#CD7FAF', 19 + 14, 22 + 14],
+      ['#A57FE2', 23 + 14, 25 + 14],
+      ['#E4AEAD', 26 + 14, 27 + 14],
+    ];
+    return mapNestedArray(
+      [
+        ['CmM7', '%', 'Gm7', 'C7'],
+        ['F^7', '%', 'Fm7', 'Bb7'],
+        ['Eb^7', ['Ebm7', 'Ab7'], 'Db^7', ['Dm7b5', 'G7b9']],
+        ['CmM7', '%', 'Gm7', 'C7'],
+        ['F^7', '%', 'Fm7', 'Bb7'],
+        ['Eb^7', ['Ebm7', 'Ab7'], 'Db^7', ['Dm7b5', 'G7b9']],
+        ['CmM7', '%', 'Gm7', 'C7'],
+        ['F^7', '%', 'Fm7', 'Bb7'],
+        ['Eb^7', ['Ebm7', 'Ab7'], 'Db^7', ['Dm7b5', 'G7b9']],
+      ],
+      (chord) => {
+        if (typeof chord === 'string') {
+          const [backgroundColor] = colors.find(([color, min, max]) => i >= min && i <= max);
+          ++i;
+          return <div style={{ backgroundColor }}>{chord}</div>;
+        }
+        return chord;
+      }
+    );
+  })()}
+/>
+<br />
+
+... and cut out the middle:
+
+<NestedGrid
+  rows={[1]}
+  innerBorders={true}
+  cells={(() => {
+    let i = 0;
+    const colors = [
+      ['#E4AEAD', 0, 1],
+      ['#D8B282', 2, 5],
+      ['#CD7FAF', 6, 8],
+      ['#A57FE2', 9, 11],
+      ['#E4AEAD', 12, 13],
+    ];
+    return mapNestedArray(
+      [
+        ['CmM7', '%', 'Gm7', 'C7'],
+        ['F^7', '%', 'Fm7', 'Bb7'],
+        ['Eb^7', ['Ebm7', 'Ab7'], 'Db^7', ['Dm7b5', 'G7b9']],
+      ],
+      (chord) => {
+        if (typeof chord === 'string') {
+          const [backgroundColor] = colors.find(([color, min, max]) => i >= min && i <= max);
+          ++i;
+          return <div style={{ backgroundColor }}>{chord}</div>;
+        }
+        return chord;
+      }
+    );
+  })()}
+/>
+<br />
+
+With this, we have a loopable version of the chord scales.. Of course, in practice, we can decide when to switch colors.
+
 ### How High The Moon
 
 export const hhtm = ['G^7', 'Gm7', 'C7', 'F^7', 'Fm7', 'Bb7', 'Eb^7', 'Am7b5', 'D7b9', 'Gm7', 'Am7b5', 'D7b9'];
@@ -994,7 +1113,7 @@ full graph:
 <Card elevation={3}>
   <CardContent style={{ maxHeight: 500, overflow: 'auto' }}>
     <Graph
-      options={{ fit: true, height: 600, width: 620 }}
+      options={{ fit: true, height: 600, width: 600 }}
       json={{
         graph: {
           directed: true,
@@ -1053,45 +1172,25 @@ export const attyaChords = [
 ];
 
 <AstarChordScaleFinder chords={attyaChords} scales={attyaScales} />
-
-<details>
-  <summary>show full graph</summary>
-
-<Card elevation={3} >
-<CardContent style={{ maxHeight: 500, overflow: 'auto'}}>
-  <Graph
-    options={{ fit: true, height: 3000, width: 620 }}
-    json={{
-      graph: {
-        directed: true,
-        ...chordScaleGraph(
-          attyaChords,
-          attyaScales
-        ),
-      },
-    }}
-  />
-</CardContent>
-</Card>
-</details>
 <br />
 
-- TBD: calculate svg height based on longest path with "heightPerLevel" to adjust the height as needed
-- TBD: colorize shortest path
-- TBD: autoscroll to shortest leaf
+full graph:
+
+<Card elevation={3}>
+  <CardContent style={{ maxHeight: 500, overflow: 'auto' }}>
+    <Graph
+      options={{ fit: true, height: 1200, width: 600 }}
+      json={{
+        graph: {
+          directed: true,
+          ...chordScaleGraph(attyaChords, attyaScales),
+        },
+      }}
+    />
+  </CardContent>
+</Card>
+<br />
 
 ## Links
 
 - [Search: Optimal, Branch and Bound, Astar @MIT](https://www.youtube.com/watch?v=gGQ-vAmdAOI)
-- https://github.com/dagrejs/graphlib/wiki/API-Reference
-
-## TODO
-
-- sort branches by lowest value first https://youtu.be/gGQ-vAmdAOI?t=1014 ?
-- extend only if not already extended https://youtu.be/gGQ-vAmdAOI?t=1236
-  - => add "extended" list (e.g `[[0,0],[1,0]]`)
-  - dead horse principle
-- think more about airline distance (can this be used with 0 distances??) https://youtu.be/gGQ-vAmdAOI?t=1680
-  - maybe just use graph.length - path.length as distance to goal https://youtu.be/j1H3jAAGlEA?t=1879
-- the case that shorter paths are extended after longer ones is a no case https://youtu.be/gGQ-vAmdAOI?t=2642
-- maybe try beam search to also keep not so good paths, could use it with [min, max] to also throw away too smooth paths ! https://youtu.be/j1H3jAAGlEA?t=1978

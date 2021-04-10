@@ -891,3 +891,21 @@ we know that we are back at the start when we reach source null. In the right or
 `D dorian -> G mixolydian -> C major`
 
 That's the whole magic!
+
+
+- https://github.com/dagrejs/graphlib/wiki/API-Reference
+
+## TODO
+
+- TBD: calculate svg height based on longest path with "heightPerLevel" to adjust the height as needed
+- TBD: colorize shortest path
+- TBD: autoscroll to shortest leaf
+
+- sort branches by lowest value first https://youtu.be/gGQ-vAmdAOI?t=1014 ?
+- extend only if not already extended https://youtu.be/gGQ-vAmdAOI?t=1236
+  - => add "extended" list (e.g `[[0,0],[1,0]]`)
+  - dead horse principle
+- think more about airline distance (can this be used with 0 distances??) https://youtu.be/gGQ-vAmdAOI?t=1680
+  - maybe just use graph.length - path.length as distance to goal https://youtu.be/j1H3jAAGlEA?t=1879
+- the case that shorter paths are extended after longer ones is a no case https://youtu.be/gGQ-vAmdAOI?t=2642
+- maybe try beam search to also keep not so good paths, could use it with [min, max] to also throw away too smooth paths ! https://youtu.be/j1H3jAAGlEA?t=1978
