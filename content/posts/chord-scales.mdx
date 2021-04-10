@@ -1,6 +1,7 @@
 ---
 title: Chord Scales
 date: 2021-01-04
+image: ./img/chord-scales.png
 ---
 
 import { BlockMath, InlineMath } from 'react-katex';
@@ -12,9 +13,12 @@ import scaleModes from '../components/sets/scaleModes';
 import chordScaleGraph from '../components/graphs/chordScaleGraph';
 import scaleColor from '../components/sets/scaleColor';
 import { Scale, Note } from '@tonaljs/tonal';
+import HarmonicCircle from '../components/sets/HarmonicCircle.tsx';
 import ChromaticCircle from '../components/sets/ChromaticCircle.tsx';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
+import { State } from 'react-powerplug';
+import Switch from '@material-ui/core/Switch';
 
 To build a hackable backing track player, we already laid the foundation of [rhythm](../rhythmical-objects/) and [harmony](../rhythmical-chords/).
 What's missing: Melodies.
@@ -94,7 +98,7 @@ Let's dial back a little bit, and start with the "Hello World" of jazz chord pro
 
 When only using the 7 modes of the major scale (diatonic scales), there are 3 scales that could be played over the D minor 7 chord:
 
-export const chordScale = (chord, scale) => {
+export const chordScale = (chord, scale, harmonic) => {
   const smallCircle = { r: 90, nodeRadius: 16 };
   const { notes: scaleNotes, tonic: scaleTonic } = Scale.get(scale);
   const { notes: chordNotes, tonic: chordTonic } = Chord.get(chord);
@@ -111,31 +115,34 @@ export const chordScale = (chord, scale) => {
     tonic: scaleTonic,
     ...smallCircle,
   };
-  return (
-    <div>
-      <ChromaticCircle {...circle} />
-    </div>
-  );
+  return <div>{harmonic ? <HarmonicCircle {...circle} /> : <ChromaticCircle {...circle} />}</div>;
 };
 
-<div style={{ display: 'flex', justifyContent: 'center' }}>
-  {chordScale('Dm7', 'D dorian')}
-  {chordScale('Dm7', 'D aeolian')}
-  {chordScale('Dm7', 'D phrygian')}
-</div>
-
-There is only one (diatonic) scale that can be played over a the G7 chord:
-
-<center>
-  <div>{chordScale('G7', 'G mixolydian')}</div>
-</center>
-
-There are 2 scales that could be played over a the C major 7 chord:
-
-<div style={{ display: 'flex', justifyContent: 'center' }}>
-  {chordScale('C^7', 'C lydian')}
-  {chordScale('C^7', 'C major')}
-</div>
+<State initial={{ harmonic: true }}>
+  {({ state, setState }) => (
+    <>
+      <label>
+        chromatic
+        <Switch checked={state.harmonic} color="default" onChange={(e) => setState({ harmonic: e.target.checked })} />
+        harmonic
+      </label>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        {chordScale('Dm7', 'D dorian', state.harmonic)}
+        {chordScale('Dm7', 'D aeolian', state.harmonic)}
+        {chordScale('Dm7', 'D phrygian', state.harmonic)}
+      </div>
+      <p>There is only one (diatonic) scale that can be played over a the G7 chord:</p>
+      <center>
+        <div>{chordScale('G7', 'G mixolydian', state.harmonic)}</div>
+      </center>
+      <p>There are 2 scales that could be played over a the C major 7 chord:</p>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        {chordScale('C^7', 'C lydian', state.harmonic)}
+        {chordScale('C^7', 'C major', state.harmonic)}
+      </div>
+    </>
+  )}
+</State>
 <br />
 
 ### Scale Graph
@@ -341,11 +348,13 @@ Navigating the graph above, we can follow one of 6 possible paths:
 />
 <br />
 
-Here, the leftmost path is the best, as its sum of values is 0. The worst path has a value of 3.
+Here, the leftmost path is the optimal one, as its sum of values is 0. The worst path has a value of 3.
+
+Now we arrived at the problem for this post: How do we find the optimal path through a graph of chord scales?
 
 ## Implementing Chord Scale Graphs
 
-Now that we have a general idea of the problem, let's implement this!
+As we have a general idea of the problem, let's implement this!
 Before we can do any path finding, we need to generate a scale graph from our chord changes.
 
 Generally, a graph consists of nodes and edges, in our domain, those are:
@@ -370,7 +379,7 @@ chords.map((chord) => chordScales(chord, scaleModes('major')));
 ```
 
 Instead of just using [Chord.chordScales](https://github.com/tonaljs/tonal/tree/master/packages/chord#chordchordscaleschordname-string--string), I am using a custom implementation that allows to filter the scales.
-As this is not really the topic of this post, I put the details in a yellow box:
+As the core topic of this post should be the actual path finding, I put the details in a yellow box:
 
 <Card elevation={3} >
 <CardContent style={{backgroundColor:'#E9E850'}}>
@@ -665,7 +674,7 @@ To find out the total number of paths, we can multiply the number of scale choic
 
 <BlockMath>{`3 * 1 * 2 = 6`}</BlockMath>
 
-In a common tune, there might be 32 bars of chords (and more). Event if each bar only has one chord with only 2 possible scales, we get:
+In a common tune, there might be 32 bars of chords (and more). Even if each bar only has one chord with only 2 possible scales, we get:
 
 <BlockMath>{`2^{32} = 4294967296`}</BlockMath>
 
@@ -680,20 +689,23 @@ We will find out what that means below..
 ### Step by Step Path Exploration
 
 Before talking code, let's look at how the algorithm should behave, step by step.
-To be able to see some interesting results, we will use a doubled 251 progression `Dm7 G7 C^7 Dm7 G7 C^7`:
+To be able to see some interesting results, we will use the progression `Dm7 G7 C^7 Cm7 F7 Bb^7`:
 
-<AstarChordScaleFinder chords={['Dm7', 'G7', 'C^7', 'Dm7', 'G7', 'C^7']} scales={scaleModes('major')} />
+<AstarChordScaleFinder
+  chords={['Dm7', 'G7', 'C^7', 'Cm7', 'F7', 'Bb^7']}
+  scales={scaleModes('major')}
+  showJson={false}
+/>
 
 <br />
 
-After pressing "Next Step" 7 times, it turns into "Done", and the algorithm has found the optimal path.
+After pressing "Step" 9 times, it turns into "Done", and the algorithm has found the optimal path.
 In this case, we have a match before we even had to check all transitions. This works because:
 
 - At each step, the path with the lowest value is extended
+- when a path is extended, all other paths leading to its source will be ignored (as they are longer)
 - The algorithm finishes if a the path with the lowest value reaches the end.
-- If no transition is negative (which cannot be), the shortest path is found
 
-We could savely ignore the first "C lydian" as well as the second time "D phrygian" and "D aeolian", because they were not as promising.
 This saves calculation time, which might seem marginal in this instance, but it will be a life saver for bigger graphs.
 
 ## General Algorithm
@@ -712,72 +724,20 @@ declare type Connection = [source: string | null, target: string, value: number]
 - target: the node we are going to
 - value: the total value to get there
 
-Inside our algorithm, we will collect 2 lists of connections:
+Inside our algorithm, we will collect the following data:
 
 - open: connections that we can follow next
 - closed: connections that we already followed
+- winner: contains the winning path when the algorithm is done
 
-In our 251 example, we start with the following connections:
+Let's again step through our example with the actual data:
 
-```json
-{
-  "open": [
-    [null, "D phrygian", 0],
-    [null, "D aeolian", 0],
-    [null, "D dorian", 0]
-  ],
-  "closed": []
-}
-```
-
-<Graph
-  json={{
-    graph: {
-      directed: true,
-      nodes: [
-        {
-          label: 'start',
-          id: '0',
-        },
-        {
-          label: 'D phrygian',
-          id: '0.0:D phrygian',
-          fillcolor: '#f6afaf',
-          style: 'filled',
-        },
-        {
-          label: 'D aeolian',
-          id: '1.0:D aeolian',
-          fillcolor: '#e5b380',
-          style: 'filled',
-        },
-        {
-          label: 'D dorian',
-          id: '2.0:D dorian',
-          fillcolor: '#e9e93c',
-          style: 'filled',
-        },
-      ],
-      edges: [
-        {
-          source: '0',
-          target: '0.0:D phrygian',
-          label: '0',
-        },
-        {
-          source: '0',
-          target: '1.0:D aeolian',
-          label: '0',
-        },
-        {
-          source: '0',
-          target: '2.0:D dorian',
-          label: '0',
-        },
-      ],
-    },
-  }}
+<AstarChordScaleFinder
+  chords={['Dm7', 'G7', 'C^7', 'Cm7', 'F7', 'Bb^7']}
+  scales={scaleModes('major')}
+  showJson={true}
 />
+<br />
 
 ### Algorithm Loop
 
@@ -846,485 +806,140 @@ or as text:
 
 1. find connection with minimum value
 2. stop if minimum connection leads to goal
-3. close that connection
+3. close that connection and all connections with the same target
 4. open all connections it leads to
 5. jump to 1
 
-Let's try that out on our example. At the start, we have 3 minimum connections with value 0, so we will just begin with the first one:
+### Implementation
 
-import ReactDiffViewer from 'react-diff-viewer';
+After all the talking, here is the code I came up with:
 
-<ReactDiffViewer
-  oldValue={`{
-      open: [
-        [null, 'D phrygian', 0],
-        [null, 'D aeolian', 0],
-        [null, 'D dorian', 0],
-      ],
-      closed: [
-      ],
-    }`}
-  newValue={`{
-      open: [
-        ['D phrygian', 'G mixolydian', 2],
-        [null, 'D aeolian', 0],
-        [null, 'D dorian', 0],
-      ],
-      closed: [
-        [null, 'D phrygian', 0],
-      ],
-    }`}
-  splitView={false}
-  extraLinesSurroundingDiff={100}
-  useDarkTheme={true}
-  hideLineNumbers={true}
-/>
+```ts
+import { minIndex } from 'd3-array';
 
-<Graph
-  json={{
-    graph: {
-      directed: true,
-      nodes: [
-        {
-          label: 'start',
-          id: '0',
-        },
-        {
-          label: 'D phrygian',
-          id: '0.0:D phrygian',
-          fillcolor: '#f6afaf',
-          style: 'filled',
-        },
-        {
-          label: 'G mixolydian',
-          id: '0.1:G mixolydian',
-          fillcolor: '#e9e93c',
-          style: 'filled',
-        },
-        {
-          label: 'D aeolian',
-          id: '1.0:D aeolian',
-          fillcolor: '#e5b380',
-          style: 'filled',
-        },
-        {
-          label: 'D dorian',
-          id: '2.0:D dorian',
-          fillcolor: '#e9e93c',
-          style: 'filled',
-        },
-      ],
-      edges: [
-        {
-          source: '0',
-          target: '0.0:D phrygian',
-          label: '0',
-        },
-        {
-          source: '0.0:D phrygian',
-          target: '0.1:G mixolydian',
-          label: '+2=2',
-        },
-        {
-          source: '0',
-          target: '1.0:D aeolian',
-          label: '0',
-        },
-        {
-          source: '0',
-          target: '2.0:D dorian',
-          label: '0',
-        },
-      ],
-    },
-  }}
-/>
+export declare type NodeID = string;
+export declare type Target = [target: NodeID, value: number];
 
-Now comes the next loop. Again, we are picking the open connection with the smallest value, which is now D aeolian:
+export function openNext(
+  startNodes: NodeID[],
+  endNodes: NodeID[],
+  getTargets: (source: NodeID) => Target[],
+  state: ConnectionState = {
+    open: startNodes.map((node) => [null, node, 0]),
+    closed: [],
+    winner: false,
+  }
+): ConnectionState {
+  let { open, closed } = state;
+  const getValue = (o) => o[2];
+  // 1. find connection with minimum value
+  const bestIndex = minIndex(open, getValue);
+  const best = open[bestIndex];
+  // 2. stop if minimum connection leads to goal
+  if (endNodes.includes(best[1])) {
+    return { open, closed, winner: traceWinner(best) };
+  }
+  // 3a. close that connection
+  closed = closed.concat([best]);
+  const [_, newSource, distance] = best;
 
-<ReactDiffViewer
-  oldValue={`{
-      open: [
-        ['D phrygian', 'G mixolydian', 2],
-        [null, 'D aeolian', 0],
-        [null, 'D dorian', 0],
-      ],
-      closed: [
-        [null, 'D phrygian', 0],
-      ],
-    }`}
-  newValue={`{
-      open: [
-        ['D phrygian', 'G mixolydian', 2],
-        ['D aeolian', 'G mixolydian', 1],
-        [null, 'D dorian', 0],
-      ],
-      closed: [
-        [null, 'D phrygian', 0],
-        [null, 'D aeolian', 0],
-      ],
-    }`}
-  splitView={false}
-  extraLinesSurroundingDiff={100}
-  useDarkTheme={true}
-  hideLineNumbers={true}
-/>
+  // 4. open all connections it leads to
+  const connections: Connection[] = getTargets(newSource).map(
+    ([target, value]): Connection => [newSource, target, distance + value]
+  );
 
-<Graph
-  json={{
-    graph: {
-      directed: true,
-      nodes: [
-        {
-          label: 'start',
-          id: '0',
-        },
-        {
-          label: 'D phrygian',
-          id: '0.0:D phrygian',
-          fillcolor: '#f6afaf',
-          style: 'filled',
-        },
-        {
-          label: 'G mixolydian',
-          id: '0.1:G mixolydian',
-          fillcolor: '#e9e93c',
-          style: 'filled',
-        },
-        {
-          label: 'D aeolian',
-          id: '1.0:D aeolian',
-          fillcolor: '#e5b380',
-          style: 'filled',
-        },
-        {
-          label: 'G mixolydian',
-          id: '1.1:G mixolydian',
-          fillcolor: '#e9e93c',
-          style: 'filled',
-        },
-        {
-          label: 'D dorian',
-          id: '2.0:D dorian',
-          fillcolor: '#e9e93c',
-          style: 'filled',
-        },
-      ],
-      edges: [
-        {
-          source: '0',
-          target: '0.0:D phrygian',
-          label: '0',
-        },
-        {
-          source: '0.0:D phrygian',
-          target: '0.1:G mixolydian',
-          label: '+2=2',
-        },
-        {
-          source: '0',
-          target: '1.0:D aeolian',
-          label: '0',
-        },
-        {
-          source: '1.0:D aeolian',
-          target: '1.1:G mixolydian',
-          label: '+1=1',
-        },
-        {
-          source: '0',
-          target: '2.0:D dorian',
-          label: '0',
-        },
-      ],
-    },
-  }}
-/>
+  open = [...open.slice(0, bestIndex), ...connections, ...open.slice(bestIndex + 1)];
 
-The last connection is now the minimum:
+  // 3b. close all connections that lead to already closed targets
+  open = open.filter((c) => !closed.find(([_, target, v]) => target === c[1] && v <= getValue(c)));
 
-<ReactDiffViewer
-  oldValue={`{
-      open: [
-        ['D phrygian', 'G mixolydian', 2],
-        ['D aeolian', 'G mixolydian', 1],
-        [null, 'D dorian', 0],
-      ],
-      closed: [
-        [null, 'D phrygian', 0],
-        [null, 'D aeolian', 0],
-      ],
-    }`}
-  newValue={`{
-      open: [
-        ['D phrygian', 'G mixolydian', 2],
-        ['D aeolian', 'G mixolydian', 1],
-        ['D dorian', 'G mixolydian', 0],
-      ],
-      closed: [
-        [null, 'D phrygian', 0],
-        [null, 'D aeolian', 0],
-        [null, 'D dorian', 0],
-      ],
-    }`}
-  splitView={false}
-  extraLinesSurroundingDiff={100}
-  useDarkTheme={true}
-  hideLineNumbers={true}
-/>
+  return { open, closed, winner: false };
 
-<Graph
-  json={{
-    graph: {
-      directed: true,
-      nodes: [
-        {
-          label: 'start',
-          id: '0',
-        },
-        {
-          label: 'D phrygian',
-          id: '0.0:D phrygian',
-          fillcolor: '#f6afaf',
-          style: 'filled',
-        },
-        {
-          label: 'G mixolydian',
-          id: '0.1:G mixolydian',
-          fillcolor: '#e9e93c',
-          style: 'filled',
-        },
-        {
-          label: 'D aeolian',
-          id: '1.0:D aeolian',
-          fillcolor: '#e5b380',
-          style: 'filled',
-        },
-        {
-          label: 'G mixolydian',
-          id: '1.1:G mixolydian',
-          fillcolor: '#e9e93c',
-          style: 'filled',
-        },
-        {
-          label: 'D dorian',
-          id: '2.0:D dorian',
-          fillcolor: '#e9e93c',
-          style: 'filled',
-        },
-        {
-          label: 'G mixolydian',
-          id: '2.1:G mixolydian',
-          fillcolor: '#e9e93c',
-          style: 'filled',
-        },
-      ],
-      edges: [
-        {
-          source: '0',
-          target: '0.0:D phrygian',
-          label: '0',
-        },
-        {
-          source: '0.0:D phrygian',
-          target: '0.1:G mixolydian',
-          label: '+2=2',
-        },
-        {
-          source: '0',
-          target: '1.0:D aeolian',
-          label: '0',
-        },
-        {
-          source: '1.0:D aeolian',
-          target: '1.1:G mixolydian',
-          label: '+1=1',
-        },
-        {
-          source: '0',
-          target: '2.0:D dorian',
-          label: '0',
-        },
-        {
-          source: '2.0:D dorian',
-          target: '2.1:G mixolydian',
-          label: '+0=0',
-        },
-      ],
-    },
-  }}
-/>
+  // trace back winner from closed paths
+  function traceWinner(winner) {
+    const path = [winner[0], winner[1]];
+    if (!path[0]) {
+      return [path[1]];
+    }
+    while (!startNodes.includes(path[0])) {
+      const prev = closed.find((c) => c[1] === path[0]);
+      path.unshift(prev[0]);
+    }
+    return path;
+  }
+}
+```
 
-At this state, all connection have reached "G mixolydian".
-The last connection was the shortest, so we continue with that one:
+We can run it like this:
 
-<ReactDiffViewer
-  oldValue={`{
-      open: [
-        ['D phrygian', 'G mixolydian', 2],
-        ['D aeolian', 'G mixolydian', 1],
-        ['D dorian', 'G mixolydian', 0],
-      ],
-      closed: [
-        [null, 'D phrygian', 0],
-        [null, 'D aeolian', 0],
-        [null, 'D dorian', 0],
-      ],
-    }`}
-  newValue={`{
-      open: [
-        ['D phrygian', 'G mixolydian', 2],
-        ['D aeolian', 'G mixolydian', 1],
-        ['G mixolydian', 'C lydian', 1],
-        ['G mixolydian', 'C major', 0],
-      ],
-      closed: [
-        [null, 'D phrygian', 0],
-        [null, 'D aeolian', 0],
-        [null, 'D dorian', 0],
-        ['D dorian', 'G mixolydian', 0],
-      ],
-    }`}
-  splitView={false}
-  extraLinesSurroundingDiff={100}
-  useDarkTheme={true}
-  hideLineNumbers={true}
-/>
+```js
+export default function bestPath(
+  startNodes: NodeID[],
+  endNodes: NodeID[],
+  getTargets: (source: NodeID) => Target[]
+): any[] {
+  let state: ConnectionState;
+  while (true) {
+    state = openNext(startNodes, endNodes, getTargets, state);
+    if (state.winner) {
+      return state.winner;
+    }
+  }
+}
+```
 
-<Graph
-  json={{
-    graph: {
-      directed: true,
-      nodes: [
-        {
-          label: 'start',
-          id: '0',
-        },
-        {
-          label: 'D phrygian',
-          id: '0.0:D phrygian',
-          fillcolor: '#f6afaf',
-          style: 'filled',
-        },
-        {
-          label: 'G mixolydian',
-          id: '0.1:G mixolydian',
-          fillcolor: '#e9e93c',
-          style: 'filled',
-        },
-        {
-          label: 'D aeolian',
-          id: '1.0:D aeolian',
-          fillcolor: '#e5b380',
-          style: 'filled',
-        },
-        {
-          label: 'G mixolydian',
-          id: '1.1:G mixolydian',
-          fillcolor: '#e9e93c',
-          style: 'filled',
-        },
-        {
-          label: 'D dorian',
-          id: '2.0:D dorian',
-          fillcolor: '#e9e93c',
-          style: 'filled',
-        },
-        {
-          label: 'G mixolydian',
-          id: '2.1:G mixolydian',
-          fillcolor: '#e9e93c',
-          style: 'filled',
-        },
-        {
-          label: 'C lydian',
-          id: '2.2:C lydian',
-          fillcolor: '#b2e580',
-          style: 'filled',
-        },
-        {
-          label: 'C major',
-          id: '3.2:C major',
-          fillcolor: '#e9e93c',
-          style: 'filled',
-        },
-      ],
-      edges: [
-        {
-          source: '0',
-          target: '0.0:D phrygian',
-          label: '0',
-        },
-        {
-          source: '0.0:D phrygian',
-          target: '0.1:G mixolydian',
-          label: '+2=2',
-        },
-        {
-          source: '0',
-          target: '1.0:D aeolian',
-          label: '0',
-        },
-        {
-          source: '1.0:D aeolian',
-          target: '1.1:G mixolydian',
-          label: '+1=1',
-        },
-        {
-          source: '0',
-          target: '2.0:D dorian',
-          label: '0',
-        },
-        {
-          source: '2.0:D dorian',
-          target: '2.1:G mixolydian',
-          label: '+0',
-        },
-        {
-          source: '2.1:G mixolydian',
-          target: '2.2:C lydian',
-          label: '+1=1',
-        },
-        {
-          source: '0',
-          target: '2.0:D dorian',
-          label: '0',
-        },
-        {
-          source: '2.0:D dorian',
-          target: '2.1:G mixolydian',
-          label: '+0',
-        },
-        {
-          source: '2.1:G mixolydian',
-          target: '3.2:C major',
-          label: '+0=0',
-        },
-      ],
-    },
-  }}
-/>
+I did this seperation to be able to run openNext as a generator function for the step by step explorations.
 
-Now our minimum open connection leads to the goal, which means we can stop here.
-To get the actual path taken, we just need to retrace our steps by starting on the goal connection, tracing back the closed connections:
+### Running the algorithm on chord scales
 
-- `['G mixolydian', 'C major', 0]`
-- `['D dorian', 'G mixolydian', 0]`
-- `[null, 'D dorian', 0]`
+The above implementation is a general purpose path finding algorithm.
+We can use it for the chord scale problem like this:
 
-we know that we are back at the start when we reach source null. In the right order, our steps were:
+```js
+const getNodeID = (level, scale) => `${level}.${scale}`;
+const colorDiff = (source, target) => {
+  return source && scaleChroma(source) !== scaleChroma(target) ? 1 : 0;
+};
+const scaleTargets = (graph) => (nodeID) => {
+  const [lvl, source] = nodeID.split('.');
+  const level = parseInt(lvl);
+  if (level >= graph.length - 1) {
+    return [];
+  }
+  return graph[level + 1].map((target): Target => [
+    getNodeID(level + 1, target),
+    scaleDifference(source, target) + colorDiff(source, target),
+  ]);
+};
 
-`D dorian -> G mixolydian -> C major`
-
-That's the whole magic!
-
-##
+export default function bestChordScales(chords, scales = scaleModes('major', 'harmonic minor', 'melodic minor')) {
+  const choices = chords.map((chord) => chordScales(chord, scales, true));
+  return bestPath(
+    choices[0].map((scale) => getNodeID(0, scale)),
+    choices[choices.length - 1].map((scale) => getNodeID(choices.length - 1, scale)),
+    scaleTargets(choices)
+  ).map((node) => node.split('.')[1]);
+}
+```
 
 ## Running On Real Tunes
 
-Enough of the 251, let's look if this actually works on real tunes:
+Now comes the fun part: let's look if this actually works on real tunes:
 
-## Solar
+### Solar
+
+This Tune is not that long, but it has a few modulations:
+
+<NestedGrid
+  rows={[1]}
+  innerBorders={true}
+  cells={[
+    ['CmM7', '%', 'Gm7', 'C7'],
+    ['F^7', '%', 'Fm7', 'Bb7'],
+    ['Eb^7', ['Ebm7', 'Ab7'], 'Db^7', ['Dm7b5', 'G7b9']],
+  ]}
+/>
+<br />
 
 export const solarChords = [
   'CmM7',
@@ -1346,56 +961,52 @@ export const solarScales = scaleModes('major', 'melodic minor', 'harmonic minor'
 //export const solarScales = ['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6', 'harmonic minor'];
 
 <AstarChordScaleFinder chords={solarChords} scales={solarScales} />
-
-<details>
-  <summary>show full graph</summary>
-
-<Card elevation={3} >
-<CardContent style={{ maxHeight: 500, overflow: 'auto'}}>
-  <Graph
-    options={{ fit: true, height: 1800, width: 620 }}
-    json={{
-      graph: {
-        directed: true,
-        ...chordScaleGraph(
-          solarChords,
-          solarScales
-        ),
-      },
-    }}
-  />
-</CardContent>
-</Card>
-</details>
 <br />
 
-## How High The Moon
+If we compare the finished graph above with a graph that includes every possible connection, we see how much work we could save:
+
+<Card elevation={3}>
+  <CardContent style={{ maxHeight: 500, overflow: 'auto' }}>
+    <Graph
+      options={{ fit: true, height: 700, width: 600 }}
+      json={{
+        graph: {
+          directed: true,
+          ...chordScaleGraph(solarChords, solarScales),
+        },
+      }}
+    />
+  </CardContent>
+</Card>
+<br />
+
+### How High The Moon
 
 export const hhtm = ['G^7', 'Gm7', 'C7', 'F^7', 'Fm7', 'Bb7', 'Eb^7', 'Am7b5', 'D7b9', 'Gm7', 'Am7b5', 'D7b9'];
 export const hhtmScales = scaleModes('major', 'melodic minor', 'harmonic minor');
 //export const hhtmScales = ['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6'];
 
 <AstarChordScaleFinder chords={hhtm} scales={hhtmScales} />
-
-<details>
-  <summary>show full graph</summary>
-  <Card elevation={3}>
-    <CardContent style={{ maxHeight: 500, overflow: 'auto' }}>
-      <Graph
-        options={{ fit: true, height: 3000, width: 620 }}
-        json={{
-          graph: {
-            directed: true,
-            ...chordScaleGraph(hhtm, hhtmScales),
-          },
-        }}
-      />
-    </CardContent>
-  </Card>
-</details>
 <br />
 
-## All The Things You Are
+full graph:
+
+<Card elevation={3}>
+  <CardContent style={{ maxHeight: 500, overflow: 'auto' }}>
+    <Graph
+      options={{ fit: true, height: 600, width: 620 }}
+      json={{
+        graph: {
+          directed: true,
+          ...chordScaleGraph(hhtm, hhtmScales),
+        },
+      }}
+    />
+  </CardContent>
+</Card>
+<br />
+
+### All The Things You Are
 
 export const attyaScales = scaleModes('major', 'melodic minor', 'harmonic minor');
 

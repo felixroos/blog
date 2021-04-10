@@ -352,3 +352,542 @@ export const pentatonicScales = Scale.names().filter((scale) => Scale.get(`C ${s
   scales={attyaScales}
   chords={attyaChords}
 />
+
+
+## 251 example step by step 
+
+
+In our 251 example, we start with the following data:
+
+```json
+{
+  "open": [
+    [null, "D phrygian", 0],
+    [null, "D aeolian", 0],
+    [null, "D dorian", 0]
+  ],
+  "closed": [],
+  "winner": false
+}
+```
+
+<Graph
+  json={{
+    graph: {
+      directed: true,
+      nodes: [
+        {
+          label: 'start',
+          id: '0',
+        },
+        {
+          label: 'D phrygian',
+          id: '0.0:D phrygian',
+          fillcolor: '#f6afaf',
+          style: 'filled',
+        },
+        {
+          label: 'D aeolian',
+          id: '1.0:D aeolian',
+          fillcolor: '#e5b380',
+          style: 'filled',
+        },
+        {
+          label: 'D dorian',
+          id: '2.0:D dorian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+      ],
+      edges: [
+        {
+          source: '0',
+          target: '0.0:D phrygian',
+          label: '0',
+        },
+        {
+          source: '0',
+          target: '1.0:D aeolian',
+          label: '0',
+        },
+        {
+          source: '0',
+          target: '2.0:D dorian',
+          label: '0',
+        },
+      ],
+    },
+  }}
+/>
+
+
+
+Let's try that out on our example. At the start, we have 3 minimum connections with value 0, so we will just begin with the first one:
+
+import ReactDiffViewer from 'react-diff-viewer';
+
+<ReactDiffViewer
+  oldValue={`{
+      open: [
+        [null, 'D phrygian', 0],
+        [null, 'D aeolian', 0],
+        [null, 'D dorian', 0],
+      ],
+      closed: [
+      ],
+    }`}
+  newValue={`{
+      open: [
+        ['D phrygian', 'G mixolydian', 2],
+        [null, 'D aeolian', 0],
+        [null, 'D dorian', 0],
+      ],
+      closed: [
+        [null, 'D phrygian', 0],
+      ],
+    }`}
+  splitView={false}
+  extraLinesSurroundingDiff={100}
+  useDarkTheme={true}
+  hideLineNumbers={true}
+/>
+
+<Graph
+  json={{
+    graph: {
+      directed: true,
+      nodes: [
+        {
+          label: 'start',
+          id: '0',
+        },
+        {
+          label: 'D phrygian',
+          id: '0.0:D phrygian',
+          fillcolor: '#f6afaf',
+          style: 'filled',
+        },
+        {
+          label: 'G mixolydian',
+          id: '0.1:G mixolydian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+        {
+          label: 'D aeolian',
+          id: '1.0:D aeolian',
+          fillcolor: '#e5b380',
+          style: 'filled',
+        },
+        {
+          label: 'D dorian',
+          id: '2.0:D dorian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+      ],
+      edges: [
+        {
+          source: '0',
+          target: '0.0:D phrygian',
+          label: '0',
+        },
+        {
+          source: '0.0:D phrygian',
+          target: '0.1:G mixolydian',
+          label: '+2=2',
+        },
+        {
+          source: '0',
+          target: '1.0:D aeolian',
+          label: '0',
+        },
+        {
+          source: '0',
+          target: '2.0:D dorian',
+          label: '0',
+        },
+      ],
+    },
+  }}
+/>
+
+Now comes the next loop. Again, we are picking the open connection with the smallest value, which is now D aeolian:
+
+<ReactDiffViewer
+  oldValue={`{
+      open: [
+        ['D phrygian', 'G mixolydian', 2],
+        [null, 'D aeolian', 0],
+        [null, 'D dorian', 0],
+      ],
+      closed: [
+        [null, 'D phrygian', 0],
+      ],
+    }`}
+  newValue={`{
+      open: [
+        ['D phrygian', 'G mixolydian', 2],
+        ['D aeolian', 'G mixolydian', 1],
+        [null, 'D dorian', 0],
+      ],
+      closed: [
+        [null, 'D phrygian', 0],
+        [null, 'D aeolian', 0],
+      ],
+    }`}
+  splitView={false}
+  extraLinesSurroundingDiff={100}
+  useDarkTheme={true}
+  hideLineNumbers={true}
+/>
+
+<Graph
+  json={{
+    graph: {
+      directed: true,
+      nodes: [
+        {
+          label: 'start',
+          id: '0',
+        },
+        {
+          label: 'D phrygian',
+          id: '0.0:D phrygian',
+          fillcolor: '#f6afaf',
+          style: 'filled',
+        },
+        {
+          label: 'G mixolydian',
+          id: '0.1:G mixolydian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+        {
+          label: 'D aeolian',
+          id: '1.0:D aeolian',
+          fillcolor: '#e5b380',
+          style: 'filled',
+        },
+        {
+          label: 'G mixolydian',
+          id: '1.1:G mixolydian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+        {
+          label: 'D dorian',
+          id: '2.0:D dorian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+      ],
+      edges: [
+        {
+          source: '0',
+          target: '0.0:D phrygian',
+          label: '0',
+        },
+        {
+          source: '0.0:D phrygian',
+          target: '0.1:G mixolydian',
+          label: '+2=2',
+        },
+        {
+          source: '0',
+          target: '1.0:D aeolian',
+          label: '0',
+        },
+        {
+          source: '1.0:D aeolian',
+          target: '1.1:G mixolydian',
+          label: '+1=1',
+        },
+        {
+          source: '0',
+          target: '2.0:D dorian',
+          label: '0',
+        },
+      ],
+    },
+  }}
+/>
+
+The last connection is now the minimum:
+
+<ReactDiffViewer
+  oldValue={`{
+      open: [
+        ['D phrygian', 'G mixolydian', 2],
+        ['D aeolian', 'G mixolydian', 1],
+        [null, 'D dorian', 0],
+      ],
+      closed: [
+        [null, 'D phrygian', 0],
+        [null, 'D aeolian', 0],
+      ],
+    }`}
+  newValue={`{
+      open: [
+        ['D phrygian', 'G mixolydian', 2],
+        ['D aeolian', 'G mixolydian', 1],
+        ['D dorian', 'G mixolydian', 0],
+      ],
+      closed: [
+        [null, 'D phrygian', 0],
+        [null, 'D aeolian', 0],
+        [null, 'D dorian', 0],
+      ],
+    }`}
+  splitView={false}
+  extraLinesSurroundingDiff={100}
+  useDarkTheme={true}
+  hideLineNumbers={true}
+/>
+
+<Graph
+  json={{
+    graph: {
+      directed: true,
+      nodes: [
+        {
+          label: 'start',
+          id: '0',
+        },
+        {
+          label: 'D phrygian',
+          id: '0.0:D phrygian',
+          fillcolor: '#f6afaf',
+          style: 'filled',
+        },
+        {
+          label: 'G mixolydian',
+          id: '0.1:G mixolydian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+        {
+          label: 'D aeolian',
+          id: '1.0:D aeolian',
+          fillcolor: '#e5b380',
+          style: 'filled',
+        },
+        {
+          label: 'G mixolydian',
+          id: '1.1:G mixolydian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+        {
+          label: 'D dorian',
+          id: '2.0:D dorian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+        {
+          label: 'G mixolydian',
+          id: '2.1:G mixolydian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+      ],
+      edges: [
+        {
+          source: '0',
+          target: '0.0:D phrygian',
+          label: '0',
+        },
+        {
+          source: '0.0:D phrygian',
+          target: '0.1:G mixolydian',
+          label: '+2=2',
+        },
+        {
+          source: '0',
+          target: '1.0:D aeolian',
+          label: '0',
+        },
+        {
+          source: '1.0:D aeolian',
+          target: '1.1:G mixolydian',
+          label: '+1=1',
+        },
+        {
+          source: '0',
+          target: '2.0:D dorian',
+          label: '0',
+        },
+        {
+          source: '2.0:D dorian',
+          target: '2.1:G mixolydian',
+          label: '+0=0',
+        },
+      ],
+    },
+  }}
+/>
+
+At this state, all connection have reached "G mixolydian".
+The last connection was the shortest, so we continue with that one:
+
+<ReactDiffViewer
+  oldValue={`{
+      open: [
+        ['D phrygian', 'G mixolydian', 2],
+        ['D aeolian', 'G mixolydian', 1],
+        ['D dorian', 'G mixolydian', 0],
+      ],
+      closed: [
+        [null, 'D phrygian', 0],
+        [null, 'D aeolian', 0],
+        [null, 'D dorian', 0],
+      ],
+    }`}
+  newValue={`{
+      open: [
+        ['D phrygian', 'G mixolydian', 2],
+        ['D aeolian', 'G mixolydian', 1],
+        ['G mixolydian', 'C lydian', 1],
+        ['G mixolydian', 'C major', 0],
+      ],
+      closed: [
+        [null, 'D phrygian', 0],
+        [null, 'D aeolian', 0],
+        [null, 'D dorian', 0],
+        ['D dorian', 'G mixolydian', 0],
+      ],
+    }`}
+  splitView={false}
+  extraLinesSurroundingDiff={100}
+  useDarkTheme={true}
+  hideLineNumbers={true}
+/>
+
+<Graph
+  json={{
+    graph: {
+      directed: true,
+      nodes: [
+        {
+          label: 'start',
+          id: '0',
+        },
+        {
+          label: 'D phrygian',
+          id: '0.0:D phrygian',
+          fillcolor: '#f6afaf',
+          style: 'filled',
+        },
+        {
+          label: 'G mixolydian',
+          id: '0.1:G mixolydian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+        {
+          label: 'D aeolian',
+          id: '1.0:D aeolian',
+          fillcolor: '#e5b380',
+          style: 'filled',
+        },
+        {
+          label: 'G mixolydian',
+          id: '1.1:G mixolydian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+        {
+          label: 'D dorian',
+          id: '2.0:D dorian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+        {
+          label: 'G mixolydian',
+          id: '2.1:G mixolydian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+        {
+          label: 'C lydian',
+          id: '2.2:C lydian',
+          fillcolor: '#b2e580',
+          style: 'filled',
+        },
+        {
+          label: 'C major',
+          id: '3.2:C major',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+      ],
+      edges: [
+        {
+          source: '0',
+          target: '0.0:D phrygian',
+          label: '0',
+        },
+        {
+          source: '0.0:D phrygian',
+          target: '0.1:G mixolydian',
+          label: '+2=2',
+        },
+        {
+          source: '0',
+          target: '1.0:D aeolian',
+          label: '0',
+        },
+        {
+          source: '1.0:D aeolian',
+          target: '1.1:G mixolydian',
+          label: '+1=1',
+        },
+        {
+          source: '0',
+          target: '2.0:D dorian',
+          label: '0',
+        },
+        {
+          source: '2.0:D dorian',
+          target: '2.1:G mixolydian',
+          label: '+0',
+        },
+        {
+          source: '2.1:G mixolydian',
+          target: '2.2:C lydian',
+          label: '+1=1',
+        },
+        {
+          source: '0',
+          target: '2.0:D dorian',
+          label: '0',
+        },
+        {
+          source: '2.0:D dorian',
+          target: '2.1:G mixolydian',
+          label: '+0',
+        },
+        {
+          source: '2.1:G mixolydian',
+          target: '3.2:C major',
+          label: '+0=0',
+        },
+      ],
+    },
+  }}
+/>
+
+Now our minimum open connection leads to the goal, which means we can stop here.
+
+
+To get the actual path taken, we just need to retrace our steps by starting on the goal connection, tracing back the closed connections:
+
+- `['G mixolydian', 'C major', 0]`
+- `['D dorian', 'G mixolydian', 0]`
+- `[null, 'D dorian', 0]`
+
+we know that we are back at the start when we reach source null. In the right order, our steps were:
+
+`D dorian -> G mixolydian -> C major`
+
+That's the whole magic!

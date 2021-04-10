@@ -12,7 +12,7 @@ import { Graph } from './Graphviz';
 import scaleColor from '../sets/scaleColor';
 import { Card, CardContent } from '@material-ui/core';
 
-export default function AstarChordScaleFinder({ chords, scales }) {
+export default function AstarChordScaleFinder({ chords, scales, showJson }) {
   scales = scales || scaleModes('major', 'harmonic minor', 'melodic minor');
   const graph = chords.map((chord) => chordScales(chord, scales, true));
   const getNodeID = (level, scale) => `${level}.${scale}`;
@@ -49,17 +49,22 @@ export default function AstarChordScaleFinder({ chords, scales }) {
           setPrevious(previous);
         }}
       />
-      {/* <ul>
-        {value?.open.map(([source, target, value], i) => (
-          <li key={i}>
-            {source || 'start'}, {target},{value}
-          </li>
-        ))}
-      </ul> */}
+      {showJson && (
+        <ReactDiffViewer
+          compareMethod={DiffMethod.LINES}
+          oldValue={stringifyCompact(previous || value || {})}
+          newValue={stringifyCompact(value || {})}
+          splitView={false}
+          showDiffOnly={false}
+          useDarkTheme={true}
+          hideLineNumbers={true}
+        />
+      )}
       {value && (
         <Card elevation={3}>
           <CardContent style={{ width: '100%', overflow: 'auto', textAlign: 'center' }}>
             <Graph
+              options={{ height: 300 }}
               json={{
                 graph: {
                   directed: true,
@@ -94,15 +99,6 @@ export default function AstarChordScaleFinder({ chords, scales }) {
           </CardContent>
         </Card>
       )}
-      <ReactDiffViewer
-        compareMethod={DiffMethod.LINES}
-        oldValue={stringifyCompact(previous || {})}
-        newValue={stringifyCompact(value || {})}
-        splitView={false}
-        showDiffOnly={false}
-        useDarkTheme={true}
-        hideLineNumbers={true}
-      />
     </>
   );
 }
