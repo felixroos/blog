@@ -110,7 +110,7 @@ export default ({
           </Button>
         </Grid>
         <Grid item xs={4}>
-          <label>
+          {/* <label>
             tol.:{' '}
             <input
               min="-6"
@@ -120,10 +120,10 @@ export default ({
               type="number"
               onChange={(e) => setTolerance(parseInt(e.target.value))}
             />
-          </label>
+          </label> */}
         </Grid>
         <Grid item xs={4}>
-          <label>
+          {/* <label>
             tree
             <Switch
               checked={view === 'graph'}
@@ -131,7 +131,7 @@ export default ({
               onChange={(e) => setView(e.target.checked ? 'graph' : 'tree')}
             />
             graph
-          </label>
+          </label> */}
         </Grid>
       </Grid>
       <PathView

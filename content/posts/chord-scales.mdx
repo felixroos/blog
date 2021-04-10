@@ -5,11 +5,8 @@ date: 2021-01-04
 
 import { BlockMath, InlineMath } from 'react-katex';
 import { Chord } from '@tonaljs/tonal';
-import Tree from '../components/rhythmical/components/Tree.tsx';
-import GraphvizJSON from '../components/graphs/Graphviz.tsx';
+import { Graph } from '../components/graphs/Graphviz.tsx';
 import PathBuilder from '../components/graphs/PathBuilder.tsx';
-import PathGraph from '../components/graphs/PathGraph.tsx';
-import PathTree from '../components/graphs/PathTree.tsx';
 import '../styles.css';
 import scaleChroma from '../components/sets/scaleChroma';
 import chromaDifference from '../components/sets/chromaDifference';
@@ -155,22 +152,14 @@ There are 2 scales that could be played over a the C major 7 chord:
 
 We can visualize the transitions between the possible scales in a graph like this:
 
-<center>
-  <PathGraph
-    paths={[
-      { path: ['D dorian', 'G mixolydian', 'C major'] },
-      { path: ['D dorian', 'G mixolydian', 'C lydian'] },
-      { path: ['D aeolian', 'G mixolydian', 'C major'] },
-      { path: ['D aeolian', 'G mixolydian', 'C lydian'] },
-      { path: ['D phrygian', 'G mixolydian', 'C major'] },
-      { path: ['D phrygian', 'G mixolydian', 'C lydian'] },
-    ].map(decoratePathValues((a, b) => scaleDifference(a, b) / 2))}
-    getColor={(scale) => scaleColor(scale)}
-    includeStartNode={false}
-    showCalculation={false}
-    showDuplicates={false}
-  />
-</center>
+<Graph
+  json={{
+    graph: {
+      directed: true,
+      ...chordScaleGraph(['Dm7', 'G7', 'C^7'], scaleModes('major'), true),
+    },
+  }}
+/>
 <br />
 
 - Each column shows the possible scales for one chord, with the arrows representing transitions between scales.
@@ -183,31 +172,200 @@ Using this representation, we can turn it into a path finding problem.
 
 Navigating the graph above, we can follow one of 6 possible paths:
 
-<center>
-  <PathTree
-    containerStyle={{}}
-    paths={[
-      { path: ['D dorian', 'G mixolydian', 'C major'] },
-      { path: ['D dorian', 'G mixolydian', 'C lydian'] },
-      { path: ['D aeolian', 'G mixolydian', 'C major'] },
-      { path: ['D aeolian', 'G mixolydian', 'C lydian'] },
-      { path: ['D phrygian', 'G mixolydian', 'C major'] },
-      { path: ['D phrygian', 'G mixolydian', 'C lydian'] },
-    ].map(decoratePathValues((a, b) => scaleDifference(a, b) / 2))}
-    getColor={(scale) => scaleColor(scale)}
-  />
-</center>
+<Graph
+  json={{
+    graph: {
+      directed: true,
+      nodes: [
+        {
+          label: 'start',
+          id: '0',
+        },
+        {
+          label: 'D dorian',
+          id: '0.0:D dorian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+        {
+          label: 'G mixolydian',
+          id: '0.1:G mixolydian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+        {
+          label: 'C major',
+          id: '0.2:C major',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+        {
+          label: 'C lydian',
+          id: '1.2:C lydian',
+          fillcolor: '#b2e580',
+          style: 'filled',
+        },
+        {
+          label: 'D aeolian',
+          id: '2.0:D aeolian',
+          fillcolor: '#e5b380',
+          style: 'filled',
+        },
+        {
+          label: 'G mixolydian',
+          id: '2.1:G mixolydian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+        {
+          label: 'C major',
+          id: '2.2:C major',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+        {
+          label: 'C lydian',
+          id: '3.2:C lydian',
+          fillcolor: '#b2e580',
+          style: 'filled',
+        },
+        {
+          label: 'D phrygian',
+          id: '4.0:D phrygian',
+          fillcolor: '#f6afaf',
+          style: 'filled',
+        },
+        {
+          label: 'G mixolydian',
+          id: '4.1:G mixolydian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+        {
+          label: 'C major',
+          id: '4.2:C major',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+        {
+          label: 'C lydian',
+          id: '5.2:C lydian',
+          fillcolor: '#b2e580',
+          style: 'filled',
+        },
+      ],
+      edges: [
+        {
+          source: '0',
+          target: '0.0:D dorian',
+          label: '0',
+        },
+        {
+          source: '0.0:D dorian',
+          target: '0.1:G mixolydian',
+          label: '+0',
+        },
+        {
+          source: '0.1:G mixolydian',
+          target: '0.2:C major',
+          label: '+0=0',
+        },
+        {
+          source: '0',
+          target: '0.0:D dorian',
+          label: '0',
+        },
+        {
+          source: '0.0:D dorian',
+          target: '0.1:G mixolydian',
+          label: '+0',
+        },
+        {
+          source: '0.1:G mixolydian',
+          target: '1.2:C lydian',
+          label: '+1=1',
+        },
+        {
+          source: '0',
+          target: '2.0:D aeolian',
+          label: '0',
+        },
+        {
+          source: '2.0:D aeolian',
+          target: '2.1:G mixolydian',
+          label: '+1',
+        },
+        {
+          source: '2.1:G mixolydian',
+          target: '2.2:C major',
+          label: '+0=1',
+        },
+        {
+          source: '0',
+          target: '2.0:D aeolian',
+          label: '0',
+        },
+        {
+          source: '2.0:D aeolian',
+          target: '2.1:G mixolydian',
+          label: '+1',
+        },
+        {
+          source: '2.1:G mixolydian',
+          target: '3.2:C lydian',
+          label: '+1=2',
+        },
+        {
+          source: '0',
+          target: '4.0:D phrygian',
+          label: '0',
+        },
+        {
+          source: '4.0:D phrygian',
+          target: '4.1:G mixolydian',
+          label: '+2',
+        },
+        {
+          source: '4.1:G mixolydian',
+          target: '4.2:C major',
+          label: '+0=2',
+        },
+        {
+          source: '0',
+          target: '4.0:D phrygian',
+          label: '0',
+        },
+        {
+          source: '4.0:D phrygian',
+          target: '4.1:G mixolydian',
+          label: '+2',
+        },
+        {
+          source: '4.1:G mixolydian',
+          target: '5.2:C lydian',
+          label: '+1=3',
+        },
+      ],
+    },
+  }}
+/>
 <br />
 
 Here, the leftmost path is the best, as its sum of values is 0. The worst path has a value of 3.
 
-## Implementation
+## Implementing Chord Scale Graphs
 
 Now that we have a general idea of the problem, let's implement this!
+Before we can do any path finding, we need to generate a scale graph from our chord changes.
+
+Generally, a graph consists of nodes and edges, in our domain, those are:
+
+- nodes: chord scales
+- edges: scale transitions
 
 ### Finding chord scales
 
-As a first step, we need to find all possible scales for a chord progression. What we want is something like this:
+To get our graph's nodes, we need to find all possible scales for a chord progression. What we want is something like this:
 
 ```js
 const chords = ['Dm7', 'G7', 'C^7'];
@@ -366,8 +524,9 @@ chordScales('^7', scaleModes('major', 'harmonic minor', 'melodic minor'));
 
 ### Scale Transitions
 
-To know which scale transition are the smoothest, we need a way to assess change.
-An easy way is using the chroma difference:
+For our graph's edges, we need to find way to evaluate scale transitions.
+
+To tell how much change is happening in a scale transition, we can use the chroma difference:
 
 ```js
 export const chromaDifference(a, b) => {
@@ -398,9 +557,10 @@ const diff = fromCtoG / 2; // 1
 
 In the final algorithm, we won't divide by 2, as it does not bring anything new to the table.
 
-## Generating Scale Graphs
+### Rendering Scale Graphs
 
-To be visualize the algorithm for development, we will use [graphviz](https://graphviz.org/).
+Now that we have our nodes (scales) and edges (scale transitions), we can generate a graph from a set of chord changes.
+To visualize the algorithm for development, we will use [graphviz](https://graphviz.org/).
 
 As this is also just an extra implementation, I'll put the details in a green box.
 
@@ -443,7 +603,7 @@ We can use it like that:
 Finally, the chordScaleGraph function will output a json-graph that represents the scales of the given chords:
 
 ```js
-export default function PathGraph(chords, allowedScales = scaleModes('major'), halfDifference = false) {
+export default function chordScaleGraph(chords, allowedScales = scaleModes('major'), halfDifference = false) {
   const scales = chords
     .map((chord) => chordScales(chord, allowedScales))
     .map((choices) => (choices.length > 0 ? choices : ['chromatic']));
@@ -485,23 +645,14 @@ which is internatlly used by d3-graphviz, which is a dependency of graphviz-reac
 
 Finally, this is what we get:
 
-<center>
-  <PathGraph
-    paths={[
-      { path: ['D dorian', 'G mixolydian', 'C major'] },
-      { path: ['D dorian', 'G mixolydian', 'C lydian'] },
-      { path: ['D aeolian', 'G mixolydian', 'C major'] },
-      { path: ['D aeolian', 'G mixolydian', 'C lydian'] },
-      { path: ['D phrygian', 'G mixolydian', 'C major'] },
-      { path: ['D phrygian', 'G mixolydian', 'C lydian'] },
-    ].map(decoratePathValues((a, b) => scaleDifference(a, b) / 2))}
-    getColor={(scale) => scaleColor(scale)}
-    includeStartNode={false}
-    showCalculation={false}
-    showDuplicates={false}
-  />
-</center>
-
+<Graph
+  json={{
+    graph: {
+      directed: true,
+      ...chordScaleGraph(['Dm7', 'G7', 'C^7'], scaleModes('major'), true),
+    },
+  }}
+/>
 <br />
 
 ## Path Finding
@@ -538,7 +689,7 @@ We will find out what that means below..
 
 ### Step by Step Path Exploration
 
-Before talking code, let's look at how the graph is building up, step by step.
+Before talking code, let's look at how the algorithm should behave, step by step.
 To be able to see some interesting results, we will use a doubled 251 progression `Dm7 G7 C^7 Dm7 G7 C^7`:
 
 export const scaleDiff = (source, target) =>
@@ -566,269 +717,633 @@ In this case, we have a match before we even had to check all transitions. This 
 We could savely ignore the first "C lydian" as well as the second time "D phrygian" and "D aeolian", because they were not as promising.
 This saves calculation time, which might seem marginal in this instance, but it will be a life saver for bigger graphs.
 
-## What's in a Path?
+## General Algorithm
 
-We can describe a path like this:
+Let's try to formulate the basic algorithm.
+
+### Connections
+
+To think about links between nodes, let's use this type:
 
 ```ts
-declare type Path = {
-  value: number;
-  path: string[];
-};
+declare type Connection = [source: string | null, target: string, value: number];
 ```
 
-In the above example, our winning path is:
+- source: the node we come from, null if it's a start connection
+- target: the node we are going to
+- value: the total value to get there
+
+Inside our algorithm, we will collect 2 lists of connections:
+
+- open: connections that we can follow next
+- closed: connections that we already followed
+
+In our 251 example, we start with the following connections:
 
 ```json
 {
-  "value": 0,
-  "path": ["D dorian", "G mixolydian", "C major", "D dorian", "G mixolydian", "C major"]
+  "open": [
+    [null, "D phrygian", 0],
+    [null, "D aeolian", 0],
+    [null, "D dorian", 0]
+  ],
+  "closed": []
 }
 ```
 
-### Value Function
+<Graph
+  json={{
+    graph: {
+      directed: true,
+      nodes: [
+        {
+          label: 'start',
+          id: '0',
+        },
+        {
+          label: 'D phrygian',
+          id: '0.0:D phrygian',
+          fillcolor: '#f6afaf',
+          style: 'filled',
+        },
+        {
+          label: 'D aeolian',
+          id: '1.0:D aeolian',
+          fillcolor: '#e5b380',
+          style: 'filled',
+        },
+        {
+          label: 'D dorian',
+          id: '2.0:D dorian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+      ],
+      edges: [
+        {
+          source: '0',
+          target: '0.0:D phrygian',
+          label: '0',
+        },
+        {
+          source: '0',
+          target: '1.0:D aeolian',
+          label: '0',
+        },
+        {
+          source: '0',
+          target: '2.0:D dorian',
+          label: '0',
+        },
+      ],
+    },
+  }}
+/>
 
-Also, we need a function that calculates the difference / cost between two graph nodes:
+### Algorithm Loop
 
-```ts
-declare type ValueFn = (source: string, target: string, path: Path) => number;
-```
+Now, the basic algorithm loop works like this:
 
-## Generating Choice Trees
+<Graph
+  json={{
+    graph: {
+      directed: true,
+      nodes: [
+        { label: 'start', id: '-1' },
+        {
+          label: '1. find connection with minimum value',
+          fillcolor: 'steelblue',
+          style: 'filled',
+          id: 0,
+        },
+        {
+          label: '2. leads to goal?',
+          fillcolor: 'salmon',
+          style: 'filled',
+          id: 1,
+        },
+        {
+          label: 'stop',
+          fillcolor: 'red',
+          style: 'filled',
+          id: 2,
+        },
+        {
+          label: '3. close that connection',
+          fillcolor: 'steelblue',
+          style: 'filled',
+          id: 3,
+        },
+        { label: '4. open all connections it leads to', fillcolor: 'steelblue', style: 'filled', id: 4 },
+      ],
+      edges: [
+        {
+          source: -1,
+          target: 0,
+        },
+        {
+          source: 0,
+          target: 1,
+        },
+        {
+          source: 1,
+          target: 2,
+          label: 'yes',
+        },
+        {
+          source: 1,
+          target: 3,
+          label: 'no',
+        },
+        { source: 3, target: 4 },
+        { source: 4, target: 0 },
+      ],
+    },
+  }}
+/>
+<br />
 
-Turning
+or as text:
 
-## Finding the Best Path
+1. find connection with minimum value
+2. stop if minimum connection leads to goal
+3. close that connection
+4. open all connections it leads to
+5. jump to 1
 
-To get this path, what we want is this:
+Let's try that out on our example. At the start, we have 3 minimum connections with value 0, so we will just begin with the first one:
 
-```js
-// scale graph as 2D array:
-const graph = [['D aeolian', 'D dorian'], ['G mixolydian'], ['C major', 'C lydian']];
-// function that tells the "distance" between two scales:
-const getValue = (source, target) => {
-  return chromaDifference(scaleChroma(source), scaleChroma(target));
-};
-expect(findBestPath(graph, getValue)).toEqual(['D dorian', 'G mixolydian', 'C major']);
-```
+import ReactDiffViewer from 'react-diff-viewer';
 
-By pulling out `getValue`, we can reuse the function for similar uses later (like finding the absolute best voice leading for a whole tune).
+<ReactDiffViewer
+  oldValue={`{
+      open: [
+        [null, 'D phrygian', 0],
+        [null, 'D aeolian', 0],
+        [null, 'D dorian', 0],
+      ],
+      closed: [
+      ],
+    }`}
+  newValue={`{
+      open: [
+        ['D phrygian', 'G mixolydian', 2],
+        [null, 'D aeolian', 0],
+        [null, 'D dorian', 0],
+      ],
+      closed: [
+        [null, 'D phrygian', 0],
+      ],
+    }`}
+  splitView={false}
+  extraLinesSurroundingDiff={100}
+  useDarkTheme={true}
+  hideLineNumbers={true}
+/>
 
-### Basic Algorithm
+<Graph
+  json={{
+    graph: {
+      directed: true,
+      nodes: [
+        {
+          label: 'start',
+          id: '0',
+        },
+        {
+          label: 'D phrygian',
+          id: '0.0:D phrygian',
+          fillcolor: '#f6afaf',
+          style: 'filled',
+        },
+        {
+          label: 'G mixolydian',
+          id: '0.1:G mixolydian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+        {
+          label: 'D aeolian',
+          id: '1.0:D aeolian',
+          fillcolor: '#e5b380',
+          style: 'filled',
+        },
+        {
+          label: 'D dorian',
+          id: '2.0:D dorian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+      ],
+      edges: [
+        {
+          source: '0',
+          target: '0.0:D phrygian',
+          label: '0',
+        },
+        {
+          source: '0.0:D phrygian',
+          target: '0.1:G mixolydian',
+          label: '+2=2',
+        },
+        {
+          source: '0',
+          target: '1.0:D aeolian',
+          label: '0',
+        },
+        {
+          source: '0',
+          target: '2.0:D dorian',
+          label: '0',
+        },
+      ],
+    },
+  }}
+/>
 
-The basic algorithm looks like this:
+Now comes the next loop. Again, we are picking the open connection with the smallest value, which is now D aeolian:
 
-```js
-import { minIndex } from 'd3-array';
+<ReactDiffViewer
+  oldValue={`{
+      open: [
+        ['D phrygian', 'G mixolydian', 2],
+        [null, 'D aeolian', 0],
+        [null, 'D dorian', 0],
+      ],
+      closed: [
+        [null, 'D phrygian', 0],
+      ],
+    }`}
+  newValue={`{
+      open: [
+        ['D phrygian', 'G mixolydian', 2],
+        ['D aeolian', 'G mixolydian', 1],
+        [null, 'D dorian', 0],
+      ],
+      closed: [
+        [null, 'D phrygian', 0],
+        [null, 'D aeolian', 0],
+      ],
+    }`}
+  splitView={false}
+  extraLinesSurroundingDiff={100}
+  useDarkTheme={true}
+  hideLineNumbers={true}
+/>
 
-export default function findBestPath(graph: string[][], getValue: ValueFn): string[] {
-  // initialize variables:
-  let paths: Path[] = [];
-  let isFinished = false;
-  while (!isFinished) {
-    // run this magic function
-    const extended = extendBestPath(paths, graph, getValue);
-    if (!extended) {
-      // if the result is false, we are finished
-      isFinished = true;
-    } else {
-      // replace paths with extended edition
-      paths = extended;
-    }
-  }
-  // when we are finished, find the path with the lowest value
-  const best = paths[minIndex(paths, (path) => path.value)];
-  // and return just the actual path array
-  return best.path;
-}
-```
+<Graph
+  json={{
+    graph: {
+      directed: true,
+      nodes: [
+        {
+          label: 'start',
+          id: '0',
+        },
+        {
+          label: 'D phrygian',
+          id: '0.0:D phrygian',
+          fillcolor: '#f6afaf',
+          style: 'filled',
+        },
+        {
+          label: 'G mixolydian',
+          id: '0.1:G mixolydian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+        {
+          label: 'D aeolian',
+          id: '1.0:D aeolian',
+          fillcolor: '#e5b380',
+          style: 'filled',
+        },
+        {
+          label: 'G mixolydian',
+          id: '1.1:G mixolydian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+        {
+          label: 'D dorian',
+          id: '2.0:D dorian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+      ],
+      edges: [
+        {
+          source: '0',
+          target: '0.0:D phrygian',
+          label: '0',
+        },
+        {
+          source: '0.0:D phrygian',
+          target: '0.1:G mixolydian',
+          label: '+2=2',
+        },
+        {
+          source: '0',
+          target: '1.0:D aeolian',
+          label: '0',
+        },
+        {
+          source: '1.0:D aeolian',
+          target: '1.1:G mixolydian',
+          label: '+1=1',
+        },
+        {
+          source: '0',
+          target: '2.0:D dorian',
+          label: '0',
+        },
+      ],
+    },
+  }}
+/>
 
-I guess that does not look that complicated. But of course, this is just a skeleton, with the real meat hiding in the extendBestPath function.
+The last connection is now the minimum:
 
-### Extending the Best Path
+<ReactDiffViewer
+  oldValue={`{
+      open: [
+        ['D phrygian', 'G mixolydian', 2],
+        ['D aeolian', 'G mixolydian', 1],
+        [null, 'D dorian', 0],
+      ],
+      closed: [
+        [null, 'D phrygian', 0],
+        [null, 'D aeolian', 0],
+      ],
+    }`}
+  newValue={`{
+      open: [
+        ['D phrygian', 'G mixolydian', 2],
+        ['D aeolian', 'G mixolydian', 1],
+        ['D dorian', 'G mixolydian', 0],
+      ],
+      closed: [
+        [null, 'D phrygian', 0],
+        [null, 'D aeolian', 0],
+        [null, 'D dorian', 0],
+      ],
+    }`}
+  splitView={false}
+  extraLinesSurroundingDiff={100}
+  useDarkTheme={true}
+  hideLineNumbers={true}
+/>
 
-To really understand what the function does, let's look at the 251 again, step by step:
+<Graph
+  json={{
+    graph: {
+      directed: true,
+      nodes: [
+        {
+          label: 'start',
+          id: '0',
+        },
+        {
+          label: 'D phrygian',
+          id: '0.0:D phrygian',
+          fillcolor: '#f6afaf',
+          style: 'filled',
+        },
+        {
+          label: 'G mixolydian',
+          id: '0.1:G mixolydian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+        {
+          label: 'D aeolian',
+          id: '1.0:D aeolian',
+          fillcolor: '#e5b380',
+          style: 'filled',
+        },
+        {
+          label: 'G mixolydian',
+          id: '1.1:G mixolydian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+        {
+          label: 'D dorian',
+          id: '2.0:D dorian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+        {
+          label: 'G mixolydian',
+          id: '2.1:G mixolydian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+      ],
+      edges: [
+        {
+          source: '0',
+          target: '0.0:D phrygian',
+          label: '0',
+        },
+        {
+          source: '0.0:D phrygian',
+          target: '0.1:G mixolydian',
+          label: '+2=2',
+        },
+        {
+          source: '0',
+          target: '1.0:D aeolian',
+          label: '0',
+        },
+        {
+          source: '1.0:D aeolian',
+          target: '1.1:G mixolydian',
+          label: '+1=1',
+        },
+        {
+          source: '0',
+          target: '2.0:D dorian',
+          label: '0',
+        },
+        {
+          source: '2.0:D dorian',
+          target: '2.1:G mixolydian',
+          label: '+0=0',
+        },
+      ],
+    },
+  }}
+/>
 
-#### Step 0
+At this state, all connection have reached "G mixolydian".
+The last connection was the shortest, so we continue with that one:
 
-export const graph = [['D aeolian', 'D dorian'], ['G mixolydian'], ['C major', 'C lydian']];
-export const getValue = (source, target) => {
-  return chromaDifference(scaleChroma(source), scaleChroma(target));
-};
-export let path = [];
+<ReactDiffViewer
+  oldValue={`{
+      open: [
+        ['D phrygian', 'G mixolydian', 2],
+        ['D aeolian', 'G mixolydian', 1],
+        ['D dorian', 'G mixolydian', 0],
+      ],
+      closed: [
+        [null, 'D phrygian', 0],
+        [null, 'D aeolian', 0],
+        [null, 'D dorian', 0],
+      ],
+    }`}
+  newValue={`{
+      open: [
+        ['D phrygian', 'G mixolydian', 2],
+        ['D aeolian', 'G mixolydian', 1],
+        ['G mixolydian', 'C lydian', 1],
+        ['G mixolydian', 'C major', 0],
+      ],
+      closed: [
+        [null, 'D phrygian', 0],
+        [null, 'D aeolian', 0],
+        [null, 'D dorian', 0],
+        ['D dorian', 'G mixolydian', 0],
+      ],
+    }`}
+  splitView={false}
+  extraLinesSurroundingDiff={100}
+  useDarkTheme={true}
+  hideLineNumbers={true}
+/>
 
-Before we do anything, we start with:
+<Graph
+  json={{
+    graph: {
+      directed: true,
+      nodes: [
+        {
+          label: 'start',
+          id: '0',
+        },
+        {
+          label: 'D phrygian',
+          id: '0.0:D phrygian',
+          fillcolor: '#f6afaf',
+          style: 'filled',
+        },
+        {
+          label: 'G mixolydian',
+          id: '0.1:G mixolydian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+        {
+          label: 'D aeolian',
+          id: '1.0:D aeolian',
+          fillcolor: '#e5b380',
+          style: 'filled',
+        },
+        {
+          label: 'G mixolydian',
+          id: '1.1:G mixolydian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+        {
+          label: 'D dorian',
+          id: '2.0:D dorian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+        {
+          label: 'G mixolydian',
+          id: '2.1:G mixolydian',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+        {
+          label: 'C lydian',
+          id: '2.2:C lydian',
+          fillcolor: '#b2e580',
+          style: 'filled',
+        },
+        {
+          label: 'C major',
+          id: '3.2:C major',
+          fillcolor: '#e9e93c',
+          style: 'filled',
+        },
+      ],
+      edges: [
+        {
+          source: '0',
+          target: '0.0:D phrygian',
+          label: '0',
+        },
+        {
+          source: '0.0:D phrygian',
+          target: '0.1:G mixolydian',
+          label: '+2=2',
+        },
+        {
+          source: '0',
+          target: '1.0:D aeolian',
+          label: '0',
+        },
+        {
+          source: '1.0:D aeolian',
+          target: '1.1:G mixolydian',
+          label: '+1=1',
+        },
+        {
+          source: '0',
+          target: '2.0:D dorian',
+          label: '0',
+        },
+        {
+          source: '2.0:D dorian',
+          target: '2.1:G mixolydian',
+          label: '+0',
+        },
+        {
+          source: '2.1:G mixolydian',
+          target: '2.2:C lydian',
+          label: '+1=1',
+        },
+        {
+          source: '0',
+          target: '2.0:D dorian',
+          label: '0',
+        },
+        {
+          source: '2.0:D dorian',
+          target: '2.1:G mixolydian',
+          label: '+0',
+        },
+        {
+          source: '2.1:G mixolydian',
+          target: '3.2:C major',
+          label: '+0=0',
+        },
+      ],
+    },
+  }}
+/>
 
-```js
-const graph = [['D aeolian', 'D dorian'], ['G mixolydian'], ['C major', 'C lydian']];
-const getValue = (source, target) => {
-  return chromaDifference(scaleChroma(source), scaleChroma(target));
-};
-let paths = [];
-```
+Now our minimum open connection leads to the goal, which means we can stop here.
+To get the actual path taken, we just need to retrace our steps by starting on the goal connection, tracing back the closed connections:
 
-#### Step 1
+- `['G mixolydian', 'C major', 0]`
+- `['D dorian', 'G mixolydian', 0]`
+- `[null, 'D dorian', 0]`
 
-export const step1 = extendBestPath([], graph, getValue);
+we know that we are back at the start when we reach source null. In the right order, our steps were:
 
-As a first step, we start with 2 paths leading to the 2 scale choices for the first chord:
+`D dorian -> G mixolydian -> C major`
 
-<center>
-  <PathTree paths={step1} getColor={(scale) => scaleColor(scale)} />
-</center>
+That's the whole magic!
 
-So we can formulate our first expectation:
+##
 
-```js
-const step1 = [
-  {
-    path: ['D aeolian'],
-    value: 0,
-  },
-  {
-    path: ['D dorian'],
-    value: 0,
-  },
-];
-paths = extendBestPath(paths, graph, getValue);
-expect(paths).toEqual(step1);
-```
+## Running On Real Tunes
 
-This is a special case, as the paths are initially populated. In the graphic, the "start" node is just a dummy, to be able to show the start values.
-
-#### Step 2
-
-export const step2 = extendBestPath(step1, graph, getValue);
-
-In the second step, we extend the (first found) best path:
-
-<!--<PathGraph height={300} paths={step2} getColor={(scale) => scaleColor(scale)} />-->
-
-<center>
-  <PathTree paths={step2} getColor={(scale) => scaleColor(scale)} />
-</center>
-
-```js
-const step2 = extendBestPath(step1, graph, getValue);
-expect(step2).toEqual([
-  {
-    path: ['D aeolian', 'G mixolydian'],
-    value: 2,
-    values: [0, 2],
-  },
-  step1[1], // index 1 does not change so we spare some writing
-]);
-```
-
-#### Step 3
-
-export const step3 = extendBestPath(step2, graph, getValue);
-
-Next, the second root branch seems more tempting, as it is still zero:
-
-<!--<PathGraph height={300} paths={step3} getColor={(scale) => scaleColor(scale)} />-->
-
-<center>
-  <PathTree paths={step3} getColor={(scale) => scaleColor(scale)} />
-</center>
-
-```js
-const step3 = extendBestPath(step2, graph, getValue);
-expect(step3).toEqual([
-  step2[0],
-  {
-    path: ['D dorian', 'G mixolydian'],
-    value: 0,
-    values: [0, 0],
-  },
-]);
-```
-
-#### Step 4
-
-export const step4 = extendBestPath(step3, graph, getValue);
-
-Now, we continue extending the right branch, as it is still zero (compared to 2):
-
-<!-- TODO: add PathView with tree + graph + json modes and maybe a minimap -->
-
-<center>
-  <PathTree paths={step4} getColor={(scale) => scaleColor(scale)} />
-</center>
-
-```js
-const step4 = extendBestPath(step3, graph, getValue);
-expect(step4).toEqual([
-  step2[0],
-  {
-    path: ['D dorian', 'G mixolydian', 'C major'],
-    value: 0,
-    values: [0, 0, 0],
-  },
-  {
-    path: ['D dorian', 'G mixolydian', 'C lydian'],
-    value: 2,
-    values: [0, 0, 2],
-  },
-]);
-```
-
-Now, we're pretty much done.
-
-#### Step 5
-
-export const step5 = extendBestPath(step4, graph, getValue);
-
-Now that the minimal path is done, we do not need to check the rest, as they will be longer anyway, as long as we do not allow negative values.
-To satisfy our algorithm, we now expect the function to return false:
-
-```js
-const step5 = extendBestPath(step4, graph, getValue);
-expect(step5).toBe(false);
-```
-
-#### The actual function
-
-After that in depth example, the algorithm might be digestible:
-
-```js
-import { minIndex } from 'd3-array';
-
-export default function extendBestPath(paths: Path[], graph: string[][], getValue: ValueFn): Path[] | false {
-  if (!paths.length) {
-    // if no paths are given, return initial paths, see step 1
-    return graph[0].map((candidate) => ({ value: 0, path: [candidate] }));
-  }
-  // find index with lowest value
-  const bestIndex = minIndex(paths, (path) => path.value);
-  const best = paths[bestIndex];
-  const { path, value } = best;
-  if (path.length >= graph.length) {
-    // we are done: see step 5
-    return false;
-  }
-  // generate next possible steps by splitting up the best path for all possible next candidates
-  // see steps 2 - 4
-  const nextSteps: Path[] = graph[path.length].map((candidate) => {
-    const nextValue = getValue(path[path.length - 1], candidate, best);
-    return {
-      value: value + nextValue,
-      path: path.concat(candidate),
-    };
-  });
-  // replace best path with nextSteps
-  return [...paths.slice(0, bestIndex), ...nextSteps, ...paths.slice(bestIndex + 1)];
-}
-```
-
-That's the basic trick! But we might run into some unforseen problems when throwing more complex graphs in..
-
-## Branch Pruning
-
-Like a diligent gardener, we might need some branch pruning to get better results..
-To illustrate the problem, let's the chord progression `TODO`
-
-export const pentatonicScales = Scale.names().filter((scale) => Scale.get(`C ${scale}`).notes.length === 5);
+Enough of the 251, let's look if this actually works on real tunes:
 
 ## Solar
 
@@ -865,11 +1380,9 @@ export const solarScales = scaleModes('major', 'melodic minor', 'harmonic minor'
 <details>
   <summary>show full graph</summary>
 
-TODO: get rid of chordScaleGraph, use PathGraph instead
-
 <Card elevation={3} >
 <CardContent style={{ maxHeight: 500, overflow: 'auto'}}>
-  {/* <GraphvizJSON
+  <Graph
     options={{ fit: true, height: 1800, width: 620 }}
     json={{
       graph: {
@@ -880,8 +1393,7 @@ TODO: get rid of chordScaleGraph, use PathGraph instead
         ),
       },
     }}
-  /> */}
-
+  />
 </CardContent>
 </Card>
 </details>
@@ -908,7 +1420,7 @@ export const hhtmScales = scaleModes('major', 'melodic minor', 'harmonic minor')
   <summary>show full graph</summary>
   <Card elevation={3}>
     <CardContent style={{ maxHeight: 500, overflow: 'auto' }}>
-      {/* <GraphvizJSON
+      <Graph
         options={{ fit: true, height: 3000, width: 620 }}
         json={{
           graph: {
@@ -916,7 +1428,7 @@ export const hhtmScales = scaleModes('major', 'melodic minor', 'harmonic minor')
             ...chordScaleGraph(hhtm, hhtmScales),
           },
         }}
-      /> */}
+      />
     </CardContent>
   </Card>
 </details>
@@ -985,7 +1497,7 @@ export const attyaChords = [
 
 <Card elevation={3} >
 <CardContent style={{ maxHeight: 500, overflow: 'auto'}}>
-{/*   <GraphvizJSON
+  <Graph
     options={{ fit: true, height: 3000, width: 620 }}
     json={{
       graph: {
@@ -996,8 +1508,7 @@ export const attyaChords = [
         ),
       },
     }}
-  /> */}
-
+  />
 </CardContent>
 </Card>
 </details>
