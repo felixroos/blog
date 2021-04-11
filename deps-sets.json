@@ -1,0 +1,996 @@
+{
+  "modules": [
+    {
+      "source": "ChromaticCircle.tsx",
+      "dependencies": [
+        {
+          "resolved": "../common/ConnectedCircle.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "../common/ConnectedCircle",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "resolved": "getNodes.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./getNodes",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "../common/ConnectedCircle.tsx",
+      "dependencies": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "getNodes.ts",
+      "dependencies": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "HarmonicCircle.tsx",
+      "dependencies": [
+        {
+          "resolved": "../common/ConnectedCircle.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "../common/ConnectedCircle",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "resolved": "getNodes.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./getNodes",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "ScalePicker.tsx",
+      "dependencies": [
+        {
+          "resolved": "../common/SimpleSelect.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "../common/SimpleSelect",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "resolved": "allPitches.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./allPitches",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "resolved": "byNoteChroma.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./byNoteChroma",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "resolved": "simplifyScale.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./simplifyScale",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "../common/SimpleSelect.tsx",
+      "dependencies": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "allPitches.ts",
+      "dependencies": [
+        {
+          "resolved": "byNoteChroma.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./byNoteChroma",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "byNoteChroma.ts",
+      "dependencies": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "simplifyScale.ts",
+      "dependencies": [
+        {
+          "resolved": "totalAccidentals.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./totalAccidentals",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "totalAccidentals.ts",
+      "dependencies": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "byNoteCount.ts",
+      "dependencies": [],
+      "orphan": true,
+      "valid": true
+    },
+    {
+      "source": "bySetNum.ts",
+      "dependencies": [],
+      "orphan": true,
+      "valid": true
+    },
+    {
+      "source": "chordChroma.ts",
+      "dependencies": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "chordScales.ts",
+      "dependencies": [],
+      "orphan": true,
+      "valid": true
+    },
+    {
+      "source": "chromaCenter.ts",
+      "dependencies": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "chromaChords.ts",
+      "dependencies": [
+        {
+          "resolved": "chordChroma.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./chordChroma",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "chromaColor.ts",
+      "dependencies": [
+        {
+          "resolved": "chromaCenter.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./chromaCenter",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "chromaDifference.ts",
+      "dependencies": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "chromaReflection.ts",
+      "dependencies": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "chromaScale.ts",
+      "dependencies": [
+        {
+          "resolved": "scaleChroma.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./scaleChroma",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "scaleChroma.ts",
+      "dependencies": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "chromaScales.ts",
+      "dependencies": [
+        {
+          "resolved": "scaleChroma.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./scaleChroma",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "chromaSymbols.ts",
+      "dependencies": [
+        {
+          "resolved": "chromaChords.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./chromaChords",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "resolved": "chromaScales.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./chromaScales",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "findCircularIndex.ts",
+      "dependencies": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "negativeHarmony.ts",
+      "dependencies": [
+        {
+          "resolved": "chromaReflection.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./chromaReflection",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "nextOne.test.ts",
+      "dependencies": [
+        {
+          "resolved": "nextOne.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./nextOne",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "nextOne.ts",
+      "dependencies": [
+        {
+          "resolved": "findCircularIndex.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./findCircularIndex",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "nextRoot.ts",
+      "dependencies": [
+        {
+          "resolved": "nextOne.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./nextOne",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "resolved": "reorderChroma.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./reorderChroma",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "resolved": "scaleChroma.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./scaleChroma",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "reorderChroma.ts",
+      "dependencies": [
+        {
+          "resolved": "reorder.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./reorder",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "reorder.ts",
+      "dependencies": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "oneOfModes.ts",
+      "dependencies": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "relatedScale.ts",
+      "dependencies": [
+        {
+          "resolved": "chromaScale.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./chromaScale",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "resolved": "scaleChroma.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./scaleChroma",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "reorder.test.ts",
+      "dependencies": [
+        {
+          "resolved": "reorder.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./reorder",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "rotateChroma.ts",
+      "dependencies": [],
+      "orphan": true,
+      "valid": true
+    },
+    {
+      "source": "rotateMode.ts",
+      "dependencies": [
+        {
+          "resolved": "nextRoot.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./nextRoot",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "resolved": "relatedScale.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./relatedScale",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "rotateScale.ts",
+      "dependencies": [
+        {
+          "resolved": "chromaScale.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./chromaScale",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "resolved": "nextOne.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./nextOne",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "resolved": "reorderChroma.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./reorderChroma",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "resolved": "scaleChroma.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./scaleChroma",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "rotateTonic.ts",
+      "dependencies": [
+        {
+          "resolved": "chromaScale.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./chromaScale",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "resolved": "scaleChroma.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./scaleChroma",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "scaleColor.ts",
+      "dependencies": [
+        {
+          "resolved": "chromaColor.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./chromaColor",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "resolved": "scaleChroma.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./scaleChroma",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "scaleDifference.ts",
+      "dependencies": [
+        {
+          "resolved": "chromaDifference.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./chromaDifference",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "resolved": "scaleChroma.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./scaleChroma",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "scaleModes.ts",
+      "dependencies": [
+        {
+          "resolved": "oneOfModes.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./oneOfModes",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "scaleReflection.ts",
+      "dependencies": [
+        {
+          "resolved": "chromaReflection.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./chromaReflection",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "resolved": "chromaScale.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./chromaScale",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "resolved": "scaleChroma.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./scaleChroma",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "transposeScale.ts",
+      "dependencies": [
+        {
+          "resolved": "scaleChroma.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "dependencyTypes": [
+            "local"
+          ],
+          "module": "./scaleChroma",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "orphan": false,
+      "valid": true
+    }
+  ],
+  "summary": {
+    "violations": [],
+    "error": 0,
+    "warn": 0,
+    "info": 0,
+    "totalCruised": 42,
+    "totalDependenciesCruised": 43,
+    "optionsUsed": {
+      "combinedDependencies": false,
+      "exclude": {
+        "path": "^(../../../node_modules|test)"
+      },
+      "externalModuleResolutionStrategy": "node_modules",
+      "moduleSystems": [
+        "amd",
+        "cjs",
+        "es6",
+        "tsd"
+      ],
+      "outputTo": "-",
+      "outputType": "json",
+      "preserveSymlinks": false,
+      "tsPreCompilationDeps": false,
+      "exoticRequireStrings": [],
+      "args": "."
+    }
+  }
+}
