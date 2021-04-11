@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { BbChordSymbolOptions, BbFormat } from 'bb-chord-symbol';
 import { useRef } from 'react';
-import { mapHierarchy } from '../rhythmical/tree/mapHierarchy';
 import { NestedArray } from '../rhythmical/helpers/arrays';
 import { mapNestedArray } from '../rhythmical/tree/mapNestedArray';
+import scaleColor from '../sets/scaleColor';
 
 export default function ChordSymbol({ chord, margin, fontSize, fontFamily }: any) {
   margin = margin || 4;
@@ -50,10 +50,17 @@ export default function ChordSymbol({ chord, margin, fontSize, fontFamily }: any
   return <canvas width="1px" height="1px" ref={(c) => (canvasRef.current = c)} />;
 }
 
-export function renderChordSymbols(chords: NestedArray<string>, options?) {
+export function renderChordSymbols(chords: NestedArray<string>, options?, scales?) {
+  let i = 0;
   return mapNestedArray(chords, (node) => {
     if (!Array.isArray(node)) {
-      return <ChordSymbol chord={node} {...options} />;
+      const backgroundColor = scales ? scaleColor(scales[i]) : 'white';
+      i++;
+      return (
+        <div style={{ backgroundColor, width: '100%', height: '100%' }}>
+          <ChordSymbol chord={node} {...options} />
+        </div>
+      );
     }
     return node;
   });

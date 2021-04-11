@@ -21,11 +21,18 @@ const scaleTargets = (graph) => (nodeID) => {
   ])
 }
 
-export default function bestChordScales(chords, scales = scaleModes('major', 'harmonic minor', 'melodic minor')) {
+export default function bestChordScales(chords, scales = scaleModes('major', 'harmonic minor', 'melodic minor'), loop?) {
+  if (loop) {
+    chords = [...chords, ...chords, ...chords];
+  }
   const choices = chords.map(chord => chordScales(chord, scales, true))
-  return astar(
+  const bestPath = astar(
     choices[0].map(scale => getNodeID(0, scale)),
     choices[choices.length - 1].map(scale => getNodeID(choices.length - 1, scale)),
     scaleTargets(choices)
   ).map(node => node.split('.')[1])
+  if (loop) {
+    return bestPath.slice(bestPath.length / 3, 2 * bestPath.length / 3);
+  }
+  return bestPath;
 }

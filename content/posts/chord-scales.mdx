@@ -930,14 +930,17 @@ Now comes the fun part: let's look if this actually works on real tunes:
 
 This Tune is not that long, but it has a few modulations:
 
-<NestedGrid
+import SheetGrid from '../components/score/SheetGrid';
+
+<SheetGrid
   rows={[1]}
-  innerBorders={true}
-  cells={[
-    ['CmM7', '%', 'Gm7', 'C7'],
-    ['F^7', '%', 'Fm7', 'Bb7'],
+  measures={[
+    ['CmM7', 'CmM7', 'Gm7', 'C7'],
+    ['F^7', 'F^7', 'Fm7', 'Bb7'],
     ['Eb^7', ['Ebm7', 'Ab7'], 'Db^7', ['Dm7b5', 'G7b9']],
   ]}
+  rawText={true}
+  noColors={true}
 />
 <br />
 
@@ -982,34 +985,16 @@ If we compare the finished graph above with a graph that includes every possible
 
 Using the result of the algorithm, here is a colored version of the sheet:
 
-<NestedGrid
+<SheetGrid
   rows={[1]}
-  innerBorders={true}
-  cells={(() => {
-    let i = 0;
-    const colors = [
-      //['#E4AEAD', 0, 5],
-      ['#D8B282', 0, 5],
-      ['#CD7FAF', 6, 8],
-      ['#A57FE2', 9, 11],
-      ['#E4AEAD', 12, 14],
-    ];
-    return mapNestedArray(
-      [
-        ['CmM7', '%', 'Gm7', 'C7'],
-        ['F^7', '%', 'Fm7', 'Bb7'],
-        ['Eb^7', ['Ebm7', 'Ab7'], 'Db^7', ['Dm7b5', 'G7b9']],
-      ],
-      (chord) => {
-        if (typeof chord === 'string') {
-          const [backgroundColor] = colors.find(([color, min, max]) => i >= min && i <= max);
-          ++i;
-          return <div style={{ backgroundColor }}>{chord}</div>;
-        }
-        return chord;
-      }
-    );
-  })()}
+  measures={[
+    ['CmM7', 'CmM7', 'Gm7', 'C7'],
+    ['F^7', 'F^7', 'Fm7', 'Bb7'],
+    ['Eb^7', ['Ebm7', 'Ab7'], 'Db^7', ['Dm7b5', 'G7b9']],
+  ]}
+  rawText={true}
+  noColors={false}
+  innerBorders={false}
 />
 <br />
 
@@ -1018,114 +1003,46 @@ Instead of C melodic minor, we could play harmonic minor at the beginning to bet
 
 Possible Solution: We could put the sheet 3 times in sequence:
 
-<NestedGrid
+<SheetGrid
   rows={[1]}
-  innerBorders={true}
-  cells={(() => {
-    let i = 0;
-    const colors = [
-      ['#D8B282', 0, 5],
-      ['#CD7FAF', 6, 8],
-      ['#A57FE2', 9, 11],
-      ['#E4AEAD', 12, 13],
-      ['#E4AEAD', 14, 15],
-      ['#D8B282', 16, 19],
-      ['#CD7FAF', 19, 22],
-      ['#A57FE2', 23, 25],
-      ['#E4AEAD', 26, 27],
-      ['#E4AEAD', 14 + 14, 15 + 14],
-      ['#D8B282', 16 + 14, 19 + 14],
-      ['#CD7FAF', 19 + 14, 22 + 14],
-      ['#A57FE2', 23 + 14, 25 + 14],
-      ['#E4AEAD', 26 + 14, 27 + 14],
-    ];
-    return mapNestedArray(
-      [
-        ['CmM7', '%', 'Gm7', 'C7'],
-        ['F^7', '%', 'Fm7', 'Bb7'],
-        ['Eb^7', ['Ebm7', 'Ab7'], 'Db^7', ['Dm7b5', 'G7b9']],
-        ['CmM7', '%', 'Gm7', 'C7'],
-        ['F^7', '%', 'Fm7', 'Bb7'],
-        ['Eb^7', ['Ebm7', 'Ab7'], 'Db^7', ['Dm7b5', 'G7b9']],
-        ['CmM7', '%', 'Gm7', 'C7'],
-        ['F^7', '%', 'Fm7', 'Bb7'],
-        ['Eb^7', ['Ebm7', 'Ab7'], 'Db^7', ['Dm7b5', 'G7b9']],
-      ],
-      (chord) => {
-        if (typeof chord === 'string') {
-          const [backgroundColor] = colors.find(([color, min, max]) => i >= min && i <= max);
-          ++i;
-          return <div style={{ backgroundColor }}>{chord}</div>;
-        }
-        return chord;
-      }
-    );
-  })()}
+  measures={[
+    ['CmM7', 'CmM7', 'Gm7', 'C7'],
+    ['F^7', 'F^7', 'Fm7', 'Bb7'],
+    ['Eb^7', ['Ebm7', 'Ab7'], 'Db^7', ['Dm7b5', 'G7b9']],
+    ['CmM7', 'CmM7', 'Gm7', 'C7'],
+    ['F^7', 'F^7', 'Fm7', 'Bb7'],
+    ['Eb^7', ['Ebm7', 'Ab7'], 'Db^7', ['Dm7b5', 'G7b9']],
+    ['CmM7', 'CmM7', 'Gm7', 'C7'],
+    ['F^7', 'F^7', 'Fm7', 'Bb7'],
+    ['Eb^7', ['Ebm7', 'Ab7'], 'Db^7', ['Dm7b5', 'G7b9']],
+  ]}
+  rawText={true}
+  noColors={false}
+  innerBorders={false}
 />
 <br />
 
 ... and cut out the middle:
 
-<NestedGrid
+<SheetGrid
   rows={[1]}
-  innerBorders={true}
-  cells={(() => {
-    let i = 0;
-    const colors = [
-      ['#E4AEAD', 0, 1],
-      ['#D8B282', 2, 5],
-      ['#CD7FAF', 6, 8],
-      ['#A57FE2', 9, 11],
-      ['#E4AEAD', 12, 13],
-    ];
-    return mapNestedArray(
-      [
-        ['CmM7', '%', 'Gm7', 'C7'],
-        ['F^7', '%', 'Fm7', 'Bb7'],
-        ['Eb^7', ['Ebm7', 'Ab7'], 'Db^7', ['Dm7b5', 'G7b9']],
-      ],
-      (chord) => {
-        if (typeof chord === 'string') {
-          const [backgroundColor] = colors.find(([color, min, max]) => i >= min && i <= max);
-          ++i;
-          return <div style={{ backgroundColor }}>{chord}</div>;
-        }
-        return chord;
-      }
-    );
-  })()}
+  measures={[
+    ['CmM7', 'CmM7', 'Gm7', 'C7'],
+    ['F^7', 'F^7', 'Fm7', 'Bb7'],
+    ['Eb^7', ['Ebm7', 'Ab7'], 'Db^7', ['Dm7b5', 'G7b9']],
+  ]}
+  rawText={true}
+  noColors={false}
+  innerBorders={false}
+  loop={true}
 />
 <br />
 
 With this, we have a loopable version of the chord scales.. Of course, in practice, we can decide when to switch colors.
 
-### How High The Moon
-
-export const hhtm = ['G^7', 'Gm7', 'C7', 'F^7', 'Fm7', 'Bb7', 'Eb^7', 'Am7b5', 'D7b9', 'Gm7', 'Am7b5', 'D7b9'];
-export const hhtmScales = scaleModes('major', 'melodic minor', 'harmonic minor');
-//export const hhtmScales = ['major', 'dorian', 'lydian', 'mixolydian', 'aeolian', 'phrygian dominant', 'locrian 6'];
-
-<AstarChordScaleFinder chords={hhtm} scales={hhtmScales} />
-<br />
-
-full graph:
-
-<Card elevation={3}>
-  <CardContent style={{ maxHeight: 500, overflow: 'auto' }}>
-    <Graph
-      options={{ fit: true, height: 600, width: 600 }}
-      json={{
-        graph: {
-          directed: true,
-          ...chordScaleGraph(hhtm, hhtmScales),
-        },
-      }}
-    />
-  </CardContent>
-</Card>
-<br />
-
 ### All The Things You Are
+
+As a last example, we can go full circle and run this on All The Things You Are
 
 export const attyaScales = scaleModes('major', 'melodic minor', 'harmonic minor');
 
@@ -1191,6 +1108,40 @@ full graph:
 </Card>
 <br />
 
+And finally, this is how the colored version of this sheet looks like:
+
+<SheetGrid
+  rows={[1]}
+  measures={[
+    ['Fm7', 'Bbm7', 'Eb7', 'Ab^7'],
+    ['Db^7', ['Dm7', 'G7'], 'C^7', 'C^7'],
+    ['Cm7', 'Fm7', 'Bb7', 'Eb^7'],
+    ['Ab^7', ['Am7', 'D7'], 'G^7', 'G^7'],
+    ['Am7', 'D7', 'G^7', 'G^7'],
+    ['F#m7b5', 'B7b9', 'E^7', 'C7b13'],
+    ['Fm7', 'Bbm7', 'Eb7', 'Ab^7'],
+    ['Db^7', 'DbmM7', 'Cm7', 'Bo7'],
+    ['Bbm7', 'Eb7', 'Ab^7', ['Gm7b5', 'C7b9']],
+  ]}
+  rawText={true}
+  noColors={false}
+  innerBorders={false}
+/>
+<br />
+
+Looking at the Cm7 chord we talked about at the beginning of this post, we see that it is correctly
+recognized as part of Ab major! So Barry Harris would be proud... [Maybe not](https://www.youtube.com/watch?v=iDozKWsGTSM).
+
+## Conclusion
+
+Now we can automatically detect how chords go together in a tune. This opens a wide field of possibilities, for example:
+
+- Generating chord substitutions from scales, using 9ths 11ths and 13ths
+- "You should know the rules to know how to break them": The scales we get can be seen as a zero point of tension. We can gradually add tension by altering the scales.
+- Generating Melodies / Basslines
+- Roman Numeral Analysis
+
 ## Links
 
 - [Search: Optimal, Branch and Bound, Astar @MIT](https://www.youtube.com/watch?v=gGQ-vAmdAOI)
+- [Computerphile: Dijkstra's Algorithm](https://www.youtube.com/watch?v=GazC3A4OQTE)

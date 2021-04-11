@@ -1,9 +1,36 @@
 import React from 'react';
+import flatten from '../common/flatten';
+import bestChordScales from '../graphs/bestChordScales';
 import NestedGrid from '../graphs/NestedGrid';
-import { renderChordSymbols } from './ChordSymbol';
+import { mapNestedArray } from '../rhythmical/tree/mapNestedArray';
+import scaleColor from '../sets/scaleColor';
+import ChordSymbol from './ChordSymbol';
+import scaleModes from '../sets/scaleModes';
 
-export default function SheetGrid({ measures }) {
+export default function SheetGrid({ measures, rows, rawText, noColors, innerBorders, loop }) {
+  const scales = !noColors
+    ? bestChordScales(flatten(measures), scaleModes('major', 'harmonic minor', 'melodic minor'), loop)
+    : [];
+  let i = 0;
+  const coloredCells = mapNestedArray(measures, (node) => {
+    if (Array.isArray(node)) {
+      return node;
+    }
+    const backgroundColor = !noColors && scales ? scaleColor(scales[i]) : 'white';
+    ++i;
+    return (
+      <div style={{ backgroundColor, width: '100%', height: '100%' }}>
+        {rawText ? node : <ChordSymbol chord={node} fontSize={'20px'} />}
+      </div>
+    );
+  });
+  // cells={renderChordSymbols(measures, { fontSize: '20px' }, scales)}
   return (
-    <NestedGrid rows={[1, 1, 1, 1]} innerBorders={true} outerBorders={false} cells={renderChordSymbols(measures)} />
+    <NestedGrid
+      rows={rows || [1, 1, 1, 1]}
+      innerBorders={innerBorders ?? true}
+      outerBorders={false}
+      cells={coloredCells}
+    />
   );
 }

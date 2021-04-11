@@ -3,6 +3,7 @@
 import { renderChordSymbols } from '../../components/score/ChordSymbol';
 import { mapHierarchy } from '../../components/rhythmical/tree/mapHierarchy';
 import NestedGrid from '../../components/graphs/NestedGrid';
+import SheetGrid from '../../components/score/SheetGrid';
 
 Using [NestedGrid](./NestedGrid) + [ChordSymbol](./ChordSymbol), we can generate beautiful sheets!
 
@@ -224,6 +225,24 @@ in one line:
   ]}
 />
 <br />
+
+## SheetGrid Component
+
+Using NestedGrid + renderChordSymbols + bestChordScales, a fancy colored sheet can be generated:
+
+<SheetGrid
+  rows={[1]}
+  measures={[
+    ['F^7', ['Gm7', 'C7'], 'F^7', ['Bbm7', 'Eb7']],
+    [['Am7', 'Ab7'], ['Gm7', 'C7'], 'F^7', ['Abm7', 'Db7']],
+    ['Gb^7', ['Abm7', 'Db7'], 'Gb^7', ['Bm7', 'E7']],
+    [['Bbm7', 'A7'], ['Abm7', 'Db7'], 'Gb^7', ['Am7', 'D7']],
+    ['G^7', ['Gm7', 'C7'], 'F^7', ['Fm7', 'Bb7']],
+    ['Eb^7', ['Abm7', 'Db7'], 'Gb^7', ['Gm7', 'C7']],
+    ['F^7', ['Gm7', 'C7'], 'F^7', ['Bbm7', 'Eb7']],
+    [['Am7', 'Ab7'], ['Gm7', 'C7'], 'F^7', ['Gm7', 'C7']],
+  ]}
+/>
 
 ### Next Steps
 

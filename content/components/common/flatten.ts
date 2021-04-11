@@ -1,7 +1,7 @@
 // https://stackoverflow.com/questions/27266550/how-to-flatten-nested-array-in-javascript/27266878#27266878
 // This is done in a linear time O(n) without recursion
 // memory complexity is O(1) or O(n) if mutable param is set to false
-export default function flatten(array, mutable) {
+export default function flatten(array, mutable?) {
   var toString = Object.prototype.toString;
   var arrayTypeStr = '[object Array]';
 
