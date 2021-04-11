@@ -482,7 +482,7 @@ chordScales('^7');
 
 ### Filtering Choices
 
-The above scale choices are pretty overwhelming. We could limit the checked scales like that:
+The scale above choices are pretty overwhelming. We could limit the checked scales like that:
 
 ```js
 function chordScales(chord, scales = Scale.names()) {
@@ -523,7 +523,7 @@ chordScales('^7', scaleModes('major', 'harmonic minor', 'melodic minor'));
 
 ### Scale Transitions
 
-For our graph's edges, we need to find way to evaluate scale transitions.
+For our graph's edges, we need to find a way to evaluate scale transitions.
 
 To tell how much change is happening in a scale transition, we can use the chroma difference:
 
@@ -543,7 +543,7 @@ This function will count how much characters of two chromas are different. Examp
 
 101011010101 = C major
 101011010110 = F major
-^^ = 2 different bits
+__________^^ = 2 different bits
 
 ```
 
@@ -704,7 +704,7 @@ In this case, we have a match before we even had to check all transitions. This 
 
 - At each step, the path with the lowest value is extended
 - when a path is extended, all other paths leading to its source will be ignored (as they are longer)
-- The algorithm finishes if a the path with the lowest value reaches the end.
+- The algorithm finishes if the path with the lowest value reaches the end.
 
 This saves calculation time, which might seem marginal in this instance, but it will be a life saver for bigger graphs.
 
@@ -892,7 +892,7 @@ I did this seperation to be able to run openNext as a generator function for the
 
 ### Running the algorithm on chord scales
 
-The above implementation is a general purpose path finding algorithm.
+The implementation above is a general purpose path finding algorithm.
 We can use it for the chord scale problem like this:
 
 ```js
