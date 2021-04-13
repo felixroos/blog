@@ -1,0 +1,40 @@
+
+Now we have a bunch of fractions.. how can we calculate the absolute timing information with them?
+
+## Calculating Absolute Time
+
+If we now know the total length of the piece, we can multiply it with the relative fraction to get the absolute time and duration.
+
+## About Note Values
+
+Let's talk about [Note Values](https://en.wikipedia.org/wiki/Note_value).
+In our example, we use different fractions to express note values. But what do the fractions refer to?
+
+Generally, the note value tells the relation of the notes value to the duration of one bar (in 4/4).
+
+### Calculating Absolute Durations
+
+If we want to calculate the absolute duration of a note value, we need to know how long one beat is.
+If we take a tempo of 60bpm, we have:
+
+<BlockMath>{`60 bpm = 60 b/m = 60b/60s = 1b/s`}</BlockMath>
+
+Most of the time, the term beat means one quarter note. With that we can calculate the duration of each note value:
+
+<BlockMath>{`1/4 = 1s, 1/8 = 0.5s, 1/24 = 0.16s`}</BlockMath>
+
+### Calculating Absolute Time
+
+If we also knew when each note is played, we have all the information to represent the rhythm as absolute timed events.
+As we already know the durations, this is quite easy. We just have to sum all durations that came before.
+In the bolero example, the second 16th triplet in bar 2 begins at:
+
+<BlockMath>{`3/4 + 1/8 + 1/24 = 0.916s`}</BlockMath>
+
+<!-- TBD: make Tree clickable to calculate the selected node's time -->
+
+For each node, we multiply its path fraction (before the bracket) with each parent's relative subdivisions
+(inside the brackets). The products are then summed up.
+You can read it the same way your eyes would move along the tree line (oscillating down and up).
+
+### Summary

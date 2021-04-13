@@ -57,7 +57,6 @@ You can learn the basic terminology by exploration. Just click on different node
 <details>
 <summary>show explanation</summary>
 
-
 <h3>Terminology</h3>
 
 Trees are commonly explained using the following terminology:
@@ -88,7 +87,6 @@ We can represent the above tree with the following object
 
 </details>
 <br/>
-
 
 ## Visual: Tree vs Score
 
@@ -212,8 +210,8 @@ Let's visit all the tree nodes:
   {({ state, setState }) => (
     <>
       <TreeVisitor
-        onNext={(_state) => {
-          setState({ node: _state.value });
+        onNode={(node) => {
+          setState({ node });
         }}
         tree={(node, visited) =>
           r2d3(bolero, (rhythm, path, parent) => {
@@ -233,12 +231,12 @@ Let's visit all the tree nodes:
           })
         }
       />
-      {!state.node && (
+      {!state.node?.path?.length && (
         <p>
-          <i>Click next to walk the tree</i>
+          <i>Click step to walk the tree</i>
         </p>
       )}
-      {state.node && <BlockMath>{`path = ${state.node.path.join(', ')}`}</BlockMath>}
+      {!!state.node?.path?.length && <BlockMath>{`path = [${state.node.path.join(', ')}]`}</BlockMath>}
     </>
   )}
 </State>
@@ -329,20 +327,21 @@ expect(
 
 Thats a flat representation.. but somehow useless. We need more information...
 
-### Relative Fraction Paths
+### Calculating Time
 
-If we divide each index by the number of siblings (also called branching factor), we can calculate relative fractions:
+If we divide each index by the number of siblings (also called branching factor), we can calculate relative fractions.
+Using those, we can determine the absolute values of time and duration for each event.
 
 <State initial={{ node: null, calculation: null }}>
   {({ state, setState }) => (
     <>
       <TreeVisitor
-        onNext={(_state) => {
-          if (!_state?.value) {
+        onNode={(node) => {
+          if (!node) {
             setState({ node: null, calculation: null });
             return;
           }
-          const { path: pairs } = _state.value;
+          const { path: pairs } = node;
           const F = (n, d) => new Fraction(n, d);
           const duration = pairs.map(([a, b]) => `\\frac{${a || 1}}{${b || 1}}`).join('*');
           const d = pairs.reduce((product, [a, b]) => product.mul(F(1, b)), F(1, 1));
@@ -376,11 +375,12 @@ If we divide each index by the number of siblings (also called branching factor)
               <p>The following fractions are relative to the complete bolero lengths:</p>
               <BlockMath>{`duration_{r} = ${duration} = \\frac{${d.n}}{${d.d}}`}</BlockMath>
               <BlockMath>{`time_{r} = ${time} = \\frac{${t.n}}{${t.d}}`}</BlockMath>
+              <p>If 2 bars of bolero take 6s, the absolute time and duration are:</p>
               <BlockMath>{`time_{a} = \\frac{${t.n}}{${t.d}} * 6s = ${ta}s`}</BlockMath>
               <BlockMath>{`duration_{a} = \\frac{${d.n}}{${d.d}} * 6s = ${da}s`}</BlockMath>
             </React.Fragment>
           );
-          setState({ node: _state.value, calculation });
+          setState({ node, calculation });
         }}
         tree={(node, visited) =>
           r2d3(bolero, (rhythm, path, parent) => {
@@ -401,11 +401,11 @@ If we divide each index by the number of siblings (also called branching factor)
       />
       {!state.node && (
         <p>
-          <i>Click next to walk the tree (prepare for math...)</i>
+          <i>Click step to walk the tree (prepare for math...)</i>
         </p>
       )}
       {state.node && (
-        <BlockMath>{`path = ${state.node.path.map(([a, b]) => `\\frac{${a}}{${b}}`).join(', ')}`}</BlockMath>
+        <BlockMath>{`path = [${state.node.path.map(([a, b]) => `\\frac{${a}}{${b}}`).join(', ')}]`}</BlockMath>
       )}
       {state.calculation && <>{state.calculation}</>}
     </>
@@ -429,48 +429,52 @@ function leafPaths(hierarchy) {
 }
 ```
 
-Now we have a bunch of fractions.. how can we calculate the absolute timing information with them?
+Test:
 
-## Calculating Absolute Time
-
-If we now know the total length of the piece, we can multiply it with the relative fraction to get the absolute time and duration.
-
-## About Note Values
-
-Let's talk about [Note Values](https://en.wikipedia.org/wiki/Note_value).
-In our example, we use different fractions to express note values. But what do the fractions refer to?
-
-Generally, the note value tells the relation of the notes value to the duration of one bar (in 4/4).
-
-### Calculating Absolute Durations
-
-If we want to calculate the absolute duration of a note value, we need to know how long one beat is.
-If we take a tempo of 60bpm, we have:
-
-<BlockMath>{`60 bpm = 60 b/m = 60b/60s = 1b/s`}</BlockMath>
-
-Most of the time, the term beat means one quarter note. With that we can calculate the duration of each note value:
-
-<BlockMath>{`1/4 = 1s, 1/8 = 0.5s, 1/24 = 0.16s`}</BlockMath>
-
-### Calculating Absolute Time
-
-If we also knew when each note is played, we have all the information to represent the rhythm as absolute timed events.
-As we already know the durations, this is quite easy. We just have to sum all durations that came before.
-In the bolero example, the second 16th triplet in bar 2 begins at:
-
-<BlockMath>{`3/4 + 1/8 + 1/24 = 0.916s`}</BlockMath>
-
-<!-- TBD: make Tree clickable to calculate the selected node's time -->
-
-For each node, we multiply its path fraction (before the bracket) with each parent's relative subdivisions
-(inside the brackets). The products are then summed up.
-You can read it the same way your eyes would move along the tree line (oscillating down and up).
-
-### Summary
-
-We can now derive the absolute note value of a tree node from a collection of indices and sibling lengths.
-The next step would be to actually implement a function that does this.
+```js
+expect(
+  leafPaths([
+    [
+      ['sn', ['sn', 'sn', 'sn']],
+      ['sn', ['sn', 'sn', 'sn']],
+      ['sn', 'sn'],
+    ],
+    [
+      ['sn', ['sn', 'sn', 'sn']],
+      ['sn', ['sn', 'sn', 'sn']],
+      [
+        ['sn', 'sn', 'sn'],
+        ['sn', 'sn', 'sn'],
+      ],
+    ],
+  ])
+).toEqual(`[
+    [[0, 2], [0, 3], [0, 2]],
+    [[0, 2], [0, 3], [1, 2], [0, 3]],
+    [[0, 2], [0, 3], [1, 2], [1, 3]],
+    [[0, 2], [0, 3], [1, 2], [2, 3]],
+    [[0, 2], [1, 3], [0, 2]],
+    [[0, 2], [1, 3], [1, 2], [0, 3]],
+    [[0, 2], [1, 3], [1, 2], [1, 3]],
+    [[0, 2], [1, 3], [1, 2], [2, 3]],
+    [[0, 2], [2, 3], [0, 2]],
+    [[0, 2], [2, 3], [1, 2]],
+    [[1, 2], [0, 3], [0, 2]],
+    [[1, 2], [0, 3], [1, 2], [0, 3]],
+    [[1, 2], [0, 3], [1, 2], [1, 3]],
+    [[1, 2], [0, 3], [1, 2], [2, 3]],
+    [[1, 2], [1, 3], [0, 2]],
+    [[1, 2], [1, 3], [1, 2], [0, 3]],
+    [[1, 2], [1, 3], [1, 2], [1, 3]],
+    [[1, 2], [1, 3], [1, 2], [2, 3]],
+    [[1, 2], [2, 3], [0, 2], [0, 3]],
+    [[1, 2], [2, 3], [0, 2], [1, 3]],
+    [[1, 2], [2, 3], [0, 2], [2, 3]],
+    [[1, 2], [2, 3], [1, 2], [0, 3]],
+    [[1, 2], [2, 3], [1, 2], [1, 3]],
+    [[1, 2], [2, 3], [1, 2], [2, 3]]
+  ]`); // stringified to keep format (code format makes too much lines..)
+```
 
 ## TODO calculate flat events with visitTree
 

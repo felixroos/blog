@@ -1,32 +1,33 @@
 import React, { useState } from 'react';
 import { walk } from '../rhythmical/util';
-import { useGenerator } from './useGenerator';
 import Tree from '../rhythmical/components/Tree';
-import Button from '@material-ui/core/Button';
+import GeneratorStepper from './GeneratorStepper';
 
-export default function TreeVisitor({ tree, getChildren, onNext }) {
+export default function TreeVisitor({ tree, getChildren, onNode }) {
   getChildren = getChildren || ((node) => node.children);
   const [visited, setVisited] = useState([]);
+  const [node, setNode] = useState<any>();
   function getTree() {
     if (typeof tree === 'function') {
-      return tree(node?.value, visited);
+      return tree(node, visited);
     }
   }
-  const [node, next] = useGenerator(() => {
-    setVisited([]);
-    return walk(getChildren, getTree());
-  }, true);
   return (
     <div>
-      <Button
-        onClick={() => {
-          setVisited([...visited, node.value]);
-          const _next = next();
-          onNext?.(_next);
+      <GeneratorStepper
+        hideFinish={true}
+        init={() => {
+          setVisited([]);
+          return walk(getChildren, getTree());
         }}
-      >
-        visit next
-      </Button>
+        onChange={(_node) => {
+          if (_node) {
+            setNode(_node);
+            onNode?.(_node);
+            setVisited([...visited, _node]);
+          }
+        }}
+      />
       <Tree width={620} nodeRadius={10} dx={20} columns={[12, 12]} data={getTree()} hideJson={true} />
     </div>
   );

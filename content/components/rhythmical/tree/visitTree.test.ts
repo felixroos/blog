@@ -24,22 +24,12 @@ export function leafPositions(hierarchy) {
 }
 
 test('leafIndices', () => {
-  expect(leafIndices(['A', [['B', 'C'], 'D']])).toEqual([[0], [1, 0, 0], [1, 0, 1], [1, 1]]);
+  expect(leafIndices(['A',
+    [['B', 'C'], 'D']])).toEqual([[0], [1, 0, 0], [1, 0, 1], [1, 1]]);
   expect(
-    leafIndices([
-      [
-        ['sn', ['sn', 'sn', 'sn']],
-        ['sn', ['sn', 'sn', 'sn']],
-        ['sn', 'sn'],
-      ],
-      [
-        ['sn', ['sn', 'sn', 'sn']],
-        ['sn', ['sn', 'sn', 'sn']],
-        [
-          ['sn', 'sn', 'sn'],
-          ['sn', 'sn', 'sn'],
-        ],
-      ],
+    leafIndices([[['sn', ['sn', 'sn', 'sn']], ['sn', ['sn', 'sn', 'sn']], ['sn', 'sn']],
+    [['sn', ['sn', 'sn', 'sn']], ['sn', ['sn', 'sn', 'sn']],
+    [['sn', 'sn', 'sn'], ['sn', 'sn', 'sn']]],
     ])
   ).toEqual([
     [0, 0, 0],
@@ -71,17 +61,9 @@ test('leafIndices', () => {
 
 test('leafPositions', () => {
   expect(
-    leafPositions([
-      [
-        ['sn', ['sn', 'sn', 'sn']],
-        ['sn', ['sn', 'sn', 'sn']],
-        ['sn', 'sn'],
-      ],
-      [
-        ['sn', ['sn', 'sn', 'sn']],
-        ['sn', ['sn', 'sn', 'sn']],
-        [['sn', 'sn', 'sn'], ['sn', 'sn', 'sn']],
-      ],
+    leafPositions([[['sn', ['sn', 'sn', 'sn']], ['sn', ['sn', 'sn', 'sn']], ['sn', 'sn']],
+    [['sn', ['sn', 'sn', 'sn']], ['sn', ['sn', 'sn', 'sn']],
+    [['sn', 'sn', 'sn'], ['sn', 'sn', 'sn']]],
     ])
   ).toEqual([
     [[0, 2], [0, 3], [0, 2]],
@@ -110,3 +92,51 @@ test('leafPositions', () => {
     [[1, 2], [2, 3], [1, 2], [2, 3]],
   ]);
 });
+
+
+function leafPaths(hierarchy) {
+  const path = [];
+  const paths = [];
+  visitTree(
+    hierarchy,
+    (t, i, children) => i >= 0 && path.push([i, children.length]) && !Array.isArray(t) && paths.push([...path]),
+    (_, i) => i >= 0 && path.pop(),
+    (node) => (Array.isArray(node) ? node : undefined)
+  );
+  return paths;
+}
+
+test('leafPaths', () => {
+  expect(leafPaths([
+    [['sn', ['sn', 'sn', 'sn']], ['sn', ['sn', 'sn', 'sn']], ['sn', 'sn'],
+    ],
+    [['sn', ['sn', 'sn', 'sn']], ['sn', ['sn', 'sn', 'sn']],
+    [['sn', 'sn', 'sn'], ['sn', 'sn', 'sn']],
+    ],
+  ])).toEqual([
+    [[0, 2], [0, 3], [0, 2]],
+    [[0, 2], [0, 3], [1, 2], [0, 3]],
+    [[0, 2], [0, 3], [1, 2], [1, 3]],
+    [[0, 2], [0, 3], [1, 2], [2, 3]],
+    [[0, 2], [1, 3], [0, 2]],
+    [[0, 2], [1, 3], [1, 2], [0, 3]],
+    [[0, 2], [1, 3], [1, 2], [1, 3]],
+    [[0, 2], [1, 3], [1, 2], [2, 3]],
+    [[0, 2], [2, 3], [0, 2]],
+    [[0, 2], [2, 3], [1, 2]],
+    [[1, 2], [0, 3], [0, 2]],
+    [[1, 2], [0, 3], [1, 2], [0, 3]],
+    [[1, 2], [0, 3], [1, 2], [1, 3]],
+    [[1, 2], [0, 3], [1, 2], [2, 3]],
+    [[1, 2], [1, 3], [0, 2]],
+    [[1, 2], [1, 3], [1, 2], [0, 3]],
+    [[1, 2], [1, 3], [1, 2], [1, 3]],
+    [[1, 2], [1, 3], [1, 2], [2, 3]],
+    [[1, 2], [2, 3], [0, 2], [0, 3]],
+    [[1, 2], [2, 3], [0, 2], [1, 3]],
+    [[1, 2], [2, 3], [0, 2], [2, 3]],
+    [[1, 2], [2, 3], [1, 2], [0, 3]],
+    [[1, 2], [2, 3], [1, 2], [1, 3]],
+    [[1, 2], [2, 3], [1, 2], [2, 3]]
+  ])
+})

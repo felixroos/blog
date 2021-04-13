@@ -2,7 +2,7 @@ import { Button } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { useGenerator } from './useGenerator';
 
-export default function GeneratorStepper({ init, onChange }) {
+export default function GeneratorStepper({ init, onChange, hideFinish }: any) {
   const [state, nextValue, resetGenerator, previous] = useGenerator(init, true, false);
   useEffect(() => {
     onChange(state?.value, previous?.value);
@@ -24,9 +24,11 @@ export default function GeneratorStepper({ init, onChange }) {
       <Button color="primary" onClick={() => resetGenerator()}>
         reset
       </Button>
-      <Button color="primary" onClick={() => finish()}>
-        finish
-      </Button>
+      {!hideFinish && (
+        <Button color="primary" onClick={() => finish()}>
+          finish
+        </Button>
+      )}
     </>
   );
 }
