@@ -1,3 +1,7 @@
+# Links
+
+this is pretty messy list of links for various topics:
+
 - rhythm heaven game
 - https://github.com/public-apis/public-apis !!!
 - http://stoney.sb.org/eno/oblique.html
@@ -163,3 +167,23 @@ https://github.com/pshrmn/notes
   - best emulation of prophet pro one + prophet 5
   - also runs on linux (could make a standalone prophet)
 - http://blog.dubspot.com/prophet-5-spotlight/
+
+
+## Snes Links
+
+- https://github.com/optixx/snes-sdk/tree/master/wla_dx
+- http://emureview.ztnet.com/developerscorner/SoundCPU/spc.htm
+- https://wiki.superfamicom.org/jay's-asm-tutorial
+- https://wiki.superfamicom.org/setting-up-a-programming-environment
+- https://wiki.superfamicom.org/
+
+- http://www.slack.net/~ant/libs/audio.html
+- https://github.com/yupferris/snes_spc
+- https://lib.rs/crates/snes-apu (rust)
+- https://github.com/emu-rs/snes-apu
+- https://github.com/yupferris/snes-apu-dbg
+- https://github.com/MrRio/js-snes-player !
+- https://github.com/cosinusoidally/snes_spc_js !!!!! (new)
+- http://cosinusoidally.github.io/#rewriting-js-snes-player blogpost
+- https://www.smwcentral.net/?p=viewthread&t=65193 !!!!
+- https://www.smwcentral.net/?p=viewthread&t=92575

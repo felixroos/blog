@@ -1,6 +1,6 @@
 ---
 title: Rhythmical Trees
-date: 2020-11-01
+date: 2021-04-14
 ---
 
 import { Chord } from '@tonaljs/tonal';
@@ -31,11 +31,14 @@ import R from 'ramda';
 After the posts about [Rhythmical Arrays](../rhythmical-arrays/) and [Rhythmical Objects](../rhythmical-objects),
 I want to investigate the actual data structure that is at play: trees.
 This is an attempt to explain why trees are a really elegant way to represent rhythm and music.
-At the same time, I will try to reimplement the core of rhythmical..
 
 ## Tree Basics
 
 This is a tree:
+
+![tree](./img/tree.png)
+
+Now if we turn this upside down, cut of the stem and draw it like a 3 year old, we get what computer scientists call a tree:
 
 <TreeAnalyzer
   data={{

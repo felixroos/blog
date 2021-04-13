@@ -46,8 +46,8 @@ export default function ComponentDoc({ json }) {
       /> */}
       <List component="nav" dense={true} className={classes.root}>
         {Object.entries(props).map(([name, prop]: any, i) => (
-          <>
-            <ListItem button onClick={() => toggleOpen(i)} key={i}>
+          <React.Fragment key={i}>
+            <ListItem button onClick={() => toggleOpen(i)}>
               <ListItemText
                 primary={
                   <>
@@ -83,7 +83,7 @@ export default function ComponentDoc({ json }) {
                 </List>
               </Collapse>
             )}
-          </>
+          </React.Fragment>
         ))}
       </List>
     </div>

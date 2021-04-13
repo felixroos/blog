@@ -10,7 +10,7 @@ This is a color, using css in JS via JSX:
     width: 20,
     height: 40,
     borderRadius: 30,
-    margin: 10
+    margin: 10,
   }}
 ></div>
 
@@ -19,12 +19,13 @@ These are multiple colors using JSX:
 <div style={{ display: 'flex' }}>
   {Array.from({ length: 10 }, (_, i) => (
     <div
+      key={i}
       style={{
         background: interpolateSinebow(i / 10),
         width: 20,
         height: 40,
         borderRadius: 30,
-        margin: 10
+        margin: 10,
       }}
     ></div>
   ))}
@@ -48,19 +49,20 @@ import { State } from 'react-powerplug';
         value={state.length}
         onChange={(e, v) =>
           setState({
-            length: v
+            length: v,
           })
         }
       />
       <div style={{ display: 'flex' }}>
         {Array.from({ length: state.length }, (_, i) => (
           <div
+            key={i}
             style={{
               background: interpolateSinebow(i / state.length),
               width: 20,
               height: 40,
               borderRadius: 30,
-              margin: 10
+              margin: 10,
             }}
           ></div>
         ))}

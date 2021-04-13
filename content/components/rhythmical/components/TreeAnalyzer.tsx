@@ -47,18 +47,18 @@ export function TreeAnalyzer(props) {
       </Grid>
       {node && !hideChips && (
         <Grid item xs={columns[1]}>
-          <Chip label={`parent: ${node.parent?.data?.name || 'none'}`} {...controlColors(['parent', 'parentLink'])} />
-          <br />
           <Chip label={`selected node: ${node.data.name}`} {...controlColors(['selected'])} />
           <br />
-          <Chip
-            label={`children: ${node.children?.map(({ data }) => data.name)?.join(', ') || 'none'}`}
-            {...controlColors(['child', 'childLink'])}
-          />
+          <Chip label={`parent: ${node.parent?.data?.name || 'none'}`} {...controlColors(['parent', 'parentLink'])} />
           <br />
           <Chip
             label={`siblings: ${getSiblings(node)?.join(', ') || 'none'}`}
             {...controlColors(['sibling', 'parent', 'siblingLink', 'parentLink'])}
+          />
+          <br />
+          <Chip
+            label={`children: ${node.children?.map(({ data }) => data.name)?.join(', ') || 'none'}`}
+            {...controlColors(['child', 'childLink'])}
           />
           <br />
           <Chip label="is root" icon={!node.parent ? <DoneIcon /> : <CloseIcon />} style={{ marginBottom: 5 }} />

@@ -2,6 +2,8 @@
 
 A Snippet is a textual representation of a Leadsheet, meaning chords and/or melody of a tune/song.
 
+Also see [leetsheet](https://github.com/felixroos/leetsheet).
+
 ## Design Goals
 
 - Readability
