@@ -21,12 +21,13 @@ import TreeVisitor from '../components/common/TreeVisitor.tsx';
 import { schemeTableau10 } from 'd3-scale-chromatic';
 import { BlockMath } from 'react-katex';
 import { toRhythmObject, haveSameIndices } from '../components/rhythmical/util';
-import { r2d3 } from '../components/rhythmical/tree/r2d3';
+import { r2d3, ro2d3 } from '../components/rhythmical/tree/r2d3';
 import { colorize } from '../components/rhythmical/tree/colorize';
 import { State } from 'react-powerplug';
 import Fraction from 'fraction.js';
 import { bolero, conventionalLabels } from '../components/rhythmical/tunes/bolero';
 import R from 'ramda';
+import NestedGrid from '../components/graphs/NestedGrid';
 
 After the posts about [Rhythmical Arrays](../rhythmical-arrays/) and [Rhythmical Objects](../rhythmical-objects),
 I want to investigate the actual data structure that is at play: trees.
@@ -116,6 +117,28 @@ export const colors = schemeTableau10;
 | <Color color={colors[2]}/> | 1/8   | 8ths          | 2 per 4th | connected by first beam     |
 | <Color color={colors[3]}/> | 1/24  | 16th triplets | 3 per 8th | connected by second beam    |
 
+<!--
+<NestedGrid
+  rows={[1]}
+  innerBorders={true}
+  outerBorders={false}
+  cells={[
+    [
+      ['sn', ['sn', 'sn', 'sn']],
+      ['sn', ['sn', 'sn', 'sn']],
+      ['sn', 'sn'],
+    ],
+    [
+      ['sn', ['sn', 'sn', 'sn']],
+      ['sn', ['sn', 'sn', 'sn']],
+      [
+        ['sn', 'sn', 'sn'],
+        ['sn', 'sn', 'sn'],
+      ],
+    ],
+  ]}
+/> -->
+
 <Player
   instruments={{ drums }}
   hierarchy={true}
@@ -197,14 +220,13 @@ The format is `[value, time, duration]`. While it is readable for machines, it i
 _The important question_: How can we transform the first notation into the second?
 With it, the human interface would be the first, while the second one would be used for rendering / playback.
 
-To be able to get the flat representation, we need..
+## Calculating Absolute Time & Duration
 
-1. to visit all nodes and save the leaves (no children)
-2. a way to calculate the absolute times from the tree structure
+Let's find out how to calculate the absolute time and duration for each node, based on the tree.
 
-## Visiting Tree Nodes
+### Fraction Paths
 
-Let's visit all the tree nodes:
+Let's identify each node by the index in its group of children:
 
 <State initial={{ node: null }}>
   {({ state, setState }) => (
@@ -216,15 +238,21 @@ Let's visit all the tree nodes:
         tree={(node, visited) =>
           r2d3(bolero, (rhythm, path, parent) => {
             path = path.map((p) => p[0]);
+            const isRoot = !path.length;
+            let color = 'darkgray';
+            const strPath = (p) => p?.join(' ') || '';
+            const isParent = strPath(node?.path).startsWith(strPath(path));
+            const isSelected = haveSameIndices(node?.path, path);
+            const isVisited = visited.find((v) => haveSameIndices(v.path, path));
+            if (isVisited) {
+              color = 'lightgray';
+            }
+            if (isParent || isSelected) {
+              color = isRoot ? 'darkgray' : 'red';
+            }
             return {
               ...toRhythmObject(rhythm),
-              color: haveSameIndices(node?.path, path)
-                ? 'red'
-                : visited.find((v) => haveSameIndices(v.path, path))
-                ? 'lightgray'
-                : path.length
-                ? colors[path.length - 1]
-                : 'black',
+              color,
               name: parent ? path[path.length - 1] : 'bolero',
               path: [...path],
             };
@@ -242,95 +270,119 @@ Let's visit all the tree nodes:
 </State>
 <br />
 
-- Here, the numbers are the indices of the nodes inside their siblings.
-- With them, we can construct a unique path for each node, by collecting all indices from the root to the node
+- When stepping into the tree, the path of indices uniquely identifies each node
+- This path will help us to calculate time and duration
 
-To call a function on every node of a tree (= visit), we can do this:
+### Calculating Durations
 
-```js
-export function visitTree(tree, before, after, getChildren, index?, siblings?) {
-  before(tree, index, siblings);
-  getChildren(tree)?.forEach((child, i, a) => visitTree(child, before, after, getChildren, i, a));
-  after(tree, index, siblings);
-}
-```
+Let's divide each index by the number of children in that group:
 
-- The before and after callbacks fire before and after the children of the node have been visited
-- Using the getChildren function, we can stay agnostic about the tree structure. This is inspired by [d3-hierarchy](https://github.com/d3/d3-hierarchy#hierarchy).
+export const parentTree = (node, visited) => {
+  return r2d3(bolero, (rhythm, path, parent) => {
+    const isSelected = haveSameIndices(node?.path, path);
+    const strPath = (p) => p?.map((s) => s.join('/')).join(' ') || '';
+    let color = 'darkgray';
+    const isRoot = !path.length;
+    const isVisited = visited.find((v) => haveSameIndices(v.path, path));
+    if (isVisited) {
+      color = 'lightgray';
+    }
+    if (isSelected) {
+      color = 'red';
+    }
+    const isParent = strPath(node?.path).startsWith(strPath(path));
+    if (isParent && !isSelected) {
+      color = isRoot ? 'darkgray' : 'red';
+    }
+    return {
+      ...toRhythmObject(rhythm),
+      color,
+      name: parent ? path[path.length - 1].join('/') : '1/1',
+      path: [...path],
+    };
+  });
+};
 
-We can now use this function to collect our index paths:
+<State initial={{ node: null, calculation: null }}>
+  {({ state, setState }) => (
+    <>
+      <TreeVisitor
+        onNode={(node) => {
+          if (!node) {
+            setState({ node: null, calculation: null });
+            return;
+          }
+          const { path: pairs } = node;
+          const F = (n, d) => new Fraction(n, d);
+          const duration = pairs
+            //.concat([[1, 1]])
+            .map(([a, b]) => `\\frac{${a || 1}}{${b || 1}}`)
+            .join('*');
+          const d = pairs.reduce((product, [a, b]) => product.mul(F(1, b)), F(1, 1));
+          const time = pairs
+            .map(([a, b], i, p) =>
+              i
+                ? `\\frac{${a}}{${b}}*(${p
+                    .slice(0, i)
+                    .reverse()
+                    .map(([x, y]) => `\\frac{1}{${y}}`)
+                    .join('*')})`
+                : `\\frac{${a}}{${b}}`
+            )
+            .join(' + ');
+          const t = pairs
+            .map(([a, b]) => F(a, b))
+            .reduce((sum, p, i) => {
+              const div = pairs.slice(0, i).map(([_, d]) => d);
+              const m = div.reverse().reduce((product, d) => {
+                return product.div(d);
+              }, p);
+              return sum.add(m);
+            }, new Fraction(0));
+          const whole = 6;
+          const ta = t.mul(6).toFraction(false);
+          const da = d.mul(6).toFraction(false);
+          const cd = F(6, 4).mul(F(d.n, d.d));
+          const ct = F(6, 4).mul(F(t.n, t.d));
+          const calculation = (
+            <React.Fragment>
+              <p>The duration relative to the complete bolero length is:</p>
+              <BlockMath>{`duration_{r} = ${pairs.length > 1 ? duration + ' = ' : ''}\\frac{${d.n}}{${
+                d.d
+              }}`}</BlockMath>
+              <p>If 1 bolero takes 6s, the absolute duration of this node is:</p>
+              <BlockMath>{`duration_{a} = \\frac{${d.n}}{${d.d}} * 6s = ${da}s`}</BlockMath>
+            </React.Fragment>
+          );
+          setState({ node, calculation });
+        }}
+        tree={parentTree}
+      />
+      {!state.node && (
+        <p>
+          <i>Click step to walk the tree (prepare for math...)</i>
+        </p>
+      )}
+      {state.node && (
+        <BlockMath>{`path = [${state.node.path
+          //.concat([[1, 1]])
+          .map(([a, b]) => `\\frac{${a}}{${b}}`)
+          .join(', ')}]`}</BlockMath>
+      )}
+      {state.calculation && <>{state.calculation}</>}
+    </>
+  )}
+</State>
+<br />
 
-```js
-function leafIndices(hierarchy) {
-  const path = [];
-  const paths = [];
-  visitTree(
-    hierarchy,
-    (t, i) => i >= 0 && path.push(i) && !Array.isArray(t) && paths.push([...path]),
-    (_, i) => i >= 0 && path.pop(),
-    (node) => (Array.isArray(node) ? node : undefined)
-  );
-  return paths;
-}
-```
-
-- By adding each index before and removing it again afterwards, we know the current path.
-- We add each path to the paths array when we reached a leaf (no children)
-- If you are a functional purist, you might be offended that the before and after callbacks are impure. But fear not, as I will present an alternative later
-
-If we call that function on the bolero, we get the following paths:
-
-```ts
-expect(
-  leafIndices([
-    [
-      ['sn', ['sn', 'sn', 'sn']],
-      ['sn', ['sn', 'sn', 'sn']],
-      ['sn', 'sn'],
-    ],
-    [
-      ['sn', ['sn', 'sn', 'sn']],
-      ['sn', ['sn', 'sn', 'sn']],
-      [
-        ['sn', 'sn', 'sn'],
-        ['sn', 'sn', 'sn'],
-      ],
-    ],
-  ])
-).toEqual([
-  [0, 0, 0],
-  [0, 0, 1, 0],
-  [0, 0, 1, 1],
-  [0, 0, 1, 2],
-  [0, 1, 0],
-  [0, 1, 1, 0],
-  [0, 1, 1, 1],
-  [0, 1, 1, 2],
-  [0, 2, 0],
-  [0, 2, 1],
-  [1, 0, 0],
-  [1, 0, 1, 0],
-  [1, 0, 1, 1],
-  [1, 0, 1, 2],
-  [1, 1, 0],
-  [1, 1, 1, 0],
-  [1, 1, 1, 1],
-  [1, 1, 1, 2],
-  [1, 2, 0, 0],
-  [1, 2, 0, 1],
-  [1, 2, 0, 2],
-  [1, 2, 1, 0],
-  [1, 2, 1, 1],
-  [1, 2, 1, 2],
-]);
-```
-
-Thats a flat representation.. but somehow useless. We need more information...
+- If we divide each node index by the total number of children (also called branching factor), we get a fraction that represents the duration of each node in its group.
+- By multiplying that fraction with all the fractions of the node's parents, we get the relative duration fraction.
+- We can calculate the absolute duration by multiplying that relative duration by the total length of everything:
 
 ### Calculating Time
 
-If we divide each index by the number of siblings (also called branching factor), we can calculate relative fractions.
-Using those, we can determine the absolute values of time and duration for each event.
+To complete our mission, we need the absolute time for each node.
+The process is similar to calculating durations, with a slightly more complicated looking calculation:
 
 <State initial={{ node: null, calculation: null }}>
   {({ state, setState }) => (
@@ -365,6 +417,7 @@ Using those, we can determine the absolute values of time and duration for each 
               }, p);
               return sum.add(m);
             }, new Fraction(0));
+          const timeSimple = t.n ? `\\frac{${t.n}}{${t.d}}` : `0`;
           const whole = 6;
           const ta = t.mul(6).toFraction(false);
           const da = d.mul(6).toFraction(false);
@@ -372,32 +425,15 @@ Using those, we can determine the absolute values of time and duration for each 
           const ct = F(6, 4).mul(F(t.n, t.d));
           const calculation = (
             <React.Fragment>
-              <p>The following fractions are relative to the complete bolero lengths:</p>
-              <BlockMath>{`duration_{r} = ${duration} = \\frac{${d.n}}{${d.d}}`}</BlockMath>
-              <BlockMath>{`time_{r} = ${time} = \\frac{${t.n}}{${t.d}}`}</BlockMath>
-              <p>If 2 bars of bolero take 6s, the absolute time and duration are:</p>
-              <BlockMath>{`time_{a} = \\frac{${t.n}}{${t.d}} * 6s = ${ta}s`}</BlockMath>
-              <BlockMath>{`duration_{a} = \\frac{${d.n}}{${d.d}} * 6s = ${da}s`}</BlockMath>
+              <p>The time relative to the complete bolero is:</p>
+              <BlockMath>{`time_{r} = ${time} = ${timeSimple}`}</BlockMath>
+              <p>If 1 bolero take 6s, the absolute time of this node is:</p>
+              <BlockMath>{`time_{a} = ${timeSimple} * 6s = ${ta}s`}</BlockMath>
             </React.Fragment>
           );
           setState({ node, calculation });
         }}
-        tree={(node, visited) =>
-          r2d3(bolero, (rhythm, path, parent) => {
-            return {
-              ...toRhythmObject(rhythm),
-              color: haveSameIndices(node?.path, path)
-                ? 'red'
-                : visited.find((v) => haveSameIndices(v.path, path))
-                ? 'lightgray'
-                : path.length
-                ? colors[path.length - 1]
-                : 'black',
-              name: parent ? path[path.length - 1].join('/') : 'bolero',
-              path: [...path],
-            };
-          })
-        }
+        tree={parentTree}
       />
       {!state.node && (
         <p>
@@ -413,9 +449,266 @@ Using those, we can determine the absolute values of time and duration for each 
 </State>
 <br />
 
-The function is really similar to the leafIndices function. The only difference is that we include push children.length to the path:
+- to calculate the relative time fraction, we need to sun the relative timse of each node in the path
+
+## Variable Durations
+
+In the bolero example, there are no duration fractions with a numerator other than 1.
+To be able to cover any rhythm of this world, we need to extend our paths.
+
+import { Score } from '../components/score/Score.tsx';
+import { rhythmicalScore } from '../components/score/score.ts';
+
+Take this as an example:
+
+<Score
+  width={400}
+  height={100}
+  staves={[
+    [
+      ['C4', '2d'],
+      ['D4', 'q'],
+    ],
+    [
+      ['E4', 'q'],
+      ['D4', '2'],
+      ['B3', 'q'],
+    ],
+  ]}
+/>
+
+To be able to express that as a nested array, we need a way to declare durations, for example:
+
+```json
+[
+  ["C4*3", "D4"],
+  ["E4", "D4*2", "B3"]
+]
+```
+
+If we just represent the durations as a tree, it looks like this:
+
+<Tree
+  width={620}
+  nodeRadius={10}
+  dx={20}
+  columns={[12, 12]}
+  data={ro2d3(
+    [
+      [{ value: 'C4', duration: 3 }, 'D4'],
+      ['E4', { value: 'D4', duration: 2 }, 'B3'],
+    ],
+    (rhythm, path) => ({
+      ...toRhythmObject(rhythm),
+      color: path.length ? colors[path.length - 1] : 'black',
+      name: path.length ? `${path[path.length - 1][2]}` : '1',
+      path: [...path],
+    })
+  )}
+  hideJson={true}
+/>
+
+### Calculating Variable Durations
+
+Now, to get the correct fractions, we cannot just use the indices like before.
+Instead, we can use the duration as the numerator and the sum of all durations for the denominator:
+
+<State initial={{ node: null }}>
+  {({ state, setState }) => (
+    <>
+      <TreeVisitor
+        onNode={(node) => {
+          if (!node) {
+            setState({ node: null, calculation: null });
+            return;
+          }
+          const { path: pairs } = node;
+          const F = (n, d) => new Fraction(n, d);
+          const duration = pairs
+            //.concat([[1, 1]])
+            .map(([_, b, a]) => `\\frac{${a || 1}}{${b || 1}}`)
+            .join('*');
+          const d = pairs.reduce((product, [_, b, a]) => product.mul(F(a || 1, b)), F(1, 1));
+          const whole = 8;
+          const da = d.mul(whole).toFraction(false);
+          const cd = F(whole, 4).mul(F(d.n, d.d));
+          const calculation = (
+            <React.Fragment>
+              <p>The duration relative to the length is:</p>
+              <BlockMath>{`duration_{r} = ${pairs.length > 1 ? duration + ' = ' : ''}\\frac{${d.n}}{${
+                d.d
+              }}`}</BlockMath>
+              <p>If the whole takes 8s, the absolute duration of this node is:</p>
+              <BlockMath>{`duration_{a} = \\frac{${d.n}}{${d.d}} * 8s = ${da}s`}</BlockMath>
+            </React.Fragment>
+          );
+          setState({ node, calculation });
+        }}
+        tree={(node, visited) =>
+          ro2d3(
+            [
+              [{ value: 'C4', duration: 3 }, 'D4'],
+              ['E4', { value: 'D4', duration: 2 }, 'B3'],
+            ],
+            (rhythm, path) => {
+              const isRoot = !path.length;
+              let color = 'darkgray';
+              const strPath = (p) => p?.map((s) => s.join('/')).join(' ') || '';
+              const isParent = strPath(node?.path).startsWith(strPath(path));
+              const isSelected = haveSameIndices(node?.path, path);
+              const isVisited = visited.find((v) => haveSameIndices(v.path, path));
+              if (isVisited) {
+                color = 'lightgray';
+              }
+              if (isSelected || (isParent && !isRoot)) {
+                color = 'red';
+              }
+              return {
+                ...toRhythmObject(rhythm),
+                color,
+                name: path.length ? `${path[path.length - 1][2]}/${path[path.length - 1][1]}` : '1',
+                path: [...path],
+              };
+            }
+          )
+        }
+        hideJson={true}
+      />
+      {state.calculation}
+    </>
+  )}
+</State>
+
+### Calculating Time With Variable Durations
+
+To know calculate the time fraction, we need to sum all durations that came before:
+
+<State initial={{ node: null }}>
+  {({ state, setState }) => (
+    <>
+      <TreeVisitor
+        onNode={(node) => {
+          if (!node) {
+            setState({ node: null, calculation: null });
+            return;
+          }
+          const { path: pairs } = node;
+          const F = (n, d) => new Fraction(n, d);
+          const duration = pairs.map(([a, b]) => `\\frac{${a || 1}}{${b || 1}}`).join('*');
+          const d = pairs.reduce((product, [a, b]) => product.mul(F(a || 1, b)), F(1, 1));
+          const time = pairs
+            .map(([a, b], i, p) =>
+              i
+                ? `\\frac{${a || 1}}{${b}}*(${p
+                    .slice(0, i)
+                    .reverse()
+                    .map(([x, y]) => `\\frac{${x}}{${y}}`)
+                    .join('*')})`
+                : `\\frac{${a}}{${b}}`
+            )
+            .join(' + ');
+          const t = pairs
+            .map(([a, b]) => F(a, b))
+            .reduce((sum, p, i) => {
+              const div = pairs.slice(0, i).map(([_, d]) => d);
+              const m = div.reverse().reduce((product, d) => {
+                return product.div(d);
+              }, p);
+              return sum.add(m);
+            }, new Fraction(0));
+          const timeSimple = t.n ? `\\frac{${t.n}}{${t.d}}` : `0`;
+          const whole = 8;
+          const ta = t.mul(whole).toFraction(false);
+          const da = d.mul(whole).toFraction(false);
+          const cd = F(whole, 4).mul(F(d.n, d.d));
+          const ct = F(whole, 4).mul(F(t.n, t.d));
+          const calculation = (
+            <React.Fragment>
+              <p>The time relative to the whole is:</p>
+              <BlockMath>{`time_{r} = ${time} = ${timeSimple}`}</BlockMath>
+              <p>If the whole takes 8s, the absolute time of this node is:</p>
+              <BlockMath>{`time_{a} = ${timeSimple} * 8s = ${ta}s`}</BlockMath>
+            </React.Fragment>
+          );
+          setState({ node, calculation });
+        }}
+        tree={(node, visited) =>
+          ro2d3(
+            [
+              [{ value: 'C4', duration: 3 }, 'D4'],
+              ['E4', { value: 'D4', duration: 2 }, 'B3'],
+            ],
+            (rhythm, path) => {
+              const isRoot = !path.length;
+              let color = 'darkgray';
+              const strPath = (p) => p?.map((s) => s.join('/')).join(' ') || '';
+              const isParent = strPath(node?.path).startsWith(strPath(path));
+              const isSelected = haveSameIndices(node?.path, path);
+              const isVisited = visited.find((v) => haveSameIndices(v.path, path));
+              if (isVisited) {
+                color = 'lightgray';
+              }
+              if (isSelected || (isParent && !isRoot)) {
+                color = 'red';
+              }
+              return {
+                ...toRhythmObject(rhythm),
+                color,
+                name: path.length ? `${path[path.length - 1][0]}/${path[path.length - 1][1]}` : '1',
+                path: [...path],
+              };
+            }
+          )
+        }
+        hideJson={true}
+      />
+      {state.calculation}
+    </>
+  )}
+</State>
+
+### Flat representation
+
+Using the calculated values above, we get this flat representation:
+
+```json
+[
+  ["C4", 0, 3],
+  ["D4", 3, 1],
+  ["E4", 4, 1],
+  ["D4", 5, 2],
+  ["B3", 7, 1]
+]
+```
+
+Nice! Now chewed through all the theory that is needed to calculate any rhythm.
+
+## Implementation
+
+Let's transfer the above ideas into code. In general, we need to
+
+1. Visit every node of the tree
+2. Calculate time and duration of every node
+
+### 1. Visiting every node of a tree
+
+This function visits every tree node, while being agnostic about the tree object structure:
 
 ```js
+export function visitTree(tree, before, after, getChildren, index?, siblings?) {
+  before(tree, index, siblings);
+  getChildren(tree)?.forEach((child, i, a) => visitTree(child, before, after, getChildren, i, a));
+  after(tree, index, siblings);
+}
+```
+
+- The before and after callbacks fire before and after the children of the node have been visited
+- Using the getChildren function, we can stay agnostic about the tree structure. This is inspired by [d3-hierarchy](https://github.com/d3/d3-hierarchy#hierarchy).
+
+We can now use this function to collect our paths:
+
+```js
+// TODO: add variable durations
 function leafPaths(hierarchy) {
   const path = [];
   const paths = [];
@@ -475,10 +768,6 @@ expect(
     [[1, 2], [2, 3], [1, 2], [2, 3]]
   ]`); // stringified to keep format (code format makes too much lines..)
 ```
-
-## TODO calculate flat events with visitTree
-
-...
 
 ## Editing Nodes
 
