@@ -122,16 +122,13 @@ export function RealSongs({ url, onChange }) {
   );
 }
 
+export function getPlaylist(url) {
+  return url ? iRealReader(decodeURI(url)) : { songs: [] };
+}
+
 export function RealPlaylist({ url, onChange }) {
   const [playlist, setPlaylist] = useState<any>(getPlaylist(url));
   const [songIndex, setSongIndex] = useState(0);
-  function getPlaylist(url) {
-    const list = url ? iRealReader(decodeURI(url)) : { songs: [] };
-    if (onChange) {
-      onChange(list);
-    }
-    return list;
-  }
   return (
     <>
       <TextField
@@ -140,7 +137,13 @@ export function RealPlaylist({ url, onChange }) {
         value={url}
         variant="filled"
         style={{ width: '100%' }}
-        onChange={(e) => setPlaylist(getPlaylist(e.target.value))}
+        onChange={(e) => {
+          const list = getPlaylist(e.target.value);
+          if (onChange) {
+            onChange(list);
+          }
+          setPlaylist(list);
+        }}
       />
       {playlist?.songs?.length && (
         <>
