@@ -2,6 +2,7 @@
 title: Chord Scales
 date: 2021-04-11
 image: ./img/chord-scales-scrot.png
+keywords: ['music theory', 'algorithms']
 ---
 
 import { BlockMath, InlineMath } from 'react-katex';
@@ -985,17 +986,33 @@ If we compare the finished graph above with a graph that includes every possible
 
 Using the result of the algorithm, here is a colored version of the sheet:
 
-<SheetGrid
-  rows={[1]}
-  measures={[
-    ['CmM7', 'CmM7', 'Gm7', 'C7'],
-    ['F^7', 'F^7', 'Fm7', 'Bb7'],
-    ['Eb^7', ['Ebm7', 'Ab7'], 'Db^7', ['Dm7b5', 'G7b9']],
-  ]}
-  rawText={true}
-  noColors={false}
-  innerBorders={false}
-/>
+<State initial={{ showScales: false }}>
+  {({ state, setState }) => (
+    <>
+      <label>
+        chords
+        <Switch
+          checked={state.showScales}
+          color="default"
+          onChange={(e) => setState({ showScales: e.target.checked })}
+        />
+        scales
+      </label>
+      <SheetGrid
+        rows={[1]}
+        showScales={state.showScales}
+        measures={[
+          ['CmM7', 'CmM7', 'Gm7', 'C7'],
+          ['F^7', 'F^7', 'Fm7', 'Bb7'],
+          ['Eb^7', ['Ebm7', 'Ab7'], 'Db^7', ['Dm7b5', 'G7b9']],
+        ]}
+        rawText={true}
+        noColors={false}
+        innerBorders={false}
+      />
+    </>
+  )}
+</State>
 <br />
 
 Problem: A set of changes is mostly played in a loop, but the result has a break between the end and the beginning.
@@ -1024,21 +1041,39 @@ Possible Solution: We could put the sheet 3 times in sequence:
 
 ... and cut out the middle:
 
-<SheetGrid
-  rows={[1]}
-  measures={[
-    ['CmM7', 'CmM7', 'Gm7', 'C7'],
-    ['F^7', 'F^7', 'Fm7', 'Bb7'],
-    ['Eb^7', ['Ebm7', 'Ab7'], 'Db^7', ['Dm7b5', 'G7b9']],
-  ]}
-  rawText={true}
-  noColors={false}
-  innerBorders={false}
-  loop={true}
-/>
+<State initial={{ showScales: false }}>
+  {({ state, setState }) => (
+    <>
+      <label>
+        chords
+        <Switch
+          checked={state.showScales}
+          color="default"
+          onChange={(e) => setState({ showScales: e.target.checked })}
+        />
+        scales
+      </label>
+      <SheetGrid
+        rows={[1]}
+        showScales={state.showScales}
+        measures={[
+          ['CmM7', 'CmM7', 'Gm7', 'C7'],
+          ['F^7', 'F^7', 'Fm7', 'Bb7'],
+          ['Eb^7', ['Ebm7', 'Ab7'], 'Db^7', ['Dm7b5', 'G7b9']],
+        ]}
+        rawText={true}
+        noColors={false}
+        innerBorders={false}
+        loop={true}
+      />
+    </>
+  )}
+</State>
 <br />
 
 With this, we have a loopable version of the chord scales.. Of course, in practice, we can decide when to switch colors.
+
+Note: The ends of some scales might not fit in the cells. You can hover over a cell to see the full name.
 
 ### All The Things You Are
 
@@ -1110,23 +1145,39 @@ full graph:
 
 And finally, this is how the colored version of this sheet looks like:
 
-<SheetGrid
-  rows={[1]}
-  measures={[
-    ['Fm7', 'Bbm7', 'Eb7', 'Ab^7'],
-    ['Db^7', ['Dm7', 'G7'], 'C^7', 'C^7'],
-    ['Cm7', 'Fm7', 'Bb7', 'Eb^7'],
-    ['Ab^7', ['Am7', 'D7'], 'G^7', 'G^7'],
-    ['Am7', 'D7', 'G^7', 'G^7'],
-    ['F#m7b5', 'B7b9', 'E^7', 'C7b13'],
-    ['Fm7', 'Bbm7', 'Eb7', 'Ab^7'],
-    ['Db^7', 'DbmM7', 'Cm7', 'Bo7'],
-    ['Bbm7', 'Eb7', 'Ab^7', ['Gm7b5', 'C7b9']],
-  ]}
-  rawText={true}
-  noColors={false}
-  innerBorders={false}
-/>
+<State initial={{ showScales: false }}>
+  {({ state, setState }) => (
+    <>
+      <label>
+        chords
+        <Switch
+          checked={state.showScales}
+          color="default"
+          onChange={(e) => setState({ showScales: e.target.checked })}
+        />
+        scales
+      </label>
+      <SheetGrid
+        rows={[1]}
+        showScales={state.showScales}
+        measures={[
+          ['Fm7', 'Bbm7', 'Eb7', 'Ab^7'],
+          ['Db^7', ['Dm7', 'G7'], 'C^7', 'C^7'],
+          ['Cm7', 'Fm7', 'Bb7', 'Eb^7'],
+          ['Ab^7', ['Am7', 'D7'], 'G^7', 'G^7'],
+          ['Am7', 'D7', 'G^7', 'G^7'],
+          ['F#m7b5', 'B7b9', 'E^7', 'C7b13'],
+          ['Fm7', 'Bbm7', 'Eb7', 'Ab^7'],
+          ['Db^7', 'DbmM7', 'Cm7', 'Bo7'],
+          ['Bbm7', 'Eb7', 'Ab^7', ['Gm7b5', 'C7b9']],
+        ]}
+        rawText={true}
+        noColors={false}
+        innerBorders={false}
+      />
+    </>
+  )}
+</State>
 <br />
 
 Looking at the Cm7 chord we talked about at the beginning of this post, we see that it is correctly
