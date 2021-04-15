@@ -10,7 +10,7 @@ export const boxStyle = { border: '1px solid #444', padding: '1px' };
 export default function NestedGrid(props: any) {
   const { cells, outerBorders, innerBorders, rows } = props;
   if (!Array.isArray(cells)) {
-    return <div style={{ ...(innerBorders ? boxStyle : {}), whiteSpace: 'nowrap' }}>{cells}</div>;
+    return <div style={{ ...(innerBorders ? boxStyle : {}), whiteSpace: 'nowrap', overflow: 'hidden' }}>{cells}</div>;
   }
   return (
     <div style={{ ...(outerBorders ? boxStyle : {}), ...gridStyle(rows || cells.map(() => 1)) }}>

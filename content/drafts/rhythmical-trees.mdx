@@ -1,6 +1,7 @@
 ---
 title: Rhythmical Trees
 date: 2021-04-14
+keywords: ['rhythmical', 'draft']
 ---
 
 import { Chord } from '@tonaljs/tonal';
@@ -581,7 +582,7 @@ Instead, we can use the duration as the numerator and the sum of all durations f
 
 ### Calculating Time With Variable Durations
 
-To know calculate the time fraction, we need to sum all durations that came before:
+To know calculate the time fraction, our numerator must be the sum of all durations that came before the node in question:
 
 <State initial={{ node: null }}>
   {({ state, setState }) => (
@@ -682,6 +683,15 @@ Using the calculated values above, we get this flat representation:
 ```
 
 Nice! Now chewed through all the theory that is needed to calculate any rhythm.
+
+## Tree Mutation
+
+So far, we were walking over each tree node to calculate some value.
+If we were able to not just walk, but modify nodes as we go, we could do more.
+
+### Growing Chords
+
+There are more musical things we can do with trees! For example, we can
 
 ## Implementation
 

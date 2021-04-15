@@ -28,7 +28,7 @@ export function r2d3<T>(rhythm: RhythmNode<T>, mapFn?) {
   );
 }
 
-// r2d3 = rhythm to d3 => map rhythmical object to d3-hierarchy format
+// r2d3 = rhythm to d3 => map rhythmical object to d3-hierarchy format : WITH DURATION
 export function ro2d3<T>(rhythm: RhythmNode<T>, mapFn?) {
   let path = [];
   return editTree<RhythmNode<T>>(

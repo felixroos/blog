@@ -7,7 +7,7 @@ import scaleColor from '../sets/scaleColor';
 import ChordSymbol from './ChordSymbol';
 import scaleModes from '../sets/scaleModes';
 
-export default function SheetGrid({ measures, rows, rawText, noColors, innerBorders, loop }) {
+export default function SheetGrid({ measures, rows, rawText, noColors, innerBorders, loop, showScales }) {
   const scales = !noColors
     ? bestChordScales(flatten(measures), scaleModes('major', 'harmonic minor', 'melodic minor'), loop)
     : [];
@@ -17,10 +17,11 @@ export default function SheetGrid({ measures, rows, rawText, noColors, innerBord
       return node;
     }
     const backgroundColor = !noColors && scales ? scaleColor(scales[i]) : 'white';
+    const label = showScales ? scales[i] : node;
     ++i;
     return (
-      <div style={{ backgroundColor, width: '100%', height: '100%' }}>
-        {rawText ? node : <ChordSymbol chord={node} fontSize={'20px'} />}
+      <div style={{ backgroundColor, width: '100%', height: '100%' }} title={label}>
+        {rawText ? label : <ChordSymbol chord={node} fontSize={'20px'} />}
       </div>
     );
   });

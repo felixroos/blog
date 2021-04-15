@@ -1,6 +1,7 @@
 ---
 title: Rhythmical Ties
 date: 2020-07-10
+keywords: ['rhythmical']
 ---
 
 import { tieReducer } from '../components/rhythmical/reducers.ts';
@@ -21,8 +22,8 @@ In modern music, ties across barlines are a common way of adding interest to a m
       { key: 'eb4', duration: 8 },
       { key: 'e4', duration: 8 },
       { key: 'f4', duration: 8 },
-      { key: 'f4', duration: '2', tie: true } //TBD: implement this for rhythmicalScore
-    ]
+      { key: 'f4', duration: '2', tie: true }, //TBD: implement this for rhythmicalScore
+    ],
   ]}
 />
 
@@ -41,7 +42,7 @@ If we render the above events:
 ```js
 renderRhythmObject({
   duration: 8,
-  sequential: [['d4', 'eb4', 'e4', 'f4'], '_']
+  sequential: [['d4', 'eb4', 'e4', 'f4'], '_'],
 });
 ```
 
@@ -88,9 +89,7 @@ const tieReducer = (filter) => (events, event, index, array) => {
   }
   // check if next event is a tie
   if (index + 1 < array.length && array[index + 1].value === '_') {
-    return events.concat([
-      { ...event, duration: event.duration + array[index + 1].duration }
-    ]); // adds duration of next event to current
+    return events.concat([{ ...event, duration: event.duration + array[index + 1].duration }]); // adds duration of next event to current
   }
   if (event.value === '_') {
     return events; // ignore tie
@@ -100,7 +99,7 @@ const tieReducer = (filter) => (events, event, index, array) => {
 // to apply the reducer, we use it with reduce on the rendered events:
 renderRhythmObject({
   duration: 8,
-  sequential: [['d4', 'eb4', 'e4', 'f4'], '_']
+  sequential: [['d4', 'eb4', 'e4', 'f4'], '_'],
 }).reduce(tieReducer(), []);
 ```
 
@@ -138,7 +137,7 @@ These events are now suitable for playback:
   fold={true}
   events={renderRhythmObject({
     duration: 2,
-    sequential: [['d4', 'eb4', 'e4', 'f4'], '_']
+    sequential: [['d4', 'eb4', 'e4', 'f4'], '_'],
   }).reduce(tieReducer(), [])}
 />
 
@@ -183,18 +182,10 @@ export function rhythmicalScore(rhythm: NestedRhythm<string>) {
 
 Now the tie symbol works in the score:
 
-<Score
-  width={600}
-  height={100}
-  staves={rhythmicalScore([[['d4', 'eb4', 'e4', 'f4'], '_']])}
-/>
+<Score width={600} height={100} staves={rhythmicalScore([[['d4', 'eb4', 'e4', 'f4'], '_']])} />
 
 ```js
-<Score
-  width={600}
-  height={100}
-  staves={rhythmicalScore([[['d4', 'eb4', 'e4', 'f4'], '_']])}
-/>
+<Score width={600} height={100} staves={rhythmicalScore([[['d4', 'eb4', 'e4', 'f4'], '_']])} />
 ```
 
 ## sandman
@@ -227,24 +218,24 @@ Now here's a more sophisticated (non swung) example:
         ['r', 'r'],
         ['r', 'r'],
         ['r', 'r'],
-        ['r', 'r']
+        ['r', 'r'],
       ],
       [
         [
           ['r', { value: 'e5', duration: 3 }],
-          ['_', [{ value: 'e5', duration: 3 }, 'r']]
+          ['_', [{ value: 'e5', duration: 3 }, 'r']],
         ],
         [
           ['r', { value: 'f5', duration: 3 }],
-          ['_', 'r']
+          ['_', 'r'],
         ],
         [
           ['r', { value: 'e5', duration: 3 }],
-          ['_', [{ value: 'e5', duration: 3 }, 'r']]
+          ['_', [{ value: 'e5', duration: 3 }, 'r']],
         ],
         [
           ['r', { value: 'f5', duration: 3 }],
-          ['_', 'r']
+          ['_', 'r'],
         ],
         'r',
         'r',
@@ -261,23 +252,23 @@ Now here's a more sophisticated (non swung) example:
         'r',
         'r',
         'r',
-        'r'
+        'r',
       ],
       [
         [
           ['r', 'g5'],
           [
             ['_', 'g5'],
-            [{ value: '_', duration: 3 }, 'r']
-          ]
+            [{ value: '_', duration: 3 }, 'r'],
+          ],
         ],
         [['r', 'a5'], 'r'],
         [
           ['r', 'g5'],
           [
             ['_', 'g5'],
-            [{ value: '_', duration: 3 }, 'r']
-          ]
+            [{ value: '_', duration: 3 }, 'r'],
+          ],
         ],
         [['r', 'a5'], 'r'],
         'r',
@@ -295,77 +286,74 @@ Now here's a more sophisticated (non swung) example:
         'r',
         'r',
         'r',
-        'r'
+        'r',
       ],
       {
         sequential: [
           [
             ['r', 'r', 'r', 'b5'],
-            ['a5', 'r', 'r', 'r']
+            ['a5', 'r', 'r', 'r'],
           ],
           [
             ['r', 'r', 'r', 'c6'],
-            ['b5', 'r']
+            ['b5', 'r'],
           ],
           [
             ['r', 'r', 'r', 'b5'],
-            ['a5', 'r', 'r', 'r']
+            ['a5', 'r', 'r', 'r'],
           ],
           [
             ['r', 'r', 'r', 'c6'],
-            ['b5', ['g5', 'a5']]
+            ['b5', ['g5', 'a5']],
           ],
           [['b5', { value: 'a5', duration: 3 }], ['_']],
           [['b5', 'b5', 'f#5', 'b5'], ['_']],
           [
             ['r', 'c6', 'c6', 'b5'],
-            ['c6', { value: 'c6', duration: 2 }, 'b5']
+            ['c6', { value: 'c6', duration: 2 }, 'b5'],
           ],
           [['f5', 'f5', 'e5', 'f5'], ['_']],
           [
             ['r', 'b5', 'b5', 'a5'],
-            ['b5', { value: 'r', duration: 2 }, 'a5']
+            ['b5', { value: 'r', duration: 2 }, 'a5'],
           ],
           [
             ['e5', 'e5', 'd5', 'e5'],
-            ['_', { value: 'g5', duration: 3 }]
+            ['_', { value: 'g5', duration: 3 }],
           ],
           [
             ['r', 'd6', 'd6', 'c6'],
-            ['d6', 'c6', 'd6', 'c6']
+            ['d6', 'c6', 'd6', 'c6'],
           ],
           [
             ['eb6', 'eb6'],
-            ['e6', { value: 'd6', duration: 3 }]
+            ['e6', { value: 'd6', duration: 3 }],
           ], // repeat
           [['b5', { value: 'a5', duration: 3 }], ['_']],
           [['b5', 'b5', 'a5', 'b5'], ['_']],
           [
             ['r', 'c6', 'c6', 'b5'],
-            ['c6', { value: 'c6', duration: 2 }, 'b5']
+            ['c6', { value: 'c6', duration: 2 }, 'b5'],
           ],
           [['f5', ['e5', 'f5']], ['_']],
           [
             ['d5', ['f5', 'a5']],
-            ['_', 'd6', 'd6', 'c6']
+            ['_', 'd6', 'd6', 'c6'],
           ],
           [['d6'], ['r', ['c6', 'd6']]],
           [
             ['e6', 'e6'],
-            ['e6', 'c6', 'e6', 'c6']
+            ['e6', 'c6', 'e6', 'c6'],
           ],
-          [['_'], ['r', 'g4', 'a4', 'b4']]
-        ]
-      }
-    ]
+          [['_'], ['r', 'g4', 'a4', 'b4']],
+        ],
+      },
+    ],
   })
     .reduce(tieReducer(), [])
     .map((event) => ({
       ...event,
-      value:
-        event.value !== 'r'
-          ? Note.transpose(event.value, Interval.fromSemitones(-15))
-          : 'r'
+      value: event.value !== 'r' ? Note.transpose(event.value, Interval.fromSemitones(-15)) : 'r',
     }))}
 />
 

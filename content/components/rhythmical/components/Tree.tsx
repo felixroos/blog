@@ -3,8 +3,10 @@ import { select } from 'd3-selection';
 import { cluster, hierarchy, tree } from 'd3-hierarchy';
 import { NestedArray } from '../helpers/arrays';
 
+// todo: use https://github.com/klortho/d3-flextree + rects width variable width to show duration
+
 export default function Tree(props) {
-  let { width = 400, height = 300, data, onClick, selected, theme, nodeRadius, dx, dy } = props;
+  let { width = 420, height = 300, data, onClick, selected, theme, nodeRadius, dx, dy } = props;
   const h = hierarchy(data);
   //const root = cluster().nodeSize([dx || 40, dy || height / (h.height + 1)])(h);
   const root = tree().nodeSize([dx || 40, dy || height / (h.height + 1)])(h);

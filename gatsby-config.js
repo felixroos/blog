@@ -38,31 +38,32 @@ module.exports = {
         // browser address bar as well.
         // This is to prevent ref tracking ending up in your users bookmarks.
         // All parameters other than `ref` and all `utm_` will stay intact
-        urlCleanup: false
-      }
+        urlCleanup: false,
+      },
     },
     {
       resolve: `gatsby-theme-notes`,
       options: {
         // basePath defaults to `/`
-        basePath: `/notes`
-      }
+        basePath: `/notes`,
+      },
     },
     {
       resolve: `gatsby-theme-blog`,
       options: {
-        mdxOtherwiseConfigured: false
-      }
+        mdxOtherwiseConfigured: false,
+        // filter: {keywords: {nin: "draft"}},
+      },
     },
     {
       resolve: `gatsby-plugin-typescript`,
       options: {
         isTSX: true, // defaults to false
         //jsxPragma: `jsx`, // defaults to "React"
-        allExtensions: true // defaults to false
-      }
+        allExtensions: true, // defaults to false
+      },
     },
-    { resolve: 'gatsby-theme-material-ui' }
+    { resolve: 'gatsby-theme-material-ui' },
   ],
   // Customize your site metadata:
   siteMetadata: {
@@ -72,8 +73,8 @@ module.exports = {
     social: [
       {
         name: `github`,
-        url: `https://github.com/felixroos`
-      }
-    ]
-  }
+        url: `https://github.com/felixroos`,
+      },
+    ],
+  },
 };

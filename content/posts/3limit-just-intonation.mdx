@@ -1,24 +1,20 @@
 ---
 title: 3 Limit Just Intonation
 date: 2020-04-26
+keywords: ['tuning', 'music theory']
 ---
 
-import ConnectedCircle from "../components/common/ConnectedCircle.tsx"
-import TuningCircle from "../components/tuning/TuningCircle.tsx"
-import Monochord from "../components/tuning/Monochord.tsx"
-import { InlineMath, BlockMath } from "react-katex"
-import { State } from "react-powerplug"
-import Slider from "@material-ui/core/Slider"
-import Select from "@material-ui/core/Select"
-import Fraction from "fraction.js"
-import canUseDOM from "../components/canUseDOM.ts"
-import {
-  cents,
-  generate,
-  frequencyColor,
-  pythagoreanComma,
-} from "../components/tuning/tuning.ts"
-import * as Tone from "tone"
+import ConnectedCircle from '../components/common/ConnectedCircle.tsx';
+import TuningCircle from '../components/tuning/TuningCircle.tsx';
+import Monochord from '../components/tuning/Monochord.tsx';
+import { InlineMath, BlockMath } from 'react-katex';
+import { State } from 'react-powerplug';
+import Slider from '@material-ui/core/Slider';
+import Select from '@material-ui/core/Select';
+import Fraction from 'fraction.js';
+import canUseDOM from '../components/canUseDOM.ts';
+import { cents, generate, frequencyColor, pythagoreanComma } from '../components/tuning/tuning.ts';
+import * as Tone from 'tone';
 import { harp } from '../components/common/harp.ts';
 
 After building a foundation of understanding pure intervals in the last post, we will now look at different ways of building tuning systems with them.
@@ -77,12 +73,11 @@ The above simplification aimed to pave the way for a more abstract understanding
 This is where N-Limit Tuning comes in. N-Limit Tuning generates ratios by multiplying powers of natural numbers up to N.
 
 <p>
-  For example, 3 Limit ratios can be calculated with:{" "}
-  <InlineMath>{"R_{3} = 2^{a} * 3^{b}"}</InlineMath>
+  For example, 3 Limit ratios can be calculated with: <InlineMath>{'R_{3} = 2^{a} * 3^{b}'}</InlineMath>
 </p>
 
 <p>
-  And 5 Limit ratios: <InlineMath>{"R_{5} = 2^{a} * 3^{b} * 5^{c}"}</InlineMath>
+  And 5 Limit ratios: <InlineMath>{'R_{5} = 2^{a} * 3^{b} * 5^{c}'}</InlineMath>
 </p>
 
 **What about the 4?**
@@ -106,13 +101,13 @@ Enough of the theoretical blabla, let's make some "music":
 <State initial={{ power: 0 }}>
   {({ state, setState }) => {
     function calculate(power) {
-      const factor = Math.pow(3, power)
-      const exp = Math.ceil(Math.log(1 / factor) / Math.log(2))
-      const value = Math.pow(2, exp) * factor
-      const [top, bottom] = new Fraction(value).toFraction().split("/")
-      return { factor, exp, value, top, bottom }
+      const factor = Math.pow(3, power);
+      const exp = Math.ceil(Math.log(1 / factor) / Math.log(2));
+      const value = Math.pow(2, exp) * factor;
+      const [top, bottom] = new Fraction(value).toFraction().split('/');
+      return { factor, exp, value, top, bottom };
     }
-    const { factor, exp, value, top, bottom } = calculate(state.power)
+    const { factor, exp, value, top, bottom } = calculate(state.power);
     return (
       <div>
         <InlineMath>{`b = ${state.power}`}</InlineMath>
@@ -126,26 +121,22 @@ Enough of the theoretical blabla, let's make some "music":
           onMouseDown={() => harp.triggerAttackRelease(value * 440, 1)}
           onChange={(e, v) => {
             if (v !== state.power) {
-              const { value } = calculate(v)
-              harp.triggerAttackRelease(value * 440, 1)
-              setState({ power: v })
+              const { value } = calculate(v);
+              harp.triggerAttackRelease(value * 440, 1);
+              setState({ power: v });
             }
           }}
-        />{" "}
+        />{' '}
         <br />
-        <InlineMath>{`R_f = 2^{a} * 3^{b} = 2^{${exp}} * 3^{${
-          state.power
-        }} = \\frac{${top}}{${bottom || 1}}`}</InlineMath>
+        <InlineMath>{`R_f = 2^{a} * 3^{b} = 2^{${exp}} * 3^{${state.power}} = \\frac{${top}}{${bottom || 1}}`}</InlineMath>
         <br />
-        <InlineMath>{`a = \\lceil\\log_2 3^{-b}\\rceil = \\lceil\\log_2 {3^{${
-          state.power * -1
-        }}}\\rceil = ${exp}`}</InlineMath>
+        <InlineMath>{`a = \\lceil\\log_2 3^{-b}\\rceil = \\lceil\\log_2 {3^{${state.power * -1}}}\\rceil = ${exp}`}</InlineMath>
         <br />
         <br />
         <Monochord value={1 / value} amplitude={1} invert={false} base={440} />
         <InlineMath>{`R_l = \\frac{1}{R_f} = \\frac{${bottom || 1}}{${top}}`}</InlineMath>
       </div>
-    )
+    );
   }}
 </State>
 
@@ -169,24 +160,24 @@ Now we can generate a whole tuning system, by picking a range of ratios. We can 
   }}
 >
   {({ state, setState }) => {
-    const [from, to] = [state.rotate, state.rotate + state.pitches - 1]
-    const ratios = generate(3, state.pitches + state.rotate, state.pitches, 2)
-    const range = [-28, 28]
-    const base = 440
-    const selectedPreset = state.preset >= 0 ? state.preset : undefined
+    const [from, to] = [state.rotate, state.rotate + state.pitches - 1];
+    const ratios = generate(3, state.pitches + state.rotate, state.pitches, 2);
+    const range = [-28, 28];
+    const base = 440;
+    const selectedPreset = state.preset >= 0 ? state.preset : undefined;
     const presets = [
-      [0, 5, "Major Pentatonic"],
-      [-3, 5, "Minor Pentatonic"],
-      [0, 7, "Lydian"],
-      [-1, 7, "Ionian"],
-      [-2, 7, "Mixolydian"],
-      [-3, 7, "Dorian"],
-      [-4, 7, "Aeolian"],
-      [-5, 7, "Phrygian"],
-      [-6, 7, "Locrian"],
-      [-5, 12, "12 Notes centered"],
-      [-26, 53, "53 Notes centered"],
-    ]
+      [0, 5, 'Major Pentatonic'],
+      [-3, 5, 'Minor Pentatonic'],
+      [0, 7, 'Lydian'],
+      [-1, 7, 'Ionian'],
+      [-2, 7, 'Mixolydian'],
+      [-3, 7, 'Dorian'],
+      [-4, 7, 'Aeolian'],
+      [-5, 7, 'Phrygian'],
+      [-6, 7, 'Locrian'],
+      [-5, 12, '12 Notes centered'],
+      [-26, 53, '53 Notes centered'],
+    ];
     return (
       <div>
         <InlineMath>{`3^{${from}} - 3^{${to}}`}</InlineMath>
@@ -205,7 +196,7 @@ Now we can generate a whole tuning system, by picking a range of ratios. We can 
           links={[]}
           onClick={({ node }) => {
             if (node) {
-              harp.triggerAttackRelease(node.ratio * base, 1)
+              harp.triggerAttackRelease(node.ratio * base, 1);
             }
           }}
         />
@@ -214,8 +205,8 @@ Now we can generate a whole tuning system, by picking a range of ratios. We can 
         <select
           value={selectedPreset}
           onChange={(e) => {
-            const [rotate, pitches] = presets[e.target.value]
-            setState({ rotate, pitches })
+            const [rotate, pitches] = presets[e.target.value];
+            setState({ rotate, pitches });
           }}
         >
           {presets.map(([rotate, pitches, title], i) => (
@@ -225,7 +216,7 @@ Now we can generate a whole tuning system, by picking a range of ratios. We can 
           ))}
         </select>
         <br />
-        {state.pitches} pitch{state.pitches !== 1 ? "es" : ""}
+        {state.pitches} pitch{state.pitches !== 1 ? 'es' : ''}
         <br />
         <Slider
           marks
@@ -236,7 +227,7 @@ Now we can generate a whole tuning system, by picking a range of ratios. We can 
           onChange={(e, v) => v !== state.pitches && setState({ pitches: v })}
         />
         <br />
-        rotate by {state.rotate} power{Math.abs(state.rotate) !== 1 ? "s" : ""}
+        rotate by {state.rotate} power{Math.abs(state.rotate) !== 1 ? 's' : ''}
         <br />
         <Slider
           marks
@@ -247,10 +238,7 @@ Now we can generate a whole tuning system, by picking a range of ratios. We can 
           onChange={(e, v) => v !== state.rotate && setState({ rotate: v })}
         />
         <h3>Tuning Table</h3>
-        <p>
-          Let's look at the underlying data of the graphic above in a so called
-          Tuning Table:
-        </p>
+        <p>Let's look at the underlying data of the graphic above in a so called Tuning Table:</p>
         {/* <label style={{float:'right'}}>
           <input type="checkbox"
             checked={state.sort}
@@ -260,43 +248,37 @@ Now we can generate a whole tuning system, by picking a range of ratios. We can 
         </label> */}
         <table>
           <tbody>
-          <tr>
-            <th>position</th>
-            <th>powers</th>
-            <th>ratio</th>
-            <th>cents</th>
-            <th>listen</th>
-          </tr>
-          {ratios.map(({ ratio, power }, i) => {
-            const factor = Math.pow(3, power)
-            const [top, bottom] = new Fraction(ratio).toFraction().split("/")
-            const exp = Math.ceil(Math.log(1 / factor) / Math.log(2))
-            return (
-              <tr key={i}>
-                <td>{i}</td>
-                <td>
-                  <InlineMath key={i}>{`3^{${power}} * 2^{${exp}}`}</InlineMath>
-                </td>
-                <td>
-                  <InlineMath key={i}>{`\\frac{${top}}{${
-                    bottom || 1
-                  }}`}</InlineMath>
-                </td>
-                <td>{Math.round(cents(ratio))}</td>
-                <td>
-                  <button
-                    onClick={() => harp.triggerAttackRelease(ratio * base, 1)}
-                  >
-                    Play
-                  </button>
-                </td>
-              </tr>
-            )
-          })}
+            <tr>
+              <th>position</th>
+              <th>powers</th>
+              <th>ratio</th>
+              <th>cents</th>
+              <th>listen</th>
+            </tr>
+            {ratios.map(({ ratio, power }, i) => {
+              const factor = Math.pow(3, power);
+              const [top, bottom] = new Fraction(ratio).toFraction().split('/');
+              const exp = Math.ceil(Math.log(1 / factor) / Math.log(2));
+              return (
+                <tr key={i}>
+                  <td>{i}</td>
+                  <td>
+                    <InlineMath key={i}>{`3^{${power}} * 2^{${exp}}`}</InlineMath>
+                  </td>
+                  <td>
+                    <InlineMath key={i}>{`\\frac{${top}}{${bottom || 1}}`}</InlineMath>
+                  </td>
+                  <td>{Math.round(cents(ratio))}</td>
+                  <td>
+                    <button onClick={() => harp.triggerAttackRelease(ratio * base, 1)}>Play</button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
-    )
+    );
   }}
 </State>
 
@@ -345,12 +327,12 @@ An easy and expressive way to solve this is using a recursive function:
 ```js
 export function clamp(ratio) {
   if (ratio > 2) {
-    return clamp(ratio / 2)
+    return clamp(ratio / 2);
   }
   if (ratio < 1) {
-    return clamp(ratio * 2)
+    return clamp(ratio * 2);
   }
-  return ratio
+  return ratio;
 }
 ```
 
