@@ -24,6 +24,7 @@ export const toTonalChordSymbol = (symbol) => {
   if (alternatives?.[symbol] && isSupported(alternatives?.[symbol])) {
     return alternatives?.[symbol];
   }
-  console.warn('unsupported symbol ', symbol)
-  return 'unsupported###' + symbol;
+  console.warn('unsupported symbol ', symbol);
+  return symbol;
+  // return 'unsupported###' + symbol;
 }

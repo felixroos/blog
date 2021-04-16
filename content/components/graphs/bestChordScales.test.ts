@@ -48,4 +48,45 @@ test('bestChordScales', () => {
       "C phrygian dominant",
     ]
   );
+
+  expect(bestChordScales(
+    // have you met miss jones
+    ["F^7", "D7", "Gm7", "C7", "Am7", "Dm7", "Gm7", "C7", "Cm7", "F7", "Bb^7", "Abm7", "Db7", "Gb^7", "Em7", "A7", "D^7", "Abm7", "Db7", "Gb^7", "Gm7", "C7", "F^7", "Bb7", "Am7", "D7", "Gm7", "C7", "Am7", "D7", "Gm7", "C7", "F6", "Gm7", "C7"]
+  )).toEqual([
+    "F major",
+    "D mixolydian b6",
+    "G dorian",
+    "C mixolydian",
+    "A phrygian",
+    "D aeolian",
+    "G dorian",
+    "C mixolydian",
+    "C dorian",
+    "F mixolydian",
+    "Bb major",
+    "Ab dorian",
+    "Db mixolydian",
+    "Gb major",
+    "E dorian",
+    "A mixolydian",
+    "D major",
+    "Ab dorian b2",
+    "Db mixolydian b6",
+    "Gb lydian #9",
+    "G dorian",
+    "C mixolydian",
+    "F major",
+    "Bb lydian dominant",
+    "A dorian b2",
+    "D mixolydian b6",
+    "G dorian",
+    "C mixolydian",
+    "A phrygian",
+    "D mixolydian b6",
+    "G dorian",
+    "C mixolydian",
+    "F major",
+    "G dorian",
+    "C mixolydian",
+  ])
 })

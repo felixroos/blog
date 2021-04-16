@@ -3,5 +3,9 @@ import { toTonalChordSymbol } from './toTonalChordSymbol';
 
 export function toTonalChord(chord) {
   const [root, symbol] = tokenizeChord(chord);
-  return root + toTonalChordSymbol(symbol);
+  if (!root) {
+    console.warn('unrecognized chord', chord)
+    return (root || '') + (chord || '');
+  }
+  return (root || '') + toTonalChordSymbol(symbol);
 }

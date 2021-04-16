@@ -21,7 +21,7 @@ const scaleTargets = (graph) => (nodeID) => {
   ])
 }
 
-export default function bestChordScales(chords, scales = scaleModes('major', 'harmonic minor', 'melodic minor'), loop?, fallbackScale = 'chromatic') {
+export default function bestChordScales(chords, scales = [...scaleModes('major'), ...scaleModes('harmonic minor', 'melodic minor')], loop?, fallbackScale = 'chromatic') {
   if (loop) {
     chords = [...chords, ...chords, ...chords];
   }

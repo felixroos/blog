@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import flatten from '../common/flatten';
 import bestChordScales from '../graphs/bestChordScales';
 import NestedGrid from '../graphs/NestedGrid';
@@ -8,9 +8,14 @@ import ChordSymbol from './ChordSymbol';
 import scaleModes from '../sets/scaleModes';
 
 export default function SheetGrid({ measures, rows, rawText, noColors, innerBorders, loop, showScales }: any) {
-  const scales = !noColors
-    ? bestChordScales(flatten(measures), scaleModes('major', 'harmonic minor', 'melodic minor'), loop)
-    : [];
+  const [scales, setScales] = useState([]);
+  useEffect(() => {
+    console.log('run bestChordScales');
+    const _scales = !noColors
+      ? bestChordScales(flatten(measures), scaleModes('major', 'harmonic minor', 'melodic minor'), loop)
+      : [];
+    setScales(_scales);
+  }, [measures]);
   let i = 0;
   const coloredCells = mapNestedArray(measures, (node) => {
     if (Array.isArray(node)) {
