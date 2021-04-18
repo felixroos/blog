@@ -11,6 +11,7 @@ import SheetGrid from '../score/SheetGrid';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import SongList from './SongList';
+import RhythmicalComposer from './RhythmicalComposer';
 
 export default function RhythmicalBrowser() {
   const [songs, setSongs] = useState<any>();
@@ -29,9 +30,11 @@ export default function RhythmicalBrowser() {
   function selectSong(song) {
     console.log('select song', song);
     const _sheet = getSheet(song);
+    const _chords = _sheet.map(({ body }: any) => body.map(toTonalChord));
+    console.log('chords', _chords);
     setSong(song);
     setSheet(_sheet);
-    setChords(_sheet.map(({ body }: any) => body.map(toTonalChord)));
+    setChords(_chords);
   }
 
   return (
@@ -58,6 +61,7 @@ export default function RhythmicalBrowser() {
                 innerBorders={false}
               />
             )}
+            {chords && <RhythmicalComposer chords={chords} />}
           </>
         )}
         {songList}

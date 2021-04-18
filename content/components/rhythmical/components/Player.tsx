@@ -81,8 +81,12 @@ export function drawCallback(callback, grain = 1 / 30) {
 }
 
 export default function Player(props) {
+  const { hidePianoRoll } = props;
   const [time, setTime] = useState(0);
   // TBD with more complex tunes (swimming), calling setTime each frame will lead to hiccups after a certain time
+  if (hidePianoRoll) {
+    return <PlayButton {...props} draw={setTime} />;
+  }
   return (
     <>
       <PianoRoll {...props} time={time} />

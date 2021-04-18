@@ -1,7 +1,7 @@
 import { Note } from '@tonaljs/tonal';
 import { convertRhythm } from '../tree/convertRhythm';
 import { RhythmNode, RhythmObject } from '../util';
-import { lefthand, VoicingDictionary } from './dictionary';
+import { guidetones, lefthand, VoicingDictionary } from './dictionary';
 import { getBestVoicing } from './getBestVoicing';
 
 
@@ -33,6 +33,7 @@ export function generateVoicings(
 export const voicingFactory = (dictionary, range = ['D3', 'A4'], sorter = topNoteDiff) => (tree) => generateVoicings(tree, dictionary, range, sorter);
 
 export const lefthandVoicings = voicingFactory(lefthand);
+export const guideToneVoicings = voicingFactory(guidetones);
 
 
 // NEW SHIT
