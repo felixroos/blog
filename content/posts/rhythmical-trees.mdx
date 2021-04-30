@@ -1,6 +1,6 @@
 ---
 title: Rhythmical Trees
-date: 2021-04-14
+date: 2021-04-30
 keywords: ['rhythmical', 'draft']
 ---
 
@@ -29,6 +29,7 @@ import Fraction from 'fraction.js';
 import { bolero, conventionalLabels } from '../components/rhythmical/tunes/bolero';
 import R from 'ramda';
 import NestedGrid from '../components/graphs/NestedGrid';
+import drums from '../instruments/tidal';
 
 After the posts about [Rhythmical Arrays](../rhythmical-arrays/) and [Rhythmical Objects](../rhythmical-objects),
 I want to investigate the actual data structure that is at play: trees.
@@ -111,12 +112,12 @@ export const colors = schemeTableau10;
 
 ![bolero](./img/bolero34.png)
 
-| color                      | value | type          | amount    | visual cue                  |
-| -------------------------- | ----- | ------------- | --------- | --------------------------- |
-| <Color color={colors[0]}/> | 3/4   | bar           | 2 total   | seperated by vertical lines |
-| <Color color={colors[1]}/> | 1/4   | 4ths          | 3 per bar | separated by space          |
-| <Color color={colors[2]}/> | 1/8   | 8ths          | 2 per 4th | connected by first beam     |
-| <Color color={colors[3]}/> | 1/24  | 16th triplets | 3 per 8th | connected by second beam    |
+| color                      | value | type          | amount    | visual cue                  | sound     |
+| -------------------------- | ----- | ------------- | --------- | --------------------------- | --------- |
+| <Color color={colors[0]}/> | 3/4   | bar           | 2 total   | seperated by vertical lines | high tom  |
+| <Color color={colors[1]}/> | 1/4   | 4ths          | 3 per bar | separated by space          | bass drum |
+| <Color color={colors[2]}/> | 1/8   | 8ths          | 2 per 4th | connected by first beam     | hi hat    |
+| <Color color={colors[3]}/> | 1/24  | 16th triplets | 3 per 8th | connected by second beam    | snare     |
 
 <!--
 <NestedGrid
@@ -140,6 +141,68 @@ export const colors = schemeTableau10;
   ]}
 /> -->
 
+- The tree essentially contains the same information as the score, though using less visual encoding (taking more space).
+- Each group represents different subdivisions of time
+- Each member of a group (color) takes the same amount of time!
+- Each fraction is the duration of the member, relative to the length of 4/4
+
+## Aural: Hearing the Layers of Rhythm
+
+As we are talking about music, let's make the tree layers audible:
+
+export const _8 = ['hh', 'hh', 'hh'];
+export const _4 = [_8, _8];
+export const _1 = [_4, _4, _4];
+export const _b = [_1, _1];
+console.log(_b);
+
+<Player
+  instruments={{ drums }}
+  hierarchy={true}
+  height={25}
+  fold={false}
+  center={0}
+  events={renderRhythm(
+    colorize(
+      {
+        duration: 6,
+        parallel: [
+          _b,
+          [
+            [
+              ['ht', 'ht'],
+              ['ht', 'ht'],
+              ['ht', 'ht'],
+            ],
+            [
+              ['ht', 'ht'],
+              ['ht', 'ht'],
+              ['ht', 'ht'],
+            ],
+          ],
+          [
+            ['mt', 'mt', 'mt'],
+            ['mt', 'mt', 'mt'],
+          ],
+          ['lt', 'lt'],
+        ],
+      },
+      ['black', ...colors]
+    )
+  )}
+/>
+
+Using the same color coding as above, we now use a different sound for each layer of the tree:
+
+| color                      | value | sound      |
+| -------------------------- | ----- | ---------- |
+| <Color color={colors[0]}/> | 3/4   | hi hat     |
+| <Color color={colors[1]}/> | 1/4   | high tom   |
+| <Color color={colors[2]}/> | 1/8   | middle tom |
+| <Color color={colors[3]}/> | 1/24  | low tom    |
+
+The actual bolero rhythm just switches between different layers:
+
 <Player
   instruments={{ drums }}
   hierarchy={true}
@@ -148,11 +211,6 @@ export const colors = schemeTableau10;
   center={0}
   events={renderRhythm(colorize({ duration: 6, sequential: bolero }, colors))}
 />
-
-- The tree essentially contains the same information as the score, though using less visual encoding (taking more space).
-- Each group represents different subdivisions of time
-- Each member of a group (color) takes the same amount of time!
-- Each fraction is the duration of the member, relative to the length of 4/4
 
 ## Textual: Nested vs Flat
 
@@ -181,6 +239,51 @@ As JSON, this is the most compact and readable version I can think of:
 
 The nesting of the braces directly resembles the structure of the notes.
 To understand more about this syntax, check out my post about [Rhythmical Arrays](../rhythmical-arrays).
+
+We could also just ignore the outer two levels:
+
+```json
+[
+  "sn",
+  ["sn", "sn", "sn"],
+  "sn",
+  ["sn", "sn", "sn"],
+  "sn",
+  "sn",
+  "sn",
+  ["sn", "sn", "sn"],
+  "sn",
+  ["sn", "sn", "sn"],
+  ["sn", "sn", "sn"],
+  ["sn", "sn", "sn"]
+]
+```
+
+This piece of text also represents the bolero rhyhtm. It might not be as readable, but it still works..
+It depends on the use case, which representation should be chosen.
+
+<!--
+<Player
+  instruments={{ drums }}
+  hierarchy={true}
+  height={25}
+  fold={true}
+  center={0}
+  events={renderRhythm(colorize({ duration: 6, sequential: [
+  "sn",
+  ["sn", "sn", "sn"],
+  "sn",
+  ["sn", "sn", "sn"],
+  "sn",
+  "sn",
+  "sn",
+  ["sn", "sn", "sn"],
+  "sn",
+  ["sn", "sn", "sn"],
+  ["sn", "sn", "sn"],
+  ["sn", "sn", "sn"]
+] }, colors))}
+/> -->
 
 ### Flat
 
@@ -298,7 +401,7 @@ export const parentTree = (node, visited) => {
     return {
       ...toRhythmObject(rhythm),
       color,
-      name: parent ? path[path.length - 1].join('/') : '1/1',
+      name: parent ? path[path.length - 1].join('/') : '/',
       path: [...path],
     };
   });
@@ -378,11 +481,11 @@ export const parentTree = (node, visited) => {
 
 - If we divide each node index by the total number of children (also called branching factor), we get a fraction that represents the duration of each node in its group.
 - By multiplying that fraction with all the fractions of the node's parents, we get the relative duration fraction.
-- We can calculate the absolute duration by multiplying that relative duration by the total length of everything:
+- We can calculate the absolute duration by multiplying that relative duration by the total length of everything
 
 ### Calculating Time
 
-To complete our mission, we need the absolute time for each node.
+To get something usable, we also need the absolute time for each node.
 The process is similar to calculating durations, with a slightly more complicated looking calculation:
 
 <State initial={{ node: null, calculation: null }}>
@@ -450,7 +553,8 @@ The process is similar to calculating durations, with a slightly more complicate
 </State>
 <br />
 
-- to calculate the relative time fraction, we need to sun the relative timse of each node in the path
+- to calculate the relative time fraction, we need to sum the relative times of each node in the path
+- the relative time of a single node is the factor of its path and its parent's relative durations
 
 ## Variable Durations
 
@@ -478,7 +582,7 @@ Take this as an example:
   ]}
 />
 
-To be able to express that as a nested array, we need a way to declare durations, for example:
+Using our current textual representation, this is impossible to express. We need a way to declare durations, for example:
 
 ```json
 [
@@ -600,12 +704,12 @@ To know calculate the time fraction, our numerator must be the sum of all durati
           const time = pairs
             .map(([a, b], i, p) =>
               i
-                ? `\\frac{${a || 1}}{${b}}*(${p
+                ? `\\frac{${a || 0}}{${b}}*(${p
                     .slice(0, i)
                     .reverse()
-                    .map(([x, y]) => `\\frac{${x}}{${y}}`)
+                    .map(([x, y]) => `\\frac{${x || 1}}{${y}}`)
                     .join('*')})`
-                : `\\frac{${a}}{${b}}`
+                : `\\frac{${a || 0}}{${b}}`
             )
             .join(' + ');
           const t = pairs
@@ -684,15 +788,6 @@ Using the calculated values above, we get this flat representation:
 
 Nice! Now chewed through all the theory that is needed to calculate any rhythm.
 
-## Tree Mutation
-
-So far, we were walking over each tree node to calculate some value.
-If we were able to not just walk, but modify nodes as we go, we could do more.
-
-### Growing Chords
-
-There are more musical things we can do with trees! For example, we can
-
 ## Implementation
 
 Let's transfer the above ideas into code. In general, we need to
@@ -702,82 +797,317 @@ Let's transfer the above ideas into code. In general, we need to
 
 ### 1. Visiting every node of a tree
 
-This function visits every tree node, while being agnostic about the tree object structure:
+#### Simple Walker
+
+This recursive generator function visits every tree node, while being agnostic about the tree structure:
 
 ```js
-export function visitTree(tree, before, after, getChildren, index?, siblings?) {
-  before(tree, index, siblings);
-  getChildren(tree)?.forEach((child, i, a) => visitTree(child, before, after, getChildren, i, a));
-  after(tree, index, siblings);
+export function* walk(getChildren, tree) {
+  yield tree;
+  const children = getChildren(tree) || [];
+  for (let i = 0; i < children.length; ++i) {
+    yield* walk(getChildren, children[i]);
+  }
 }
 ```
 
-- The before and after callbacks fire before and after the children of the node have been visited
-- Using the getChildren function, we can stay agnostic about the tree structure. This is inspired by [d3-hierarchy](https://github.com/d3/d3-hierarchy#hierarchy).
+Using the getChildren accessor function, we can stay agnostic about the tree structure. This is inspired by [d3-hierarchy](https://github.com/d3/d3-hierarchy#hierarchy).
 
-We can now use this function to collect our paths:
+Walking over a simple nested array is pretty straightforward:
 
 ```js
-// TODO: add variable durations
-function leafPaths(hierarchy) {
+const nestedWalker = (tree) => walk((node) => Array.isArray(node) && node, tree);
+const tree = ['A', ['B', 'C'], 'D'];
+
+for (let node of nestedWalker(tree)) {
+  console.log(node);
+}
+```
+
+Output:
+
+```log
+['A', ['B', 'C'], 'D']
+'A'
+['B', 'C']
+'B'
+'C'
+'D'
+```
+
+#### Walking rhythmical objects
+
+To be able to walk over a [rhythmical object](./rhythmical-objects), we just have to implement a different getChildren accessor:
+
+```js
+function getRhythmChildren(node) {
+  return Array.isArray(node) ? node : node?.parallel || node?.sequential;
+}
+const rhythmWalker = (tree) => walk(getRhythmChildren, tree);
+
+const rhythm = {
+  duration: 4,
+  sequential: [
+    [{ value: 'C3', duration: 3 }, 'D3'],
+    ['E3', { value: 'D3', duration: 2 }, 'B2'],
+  ],
+};
+
+for (let node of rhythmWalker(rhythm)) {
+  console.log(node);
+}
+```
+
+Output:
+
+```log
+{
+  duration: 4,
+  sequential: [ [ [Object], 'D3' ], [ 'E3', [Object], 'B2' ] ]
+}
+[ { value: 'C3', duration: 3 }, 'D3' ]
+{ value: 'C3', duration: 3 }
+D3
+[ 'E3', { value: 'D3', duration: 2 }, 'B2' ]
+E3
+{ value: 'D3', duration: 2 }
+B2
+```
+
+Now we are able to look at nodes one after the other. This is still too primitive to be usable.
+
+#### Exposing More Data
+
+The problem: We have no information about the current index or the siblings. So, instead of just yielding the node, let's enrich the data:
+
+```js
+export function* visit(getChildren, tree, index?, siblings?) {
+  const children = getChildren(tree) || [];
+  const isRoot = index === undefined;
+  const isLeaf = !children?.length;
+  yield { node: tree, index, siblings, children, isBefore: true, isRoot, isLeaf };
+  for (let i = 0; i < children.length; ++i) {
+    yield* visit(getChildren, children[i], i, children);
+  }
+  yield { node: tree, index, siblings, children, isBefore: false, isRoot, isLeaf };
+}
+```
+
+What's new:
+
+- the current index + siblings is fed back into the function
+- we are now yielding an object with more information on the state of the iteration
+- we are yielding again after the children have been processed, passing an isBefore flag
+
+#### Generating Index Paths
+
+Using that, we can build an index path like this:
+
+```js
+const nestedWalker = (tree) => visit((node) => Array.isArray(node) && node, tree);
+
+const tree = ['A', ['B', 'C'], 'D'];
+
+const path = []; // stack of indices
+const events = []; // collection of path states
+
+for (let { index, isBefore, isLeaf, isRoot } of nestedWalker(tree)) {
+  if (isBefore) {
+    // before children have been visited
+    !isRoot && path.push(index);
+    isLeaf && events.push([...path]); // we only care for leaves
+  } else {
+    // after children have been visited
+    !isRoot && path.pop();
+  }
+}
+expect(events).toEqual([[0], [1, 0], [1, 1], [2]]); // leaf index paths
+```
+
+- the path array acts as a stack of indices, where we add the index before and remove it after visiting the children
+- for each leaf, we add the current path to the events array
+
+### 2. Calculate time and duration of every node
+
+Now let's find out how we can perform the calculations in code.
+
+#### Division Paths
+
+Before we can calculate the time & duration, we need to keep track of the relative times and durations.
+
+```js
+function divisionPaths(tree) {
   const path = [];
-  const paths = [];
-  visitTree(
-    hierarchy,
-    (t, i, children) => i >= 0 && path.push([i, children.length]) && !Array.isArray(t) && paths.push([...path]),
-    (_, i) => i >= 0 && path.pop(),
-    (node) => (Array.isArray(node) ? node : undefined)
-  );
-  return paths;
+  const events = [];
+  for (let { node, index, isBefore, isLeaf, siblings } of nestedWalker(tree)) {
+    if (isBefore) {
+      siblings && path.push([index, siblings.length]);
+      isLeaf && events.push({ node, path: path.join(' ') });
+    } else {
+      siblings && path.pop();
+    }
+  }
+  return events;
+}
+
+expect(getPaths(['A', ['B', 'C'], 'D'])).toEqual([
+  { node: 'A', path: '0,3' },
+  { node: 'B', path: '1,3 0,2' },
+  { node: 'C', path: '1,3 1,2' },
+  { node: 'D', path: '2,3' },
+]);
+```
+
+Like in [Calculating Durations](#calculating-durations), we represent the position of a node as a number pair of index and number of siblings.
+
+#### Calculating absolute times
+
+To turn those paths into concrete numbers we can run the following logic:
+
+```js
+function pathTimeDurationSimple(path, whole = 1) {
+  let time = 0;
+  let duration = whole;
+  for (let i = 0; i < path.length; i++) {
+    time = time + (path[i][0] / path[i][1]) * duration;
+    duration /= path[i][1];
+  }
+  return { time, duration };
+}
+
+const renderEvents = (tree, duration) =>
+  divisionPaths(tree).map(({ node, path }) => ({ node, ...pathTimeDurationSimple(path, duration) }));
+
+expect(renderEvents(['A', ['B', 'C'], 'D'], 6)).toEqual([
+  { node: 'A', time: 0, duration: 2 },
+  { node: 'B', time: 2, duration: 1 },
+  { node: 'C', time: 3, duration: 1 },
+  { node: 'D', time: 4, duration: 2 },
+]);
+```
+
+Et voir-la! This is it for rendering without variable durations.
+
+#### With variable durations
+
+To add variable durations, we can just add a third number to our path. For aesthetic reasons, I chose to add this number in the middle:
+
+```js
+function timeDurationPaths(walker, getDuration) {
+  const path = [];
+  const events = [];
+  const sumDurations = (nodes) => nodes.reduce((sum, current) => sum + getDuration(current), 0);
+  for (let { node, index, isBefore, isRoot, isLeaf, siblings } of walker) {
+    if (!isRoot && isBefore) {
+      siblings = siblings || [];
+      const time = sumDurations(siblings.slice(0, index));
+      const duration = getDuration(node);
+      const total = time + sumDurations(siblings.slice(index));
+      path.push([time, duration, total]);
+      isLeaf && events.push({ node, path: [...path] });
+    } else if (!isRoot) {
+      path.pop();
+    }
+  }
+  return events;
 }
 ```
 
-Test:
+Now we are using the sum of all preceding durations as time and the sum of all siblings durations as total duration.
+To stay agnostic of the node format, we just pass a function that should resolve the duration of a node.
+
+Before we test this, let's fix our calculation:
 
 ```js
-expect(
-  leafPaths([
-    [
-      ['sn', ['sn', 'sn', 'sn']],
-      ['sn', ['sn', 'sn', 'sn']],
-      ['sn', 'sn'],
-    ],
-    [
-      ['sn', ['sn', 'sn', 'sn']],
-      ['sn', ['sn', 'sn', 'sn']],
-      [
-        ['sn', 'sn', 'sn'],
-        ['sn', 'sn', 'sn'],
-      ],
-    ],
-  ])
-).toEqual(`[
-    [[0, 2], [0, 3], [0, 2]],
-    [[0, 2], [0, 3], [1, 2], [0, 3]],
-    [[0, 2], [0, 3], [1, 2], [1, 3]],
-    [[0, 2], [0, 3], [1, 2], [2, 3]],
-    [[0, 2], [1, 3], [0, 2]],
-    [[0, 2], [1, 3], [1, 2], [0, 3]],
-    [[0, 2], [1, 3], [1, 2], [1, 3]],
-    [[0, 2], [1, 3], [1, 2], [2, 3]],
-    [[0, 2], [2, 3], [0, 2]],
-    [[0, 2], [2, 3], [1, 2]],
-    [[1, 2], [0, 3], [0, 2]],
-    [[1, 2], [0, 3], [1, 2], [0, 3]],
-    [[1, 2], [0, 3], [1, 2], [1, 3]],
-    [[1, 2], [0, 3], [1, 2], [2, 3]],
-    [[1, 2], [1, 3], [0, 2]],
-    [[1, 2], [1, 3], [1, 2], [0, 3]],
-    [[1, 2], [1, 3], [1, 2], [1, 3]],
-    [[1, 2], [1, 3], [1, 2], [2, 3]],
-    [[1, 2], [2, 3], [0, 2], [0, 3]],
-    [[1, 2], [2, 3], [0, 2], [1, 3]],
-    [[1, 2], [2, 3], [0, 2], [2, 3]],
-    [[1, 2], [2, 3], [1, 2], [0, 3]],
-    [[1, 2], [2, 3], [1, 2], [1, 3]],
-    [[1, 2], [2, 3], [1, 2], [2, 3]]
-  ]`); // stringified to keep format (code format makes too much lines..)
+export function pathTimeDuration(path, whole = 1) {
+  let time = 0;
+  let duration = whole;
+  for (let i = 0; i < path.length; i++) {
+    time = time + (path[i][0] / path[i][2]) * duration;
+    duration *= path[i][1] / path[i][2];
+  }
+  return { time, duration };
+}
 ```
+
+Running this on our variable duration example:
+
+```js
+const renderEvents = (tree, duration, getDuration = (_) => 1) =>
+  timeDurationPaths(nestedWalker(tree), getDuration).map(({ node, path }) => ({
+    node,
+    ...pathTimeDuration(path, duration),
+  }));
+
+expect(
+  renderEvents(
+    [
+      ['C4*3', 'D4'],
+      ['E4', 'D4*2', 'B3'],
+    ],
+    8,
+    (node) => (typeof node === 'string' ? +node.split('*')[1] || 1 : 1)
+  )
+).toEqual([
+  { node: 'C4*3', time: 0, duration: 3 },
+  { node: 'D4', time: 3, duration: 1 },
+  { node: 'E4', time: 4, duration: 1 },
+  { node: 'D4*2', time: 5, duration: 2 },
+  { node: 'B3', time: 7, duration: 1 },
+]);
+```
+
+And that's it! Let's run the beast on a rhythmical object:
+
+```js
+export default function renderRhythmTree(rhythm) {
+  const rhythmDuration = (node) => toRhythmObject(node).duration || 1;
+  const totalDuration = rhythmDuration(rhythm);
+  const path = [];
+  const events = [];
+  for (let { node, index, isBefore, isRoot, isLeaf, siblings } of visit(getRhythmChildren, rhythm)) {
+    if (!isRoot && isBefore) {
+      siblings = siblings || [];
+      const sumDurations = (nodes) => nodes.reduce((sum, current) => sum + rhythmDuration(current), 0);
+      const time = sumDurations(siblings.slice(0, index));
+      const duration = rhythmDuration(node);
+      const total = time + duration + sumDurations(siblings.slice(index + 1));
+      path.push([time, duration, total]);
+      isLeaf && events.push({ ...toRhythmObject(node), ...pathTimeDuration(path, totalDuration) });
+    } else if (!isRoot) {
+      path.pop();
+    }
+  }
+  return events;
+}
+```
+
+- Here, the duration of the root node is interpreted as seconds
+- Each
+
+```js
+test('renderRhythmTree', () => {
+  expect(
+    renderRhythmTree({
+      duration: 8,
+      sequential: [
+        [{ value: 'C4', duration: 3 }, 'D4'],
+        ['E4', { value: 'D4', duration: 2 }, 'B3'],
+      ],
+    }).map(({ value, time, duration }) => [value, time, duration])
+  ).toEqual([
+    ['C4', 0, 3],
+    ['D4', 3, 1],
+    ['E4', 4, 1],
+    ['D4', 5, 2],
+    ['B3', 7, 1],
+  ]);
+});
+```
+
+<hr />
+
+## The Unfinished Section
 
 ## Editing Nodes
 
@@ -1147,3 +1477,89 @@ export function r2d3<T>(rhythm: RhythmNode<T>, mapFn?) {
 - anytime algorithm
 
 - https://github.com/Marr11317/bb-tree-model
+
+## Tree Mutation
+
+So far, we were walking over each tree node to calculate some value.
+If we were able to not just walk, but modify nodes as we go, we could do more.
+
+### Growing Chords
+
+There are more musical things we can do with trees! For example, we can
+
+## Abandoned
+
+```js
+export function visitTree(tree, before, after, getChildren, index?, siblings?) {
+  before(tree, index, siblings);
+  getChildren(tree)?.forEach((child, i, a) => visitTree(child, before, after, getChildren, i, a));
+  after(tree, index, siblings);
+}
+```
+
+- The before and after callbacks fire before and after the children of the node have been visited
+- Using the getChildren function, we can stay agnostic about the tree structure. This is inspired by [d3-hierarchy](https://github.com/d3/d3-hierarchy#hierarchy).
+
+We can now use this function to collect our paths:
+
+```js
+// TODO: add variable durations
+function leafPaths(hierarchy) {
+  const path = [];
+  const paths = [];
+  visitTree(
+    hierarchy,
+    (t, i, children) => i >= 0 && path.push([i, children.length]) && !Array.isArray(t) && paths.push([...path]),
+    (_, i) => i >= 0 && path.pop(),
+    (node) => (Array.isArray(node) ? node : undefined)
+  );
+  return paths;
+}
+```
+
+Test:
+
+```js
+expect(
+  leafPaths([
+    [
+      ['sn', ['sn', 'sn', 'sn']],
+      ['sn', ['sn', 'sn', 'sn']],
+      ['sn', 'sn'],
+    ],
+    [
+      ['sn', ['sn', 'sn', 'sn']],
+      ['sn', ['sn', 'sn', 'sn']],
+      [
+        ['sn', 'sn', 'sn'],
+        ['sn', 'sn', 'sn'],
+      ],
+    ],
+  ])
+).toEqual(`[
+    [[0, 2], [0, 3], [0, 2]],
+    [[0, 2], [0, 3], [1, 2], [0, 3]],
+    [[0, 2], [0, 3], [1, 2], [1, 3]],
+    [[0, 2], [0, 3], [1, 2], [2, 3]],
+    [[0, 2], [1, 3], [0, 2]],
+    [[0, 2], [1, 3], [1, 2], [0, 3]],
+    [[0, 2], [1, 3], [1, 2], [1, 3]],
+    [[0, 2], [1, 3], [1, 2], [2, 3]],
+    [[0, 2], [2, 3], [0, 2]],
+    [[0, 2], [2, 3], [1, 2]],
+    [[1, 2], [0, 3], [0, 2]],
+    [[1, 2], [0, 3], [1, 2], [0, 3]],
+    [[1, 2], [0, 3], [1, 2], [1, 3]],
+    [[1, 2], [0, 3], [1, 2], [2, 3]],
+    [[1, 2], [1, 3], [0, 2]],
+    [[1, 2], [1, 3], [1, 2], [0, 3]],
+    [[1, 2], [1, 3], [1, 2], [1, 3]],
+    [[1, 2], [1, 3], [1, 2], [2, 3]],
+    [[1, 2], [2, 3], [0, 2], [0, 3]],
+    [[1, 2], [2, 3], [0, 2], [1, 3]],
+    [[1, 2], [2, 3], [0, 2], [2, 3]],
+    [[1, 2], [2, 3], [1, 2], [0, 3]],
+    [[1, 2], [2, 3], [1, 2], [1, 3]],
+    [[1, 2], [2, 3], [1, 2], [2, 3]]
+  ]`); // stringified to keep format (code format makes too much lines..)
+```
