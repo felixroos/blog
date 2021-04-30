@@ -12,6 +12,7 @@ import tetrisQuiet from '../components/rhythmical/tunes/tetrisQuiet.ts';
 import { marblemachine } from '../components/rhythmical/tunes/marblemachine.ts';
 import { rhythmEvents } from '../components/rhythmical/tree/hierarchy.ts';
 import { renderRhythm } from '../components/rhythmical/rhythmical.ts';
+import renderRhythmTree from '../components/rhythmical/tree/renderRhythmTree';
 import { generateVoicings, voicingFactory } from '../components/rhythmical/voicings/generateVoicings.ts';
 import { lefthand } from '../components/rhythmical/voicings/dictionary.ts';
 import Player from '../components/rhythmical/components/Player.tsx';
@@ -30,6 +31,7 @@ import { bolero, conventionalLabels } from '../components/rhythmical/tunes/boler
 import R from 'ramda';
 import NestedGrid from '../components/graphs/NestedGrid';
 import drums from '../instruments/tidal';
+import swimming from '../components/rhythmical/tunes/swimming.ts';
 
 After the posts about [Rhythmical Arrays](../rhythmical-arrays/) and [Rhythmical Objects](../rhythmical-objects),
 I want to investigate the actual data structure that is at play: trees.
@@ -799,7 +801,7 @@ Let's transfer the above ideas into code. In general, we need to
 
 #### Simple Walker
 
-This recursive generator function visits every tree node, while being agnostic about the tree structure:
+This recursive [generator function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Iterators_and_Generators) visits every tree node, while being agnostic about the tree structure:
 
 ```js
 export function* walk(getChildren, tree) {
@@ -881,15 +883,15 @@ Now we are able to look at nodes one after the other. This is still too primitiv
 The problem: We have no information about the current index or the siblings. So, instead of just yielding the node, let's enrich the data:
 
 ```js
-export function* visit(getChildren, tree, index?, siblings?) {
+export function* visit(getChildren, tree, index?, siblings?, parent?) {
   const children = getChildren(tree) || [];
-  const isRoot = index === undefined;
+  const isRoot = parent === undefined;
   const isLeaf = !children?.length;
-  yield { node: tree, index, siblings, children, isBefore: true, isRoot, isLeaf };
+  yield { node: tree, index, siblings, children, isBefore: true, isRoot, isLeaf, parent };
   for (let i = 0; i < children.length; ++i) {
-    yield* visit(getChildren, children[i], i, children);
+    yield* visit(getChildren, children[i], i, children, tree);
   }
-  yield { node: tree, index, siblings, children, isBefore: false, isRoot, isLeaf };
+  yield { node: tree, index, siblings, children, isBefore: false, isRoot, isLeaf, parent };
 }
 ```
 
@@ -990,7 +992,7 @@ Et voir-la! This is it for rendering without variable durations.
 
 #### With variable durations
 
-To add variable durations, we can just add a third number to our path. For aesthetic reasons, I chose to add this number in the middle:
+To add variable durations, we can just add a third number to our path:
 
 ```js
 function timeDurationPaths(walker, getDuration) {
@@ -1033,7 +1035,7 @@ export function pathTimeDuration(path, whole = 1) {
 Running this on our variable duration example:
 
 ```js
-const renderEvents = (tree, duration, getDuration = (_) => 1) =>
+const renderEvents = (tree, duration, getDuration) =>
   timeDurationPaths(nestedWalker(tree), getDuration).map(({ node, path }) => ({
     node,
     ...pathTimeDuration(path, duration),
@@ -1057,7 +1059,11 @@ expect(
 ]);
 ```
 
-And that's it! Let's run the beast on a rhythmical object:
+And that's it!
+
+#### Rendering Rhythmical Objects
+
+Rendering a rhythmical object works like this:
 
 ```js
 export default function renderRhythmTree(rhythm) {
@@ -1065,14 +1071,9 @@ export default function renderRhythmTree(rhythm) {
   const totalDuration = rhythmDuration(rhythm);
   const path = [];
   const events = [];
-  for (let { node, index, isBefore, isRoot, isLeaf, siblings } of visit(getRhythmChildren, rhythm)) {
+  for (let { node, index, isBefore, isRoot, isLeaf, siblings, parent } of visit(getRhythmChildren, rhythm)) {
     if (!isRoot && isBefore) {
-      siblings = siblings || [];
-      const sumDurations = (nodes) => nodes.reduce((sum, current) => sum + rhythmDuration(current), 0);
-      const time = sumDurations(siblings.slice(0, index));
-      const duration = rhythmDuration(node);
-      const total = time + duration + sumDurations(siblings.slice(index + 1));
-      path.push([time, duration, total]);
+      path.push(rhythmFraction(node, index, siblings, parent));
       isLeaf && events.push({ ...toRhythmObject(node), ...pathTimeDuration(path, totalDuration) });
     } else if (!isRoot) {
       path.pop();
@@ -1082,8 +1083,33 @@ export default function renderRhythmTree(rhythm) {
 }
 ```
 
-- Here, the duration of the root node is interpreted as seconds
-- Each
+Here, the duration of the root node is interpreted as seconds. The path fraction can be calculated using sibling and parent information:
+
+```js
+export function rhythmFraction<T>(
+  node: RhythmNode<T>,
+  index?: number,
+  siblings?: RhythmNode<T>[],
+  parent?: RhythmNode<T>
+): Fraction {
+  const duration = (node as RhythmObject<T>).duration ?? 1;
+  if (!parent) {
+    // root node
+    return [0, duration, 1]
+  }
+  const durations = siblings.map((sibling: RhythmObject<T>) => sibling.duration ?? 1);
+  const total = sum(durations);
+  if ((parent as RhythmObject<T>)?.parallel) {
+    // parallel path
+    return [0, duration, max(durations)];
+  }
+  const time = sum(durations.slice(0, index));
+  // sequential path
+  return [time, duration, total]
+}
+```
+
+Now we can test the variable duration example from above:
 
 ```js
 test('renderRhythmTree', () => {
@@ -1105,461 +1131,115 @@ test('renderRhythmTree', () => {
 });
 ```
 
-<hr />
+And it works! Now we worked out a complete reimplementation of rendering [rhythmical objects](./rhythmical-objects).
+The complexity of the implementation is much lower, using less clutter.
 
-## The Unfinished Section
+But enough of that cheap test sequence, let's render a much more complex tune:
 
-## Editing Nodes
+<Player fold={true} hierarchy={false} instruments={{ piano }} events={renderRhythmTree(swimming)} />
 
-It would be extremely powerful to be able to edit notes. Like a map function for trees:
+<details>
+  <summary>show source</summary>
 
-```ts
-export function editTree<T>(
-  getChildren: (tree: T) => T[],
-  makeParent: (tree: T, children: T[]) => T,
-  before: (tree: T, index: number, siblings?: T[], parent?: T) => T,
-  after: (tree: T, index: number, siblings?: T[], parent?: T) => T,
-  tree: T,
-  index?: number,
-  siblings?: T[],
-  parent?: T
-) {
-  tree = before(tree, index, siblings, parent);
-  const children = getChildren(tree);
-  if (children?.length) {
-    tree = makeParent(
-      tree,
-      children.map((child, index, siblings) =>
-        editTree(getChildren, makeParent, before, after, child, index, siblings, tree)
-      )
-    );
+I generated the tree json of this tune using some shorthand functions:
+
+```js
+const d = (e) => {
+  // duration short notation
+  const [value, duration] = e.split('*');
+  if (duration) {
+    return { sequential: [value], duration: parseInt(duration) };
   }
-  return after(tree, index, siblings, parent);
-}
-```
-
-This function enables us to walk any tree, no matter which form.
-
-### Editing Rhythm Trees
-
-We can narrow down the abstraction by implementing the first two functions.
-For a rhythmical object, this looks like that:
-
-```ts
-export function editRhythm<T>(rhythm: RhythmNode<T>, before?, after?) {
-  let path = [];
-  return editTree<RhythmNode<T>>(
-    getRhythmChildren, // resolves children of RhythmNode
-    makeRhythmParent, // creates RhythmNode with chilren
-    (r, i, _, parent) => {
-      i >= 0 && path.push(i);
-      return before ? before(r, path, parent) : r;
-    },
-    (r, i) => {
-      r = after ? after(r, path, parent) : r;
-      i >= 0 && path.pop();
-      return r;
-    },
-    rhythm
-  );
-}
-```
-
-### Example: Chord Voicings
-
-Using the above editRhythm function, we could replace chord symbols with [chord voicings](../rhythmical-chords/):
-
-```ts
-export function generateVoicings(tree: RhythmNode<string>, dictionary, range, sorter = topNoteDiff) {
-  let lastVoicing = [];
-  return editRhythm(tree, (r, path, parent) => {
-    if (typeof r !== 'string' || !!parent.chord) {
-      return r; // no chord symbol or already part of a voicing
-    }
-    const voicing = getBestVoicing(r, dictionary, range, sorter, lastVoicing);
-    lastVoicing = [...voicing];
-    return {
-      chord: r, // prevent infinite loop
-      parallel: voicing,
-    };
-  });
-}
-```
-
-<Player
-  instruments={{ piano }}
-  events={R.compose(
-    renderRhythm,
-    voicingFactory(lefthand, ['D3', 'A4'])
-  )({
-    duration: 6,
-    sequential: ['C^7', 'Am7', 'Dm7', ['G7', 'G7b9']],
-  })}
-/>
-
-<Tree
-  width={620}
-  nodeRadius={10}
-  dx={20}
-  columns={[12, 12]}
-  data={r2d3(
-    voicingFactory(lefthand, ['D3', 'A4'])({
-      duration: 6,
-      sequential: ['C^7', 'Am7', 'Dm7', ['G7', 'G7b9']],
-    }),
-    (rhythm, path) => ({
-      ...toRhythmObject(rhythm),
-      color: path.length ? colors[path.length - 1] : 'black',
-      name: toRhythmObject(rhythm).value,
-    })
-  )}
-  hideJson={true}
-/>
-
-```js
-<Player
-  instruments={{ piano }}
-  events={R.compose(
-    renderRhythm,
-    voicingFactory(lefthand, ['D3', 'A4'])
-  )({
-    duration: 6,
-    sequential: ['C^7', 'Am7', 'Dm7', ['G7', 'G7b9']],
-  })}
-/>
-```
-
-## Possible Plugins
-
-Let's try a solution oriented approach. Following plugins should be possible:
-
-- transposition
-  - runs only on certain target (e.g. node.transpose !== undefined)
-  - edits value of leaf nodes (e.g. 'C3' => 'D3' for transpose = 2)
-  - needs state to remember transpose
-  - if already has transpose in state, add to target transpose
-- chord Voicings
-  - runs only on certain target (e.g. node.type === 'chords')
-  - replaces leaf nodes of target with { sequential: voicing }
-  - needs state to remember latest voicing to decide best voice leading
-- render events
-  - runs over all nodes
-  - needs global state to hold all events
-  - needs local state to hold path (backtraces to parent state)
-
-## Purity
-
-Problem: editTree / editRhythm callers use impure before / after functions:
-
-The structure can be broken down like this:
-
-```js
-export function caller(tree: RhythmNode<string>) {
-  let state; // state in outside scope
-  return editTree(tree, (node) => {
-    // editRhythm is similar
-    state = mutate(state); // usage of state from outter scope
-    return edit(node, state);
-  });
-}
-```
-
-The point is: the callback depends on and modifies the state, which is defined outside the functions scope.
-This is a side effect, as the return value of the function may change for the same set of arguments.
-This makes it an impure function, which makes it less composable.
-If the function was pure, we would have less trouble when trying to combine multiple of them.
-
-### How to make it pure
-
-- the function needs access to the state
-  - the access can only happen through a param
-  - so, either we cram the state into the node itself (A)
-    - before({node,state}, index, siblings, {node,state})
-  - or we add an extra param for state (B)
-    - before(node, index, siblings, parent, state)
-- the function needs to modify the state
-  - the modified state needs to returned in some way
-  - so, either we return the state as part of the node (A)
-    - return { node, state }
-  - or we expect a specific return format (B)
-    - return [node,state] or { node, state }
-  - but, the before after functions expect the same output as input => maybe modify that
-
-### A
-
-```ts
-declare type RhythmState<T> = {
-  state: object;
-  node: RhythmNode<T>;
+  return value;
 };
-export function editRhythmState<T>(rhythm: RhythmState<T>) { // removed before, after params
-  let path = [];
-  return editTree<RhythmState<T>>(
-    ({ node, state }) => getRhythmChildren(node).map((child) => ({ node: child, state })), // + n
-    ({ node, state }, children) => ({
-      // merge child state to parent state
-      state = children.reduce((_state, { state: childState, node}) => ({ // + n
-        ..._state,
-        events: state.events.concat(childState.events)
-      }), state);
-      node: makeRhythmParent(
-        node,
-        children.map(({ node: childNode, state: childState }) => child.node) // + n
-      ),
-      state, // how to use childState here ?,
-    }),
-    ({ node, state }, i, c, { node: parent }) => {
-      // parent.state is equal to state (passed down in getChildren)
-      return {
-        node,
-        state: {
-          ...state,
-          path: path.concat([rhythmFraction(node, i, c, parent)]),
-        },
-      };
-    },
-    ({ node, state }, i, c, { node: parent }) => {
-      return {
-        node,
-        state: {
-          ...state,
-          events: state.events.concat([rhythmEvent(node,state.path)]) // concat event
-        }
-      };
-    },
-    rhythm
-  );
-}
-```
+const s = (str, duration = 1) => ({ sequential: str.split(' ').map(d), duration }); // sequential short notation
+const p = (str, duration = 1) => ({ parallel: str.split(' ').map(d), duration }); // parallel short notation
+const w = (str) => ['r', p(str), p(str)]; // waltz chord comping
 
-- I wrote this code directly in mdx, just for conceptualizing => no type checking
-- may have forgotten something
-- generally, this grows into a monster pretty quickly. also, we need an extra of 3 rounds node iterations (+n)
-
-### B
-
-```ts
-export function editRhythm<T>(rhythm: RhythmNode<T>) {
-  // removed before, after params
-  let path = [];
-  return editTree<RhythmNode<T>>(
-    // here we pass parent state down to children (events should be empty..)
-    ([rhythm, state]) => getRhythmChildren(rhythm).map((child) => [child, state]), // + n
-    // here we pass reduce children states up to parent (just events)
-    ([parent, state], children) => [
-      makeRhythmParent(
-        parent,
-        children.map(([child]) => child) // + n
-      ),
-      { ...state, events: children.reduce((e, [c, s]) => [...e, s.events]) }, // + n
-    ],
-    // here we add the child fraction to the parent path
-    ([child, state], i, c, [parent, parentState]) => {
-      state = { ...parentState, path: parentState.path.concat(rhythmFraction(child, i, c, parent)) };
-      return [child, state]; // expected format
-    },
-    // here we add the child event to the child state (which is reduced in makeParent)
-    ([child, state], i, _, [parent, parentState]) => {
-      state = { ...parentState, events: [rhythmEvent(child, state.path), ...state.events] }; // state.events contains reduced child events
-      // no need to pop path => just don't pass path to parent
-      return [r, state];
-    },
-    rhythm
-  );
-}
-```
-
-- this turned out to be A, just with a more compact array format ...
-- this looks much better, as the array syntax is shorter and more readable than the object syntax
-- its still pretty mindfucky...
-- maybe, the second (makeParent) and fourth (after) can be combined...
-  - we could just add the already modified children as last argument to after
-  - then, we could check if it has children, and if yes, run makeRhythmParent
-
-```ts
-export function editRhythm<T>(rhythm: RhythmNode<T>) {
-  // removed before, after params
-  let path = [];
-  return editTreeSimpler<RhythmNode<T>>(
-    // here we pass parent state down to children (events should be empty..)
-    // could also concat path here... ?!
-    ([rhythm, state]) => getRhythmChildren(rhythm).map((child) => [child, state]), // +n
-    // here we add the child fraction to the parent path
-    ([child, state], i, c, [parent, parentState]) => {
-      state = { ...parentState, path: parentState.path.concat(rhythmFraction(child, i, c, parent)) };
-      return [child, state]; // expected format
-    },
-    // here we add the child event to the child state (which is reduced in makeParent)
-    ([node, state], i, _, [parent, parentState], children) => {
-      let childEvents = [];
-      if (children?.length) {
-        // could also collect nodes when reducing events
-        // [childNodes, childEvents] = children.reduce(blabla)
-        childEvents = children.reduce((e, [c, s]) => [...e, s.events]); // +n
-        const childNodes = children.map(([child]) => child); // +n
-        state = { ...state, events: childEvents };
-        node = makeRhythmParent(node, childNodes);
-      }
-      state = { ...parentState, events: [rhythmEvent(child, state.path), ...childEvents] };
-      return [node, state];
-    },
-    rhythm
-  );
-}
-```
-
-- this is somewhat more easy to understand in the third function
-- maybe it would help if there were functions for both data flow direction
-  - down: parent => child (getChildren and before)
-  - up: children => parent (after)
-- either wrap this around editTreeSimpler or write a new editTree that has the call signature with down, up
-
-## filter?
-
-filter tree nodes...
-
-## ideas
-
-- path down, event up
-
-## Bonux: Generating dependency graph
-
-```sh
-depcruise --exclude "node_modules" --output-type dot . | dot -T svg > dependencygraph3.svg
-```
-
-https://www.netlify.com/blog/2018/08/23/how-to-easily-visualize-a-projects-dependency-graph-with-dependency-cruiser/
-
-## Bonus: Rhythmical > d3-hierarchy
-
-Using the editTree function, I was able to convert rhythmical objects to [d3-hierarchy](https://github.com/d3/d3-hierarchy) format like this:
-
-```ts
-export function r2d3<T>(rhythm: RhythmNode<T>, mapFn?) {
-  let path = [];
-  return editTree<RhythmNode<T>>(
-    getRhythmChildren,
-    (r, children) => ({
-      name: 'parent',
-      children,
-      ...r,
-    }),
-    (r, i, _, parent) => {
-      i !== undefined && path.push(i);
-      if (mapFn) {
-        r = mapFn(r, path, parent);
-      }
-      return r;
-    },
-    (r, i) => {
-      i !== undefined && path.pop();
-      return r;
-    },
-    rhythm
-  );
-}
-```
-
-## links
-
-- https://github.com/d3/d3-hierarchy
-- https://github.com/tommikaikkonen/zippa
-- https://github.com/syntax-tree/unist
-- https://github.com/benjamn/ast-types ?!?!?
-- https://astexplorer.net/
-- https://github.com/vtrushin/json-to-ast => inspiration for rhythmical DSL
-
-  - maybe add rhythmical DSL to astexplorer when done? ..
-
-- branch and bound
-- minimax
-- alpha beta pruning
-- anytime algorithm
-
-- https://github.com/Marr11317/bb-tree-model
-
-## Tree Mutation
-
-So far, we were walking over each tree node to calculate some value.
-If we were able to not just walk, but modify nodes as we go, we could do more.
-
-### Growing Chords
-
-There are more musical things we can do with trees! For example, we can
-
-## Abandoned
-
-```js
-export function visitTree(tree, before, after, getChildren, index?, siblings?) {
-  before(tree, index, siblings);
-  getChildren(tree)?.forEach((child, i, a) => visitTree(child, before, after, getChildren, i, a));
-  after(tree, index, siblings);
-}
-```
-
-- The before and after callbacks fire before and after the children of the node have been visited
-- Using the getChildren function, we can stay agnostic about the tree structure. This is inspired by [d3-hierarchy](https://github.com/d3/d3-hierarchy#hierarchy).
-
-We can now use this function to collect our paths:
-
-```js
-// TODO: add variable durations
-function leafPaths(hierarchy) {
-  const path = [];
-  const paths = [];
-  visitTree(
-    hierarchy,
-    (t, i, children) => i >= 0 && path.push([i, children.length]) && !Array.isArray(t) && paths.push([...path]),
-    (_, i) => i >= 0 && path.pop(),
-    (node) => (Array.isArray(node) ? node : undefined)
-  );
-  return paths;
-}
-```
-
-Test:
-
-```js
-expect(
-  leafPaths([
-    [
-      ['sn', ['sn', 'sn', 'sn']],
-      ['sn', ['sn', 'sn', 'sn']],
-      ['sn', 'sn'],
-    ],
-    [
-      ['sn', ['sn', 'sn', 'sn']],
-      ['sn', ['sn', 'sn', 'sn']],
-      [
-        ['sn', 'sn', 'sn'],
-        ['sn', 'sn', 'sn'],
+const swimming = {
+  name: 'Swimming',
+  composer: 'Koji Kondo',
+  duration: 51,
+  parallel: [
+    {
+      description: 'melody',
+      velocity: 1,
+      sequential: [
+        d('r*3'),
+        ['A5', s('F5*2 C5'), s('D5*2 F5'), 'F5'],
+        [s('C5*2 F5'), s('F5*2 C6'), 'A5', 'G5'],
+        ['A5', s('F5*2 C5'), s('D5*2 F5'), 'F5'],
+        [s('C5*2 F5'), ['Bb5', 'A5', 'G5'], d('F5*2')],
+        ['A5', s('F5*2 C5'), s('D5*2 F5'), 'F5'],
+        [s('C5*2 F5'), s('F5*2 C6'), 'A5', 'G5'],
+        ['A5', s('F5*2 C5'), s('D5*2 F5'), 'F5'],
+        [s('C5*2 F5'), ['Bb5', 'A5', 'G5'], d('F5*2')],
+        ['A5', s('F5*2 C5'), 'A5', 'F5'],
+        ['Ab5', s('F5*2 Ab5'), d('G5*2')],
+        ['A5', s('F5*2 C5'), 'A5', 'F5'],
+        ['Ab5', s('F5*2 C5'), d('C6*2')],
+        ['A5', s('F5*2 C5'), s('D5*2 F5'), 'F5'],
+        [s('C5*2 F5'), ['Bb5', 'A5', 'G5'], d('F5*2')],
       ],
-    ],
-  ])
-).toEqual(`[
-    [[0, 2], [0, 3], [0, 2]],
-    [[0, 2], [0, 3], [1, 2], [0, 3]],
-    [[0, 2], [0, 3], [1, 2], [1, 3]],
-    [[0, 2], [0, 3], [1, 2], [2, 3]],
-    [[0, 2], [1, 3], [0, 2]],
-    [[0, 2], [1, 3], [1, 2], [0, 3]],
-    [[0, 2], [1, 3], [1, 2], [1, 3]],
-    [[0, 2], [1, 3], [1, 2], [2, 3]],
-    [[0, 2], [2, 3], [0, 2]],
-    [[0, 2], [2, 3], [1, 2]],
-    [[1, 2], [0, 3], [0, 2]],
-    [[1, 2], [0, 3], [1, 2], [0, 3]],
-    [[1, 2], [0, 3], [1, 2], [1, 3]],
-    [[1, 2], [0, 3], [1, 2], [2, 3]],
-    [[1, 2], [1, 3], [0, 2]],
-    [[1, 2], [1, 3], [1, 2], [0, 3]],
-    [[1, 2], [1, 3], [1, 2], [1, 3]],
-    [[1, 2], [1, 3], [1, 2], [2, 3]],
-    [[1, 2], [2, 3], [0, 2], [0, 3]],
-    [[1, 2], [2, 3], [0, 2], [1, 3]],
-    [[1, 2], [2, 3], [0, 2], [2, 3]],
-    [[1, 2], [2, 3], [1, 2], [0, 3]],
-    [[1, 2], [2, 3], [1, 2], [1, 3]],
-    [[1, 2], [2, 3], [1, 2], [2, 3]]
-  ]`); // stringified to keep format (code format makes too much lines..)
+    },
+    {
+      description: 'chords',
+      velocity: 0.6,
+      sequential: [
+        [
+          p('F4 Bb4 D5'),
+          [p('D4 G4 Bb4', 2), p('Bb3 D4 F4')],
+          [p('G3 C4 E4', 2), [p('Ab3 F4'), p('A3 Gb4')]],
+          p('Bb3 E4 G4'),
+        ],
+        [w('F3 A3 C3'), w('F3 A3 C3'), w('F3 Bb3 D3'), w('F3 Bb3 Db3')],
+        [w('F3 A3 C3'), w('F3 A3 C3'), w('F3 Bb3 D3'), w('F3 B3 D3')],
+        [w('F3 A3 C3'), w('F3 A3 C3'), w('F3 Bb3 D3'), w('F3 B3 D3')],
+        [w('A3 C4 E4'), w('Ab3 C4 Eb4'), w('F3 Bb3 D3'), w('G3 C4 E4')],
+        [w('F3 A3 C4'), w('F3 A3 C4'), w('F3 Bb3 D3'), w('F3 B3 D3')],
+        [w('F3 Bb3 D4'), w('F3 Bb3 C4'), w('F3 A3 C4'), w('F3 A3 C4')],
+        [w('F3 A3 C3'), w('F3 A3 C3'), w('F3 Bb3 D3'), w('F3 B3 D3')],
+        [w('A3 C4 E4'), w('Ab3 C4 Eb4'), w('F3 Bb3 D3'), w('G3 C4 E4')],
+        [w('F3 A3 C3'), w('F3 A3 C3'), w('F3 Bb3 D3'), w('F3 B3 D3')],
+        [w('F3 Bb3 D4'), w('F3 Bb3 C4'), w('F3 A3 C4'), w('F3 A3 C4')],
+        [w('Bb3 D3 F4'), w('Bb3 D3 F4'), w('A3 C4 F4'), w('A3 C4 F4')],
+        [w('Ab3 B3 F4'), w('Ab3 B3 F4'), w('G3 Bb3 F4'), w('G3 Bb3 E4')],
+        [w('Bb3 D3 F4'), w('Bb3 D3 F4'), w('A3 C4 F4'), w('A3 C4 F4')],
+        [w('Ab3 B3 F4'), w('Ab3 B3 F4'), w('G3 Bb3 F4'), w('G3 Bb3 E4')],
+        [w('F3 A3 C3'), w('F3 A3 C3'), w('F3 Bb3 D3'), w('F3 B3 D3')],
+        [w('F3 Bb3 D4'), w('F3 Bb3 C4'), w('F3 A3 C4'), w('F3 A3 C4')],
+      ],
+    },
+    {
+      description: 'bass',
+      sequential: [
+        ['G3', 'G3', 'C3', 'E3'],
+        ['F2', 'D2', 'G2', 'C2'],
+        ['F2', 'D2', 'G2', 'C2'],
+        ['F2', 'A2', 'Bb2', 'B2'],
+        ['A2', 'Ab2', 'G2', 'C2'],
+        ['F2', 'A2', 'Bb2', 'B2'],
+        ['G2', 'C2', 'F2', 'F2'],
+        ['F2', 'A2', 'Bb2', 'B2'],
+        ['A2', 'Ab2', 'G2', 'C2'],
+        ['F2', 'A2', 'Bb2', 'B2'],
+        ['G2', 'C2', 'F2', 'F2'],
+        ['Bb2', 'Bb2', 'A2', 'A2'],
+        ['Ab2', 'Ab2', 'G2', ['C2', 'D2', 'E2']],
+        ['Bb2', 'Bb2', 'A2', 'A2'],
+        ['Ab2', 'Ab2', 'G2', ['C2', 'D2', 'E2']],
+        ['F2', 'A2', 'Bb2', 'B2'],
+        ['G2', 'C2', 'F2', 'F2'],
+      ],
+    },
+  ],
+};
 ```
+
+```js
+<Player fold={true} hierarchy={false} instruments={{ piano }} events={renderRhythmTree(swimming)} />
+```
+
+</details>
+
+That's it for today! In a future post, I want to implement plugins by tree mutation.

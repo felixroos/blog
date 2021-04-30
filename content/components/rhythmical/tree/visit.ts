@@ -6,5 +6,5 @@ export function* visit(getChildren, tree, index?, siblings?, parent?) {
   for (let i = 0; i < children.length; ++i) {
     yield* visit(getChildren, children[i], i, children, tree)
   }
-  yield { node: tree, index, siblings, children, isBefore: false, isRoot, isLeaf };
+  yield { node: tree, index, siblings, children, isBefore: false, isRoot, isLeaf, parent };
 }

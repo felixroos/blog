@@ -32,14 +32,14 @@ export function rhythmFraction<T>(
     return [0, duration, 1]
   }
   const durations = siblings.map((sibling: RhythmObject<T>) => sibling.duration ?? 1);
-  const position = sum(durations.slice(0, index));
   const total = sum(durations);
   if ((parent as RhythmObject<T>)?.parallel) {
     // parallel path
     return [0, duration, max(durations)];
   }
+  const time = sum(durations.slice(0, index));
   // sequential path
-  return [position, duration, total]
+  return [time, duration, total]
 }
 
 export function isRhythmLeaf<T>(rhythm: RhythmNode<T>) {
