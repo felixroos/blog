@@ -56,6 +56,11 @@ export default function RhythmicalEditor() {
             console.error('error', error);
           }
         }}
+        options={{
+          mode: 'javascript',
+          theme: 'material',
+          lineNumbers: false,
+        }}
       />
       <button
         onClick={() => {

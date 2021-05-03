@@ -11,9 +11,9 @@ if (canUseDOM()) {
 
 export default function CodeMirror({ value, onChange, options }: any) {
   options = options || {
-    mode: 'json',
+    mode: 'javascript',
     theme: 'material',
     lineNumbers: true,
   };
-  return <CodeMirror2 value={value} options={options} onBeforeChange={onChange}/>;
+  return <CodeMirror2 value={value} options={options} onBeforeChange={onChange} />;
 }

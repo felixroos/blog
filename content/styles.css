@@ -36,7 +36,7 @@ svg.dagre-d3-react path {
 }
 
 .CodeMirror {
-  height: 600px;
+  height: 600px !important;
   width: 800px;
   font-size: 14px;
 }
