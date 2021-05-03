@@ -1,4 +1,4 @@
-import { Voicing, VoicingDictionary, VoiceLeading, enharmonicEquivalent } from './Voicing'
+import { Voicing, VoicingDictionary, VoiceLeading, enharmonicEquivalent, infiniteGenerator, voicingGenerator } from './Voicing'
 const { lefthand, triads } = VoicingDictionary;
 const { topNoteDiff } = VoiceLeading;
 
@@ -113,3 +113,20 @@ test('searchSets', () => {
     ['C4', 'E4', 'G4'],
   ]);
 }) */
+
+test('infiniteGenerator', () => {
+  const generator = infiniteGenerator();
+  generator.next(); // A value passed to the first invocation of next() is always ignored.
+  expect(generator.next('x').value).toBe('x');
+  expect(generator.next('y').value).toBe('xy');
+  expect(generator.next('z').value).toBe('xyz');
+});
+
+test('voicingGenerator', () => {
+  const range = ['E3', 'A4'], dictionary = lefthand, voiceLeading = topNoteDiff;
+  const generator = voicingGenerator({ range, dictionary, voiceLeading });
+  generator.next();
+  expect(generator.next('Dm7').value).toEqual(['F3', 'A3', 'C4', 'E4']);
+  expect(generator.next('G7').value).toEqual(['F3', 'A3', 'B3', 'E4']);
+  expect(generator.next('C^7').value).toEqual(['E3', 'G3', 'B3', 'D4']);
+});

@@ -114,12 +114,12 @@ export const colors = schemeTableau10;
 
 ![bolero](./img/bolero34.png)
 
-| color                      | value | type          | amount    | visual cue                  | sound     |
-| -------------------------- | ----- | ------------- | --------- | --------------------------- | --------- |
-| <Color color={colors[0]}/> | 3/4   | bar           | 2 total   | seperated by vertical lines | high tom  |
-| <Color color={colors[1]}/> | 1/4   | 4ths          | 3 per bar | separated by space          | bass drum |
-| <Color color={colors[2]}/> | 1/8   | 8ths          | 2 per 4th | connected by first beam     | hi hat    |
-| <Color color={colors[3]}/> | 1/24  | 16th triplets | 3 per 8th | connected by second beam    | snare     |
+| color                      | value | type          | amount    | visual cue                  |
+| -------------------------- | ----- | ------------- | --------- | --------------------------- |
+| <Color color={colors[0]}/> | 3/4   | bar           | 2 total   | seperated by vertical lines |
+| <Color color={colors[1]}/> | 1/4   | 4ths          | 3 per bar | separated by space          |
+| <Color color={colors[2]}/> | 1/8   | 8ths          | 2 per 4th | connected by first beam     |
+| <Color color={colors[3]}/> | 1/24  | 16th triplets | 3 per 8th | connected by second beam    |
 
 <!--
 <NestedGrid
@@ -198,10 +198,10 @@ Using the same color coding as above, we now use a different sound for each laye
 
 | color                      | value | sound      |
 | -------------------------- | ----- | ---------- |
-| <Color color={colors[0]}/> | 3/4   | hi hat     |
-| <Color color={colors[1]}/> | 1/4   | high tom   |
-| <Color color={colors[2]}/> | 1/8   | middle tom |
-| <Color color={colors[3]}/> | 1/24  | low tom    |
+| <Color color={colors[0]}/> | 3/4   | low tom    |
+| <Color color={colors[1]}/> | 1/4   | middle tom |
+| <Color color={colors[2]}/> | 1/8   | high tom   |
+| <Color color={colors[3]}/> | 1/24  | hi hat     |
 
 The actual bolero rhythm just switches between different layers:
 
@@ -688,7 +688,7 @@ Instead, we can use the duration as the numerator and the sum of all durations f
 
 ### Calculating Time With Variable Durations
 
-To know calculate the time fraction, our numerator must be the sum of all durations that came before the node in question:
+To know the time fraction, our numerator must be the sum of all durations that came before the node in question:
 
 <State initial={{ node: null }}>
   {({ state, setState }) => (

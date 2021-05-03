@@ -176,3 +176,19 @@ export function enharmonicEquivalent(note: string, pitchClass: string): string {
   }
   return pitchClass + oct;
 }
+
+export function* infiniteGenerator() {
+  let state = '';
+  while (true) {
+    state += yield state;
+  }
+}
+
+export function* voicingGenerator({ range, dictionary, voiceLeading }) {
+  let lastVoicing;
+  let chord;
+  while (true) {
+    lastVoicing = chord ? Voicing.get(chord, range, dictionary, voiceLeading, lastVoicing) : [];
+    chord = yield lastVoicing;
+  }
+}

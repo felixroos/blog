@@ -1,7 +1,7 @@
 const d = (e) => { // duration short notation
   const [value, duration] = e.split('*');
   if (duration) {
-    return { sequential: [value], duration: parseInt(duration) };
+    return { sequential: [value], duration: +duration };
   }
   return value;
 }
@@ -711,4 +711,4 @@ export const rendered = [
   ["C2", 48.75, 0.75],
   ["F2", 49.5, 0.75],
   ["F2", 50.25, 0.75]
-]; 
+];
