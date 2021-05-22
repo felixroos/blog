@@ -76,15 +76,26 @@ export default function RhythmicalEditor() {
 
 /*
 
+// so könnte es eines tages aussehen:
+
 {
+  "duration": 4,
   "parallel": [
     {
-      "instrument":"piano",
-      "sequential":["C2","G2"]
+      "instrument": "piano",
+      "color": "green",
+      "sequential": [
+       "Db3 Db3 . Db3 B2 A2",
+       "G2 G2 G2 [_ A2 B2]*2"
+       ]
     },
     {
-      "instrument":"drums",
-      "sequential":["bd","sn"]
+      "color": "steelblue",
+      "instrument": "drums",
+      "parallel": [
+        "bd sn bd sn",
+        "hh hh hh hh . hh hh hh hh hh"
+      ]
     }
   ]
 }

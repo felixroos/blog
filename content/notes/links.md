@@ -6,10 +6,15 @@ this is pretty messy list of links for various topics:
 - https://github.com/public-apis/public-apis !!!
 - http://stoney.sb.org/eno/oblique.html
 
+- https://zeptobars.com/en/ scans of integrated circuits
 
 - https://github.com/unkleho/d3-render !!
 
 - https://github.com/rakannimer/react-orchestra
+
+- https://cables.gl/
+
+- https://shop.evilmadscientist.com/productsmenu/846
 
 - - https://github.com/Ableton/link/issues/49
   - https://github.com/Deep-Symmetry/afterglow#afterglow

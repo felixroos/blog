@@ -30,7 +30,7 @@ const flattenNodes = [
 
 declare type SimpleTreeState = {
   tree: any[] | string,
-  nodes?: SimpleTreeState[];
+  // nodes?: SimpleTreeState[];
 };
 
 

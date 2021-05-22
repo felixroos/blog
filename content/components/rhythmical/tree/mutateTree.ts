@@ -1,12 +1,12 @@
-export function* mutateTree(getChildren, tree, mutateFn, index?, siblings?, parent?) {
-  tree = mutateFn(tree);
-  const children = getChildren(tree) || []
-  const isRoot = parent === undefined;
+// difference to visit = getChildren passes not only the node, but also state info
+export function* mutateTree(getChildren, tree, index?, siblings?, parent?) {
+  const state = { node: tree, index, siblings, parent, isRoot: parent === undefined };
+  const children = getChildren(state) || []
   const isLeaf = !children?.length
-  yield { node: tree, index, siblings, children, isBefore: true, isRoot, isLeaf, parent };
+  yield { ...state, children, isBefore: true, isLeaf };
   for (let i = 0; i < children.length; ++i) {
-    yield* mutateTree(getChildren, children[i], mutateFn, i, children, tree)
+    yield* mutateTree(getChildren, children[i], i, children, tree)
   }
   // yield* children.map((child, i) => mutateTree(getChildren, child, mutateFn, i, children, tree));
-  yield { node: tree, index, siblings, children, isBefore: false, isRoot, isLeaf, parent };
+  yield { ...state, children, isBefore: false, isLeaf };
 }
