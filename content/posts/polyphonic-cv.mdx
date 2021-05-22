@@ -20,7 +20,7 @@ The Arduino receives a MIDI note message, calculates the correct voltage for tha
 
 ## Digital to Analog Conversion
 
-Without a DAC, an Arudino is not able to produce *true analog voltage*™, meaning a voltage that is not either 0V or 5V.
+Without a DAC, an Arudino is not able to produce *true analog output*™, meaning a voltage that is not either 0V or 5V.
 
 ### What about analogWrite?
 
@@ -89,8 +89,8 @@ output pins if we built our multi channel dac with resistor ladders.
 
 ### Using the MCP4728
 
-Using an IC DAC, like the MCP4728, we can have 4 channel true analog output without using zillions of output pins.
-The integration is much easier with a breakout board, like the one from Adafruit:
+Using an IC DAC, like the MCP4728, we can have 4 channel *true analog output*™ without using zillions of pins.
+The integration is really easy with a breakout board, like the one from Adafruit:
 
 ![mcp4728](./img/midi2cv/mcp4728-sketch.png)
 
@@ -258,18 +258,34 @@ void noteOff(byte midiChannel, byte pitch, byte velocity) {
 ```
 
 And that's all we need for polyphonic CV messages!
+This is the starting point to build any paraphonic / polyphonic synth.
+In the next post, I will expand the above synth to a paraphonic poor mans prophet.
 
-## TODO
+## Bonus: Is 12 bit enough for pitch CV?
 
-- add sound example
-- add vcf + adsr via orGate + LEDs
-- compare to prophet
+Some might think now: Is 12 bit anough for *true analog output*™ pitch CV? Let's calculate a little bit..
+
+- With 12 bit, we have 2^12 = 4096 different steps representing voltages from 0 to 5V.
+- At 1V/oct, we have 5\*12 = 60 semitones in the volt range.
+- Each semitone can be broken down to 100 cents, so we have 6000 cents in our range, giving us 6000/4096 = 1.4 cents per step.
+- According to [this page](http://hyperphysics.phy-astr.gsu.edu/hbase/Music/cents.html#c4), the so called "Just Noticeable Difference" (JND) in pitch
+  perception is around 5 cents.
+- Having 1.4 cents per step, we are way below the JND.
+
+So 12 bit should be fine.. (Maybe smaller changes in pitch are perceptible in the context of chords, but that might be topic of another discussion).
 
 ## Future Ideas
 
 - note stealing
-- autotune
-  - https://github.com/PaulStoffregen/FreqCount
-  - https://simple-circuit.com/arduino-frequency-counter-project/
-- https://bastl-instruments.com/eurorack/modules/1983
+- unison mode
+- auto tuning (like bastl 1983) using [FreqCount](https://github.com/PaulStoffregen/FreqCount), [also see](https://simple-circuit.com/arduino-frequency-counter-project/)
 - https://www.soundonsound.com/techniques/introducing-polyphony
+- Add MIDI a input jack to be able to play the synth without a computer
+- add MCP4728 to [keyboard scanner](../diy-midi-keyboard)
+- build a eurorack module
+
+## Similar Devices
+
+- https://mutable-instruments.net/modules/yarns/
+- https://bastl-instruments.com/eurorack/modules/1983
+- https://github.com/joeSeggiola/arduino-eurorack-projects/tree/master/midi4plus1
