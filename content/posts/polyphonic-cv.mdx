@@ -4,7 +4,7 @@ date: 2021-05-22
 keywords: ['synthesis', 'electronics']
 ---
 
-After looking at the basics of analog synthesis in the [last post](./analog-synthesis),
+After looking at the basics of analog synthesis in the [last post](../analog-synthesis),
 let's now look at how to approach polyphony.
 
 So far, I used the Arturia Keystep to send pitch and gate CV to the VCO.
@@ -283,6 +283,12 @@ So 12 bit should be fine.. (Maybe smaller changes in pitch are perceptible in th
 - Add MIDI a input jack to be able to play the synth without a computer
 - add MCP4728 to [keyboard scanner](../diy-midi-keyboard)
 - build a eurorack module
+- try using a single dac with demultiplexer and sample and holds [like here](https://www.youtube.com/watch?v=Mptm30r0wf8)
+  - https://circuitdigest.com/electronic-circuits/sample-and-hold-circuit-op-amp
+  - https://www.reichelt.de/fr/de/sample-and-hold-ic-1-kanal-dip-8-lf-398-dip-p10279.html?r=1
+  - https://www.analog.com/media/en/technical-documentation/data-sheets/AD585.pdf
+- try using a resistor ladder with a shift register
+  - https://www.conrad.de/de/ratgeber/handwerk-industrie-wiki/elektronik-bauteile/74hc595.html
 
 ## Similar Devices
 

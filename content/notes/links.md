@@ -1,5 +1,12 @@
 # Links
 
+- https://teropa.info/blog !!!
+  - https://teropa.info/blog/2016/08/19/what-is-the-web-audio-api.html
+  - 
+  - https://teropa.info/blog/2016/07/28/javascript-systems-music.html
+
+- https://www.gerschlauermusic.com/downloads
+
 this is pretty messy list of links for various topics:
 
 - rhythm heaven game
