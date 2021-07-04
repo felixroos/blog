@@ -5,8 +5,11 @@ keywords: ['web audio']
 ---
 
 import AudioWorklet from '../components/synthesis/AudioWorklet';
+import Knob from '../components/common/Knob';
 import { State } from 'react-powerplug';
 import Slider from '@material-ui/core/Slider';
+
+<Knob size={80} />
 
 # React Audio Worklet
 
@@ -179,6 +182,28 @@ Now, to make the frequency controllable from within MDX, we can use react-powerp
         value={state.frequency}
         onChange={(e, v) => setState({ ...state, frequency: +v })}
       />
+      {/* <Knob
+        min={55}
+        max={880}
+        step={0.1}
+        value={state.frequency}
+        onChange={(v) => setState({ ...state, frequency: +v })}
+      /> */}
     </>
   )}
+</State>
+
+## Wavetable
+
+<State initial={{ midi: 57 }}>
+  {({ state, setState }) => {
+    const frequency = 440 * Math.pow(2, (state.midi - 69) / 12);
+    return (
+      <>
+        <AudioWorklet src="../waa/wavetable-processor.js" name="wavetable-processor" params={{ frequency }} />
+        <br />
+        <Knob min={36} max={72} value={state.midi} onChange={(midi) => setState({ ...state, midi })} />
+      </>
+    );
+  }}
 </State>

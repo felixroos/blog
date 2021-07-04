@@ -1,5 +1,29 @@
 # Links
 
+## traditionelles liedgut
+
+- https://de.wikipedia.org/wiki/B%C3%A4nkelsang
+- https://de.wikipedia.org/wiki/Shanty
+
+## other
+
+- https://www.electronics-lab.com/project/how-to-program-attiny13attiny13a-using-arduino-ide/
+- https://mitxela.com/projects/midi_on_the_attiny
+
+- https://www.desmos.com/?lang=de
+
+- http://www-new.idmil.org/
+- https://sensorwiki.org/welcome
+
+- https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Visualizations_with_Web_Audio_API
+
+- https://hackaday.com/2015/02/04/logic-noise-sweet-sweet-oscillator-sounds/
+
+- https://www.schmitzbits.de/vco4069.html
+
+- https://diyelectromusic.wordpress.com/2020/08/18/arduino-fm-midi-synthesis-with-mozzi/
+- https://sensorium.github.io/Mozzi/learn/introductory-tutorial/
+
 - https://teropa.info/blog !!!
   - https://teropa.info/blog/2016/08/19/what-is-the-web-audio-api.html
   - 
@@ -7,7 +31,17 @@
 
 - https://www.gerschlauermusic.com/downloads
 
-this is pretty messy list of links for various topics:
+- https://dendriform.xyz/
+
+- https://www.notesandvolts.com/2014/11/midi-and-arduino-circuit-analysis.html
+
+## fp
+
+- https://mostly-adequate.gitbook.io/mostly-adequate-guide/ch08
+- https://jrsinclair.com/articles/2016/marvellously-mysterious-javascript-maybe-monad/
+- https://medium.com/@collardeau/intro-to-functional-programming-concepts-in-javascript-part-2-f45228c49eed
+
+## this is pretty messy list of links for various topics:
 
 - rhythm heaven game
 - https://github.com/public-apis/public-apis !!!

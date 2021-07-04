@@ -1,0 +1,148 @@
+---
+title: SVG Piano Revisited
+date: 2021-07-04
+keywords: ['tools', 'web audio']
+---
+
+import { InlineMath, BlockMath } from 'react-katex';
+import Claviature, { ClaviatureOctave } from '../components/common/Claviature';
+
+My first post on this blog was about [svg-piano](https://felixroos.github.io/blog/svg-piano/),
+which is a little lib that helps creating correctly sized piano keys on the web.
+In this post, I want to investigate an alternative sizing that is better suited for digital applications,
+while keeping the character of the standard keyboard as authentic as possible.
+
+<!--
+After playing some time with keyboards and piano rolls, I came to the conclusion that it would be
+pretty handy if the top of each key had the same width, which is not the case for a standard keyboard.
+This would make it much easier to align the piano with a piano roll, which typically has an equal grid of chromatic steps. -->
+
+## The Standard Claviature
+
+The standard claviature looks like this:
+
+![standard claviature](https://upload.wikimedia.org/wikipedia/commons/4/48/Pianoteilung.svg)
+
+- The black key tops (and bottoms) are all 12.7mm
+- The white key bottoms have 23.6mm
+- The white key tops have 13.95mm, 14.20mm, 15.05mm or 15.30mm
+- Let's not care about height, as it is pretty simple
+
+The important point: The top side of the keys (blak and white) have different widths.
+
+## Why is this a Problem?
+
+In the digital domain, we might want to align a piano roll with a keyboard.
+If we use the standard sizing, we always have to make sure the columns of the piano roll grid are also sized irregularly,
+which is quite a hassle. If the tops of each key all had the same width, we would have no problems.
+
+When it comes to the real world, the reason for the different key top sizes is probably that the white keys are lower
+thus enabling thick finger folks to reach them without getting stuck.
+
+## The Dilemma
+
+Now, at the first glance, this seems pretty easy, just make the tops equal and call it a day, right?
+It's a little more complicated:
+
+![equal piano](./img/equal-piano.svg)
+
+- _b_ stands for the desired equal top width and _w_ for the bottom width of the white keys.
+- The break between the keys E and F is predetermined
+
+So, keys C, D and E (=3w) must have a total width of 5b:
+
+<BlockMath>{`3w = 5b`}</BlockMath>
+<BlockMath>{`w = \\frac{5}{3}b`}</BlockMath>
+
+Also, keys F, G, A and B (=4w) must have a bottom width of 7b:
+
+<BlockMath>{`4w = 7b`}</BlockMath>
+<BlockMath>{`w = \\frac{7}{4}b`}</BlockMath>
+
+Now we have two different solutions for _w_:
+
+<BlockMath>{`\\frac{5}{3}b \\neq \\frac{7}{4}b`}</BlockMath>
+
+... which brings us to the dilemma:
+
+> If the top width of each key should be equal, the white keys cannot.
+
+In the real world, it seems obvious to favor the equal size of white and black keys with larger gaps between black keys
+for the ease of playability.
+
+In the digital domain, it might be more clever to scrap the equality of the white keys.
+
+## Generating the Equal Sized Keyboard
+
+With only a little bit of SVG magic, we can render one octave:
+
+```js
+export function Claviature() {
+  const topWidth = 15;
+  const blackHeight = 100;
+  const whiteHeight = 145;
+  const whiteWidth = (index) => (index > 2 ? 7 / 4 : 5 / 3) * topWidth;
+  const whiteX = (index) => Array.from({ length: index }, (_, i) => i).reduce((sum, w) => sum + whiteWidth(w), 0);
+  return (
+    <svg>
+      {Array.from({ length: 7 }, (_, i) => i).map((index) => (
+        <rect
+          key={index}
+          x={whiteX(index)}
+          stroke="black"
+          strokeWidth="1px"
+          fill="white"
+          y={0}
+          width={whiteWidth(index)}
+          height={whiteHeight}
+        />
+      ))}
+      {[0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0].map(
+        (place, index) => place && <rect key={index} x={index * topWidth} y={0} width={topWidth} height={blackHeight} />
+      )}
+    </svg>
+  );
+}
+```
+
+Result:
+
+<ClaviatureOctave />
+
+With range:
+
+<Claviature options={{ range: ['A1', 'C4'] }} />
+
+scaled:
+
+<Claviature options={{ scaleX: 0.5, scaleY: 0.5 }} />
+
+custom heights:
+
+<Claviature options={{ upperHeight: 50, lowerHeight: 20 }} />
+
+custom palette:
+
+<Claviature options={{ palette: ['#F2F2EF', '#39383D'] }} />
+
+colorize:
+
+<Claviature
+  options={{
+    colorize: [
+      { keys: ['C3', 'E3', 'G3'], color: 'steelblue' },
+      { keys: ['A3', 'C#4', 'E4'], color: 'tomato' },
+    ],
+  }}
+/>
+
+onClick:
+
+<Claviature
+  onClick={(key) => {
+    console.log('clicked', key);
+    alert(`clicked ${key}`);
+  }}
+/>
+
+<Claviature options={{ range: ['F3', 'D6'] }} />
