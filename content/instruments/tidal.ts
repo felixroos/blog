@@ -12,6 +12,6 @@ export default {
       ht: "../samples/tidal/ht/HT0D3.wav",
       lt: "../samples/tidal/lt/LT0D3.wav",
     }
-    return canUseDOM() && (await rack(samples, { volume: -20 })()).toMaster();
+    return canUseDOM() && (await rack(samples, { volume: -20 })()).toDestination();
   }
 }

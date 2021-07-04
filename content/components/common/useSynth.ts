@@ -28,7 +28,7 @@ export default function useSynth(props: { synth?: any, options?: any, voices?: n
           },
           ...options
         }
-      }).toMaster()
+      }).toDestination()
   }, []);
   const [state, dispatch] = useReducer(
     (state, action: SynthAction) => {

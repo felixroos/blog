@@ -152,17 +152,20 @@ Using [Tone.js](https://tonejs.github.io/), we now can make the keys playable:
 import { Synth, PolySynth } from 'tone';
 import canUseDOM from '../components/canUseDOM.ts';
 
-export const synth = canUseDOM() && new Synth({ volume: -12 }).toMaster();
+export const synth = canUseDOM() && new Synth({ volume: -12 }).toDestination();
 export const poly =
   canUseDOM() && new PolySynth({ maxPolyphony: 6, voice: Synth, options: { volume: -12 } }).toDestination();
 
 ```jsx
 import { Synth } from "tone"
-const synth = new Synth({ volume: -6 }).toMaster()
+const synth = new Synth({ volume: -6 }).toDestination()
 
 <Keyboard
   options={{range: ["C3", "C5"]}}
-  onAttack={key => synth && synth.triggerAttack(key.notes[0])}
+  onAttack={key => {
+    console.log('attt',key);
+    // synth && synth.triggerAttack(key.notes[0])
+  }}
   onRelease={key => synth && synth.triggerRelease([key.notes[0]])}
 />
 ```
@@ -170,7 +173,7 @@ const synth = new Synth({ volume: -6 }).toMaster()
 <Keyboard
   options={{ range: ['C3', 'C5'] }}
   onAttack={(key) => synth && synth.triggerAttack(key.notes[0])}
-  onRelease={(key) => synth && synth.triggerRelease([key.notes[0]])}
+  onRelease={(key) => synth && synth.triggerRelease()}
 />
 
 ---

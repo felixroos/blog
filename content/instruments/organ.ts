@@ -66,6 +66,6 @@ export const organ = {
       B6: "../samples/organ/B4 Blues_61.mp3",
       C7: "../samples/organ/B4 Blues_62.mp3",
     }
-    return canUseDOM() && (await sampler(samples, { volume: -20 })()).toMaster();
+    return canUseDOM() && (await sampler(samples, { volume: -20 })()).toDestination();
   }
 }

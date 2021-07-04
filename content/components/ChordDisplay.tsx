@@ -17,7 +17,7 @@ const isBrowser = typeof window !== 'undefined';
 
 export default function ChordDisplay() {
   const poly = useMemo(
-    () => isBrowser && new PolySynth({ maxPolyphony: 6, voice: Synth, volume: -12 }).toDestination(),
+    () => isBrowser && new PolySynth({ maxPolyphony: 32, voice: Synth, volume: -12 }).toDestination(),
     []
   );
 

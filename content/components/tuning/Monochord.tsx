@@ -28,7 +28,7 @@ export default function Monochord({
   const { triggerAttackRelease } =
     polysynth ||
     useSynth({
-      voices: 1,
+      voices: 4,
       options: {
         volume: -16,
         oscillator: { type: "fmtriangle" },

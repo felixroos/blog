@@ -18,7 +18,7 @@ function getScaleWithNumerals(root, name) {
 const isBrowser = typeof window !== 'undefined';
 export default function ScaleDisplay() {
   const poly = useMemo(
-    () => isBrowser && new PolySynth({ maxPolyphony: 6, voice: Synth, volume: -12 }).toDestination(),
+    () => isBrowser && new PolySynth({ maxPolyphony: 32, voice: Synth, volume: -12 }).toDestination(),
     []
   );
   const range = ['B2', 'C6'];

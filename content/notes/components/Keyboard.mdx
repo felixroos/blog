@@ -11,7 +11,7 @@ With Mouse Events + Synth
 import canUseDOM from '../../components/canUseDOM.ts';
 import { Synth, PolySynth } from 'tone';
 
-export const synth = canUseDOM() && new Synth({ volume: -12 }).toMaster();
+export const synth = canUseDOM() && new Synth({ volume: -12 }).toDestination();
 export const poly =
   canUseDOM() && new PolySynth({ maxPolyphony: 6, voice: Synth, options: { volume: -12 } }).toDestination();
 

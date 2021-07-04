@@ -1,6 +1,6 @@
 
 import { Interval, Note } from '@tonaljs/tonal';
-import Tone from 'tone';
+import * as Tone from 'tone';
 
 export function sampler(samples, options = {}) {
   return () => new Promise<any>((resolve, reject) => {
@@ -26,7 +26,8 @@ export function sampler(samples, options = {}) {
       triggerAttack: sampler.triggerAttack,
       triggerRelease: sampler.triggerAttack,
       connect: (dest) => { sampler.connect(dest); return s },
-      toMaster: () => { sampler.toMaster(); return s },
+      toMaster: () => { sampler.toDestination(); return s },
+      toDestination: () => { sampler.toDestination(); return s },
     }
   })
 }

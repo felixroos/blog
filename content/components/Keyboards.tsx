@@ -6,7 +6,7 @@ import * as Tone from "tone"
 
 const { Synth } = Tone
 
-const synth = new Synth({ volume: -6 }).toMaster()
+const synth = new Synth({ volume: -6 }).toDestination()
 
 export default function Keyboards() {
   const [scale, setScale] = useState(0.5)

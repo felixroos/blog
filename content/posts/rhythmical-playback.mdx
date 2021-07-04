@@ -108,7 +108,7 @@ export function rack(samples: { [key: string]: any }, options = {}) {
       return s;
     },
     toMaster: () => {
-      players.toMaster();
+      players.toDestination();
       return s;
     },
   };
@@ -132,7 +132,7 @@ const drums =
     mt: require('./mt/MT0D3.wav'),
     ht: require('./ht/HT0D3.wav'),
     lt: require('./lt/LT0D3.wav'),
-  }).toMaster();
+  }).toDestination();
 // play
 playEvents(
   renderRhythmObject({
