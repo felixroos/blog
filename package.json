@@ -88,7 +88,7 @@
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.15.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.2",
     "babel-jest": "^26.2.2",
     "babel-preset-gatsby": "^0.5.5",
     "cheerio": "^1.0.0-rc.3",
