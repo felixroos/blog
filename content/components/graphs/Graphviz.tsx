@@ -18,11 +18,13 @@ export function Graph({ json, editable, options, containerStyle }: any) {
     }
     try {
       const dot = toDot(JSON.parse(jsonString)); //.split('graph {').join('graph { node [width=0.4,height=0.4];');
+      console.log('dot', dot);
       const svg = await graphviz.layout(dot, 'svg', 'dot'); //.split('<svg width=').join('');
       // console.log('svg', svg);
       el.innerHTML = svg;
     } catch (error) {
       console.log('invalid..');
+      console.log(error);
     }
   };
   React.useEffect(() => {

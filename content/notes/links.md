@@ -1,11 +1,42 @@
 # Links
 
+- https://threejs-journey.com/
+- https://mastery.games/
+
 ## traditionelles liedgut
 
 - https://de.wikipedia.org/wiki/B%C3%A4nkelsang
 - https://de.wikipedia.org/wiki/Shanty
 
 ## other
+
+- https://betterexplained.com/cheatsheet/
+
+<!--
+- https://github.com/christophhart/HISE
+- https://autotel.co/blog/sample-slicing-in-tone-js/
+
+* https://bedroomproducersblog.com/2016/10/21/native-instruments-kontakt-review/
+* https://www.nilsliberg.se/ksp/scripts/tutorial/
+* https://ask.audio/articles/introduction-to-scripting-in-kontakt-part-1
+* check KSP manual
+* https://www.youtube.com/watch?time_continue=315&v=SlpQoXhvjgc&feature=emb_title
+* https://www.youtube.com/watch?v=kVEB9pabviI
+* free instruments https://bedroomproducersblog.com/tag/kontakt/
+* https://www.youtube.com/watch?v=fV9hOZrNO_g
+
+* bela board c++ real time audio https://www.youtube.com/watch?v=aVLRUyPBBJk !!
+-->
+
+
+- https://smoothstep.io/
+- https://github.com/developit/htm
+- https://www.npmjs.com/package/@toycode/markdown-it-class
+- https://lit.dev/
+- https://github.com/ithinkihaveacat/eleventy-jsx
+- https://github.com/developit/vhtml
+- https://reactjs.org/docs/react-dom-server.html#rendertostaticmarkup
+- https://github.com/react-static/react-static
 
 - https://www.electronics-lab.com/project/how-to-program-attiny13attiny13a-using-arduino-ide/
 - https://mitxela.com/projects/midi_on_the_attiny
