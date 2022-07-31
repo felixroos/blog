@@ -21,6 +21,7 @@ export const guidetones: VoicingDictionary = {
   m9: ['3m 7m', '7m 10m'],
   '7': ['3M 7m', '7m 10M'],
   '^7': ['3M 7M', '7M 10M'],
+  '^7#11': ['3M 7M', '7M 10M'],
   '^9': ['3M 7M', '7M 10M'],
   '69': ['3M 6M'],
   '6': ['3M 6M', '6M 10M'],

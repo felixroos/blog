@@ -9,6 +9,7 @@ export function scaleNotes(scale, octave = 3) {
 }
 
 export default function composePhrase(phrase, scales, rhythm, octave = 3) {
+  // TODO: add tie reducer
   let i = 0;
   let lastScale;
   return composeEvents(rhythmEvents(scales), rhythmEvents(rhythm), (scaleEvent, noteEvent) => {

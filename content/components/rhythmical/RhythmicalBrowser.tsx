@@ -42,6 +42,11 @@ export default function RhythmicalBrowser() {
       <CardContent style={{ width: '100%', overflow: 'auto' }}>
         {song && (
           <>
+            {chords && (
+              <div style={{ float: 'right' }}>
+                <RhythmicalComposer chords={chords} />
+              </div>
+            )}
             <h3>
               {song.composer} - {song.title}
             </h3>
@@ -61,7 +66,6 @@ export default function RhythmicalBrowser() {
                 innerBorders={false}
               />
             )}
-            {chords && <RhythmicalComposer chords={chords} />}
           </>
         )}
         {songList}
