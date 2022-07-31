@@ -12,6 +12,6 @@ export default {
       C6: "../samples/piano/C6.mp3",
       C7: "../samples/piano/C7.mp3",
     }
-    return canUseDOM() && (await sampler(samples, { volume: -20 })()).toMaster();
+    return canUseDOM() && (await sampler(samples, { volume: -20 })()).toDestination();
   }
 }

@@ -9,11 +9,15 @@ const { PolySynth, Synth } = Tone;
 
 const harp =
   canUseDOM() &&
-  new PolySynth(6, Synth, {
-    volume: -16,
-    envelope: { attack: 0.01, decay: 2, sustain: 0, release: 0.1 },
-    oscillator: { type: 'fmtriangle' },
-  }).toMaster();
+  new PolySynth({
+    maxPolyphony: 6,
+    voice: Synth,
+    options: {
+      volume: -16,
+      envelope: { attack: 0.01, decay: 2, sustain: 0, release: 0.1 },
+      oscillator: { type: 'fmtriangle' },
+    },
+  }).toDestination();
 
 const valves: [number, string][] = [
   [0, '000'],

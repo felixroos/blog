@@ -10,19 +10,27 @@ const { PolySynth, Synth } = Tone;
 
 export const synth =
   canUseDOM() &&
-  new PolySynth(12, Synth, {
-    volume: -16,
-    envelope: { attack: 0.01, decay: 0.2, sustain: 0.5, release: 0.1 },
-    oscillator: { type: 'fmtriangle' },
-  }).toMaster();
+  new PolySynth({
+    maxPolyphony: 12,
+    voice: Synth,
+    options: {
+      volume: -16,
+      envelope: { attack: 0.01, decay: 0.2, sustain: 0.5, release: 0.1 },
+      oscillator: { type: 'fmtriangle' },
+    },
+  }).toDestination();
 
 export const click =
   canUseDOM() &&
-  new PolySynth(12, Synth, {
-    volume: -16,
-    envelope: { attack: 0.01, decay: 0.1, sustain: 0, release: 0 },
-    oscillator: { type: 'fmtriangle' },
-  }).toMaster();
+  new PolySynth({
+    maxPolyphony: 12,
+    voice: Synth,
+    options: {
+      volume: -16,
+      envelope: { attack: 0.01, decay: 0.1, sustain: 0, release: 0 },
+      oscillator: { type: 'fmtriangle' },
+    },
+  }).toDestination();
 
 export function playEvents(
   events: ValueChild<string>[],
@@ -37,7 +45,7 @@ export function playEvents(
     (e) => ['string', 'number'].includes(typeof e.value) // && e.value !== 'r'
   );
   let { loop = true, instruments = { synth }, duration = max(playableEvents.map((e) => e.time + e.duration)) } = config;
-  const part = new Tone.Part((time, event) => {
+  const part = new Tone.Part((time, event: any) => {
     if (event.value === 'r' || !['string', 'number'].includes(typeof event.value)) {
       return;
     }

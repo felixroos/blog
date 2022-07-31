@@ -47,9 +47,9 @@ export function rack(samples: { [key: string]: any }, options = {}) {
       return s;
     },
     toMaster: () => {
-      players.toMaster();
+      players.toDestination();
       return s;
-    }
+    },
   };
   return s;
 }
@@ -69,9 +69,9 @@ const tidalsounds = {
   cp: require('./cp/HANDCLP0.wav'),
   mt: require('./mt/MT0D3.wav'),
   ht: require('./ht/HT0D3.wav'),
-  lt: require('./lt/LT0D3.wav')
+  lt: require('./lt/LT0D3.wav'),
 };
-export default rack(tidalsounds).toMaster();
+export default rack(tidalsounds).toDestination();
 ```
 
 You can download the samples from the [Dirt-Samples repo](https://github.com/tidalcycles/Dirt-Samples).
@@ -97,9 +97,7 @@ function toggleSeq() {
     seq.stop();
   }
 }
-document
-  .getElementById('#playButton')
-  .addEventListener('click', () => toggleSeq());
+document.getElementById('#playButton').addEventListener('click', () => toggleSeq());
 // in your dom: <button id="playButton">toggle</button>
 ```
 
@@ -109,7 +107,7 @@ document
   events={renderRhythmObject(
     {
       duration: 2,
-      sequential: ['bd', 'hh', 'cp', 'hh', 'bd', 'hh', 'cp', 'hh']
+      sequential: ['bd', 'hh', 'cp', 'hh', 'bd', 'hh', 'cp', 'hh'],
     },
     [inheritProperty('instrument')]
   )}
@@ -125,7 +123,7 @@ To use samples for playing back pitched sounds, we can use Tone.Sampler:
 // sampler.ts
 
 import { Distance, Interval, Note } from 'tonal';
-import Tone from 'tone';
+import * as Tone from 'tone';
 
 export function sampler(samples, options = {}) {
   options = { volume: -12, attack: 0.05, ...options };
@@ -133,10 +131,7 @@ export function sampler(samples, options = {}) {
   const s = {
     triggerAttackRelease: (note, duration, velocity) => {
       if (options['transpose']) {
-        note = Distance.transpose(
-          note,
-          Interval.fromSemitones(options['transpose'])
-        );
+        note = Distance.transpose(note, Interval.fromSemitones(options['transpose']));
       }
       sampler.triggerAttackRelease(Note.simplify(note), duration, velocity);
     },
@@ -145,9 +140,9 @@ export function sampler(samples, options = {}) {
       return s;
     },
     toMaster: () => {
-      sampler.toMaster();
+      sampler.toDestination();
       return s;
-    }
+    },
   };
   return s;
 }
@@ -163,12 +158,12 @@ export const piano = {
   C4: require('./C4.mp3'),
   C5: require('./C5.mp3'),
   C6: require('./C6.mp3'),
-  C7: require('./C7.mp3')
+  C7: require('./C7.mp3'),
 };
 
 import { sampler } from '../../../components/rhythmical/instruments/sampler';
 
-export default sampler(piano).toMaster();
+export default sampler(piano).toDestination();
 ```
 
 The good thing about Tone.Sampler, is that it is able to fill the gaps between non existing pitches.
@@ -182,12 +177,7 @@ You can compare the two and judge for yourself:
   fold={true}
   events={renderRhythmObject({
     duration: 4,
-    sequential: [
-      ['c3', 'e3', 'g3', 'b3'],
-      ['a3', 'g3', 'e3', 'c3'],
-      ['d3', 'f3', 'a3', 'c4'],
-      'b3'
-    ]
+    sequential: [['c3', 'e3', 'g3', 'b3'], ['a3', 'g3', 'e3', 'c3'], ['d3', 'f3', 'a3', 'c4'], 'b3'],
   })}
 />
 
@@ -196,12 +186,7 @@ You can compare the two and judge for yourself:
   fold={true}
   events={renderRhythmObject({
     duration: 4,
-    sequential: [
-      ['c3', 'e3', 'g3', 'b3'],
-      ['a3', 'g3', 'e3', 'c3'],
-      ['d3', 'f3', 'a3', 'c4'],
-      'b3'
-    ]
+    sequential: [['c3', 'e3', 'g3', 'b3'], ['a3', 'g3', 'e3', 'c3'], ['d3', 'f3', 'a3', 'c4'], 'b3'],
   })}
 />
 
@@ -211,16 +196,10 @@ This time, we play it back using rhythmical + Tone.Part (as Tone.Sequence does n
 const duration = 4;
 const seq = (instr) => {
   const sequence = new Tone.Part(
-    (time, { value, duration }) =>
-      instr.triggerAttackRelease(value, duration, time),
+    (time, { value, duration }) => instr.triggerAttackRelease(value, duration, time),
     renderRhythmObject({
       duration,
-      sequential: [
-        ['c3', 'e3', 'g3', 'b3'],
-        ['a3', 'g3', 'e3', 'c3'],
-        ['d3', 'f3', 'a3', 'c4'],
-        'b3'
-      ]
+      sequential: [['c3', 'e3', 'g3', 'b3'], ['a3', 'g3', 'e3', 'c3'], ['d3', 'f3', 'a3', 'c4'], 'b3'],
     })
   );
   sequence.loop = true;
@@ -281,20 +260,12 @@ if (!folder) {
       .forEach(function (file) {
         const encoder = new Lame({
           output: `${directoryPath}/${file.split('.')[0]}.mp3`,
-          bitrate: 192
+          bitrate: 192,
         }).setFile(`${directoryPath}/${file.split('.')[0]}.wav`);
         encoder
           .encode()
-          .then(() =>
-            console.log(`encoded ${directoryPath}/${file.split('.')[0]}.mp3`)
-          )
-          .catch((error) =>
-            console.log(
-              `error encoding ${directoryPath}/${
-                file.split('.')[0]
-              }.mp3: ${error}`
-            )
-          );
+          .then(() => console.log(`encoded ${directoryPath}/${file.split('.')[0]}.mp3`))
+          .catch((error) => console.log(`error encoding ${directoryPath}/${file.split('.')[0]}.mp3: ${error}`));
       });
   });
 }
@@ -311,28 +282,21 @@ So here are a few demos using a rhodes sound with 40MB payload:
 <Player
   instruments={{ MK2md2 }}
   fold={true}
-  events={renderRhythmObject(
-    {
-      duration: 8,
-      parallel: [
-        {
-          parallel: [
-            ['c3', 'a2', 'd3', 'g2'],
-            ['r', 'g3', 'r', 'e3', 'r', 'a3', 'r', 'd3'],
-            ['r', 'e4', 'r', 'c4', 'r', 'f4', 'r', 'b3']
-          ]
-        },
-        {
-          sequential: [
-            ['c5', 'e5', 'g5', 'b5'],
-            ['a5', 'g5', 'e5', 'c5'],
-            ['d5', 'f5', 'a5', 'c6'],
-            ['b5']
-          ]
-        }
-      ]
-    }
-  )}
+  events={renderRhythmObject({
+    duration: 8,
+    parallel: [
+      {
+        parallel: [
+          ['c3', 'a2', 'd3', 'g2'],
+          ['r', 'g3', 'r', 'e3', 'r', 'a3', 'r', 'd3'],
+          ['r', 'e4', 'r', 'c4', 'r', 'f4', 'r', 'b3'],
+        ],
+      },
+      {
+        sequential: [['c5', 'e5', 'g5', 'b5'], ['a5', 'g5', 'e5', 'c5'], ['d5', 'f5', 'a5', 'c6'], ['b5']],
+      },
+    ],
+  })}
 />
 
 ### green onions
@@ -347,8 +311,8 @@ So here are a few demos using a rhodes sound with 40MB payload:
         ['r', 'f4', 'eb4', 'd4'],
         ['r', 'c4', 'c4', 'bb3'],
         ['r', 'ab3', 'ab3', 'f3'],
-        ['f2', 'f2', 'ab2', 'bb2']
-      ]
+        ['f2', 'f2', 'ab2', 'bb2'],
+      ],
     },
     [inheritProperty('instrument')]
   )}
@@ -366,47 +330,22 @@ So here are a few demos using a rhodes sound with 40MB payload:
         {
           instrument: 'MK2md2',
           sequential: [
-            [
-              'r',
-              ['a3', 'c4', 'f4', 'r'],
-              ['a4', 'r', 'r', 'f4'],
-              ['r', 'r', 'c4', 'r']
-            ],
-            [
-              'r',
-              ['a3', 'c#4', 'f4', 'r'],
-              ['a4', 'r', 'r', 'f4'],
-              ['r', 'r', 'c#4', 'r']
-            ],
-            [
-              'r',
-              ['b3', 'd4', 'f4', 'r'],
-              ['a4', 'r', 'r', 'f4'],
-              ['r', 'r', 'd4', 'r']
-            ],
-            [
-              'r',
-              ['c4', 'e4', 'g4', 'r'],
-              ['c5', 'r', 'r', 'bb4'],
-              ['r', 'r', 'g4', 'r']
-            ]
-          ]
+            ['r', ['a3', 'c4', 'f4', 'r'], ['a4', 'r', 'r', 'f4'], ['r', 'r', 'c4', 'r']],
+            ['r', ['a3', 'c#4', 'f4', 'r'], ['a4', 'r', 'r', 'f4'], ['r', 'r', 'c#4', 'r']],
+            ['r', ['b3', 'd4', 'f4', 'r'], ['a4', 'r', 'r', 'f4'], ['r', 'r', 'd4', 'r']],
+            ['r', ['c4', 'e4', 'g4', 'r'], ['c5', 'r', 'r', 'bb4'], ['r', 'r', 'g4', 'r']],
+          ],
         },
         {
           instrument: 'MK2md2',
           color: 'steelblue',
           parallel: [
-            [
-              'a3',
-              'a3',
-              ['a3', ['g3', 'f3']],
-              ['f3', { sequential: 'e3', duration: 3 }]
-            ],
+            ['a3', 'a3', ['a3', ['g3', 'f3']], ['f3', { sequential: 'e3', duration: 3 }]],
             ['f3', 'f3', 'd3', ['d3', { sequential: 'c3', duration: 3 }]],
-            ['c3', 'c#3', 'b2', 'bb2']
-          ]
-        }
-      ]
+            ['c3', 'c#3', 'b2', 'bb2'],
+          ],
+        },
+      ],
     },
     [inheritProperty('instrument')]
   )}
@@ -422,7 +361,7 @@ How it sounds:
   instruments={{ MK2md2 }}
   events={renderRhythmObject({
     duration: 4,
-    sequential: [400, 410, 420, 430, 440, 450, 460, 470]
+    sequential: [400, 410, 420, 430, 440, 450, 460, 470],
   })}
 />
 
@@ -431,7 +370,7 @@ How it should sound:
 <Player
   events={renderRhythmObject({
     duration: 4,
-    sequential: [400, 410, 420, 430, 440, 450, 460, 470]
+    sequential: [400, 410, 420, 430, 440, 450, 460, 470],
   })}
 />
 
@@ -442,7 +381,7 @@ source:
   instruments={{ MK2md2 }}
   events={renderRhythmObject({
     duration: 4,
-    sequential: [400, 410, 420, 430, 440, 450, 460, 470]
+    sequential: [400, 410, 420, 430, 440, 450, 460, 470],
   })}
 />
 ```

@@ -1,6 +1,6 @@
 
-import { Distance, Interval, Note } from 'tonal';
-import Tone from 'tone';
+import { Interval, Note } from '@tonaljs/tonal';
+import * as Tone from 'tone';
 
 export function sampler(samples, options = {}) {
   return () => new Promise<any>((resolve, reject) => {
@@ -19,14 +19,15 @@ export function sampler(samples, options = {}) {
           return;
         }
         if (options['transpose']) {
-          note = Distance.transpose(note, Interval.fromSemitones(options['transpose']));
+          note = Note.transpose(note, Interval.fromSemitones(options['transpose']));
         }
         sampler.triggerAttackRelease(Note.simplify(note), duration, time, velocity);
       },
       triggerAttack: sampler.triggerAttack,
       triggerRelease: sampler.triggerAttack,
       connect: (dest) => { sampler.connect(dest); return s },
-      toMaster: () => { sampler.toMaster(); return s },
+      toMaster: () => { sampler.toDestination(); return s },
+      toDestination: () => { sampler.toDestination(); return s },
     }
   })
 }

@@ -1,4 +1,4 @@
-import Tone from 'tone';
+import * as Tone from 'tone';
 
 //TBD add transpose option for keys
 
@@ -18,12 +18,13 @@ export function rack(samples: { [key: string]: any }, options = {}) {
           console.warn(`key ${key} not found for playback`);
           return;
         }
-        const player = players.get(key); // TODO: rename to players
+        const player = players.player(key); // TODO: rename to players
         player.start(time);
         player.stop(time + duration);
       },
       connect: (dest) => { players.connect(dest); return s },
-      toMaster: () => { players.toMaster(); return s }, // TODO: rename toDestination
+      toMaster: () => { players.toDestination(); return s }, // TODO: rename toDestination
+      toDestination: () => { players.toDestination(); return s }, // TODO: rename toDestination
     }
   })
 }

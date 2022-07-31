@@ -32,14 +32,14 @@ export function rhythmFraction<T>(
     return [0, duration, 1]
   }
   const durations = siblings.map((sibling: RhythmObject<T>) => sibling.duration ?? 1);
-  const position = sum(durations.slice(0, index));
   const total = sum(durations);
   if ((parent as RhythmObject<T>)?.parallel) {
     // parallel path
     return [0, duration, max(durations)];
   }
+  const time = sum(durations.slice(0, index));
   // sequential path
-  return [position, duration, total]
+  return [time, duration, total]
 }
 
 export function isRhythmLeaf<T>(rhythm: RhythmNode<T>) {
@@ -52,6 +52,17 @@ export function rhythmValue<T>(rhythm: RhythmNode<T>): T {
 
 export function rhythmEvent<T>(rhythm: RhythmNode<T>, path): RhythmEvent<T> {
   return { value: rhythmValue(rhythm), ...pathTimeDuration(path) }
+}
+
+// without variable durations (path = Array<[time, siblings]>)
+export function pathTimeDurationSimple(path: Path, whole = 1): { time: number, duration: number } {
+  let time = 0;
+  let duration = whole;
+  for (let i = 0; i < path.length; i++) {
+    time = time + path[i][0] / path[i][1] * duration
+    duration /= path[i][1];
+  }
+  return { time, duration };
 }
 
 // returns time duration from path array (array of fractions)
@@ -142,14 +153,3 @@ export function editLeafValue<T>(fn: (value: T) => T) {
     return fn(leaf);
   }
 }
-
-// SIMPLE TREE STUFF
-
-export function* walk(getChildren, tree, index?, siblings?) {
-  yield tree;
-  const children = getChildren(tree) || []
-  for (let i = 0; i < children.length; ++i) {
-    yield* walk(getChildren, children[i], i, children)
-  }
-}
-

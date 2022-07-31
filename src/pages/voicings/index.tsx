@@ -7,7 +7,7 @@ import { Voicing } from '../../../content/drafts/voicing/Voicing';
 import Keyboard from '../../../content/components/Keyboard';
 const { PolySynth, Synth } = Tone;
 const isBrowser = typeof window !== 'undefined';
-const poly = isBrowser && new PolySynth(32, Synth, { volume: -12 }).toMaster();
+const poly = isBrowser && new PolySynth({ maxPolyphony: 16, voice: Synth, options: { volume: -12 } }).toDestination();
 import DynamicTable from '../../../content/components/common/DynamicTable';
 import { min, max } from 'd3-array';
 import Layout from '../Layout';
@@ -26,47 +26,31 @@ export default function Voicings() {
     topDistances: '3-7',
     arpeggioInterval: 200,
     bottomDegrees: '1 3,5,7',
-    topDegrees: ''
+    topDegrees: '',
   });
-  const parseInts = (divider) => (d) =>
-    d.split(divider).map((_d) => parseInt(_d));
+  const parseInts = (divider) => (d) => d.split(divider).map((_d) => parseInt(_d));
   const options = {
     ...state,
     range: ['A1', 'C5'],
     notes: [state.minNotes, state.maxNotes] || 5,
     bottomPitches: state.bottomPitches ? state.bottomPitches.split(' ') : [],
     topPitches: state.topPitches ? state.topPitches.split(' ') : [],
-    bottomDegrees: state.bottomDegrees
-      ? state.bottomDegrees.trim().split(' ').map(parseInts(','))
-      : [],
-    topDegrees: state.topDegrees
-      ? state.topDegrees.trim().split(' ').map(parseInts(','))
-      : [],
-    bottomDistances: state.bottomDistances
-      ? state.bottomDistances.trim().split(' ').map(parseInts('-'))
-      : [],
-    topDistances: state.topDistances
-      ? state.topDistances.trim().split(' ').map(parseInts('-'))
-      : [],
-    defaultDistances: state.defaultDistances
-      ? state.defaultDistances.trim().split('-').map(parseInts('-'))
-      : []
+    bottomDegrees: state.bottomDegrees ? state.bottomDegrees.trim().split(' ').map(parseInts(',')) : [],
+    topDegrees: state.topDegrees ? state.topDegrees.trim().split(' ').map(parseInts(',')) : [],
+    bottomDistances: state.bottomDistances ? state.bottomDistances.trim().split(' ').map(parseInts('-')) : [],
+    topDistances: state.topDistances ? state.topDistances.trim().split(' ').map(parseInts('-')) : [],
+    defaultDistances: state.defaultDistances ? state.defaultDistances.trim().split('-').map(parseInts('-')) : [],
   };
   let voicings = Voicing.getCombinations(state.tonic + state.symbol, options);
   const flatMidi = [].concat.apply([], voicings).map((n) => Note.midi(n));
-  const range = [min(flatMidi), max(flatMidi)].map((midi) =>
-    Note.fromMidi(+midi)
-  );
+  const range = [min(flatMidi), max(flatMidi)].map((midi) => Note.fromMidi(+midi));
   //.map((note) => Note.simplify(note));
   return (
     <Layout
       sidebar={
         <>
           <label>
-            <select
-              value={state.tonic}
-              onChange={(e) => setState({ ...state, tonic: e.target.value })}
-            >
+            <select value={state.tonic} onChange={(e) => setState({ ...state, tonic: e.target.value })}>
               <option>C</option>
               <option>C#</option>
               <option>Db</option>
@@ -85,10 +69,7 @@ export default function Voicings() {
               <option>Bb</option>
               <option>B</option>
             </select>
-            <select
-              value={state.symbol}
-              onChange={(e) => setState({ ...state, symbol: e.target.value })}
-            >
+            <select value={state.symbol} onChange={(e) => setState({ ...state, symbol: e.target.value })}>
               <option>^</option>
               <option>sus4</option>
               <option>sus2</option>
@@ -171,9 +152,7 @@ export default function Voicings() {
             <input
               type="text"
               value={state.bottomDistances}
-              onChange={(e) =>
-                setState({ ...state, bottomDistances: e.target.value })
-              }
+              onChange={(e) => setState({ ...state, bottomDistances: e.target.value })}
             />
             bottomDistances (min0-max0 min1-max1 ...){' '}
           </label>
@@ -182,9 +161,7 @@ export default function Voicings() {
             <input
               type="text"
               value={state.defaultDistances}
-              onChange={(e) =>
-                setState({ ...state, defaultDistances: e.target.value })
-              }
+              onChange={(e) => setState({ ...state, defaultDistances: e.target.value })}
             />{' '}
             defaultDistances (min-max semitones)
           </label>
@@ -193,9 +170,7 @@ export default function Voicings() {
             <input
               type="text"
               value={state.topDistances}
-              onChange={(e) =>
-                setState({ ...state, topDistances: e.target.value })
-              }
+              onChange={(e) => setState({ ...state, topDistances: e.target.value })}
             />{' '}
             topDistance(s) (... minTop-maxTop){' '}
           </label>
@@ -204,9 +179,7 @@ export default function Voicings() {
             <input
               type="text"
               value={state.bottomDegrees}
-              onChange={(e) =>
-                setState({ ...state, bottomDegrees: e.target.value })
-              }
+              onChange={(e) => setState({ ...state, bottomDegrees: e.target.value })}
             />{' '}
             bottomDegree(s) (1-7)
           </label>
@@ -215,9 +188,7 @@ export default function Voicings() {
             <input
               type="text"
               value={state.topDegrees}
-              onChange={(e) =>
-                setState({ ...state, topDegrees: e.target.value })
-              }
+              onChange={(e) => setState({ ...state, topDegrees: e.target.value })}
             />{' '}
             topDegree(s) (1-7)
           </label>
@@ -226,9 +197,7 @@ export default function Voicings() {
             <input
               type="number"
               value={state.arpeggioInterval}
-              onChange={(e) =>
-                setState({ ...state, arpeggioInterval: e.target.value })
-              }
+              onChange={(e) => setState({ ...state, arpeggioInterval: e.target.value })}
               min="0"
               max="1000"
             />
@@ -236,10 +205,7 @@ export default function Voicings() {
           </label>
           <br />
           <label>
-            <select
-              value={state.sortBy}
-              onChange={(e) => setState({ ...state, sortBy: e.target.value })}
-            >
+            <select value={state.sortBy} onChange={(e) => setState({ ...state, sortBy: e.target.value })}>
               <option value="topMidi">top note</option>
               <option value="bottomMidi">bottom note</option>
               <option value="midiMedian">median note</option>
@@ -255,10 +221,7 @@ export default function Voicings() {
           </label>
           <br />
           <label>
-            <select
-              value={state.wave}
-              onChange={(e) => setState({ ...state, wave: e.target.value })}
-            >
+            <select value={state.wave} onChange={(e) => setState({ ...state, wave: e.target.value })}>
               <option value="sine">sine</option>
               <option value="triangle">triangle</option>
               <option value="sawtooth">sawtooth</option>
@@ -286,9 +249,7 @@ export default function Voicings() {
           <ul>
             <li>Beautify Interface</li>
             <li>Steps are buggy - test</li>
-            <li>
-              Reimplement rules, use array of objects with voices as selector
-            </li>
+            <li>Reimplement rules, use array of objects with voices as selector</li>
           </ul>
           <a href="../">Go back to blog</a>
         </>
@@ -322,21 +283,18 @@ export default function Voicings() {
                         colorize: [
                           {
                             keys,
-                            color: 'steelblue'
-                          }
-                        ]
+                            color: 'steelblue',
+                          },
+                        ],
                       }}
                     />
                   </div>
-                )
+                ),
               },
               {
                 property: 'structure',
                 resolve: (keys: any) => {
-                  const { steps, intervals } = Voicing.analyze(
-                    keys,
-                    state.tonic
-                  );
+                  const { steps, intervals } = Voicing.analyze(keys, state.tonic);
                   return (
                     <>
                       {keys.join(' ')}
@@ -346,24 +304,23 @@ export default function Voicings() {
                       {intervals.join(' ')}
                     </>
                   );
-                }
+                },
               },
               {
                 property: 'spread',
                 resolve: (keys) => Voicing.analyze(keys, state.tonic).spread,
-                sort: (a, b) => Interval.semitones(a) - Interval.semitones(b)
+                sort: (a, b) => Interval.semitones(a) - Interval.semitones(b),
               },
               {
                 property: 'leap',
                 resolve: (keys) => Voicing.analyze(keys, state.tonic).leap,
-                sort: (a, b) => Interval.semitones(a) - Interval.semitones(b)
+                sort: (a, b) => Interval.semitones(a) - Interval.semitones(b),
               },
               {
                 property: 'midi median',
-                resolve: (keys) =>
-                  Voicing.analyze(keys, state.tonic).midiMedian,
-                sort: (a, b) => a - b
-              }
+                resolve: (keys) => Voicing.analyze(keys, state.tonic).midiMedian,
+                sort: (a, b) => a - b,
+              },
             ]}
             rows={voicings}
           />

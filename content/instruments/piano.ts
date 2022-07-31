@@ -89,6 +89,6 @@ export const piano = {
       Bb7: "../samples/piano/Bb7.mp3",
       B7: "../samples/piano/B7.mp3"
     }
-    return canUseDOM() && (await sampler(samples, { volume: -20 })()).toMaster();
+    return canUseDOM() && (await sampler(samples, { volume: -20 })()).toDestination();
   }
 }

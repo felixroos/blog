@@ -73,7 +73,7 @@ export const MK2md2 = {
       Eb7: "../samples/rhodes/MK2Md2071.mp3",
       E7: "../samples/rhodes/MK2Md2072.mp3"
     }
-    return canUseDOM() && (await sampler(samples, { volume: -20 })()).toMaster();
+    return canUseDOM() && (await sampler(samples, { volume: -20 })()).toDestination();
   }
 }
 

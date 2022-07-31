@@ -1,24 +1,19 @@
-import React from "react"
-import { scaleLinear, scaleLog } from "d3-scale"
-import { max, min } from "d3-array"
-import { interpolateRound } from "d3-interpolate"
-import { Note } from "@tonaljs/tonal"
-import { nearestPitch, frequencyColor } from "./tuning"
+import React from 'react';
+import { scaleLinear, scaleLog } from 'd3-scale';
+import { max, min } from 'd3-array';
+import { interpolateRound } from 'd3-interpolate';
+import { Note } from '@tonaljs/tonal';
+import { nearestPitch, frequencyColor } from './tuning';
 
-import canUseDOM from "../canUseDOM"
-import * as Tone from "tone"
-const { PolySynth, Synth } = Tone
-const harp = canUseDOM() && new PolySynth(6, Synth, { volume: -6 }).toMaster()
+import canUseDOM from '../canUseDOM';
+import * as Tone from 'tone';
+const { PolySynth, Synth } = Tone;
+const harp = canUseDOM() && new PolySynth({ maxPolyphony: 6, voice: Synth, options: { volume: -6 } }).toDestination();
 
-export default function Strings({
-  frequencies,
-  notes,
-  labels,
-  amplitudes,
-}: any) {
-  frequencies = frequencies || []
+export default function Strings({ frequencies, notes, labels, amplitudes }: any) {
+  frequencies = frequencies || [];
   if (notes) {
-    frequencies = frequencies.concat(notes.map((note) => Note.freq(note)))
+    frequencies = frequencies.concat(notes.map((note) => Note.freq(note)));
   }
   const options = {
     size: {
@@ -32,30 +27,25 @@ export default function Strings({
       right: 20,
     },
     strokeWidth: 8,
-  }
-  const { size, margin, strokeWidth } = options
-  const innerWidth = size.width - margin.left - margin.right
-  const innerHeight = size.height - margin.top - margin.bottom
+  };
+  const { size, margin, strokeWidth } = options;
+  const innerWidth = size.width - margin.left - margin.right;
+  const innerHeight = size.height - margin.top - margin.bottom;
 
   const x = scaleLog()
     .base(2)
     .domain([min(frequencies), max(frequencies)])
     .range([margin.left, size.width - margin.right - strokeWidth])
-    .interpolate(interpolateRound)
+    .interpolate(interpolateRound);
 
   const lineLength = scaleLinear() /*  scaleLog()
     .base(2) */
     .domain([1, max(frequencies)])
     .range([1, innerHeight])
-    .interpolate(interpolateRound)
+    .interpolate(interpolateRound);
 
   function handleTrigger(i) {
-    harp.triggerAttackRelease(
-      frequencies[i],
-      "4n",
-      "+0",
-      amplitudes ? Math.abs(amplitudes[i]) || 1 : 1
-    )
+    harp.triggerAttackRelease(frequencies[i], '4n', '+0', amplitudes ? Math.abs(amplitudes[i]) || 1 : 1);
   }
   return (
     <>
@@ -71,27 +61,18 @@ export default function Strings({
         /> */}
 
         {frequencies.map((f, i) => {
-          const length = !amplitudes
-            ? lineLength(f)
-            : amplitudes[i] * innerHeight
-          const pos = { x: x(f), y: margin.top + (innerHeight - length) }
-          const radius = margin.bottom / 2
+          const length = !amplitudes ? lineLength(f) : amplitudes[i] * innerHeight;
+          const pos = { x: x(f), y: margin.top + (innerHeight - length) };
+          const radius = margin.bottom / 2;
           const text = {
             x: pos.x + strokeWidth / 2,
             y: size.height - margin.bottom + radius,
-          }
-          const label = labels ? labels[i] : nearestPitch(f)
-          const color = frequencyColor(f)
+          };
+          const label = labels ? labels[i] : nearestPitch(f);
+          const color = frequencyColor(f);
           return (
             <g key={i} onMouseEnter={() => handleTrigger(i)}>
-              <rect
-                key={`string-${i}`}
-                fill={color}
-                x={pos.x}
-                y={pos.y}
-                width={strokeWidth}
-                height={length}
-              ></rect>
+              <rect key={`string-${i}`} fill={color} x={pos.x} y={pos.y} width={strokeWidth} height={length}></rect>
               {/* <line
                 key={`line-${i}`}
                 x1={pos.x}
@@ -102,26 +83,14 @@ export default function Strings({
                 stroke="gray"
                 strokeWidth={1}
               /> */}
-              <circle
-                cx={text.x}
-                cy={text.y}
-                r={radius}
-                stroke="black"
-                strokeWidth="1"
-                fill={color}
-              />
+              <circle cx={text.x} cy={text.y} r={radius} stroke="black" strokeWidth="1" fill={color} />
               {label && (
-                <text
-                  textAnchor="middle"
-                  x={text.x}
-                  y={text.y + 5}
-                  fill="black"
-                >
+                <text textAnchor="middle" x={text.x} y={text.y + 5} fill="black">
                   {label}
                 </text>
               )}
             </g>
-          )
+          );
         })}
       </svg>
       <br />
@@ -133,9 +102,9 @@ export default function Strings({
           .join(" ")}
       </p> */}
     </>
-  )
+  );
 }
 
 export function fraction(frequency, root = 440) {
-  return Math.log(frequency / root) / Math.log(2)
+  return Math.log(frequency / root) / Math.log(2);
 }

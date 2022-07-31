@@ -1,3 +1,5 @@
+// for an alternative implementation, check out visit (rhythmical-trees post)
+
 export function visitTree<T>(
   tree: T,
   before: (node: T, index?: number, siblings?: T[], parent?: T) => any,

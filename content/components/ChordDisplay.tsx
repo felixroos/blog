@@ -1,58 +1,52 @@
-import React, { useState, useMemo } from "react"
+import React, { useState, useMemo } from 'react';
 
-import Keyboard from "./Keyboard"
-import { Note } from "@tonaljs/tonal"
-import { ChordType } from "@tonaljs/tonal"
-import * as Tone from "tone"
-import { useDrag } from "react-use-gesture"
+import Keyboard from './Keyboard';
+import { Note } from '@tonaljs/tonal';
+import { ChordType } from '@tonaljs/tonal';
+import * as Tone from 'tone';
+import { useDrag } from 'react-use-gesture';
 
-const { PolySynth, Synth } = Tone
+const { PolySynth, Synth } = Tone;
 
-const allNotes = [
-  ...Note.names(),
-  ...Note.names().map((n) => n + "b"),
-  ...Note.names().map((n) => n + "#"),
-]
+const allNotes = [...Note.names(), ...Note.names().map((n) => n + 'b'), ...Note.names().map((n) => n + '#')];
 
 function getChordNotes(tonic, symbol) {
-  return ChordType.get(symbol).intervals.map((interval) =>
-    Note.transpose(tonic, interval)
-  )
+  return ChordType.get(symbol).intervals.map((interval) => Note.transpose(tonic, interval));
 }
-const isBrowser = typeof window !== "undefined"
+const isBrowser = typeof window !== 'undefined';
 
 export default function ChordDisplay() {
   const poly = useMemo(
-    () => isBrowser && new PolySynth(6, Synth, { volume: -12 }).toMaster(),
+    () => isBrowser && new PolySynth({ maxPolyphony: 32, voice: Synth, volume: -12 }).toDestination(),
     []
-  )
+  );
 
-  const [note, setNote] = useState("C3")
-  const [chord, setChord] = useState("major")
-  const [active, setActive] = useState(getChordNotes(note, chord))
+  const [note, setNote] = useState('C3');
+  const [chord, setChord] = useState('major');
+  const [active, setActive] = useState(getChordNotes(note, chord));
 
   function attack(note) {
-    const notes = getChordNotes(note, chord)
-    setActive(notes)
-    poly.triggerAttack(notes)
+    const notes = getChordNotes(note, chord);
+    setActive(notes);
+    poly.triggerAttack(notes);
   }
 
   const onDrag = useDrag(({ down, first, active: _active }) => {
     if (first) {
-      poly.triggerAttack(active)
+      poly.triggerAttack(active);
     }
     if (!_active) {
-      poly.triggerRelease(active)
+      poly.triggerRelease(active);
     }
-  })
+  });
 
   return (
     <>
       <select
-        value={note.replace(/[0-9]/, "")}
+        value={note.replace(/[0-9]/, '')}
         onChange={(e) => {
-          setNote(e.target.value + "3")
-          setActive(getChordNotes(e.target.value + "3", chord))
+          setNote(e.target.value + '3');
+          setActive(getChordNotes(e.target.value + '3', chord));
         }}
       >
         {allNotes.map((note, index) => (
@@ -62,8 +56,8 @@ export default function ChordDisplay() {
       <select
         value={chord}
         onChange={(e) => {
-          setChord(e.target.value)
-          setActive(getChordNotes(note, e.target.value))
+          setChord(e.target.value);
+          setActive(getChordNotes(note, e.target.value));
         }}
       >
         {ChordType.names().map((_chord, index) => (
@@ -74,28 +68,25 @@ export default function ChordDisplay() {
       <br />
       <Keyboard
         onAttack={(key) => {
-          setNote(key.notes[0])
-          attack(key.notes[0])
+          setNote(key.notes[0]);
+          attack(key.notes[0]);
         }}
         onRelease={() => {
-          poly.triggerRelease(active)
+          poly.triggerRelease(active);
         }}
         options={{
-          range: ["B2", "C5"],
+          range: ['B2', 'C5'],
           scaleX: 2,
           scaleY: 2,
           colorize: [
             {
-              color: "yellow",
+              color: 'yellow',
               keys: active.map((n) => Note.simplify(n)),
             },
           ],
-          labels: active.reduce(
-            (l, n) => ({ ...l, [Note.simplify(n)]: n }),
-            {}
-          ),
+          labels: active.reduce((l, n) => ({ ...l, [Note.simplify(n)]: n }), {}),
         }}
       />
     </>
-  )
+  );
 }

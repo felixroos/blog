@@ -7,32 +7,34 @@ const { PolySynth, Synth } = Tone
 
 interface SynthAction {
   type?: string,
-  notes?: Tone.Frequency[],
-  time?: Tone.Time,
+  notes?: any, // TODO: type
+  time?: any,
   velocity?: number | number[],
 };
 
-export default function useSynth(props: { synth?: Tone.Monophonic, options?: any, voices?: number } = {}) {
+export default function useSynth(props: { synth?: any, options?: any, voices?: number } = {}) {
   let { synth, options, voices } = props;
   synth = synth || useMemo(() => {
     return canUseDOM() &&
-      new PolySynth(voices || 3, Synth, {
-        volume: -12,
-        oscillator: { type: "sine" },
-        envelope: {
-          attack: 0.001,
-          decay: 0.1,
-          sustain: 0.6,
-          release: 0.1
-        },
-        ...options
-      }).toMaster()
+      new PolySynth({
+        maxPolyphony: voices || 3, voice: Synth, options: {
+          volume: -12,
+          oscillator: { type: "sine" },
+          envelope: {
+            attack: 0.001,
+            decay: 0.1,
+            sustain: 0.6,
+            release: 0.1
+          },
+          ...options
+        }
+      }).toDestination()
   }, []);
   const [state, dispatch] = useReducer(
     (state, action: SynthAction) => {
       const { type, notes, time, velocity } = { time: "+0.01", velocity: 1, ...action };
 
-      function attackWithVelocity(notes: Tone.Frequency[], time: Tone.Time, velocity: number | number[] = 1) {
+      function attackWithVelocity(notes: any, time: any, velocity: number | number[] = 1) {
         if (typeof velocity === 'number') {
           synth.triggerAttack(notes, time, velocity)
         } else {

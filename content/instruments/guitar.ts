@@ -51,6 +51,6 @@ export const guitar = {
       C6: "../samples/guitar/45 L5.mp3",
       Db6: "../samples/guitar/46 L5.mp3",
     }
-    return canUseDOM() && (await sampler(samples, { volume: -20 })()).toMaster();
+    return canUseDOM() && (await sampler(samples, { volume: -20 })()).toDestination();
   }
 }

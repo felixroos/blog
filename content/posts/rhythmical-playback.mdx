@@ -4,10 +4,7 @@ date: 2020-06-09
 keywords: ['rhythmical']
 ---
 
-import {
-  playEvents,
-  synth
-} from '../components/rhythmical/components/Player.tsx';
+import { playEvents, synth } from '../components/rhythmical/components/Player.tsx';
 import PlayButton from '../components/rhythmical/components/PlayButton.tsx';
 import { renderRhythmObject } from '../components/rhythmical/rhythmical.ts';
 import PianoRoll from '../components/rhythmical/components/PianoRoll.tsx';
@@ -31,11 +28,15 @@ const { PolySynth, Synth } = Tone;
 
 const synth =
   canUseDOM() &&
-  new PolySynth(6, Synth, {
-    volume: -16,
-    envelope: { attack: 0.01, decay: 2, sustain: 0, release: 0.1 },
-    oscillator: { type: 'fmtriangle' }
-  }).toMaster();
+  new PolySynth({
+    maxPolyphony: 6,
+    voice: Synth,
+    options: {
+      volume: -16,
+      envelope: { attack: 0.01, decay: 2, sustain: 0, release: 0.1 },
+      oscillator: { type: 'fmtriangle' },
+    },
+  }).toDestination();
 
 export function playEvents(
   events: ValueChild<string>[],
@@ -44,14 +45,10 @@ export function playEvents(
     instrument?;
   } = {}
 ) {
-  let {
-    instrument = synth,
-    duration = max(events.map((e) => e.time + e.duration))
-  } = config;
+  let { instrument = synth, duration = max(events.map((e) => e.time + e.duration)) } = config;
   // play back with tonal
   const part = new Tone.Part(
-    (time, event) =>
-      instrument.triggerAttackRelease(event.value, event.duration, time),
+    (time, event) => instrument.triggerAttackRelease(event.value, event.duration, time),
     events // <- the events are used here
   ).start(0);
   part.loop = true;
@@ -67,8 +64,8 @@ with it, we can then trigger playback:
   events={renderRhythmObject({
     parallel: [
       ['E3', 'F3', 'G3', 'A3'],
-      ['C3', 'D3', 'E3', 'F3']
-    ]
+      ['C3', 'D3', 'E3', 'F3'],
+    ],
   })}
 />
 
@@ -77,8 +74,8 @@ playEvents(
   renderRhythmObject({
     parallel: [
       ['E3', 'F3', 'G3', 'A3'],
-      ['C3', 'D3', 'E3', 'F3']
-    ]
+      ['C3', 'D3', 'E3', 'F3'],
+    ],
   })
 );
 ```
@@ -111,9 +108,9 @@ export function rack(samples: { [key: string]: any }, options = {}) {
       return s;
     },
     toMaster: () => {
-      players.toMaster();
+      players.toDestination();
       return s;
-    }
+    },
   };
   return s;
 }
@@ -134,16 +131,16 @@ const drums =
     cp: require('./cp/HANDCLP0.wav'),
     mt: require('./mt/MT0D3.wav'),
     ht: require('./ht/HT0D3.wav'),
-    lt: require('./lt/LT0D3.wav')
-  }).toMaster();
+    lt: require('./lt/LT0D3.wav'),
+  }).toDestination();
 // play
 playEvents(
   renderRhythmObject({
     duration: 2,
     parallel: [
       ['hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh'],
-      ['bd', ['sn', 'bd'], 'bd', 'sn']
-    ]
+      ['bd', ['sn', 'bd'], 'bd', 'sn'],
+    ],
   }),
   { instruments: { drums } }
 );
@@ -156,8 +153,8 @@ playEvents(
       duration: 2,
       parallel: [
         ['hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh'],
-        ['bd', ['sn', 'bd'], 'bd', 'sn']
-      ]
+        ['bd', ['sn', 'bd'], 'bd', 'sn'],
+      ],
     },
     [inheritProperty('instrument')]
   )}
@@ -176,13 +173,13 @@ To be able to use multiple instruments without using multiple rhythmical objects
         [
           [
             ['Eb4', 'F4', 'r', 'G3'],
-            ['r', 'r', 'r', 'G3']
+            ['r', 'r', 'r', 'G3'],
           ],
-          [['r', 'Bb3'], 'G3', 'r', ['r', 'D4']]
+          [['r', 'Bb3'], 'G3', 'r', ['r', 'D4']],
         ],
         [
           ['C3', 'C3', 'G2', 'r'],
-          ['C3', 'C3', 'G2', 'r']
+          ['C3', 'C3', 'G2', 'r'],
         ],
         [
           {
@@ -190,16 +187,16 @@ To be able to use multiple instruments without using multiple rhythmical objects
             parallel: [
               [
                 ['hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh'],
-                ['hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', ['hh', 'hh']]
+                ['hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', ['hh', 'hh']],
               ],
               [
                 ['bd', ['sn', 'bd'], 'bd', 'sn'],
-                ['bd', ['sn', 'r', 'r', 'bd'], 'bd', 'sn']
-              ]
-            ]
-          }
-        ]
-      ]
+                ['bd', ['sn', 'r', 'r', 'bd'], 'bd', 'sn'],
+              ],
+            ],
+          },
+        ],
+      ],
     },
     [inheritProperty('instrument')]
   )}
@@ -214,13 +211,13 @@ playEvents(
         [
           [
             ['Eb4', 'F4', 'r', 'G3'],
-            ['r', 'r', 'r', 'G3']
+            ['r', 'r', 'r', 'G3'],
           ],
-          [['r', 'Bb3'], 'G3', 'r', 'r']
+          [['r', 'Bb3'], 'G3', 'r', 'r'],
         ],
         [
           ['C3', 'C3', 'G2', 'r'],
-          ['C3', 'C3', 'G3', 'r']
+          ['C3', 'C3', 'G3', 'r'],
         ],
         [
           {
@@ -228,16 +225,16 @@ playEvents(
             parallel: [
               [
                 ['hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh'],
-                ['hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', ['hh', 'hh']]
+                ['hh', 'hh', 'hh', 'hh', 'hh', 'hh', 'hh', ['hh', 'hh']],
               ],
               [
                 ['bd', ['sn', 'bd'], 'bd', 'sn'],
-                ['bd', ['sn', 'r', 'r', 'bd'], 'bd', 'sn']
-              ]
-            ]
-          }
-        ]
-      ]
+                ['bd', ['sn', 'r', 'r', 'bd'], 'bd', 'sn'],
+              ],
+            ],
+          },
+        ],
+      ],
     },
     [inheritProperty('instrument')]
   ),

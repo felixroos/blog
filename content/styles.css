@@ -34,3 +34,9 @@ svg.dagre-d3-react path {
   background: #8F201C;
   background: repeating-linear-gradient(-45deg, #EEEADE, #EEEADE 20px, #8F201C 20px, #8F201C 40px, #EEEADE 40px, #EEEADE 60px, #384D6A 60px, #384D6A 80px);
 }
+
+.CodeMirror {
+  height: 600px !important;
+  width: 800px;
+  font-size: 14px;
+}
